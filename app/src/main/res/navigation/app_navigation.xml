@@ -41,5 +41,14 @@
         android:id="@+id/paymentFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.PaymentFragment"
         android:label="fragment_payment"
-        tools:layout="@layout/fragment_payment" />
+        tools:layout="@layout/fragment_payment" >
+        <action
+            android:id="@+id/action_paymentFragment_to_addPaymentFragment"
+            app:destination="@id/addPaymentFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addPaymentFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.addContentFragments.AddPaymentFragment"
+        android:label="fragment_add_payment"
+        tools:layout="@layout/fragment_add_payment" />
 </navigation>

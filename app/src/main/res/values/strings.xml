@@ -4,4 +4,5 @@
     <string name="your_renters">Your Renters</string>
     <string name="searchbtn">searchBtn</string>
     <string name="search_here">Search Here</string>
+    <string name="google_sign_in">Google Sign-In</string>
 </resources>

@@ -51,6 +51,15 @@ class LoginFragment : Fragment() {
         initListeners()
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        if (mAuth.currentUser != null) {
+
+            findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+        }
+    }
+
     private fun initListeners() {
 
         binding.signInButton.setOnClickListener{
@@ -108,6 +117,7 @@ class LoginFragment : Fragment() {
                     Log.w(TAG, "Google sign in failed", e)
                     // [START_EXCLUDE]
                     showToast(requireContext(), "SignIn Un-successful")
+                    hideProgressBar()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

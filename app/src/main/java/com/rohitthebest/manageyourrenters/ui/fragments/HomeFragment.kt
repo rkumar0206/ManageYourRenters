@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -13,8 +14,10 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.closeKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showKeyboard
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import kotlinx.coroutines.*
 
 class HomeFragment : Fragment(), View.OnClickListener {
@@ -23,7 +26,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
     private val binding get() = _binding!!
 
     private var isSearchViewVisible = false
-    private var mAuth : FirebaseAuth? = null
+    private var mAuth: FirebaseAuth? = null
 
 
     override fun onCreateView(
@@ -49,17 +52,24 @@ class HomeFragment : Fragment(), View.OnClickListener {
     override fun onStart() {
         super.onStart()
 
-        if(mAuth?.currentUser == null) {
+        if (mAuth?.currentUser != null) {
 
-            findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
-        }else {
+            if (isInternetAvailable(requireContext())) {
 
-            //todo : Update UI
+                if (mAuth?.currentUser!!.photoUrl != null) {
+
+                    Glide.with(this)
+                        .load(mAuth?.currentUser!!.photoUrl)
+                        .into(binding.profileImage)
+                }
+
+            } else {
+
+                showNoInternetMessage(requireContext())
+            }
 
         }
-
     }
-
 
     private fun initListeners() {
 
@@ -89,7 +99,6 @@ class HomeFragment : Fragment(), View.OnClickListener {
                 }
             }
         }
-
     }
 
     private fun showSearchView() {

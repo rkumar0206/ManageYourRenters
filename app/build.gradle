@@ -115,4 +115,6 @@ dependencies {
     //Circular imageView
     implementation 'com.mikhaellopez:circularimageview:4.2.0'
 
+    //Country Code Picker Library
+    implementation 'com.hbb20:ccp:2.4.0'
 }

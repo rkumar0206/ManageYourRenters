@@ -5,4 +5,15 @@
     <string name="searchbtn">searchBtn</string>
     <string name="search_here">Search Here</string>
     <string name="google_sign_in">Google Sign-In</string>
+    <string name="add_renter">Add Renter</string>
+    <string name="addrenterbtn">addRenterBtn</string>
+    <string name="backbtn">backBtn</string>
+    <string name="name">Name</string>
+    <string name="mobile_number">Mobile Number</string>
+    <string name="e_mail_optional">E-Mail (Optional)</string>
+    <string name="document_name">Document name</string>
+    <string name="room_number_or_room_id_or_house_number">Room number or Room Id or House Number</string>
+    <string name="any_other_identification_document_optional">Any Other Identification Document (Optional)</string>
+    <string name="document_number">Document number</string>
+    <string name="address">Address</string>
 </resources>

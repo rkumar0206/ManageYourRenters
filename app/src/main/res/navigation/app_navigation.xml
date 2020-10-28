@@ -14,6 +14,9 @@
             android:id="@+id/action_homeFragment_to_loginFragment"
             app:destination="@id/loginFragment"
              />
+        <action
+            android:id="@+id/action_homeFragment_to_addRenterFragment"
+            app:destination="@id/addRenterFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -26,4 +29,9 @@
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true" />
     </fragment>
+    <fragment
+        android:id="@+id/addRenterFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.addContentFragments.AddRenterFragment"
+        android:label="fragment_add_renter"
+        tools:layout="@layout/fragment_add_renter" />
 </navigation>

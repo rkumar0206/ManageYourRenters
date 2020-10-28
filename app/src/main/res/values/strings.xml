@@ -16,4 +16,7 @@
     <string name="any_other_identification_document_optional">Any Other Identification Document (Optional)</string>
     <string name="document_number">Document number</string>
     <string name="address">Address</string>
+    <string name="payments">Payments</string>
+    <string name="menubtn">menuBtn</string>
+    <string name="addpaymentfab">addPaymentFAB</string>
 </resources>

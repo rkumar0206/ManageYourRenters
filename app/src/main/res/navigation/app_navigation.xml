@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_homeFragment_to_addRenterFragment"
             app:destination="@id/addRenterFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_paymentFragment"
+            app:destination="@id/paymentFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -34,4 +37,9 @@
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.addContentFragments.AddRenterFragment"
         android:label="fragment_add_renter"
         tools:layout="@layout/fragment_add_renter" />
+    <fragment
+        android:id="@+id/paymentFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.PaymentFragment"
+        android:label="fragment_payment"
+        tools:layout="@layout/fragment_payment" />
 </navigation>

@@ -16,6 +16,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -42,6 +43,10 @@ class Functions {
             return CheckNetworkConnection().isInternetAvailable(context)
         }
 
+        fun showNoInternetMessage(context: Context) {
+
+            showToast(context, NO_INTERNET_MESSAGE)
+        }
 
         fun checkUrl(url: String): String {
 
@@ -134,6 +139,10 @@ class Functions {
             }
         }
 
+        fun getUid(): String? {
+
+            return mAuth.currentUser?.uid
+        }
 
 
         fun View.show() {

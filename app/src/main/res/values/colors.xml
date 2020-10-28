@@ -14,6 +14,8 @@
     <color name="textColor1">#33373D</color>
     <color name="imageBtnBackgroundColor">#14000000</color>
 
+    <color name="rippleColor">#B37AEEFF</color>
+
     <color name="color_Red">#F44336</color>
     <color name="color_green">#2F6C08</color>
     <color name="color_orange">#FF6D00</color>

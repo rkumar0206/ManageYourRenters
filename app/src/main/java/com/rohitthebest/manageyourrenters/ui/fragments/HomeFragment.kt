@@ -5,6 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.closeKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
@@ -18,6 +23,8 @@ class HomeFragment : Fragment(), View.OnClickListener {
     private val binding get() = _binding!!
 
     private var isSearchViewVisible = false
+    private var mAuth : FirebaseAuth? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,11 +37,29 @@ class HomeFragment : Fragment(), View.OnClickListener {
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        mAuth = Firebase.auth
+
         initListeners()
     }
+
+    override fun onStart() {
+        super.onStart()
+
+        if(mAuth?.currentUser == null) {
+
+            findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+        }else {
+
+            //todo : Update UI
+
+        }
+
+    }
+
 
     private fun initListeners() {
 

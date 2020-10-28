@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "738346098832",
+    "firebase_url": "https://manageyourrenters.firebaseio.com",
+    "project_id": "manageyourrenters",
+    "storage_bucket": "manageyourrenters.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738346098832:android:99f2c921ef70547b047815",
+        "android_client_info": {
+          "package_name": "com.rohitthebest.manageyourrenters"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "738346098832-6jgupd14lhtd7r3at80gs51f2dk70hme.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmmIss31KZ1NtmJpTkL8_VuXqQSd6rV9Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "738346098832-6jgupd14lhtd7r3at80gs51f2dk70hme.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

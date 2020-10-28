@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ManageYourRenters</string>
+    <string name="add_renter_button">add Renter button</string>
+    <string name="your_renters">Your Renters</string>
+    <string name="searchbtn">searchBtn</string>
+    <string name="search_here">Search Here</string>
+</resources>

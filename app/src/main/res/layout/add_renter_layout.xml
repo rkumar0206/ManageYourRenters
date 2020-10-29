@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
                     android:hint="@string/name"
-                    android:inputType="textPersonName"
+                    android:inputType="textPersonName|textCapWords"
                     android:maxLength="30" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -229,7 +229,6 @@
                 android:ellipsize="end"
                 android:ems="10"
                 android:hint="@string/document_number"
-                android:inputType="textPersonName"
                 android:maxLines="1"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -279,7 +278,7 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
                     android:hint="@string/room_number_or_room_id_or_house_number"
-                    android:inputType="textPersonName"
+                    android:inputType="textPersonName|textCapWords"
                     android:maxLength="30" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -323,7 +322,7 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
                     android:hint="@string/address"
-                    android:inputType="textPostalAddress" />
+                    android:inputType="textPostalAddress|textCapWords" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

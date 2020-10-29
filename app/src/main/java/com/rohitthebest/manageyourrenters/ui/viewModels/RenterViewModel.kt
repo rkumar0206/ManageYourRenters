@@ -7,7 +7,7 @@ import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
 import kotlinx.coroutines.launch
 
-class RenterViewModels @ViewModelInject constructor(
+class RenterViewModel @ViewModelInject constructor(
     val repo : RenterRepository
 ) : ViewModel() {
 

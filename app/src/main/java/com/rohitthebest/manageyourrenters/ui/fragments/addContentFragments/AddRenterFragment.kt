@@ -8,15 +8,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddRenterBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
+import dagger.hilt.android.AndroidEntryPoint
+import kotlin.random.Random
 
+@AndroidEntryPoint
 class AddRenterFragment : Fragment(), View.OnClickListener {
+
+    private val renterViewModel : RenterViewModel by viewModels()
 
     private var _binding: FragmentAddRenterBinding? = null
     private val binding get() = _binding!!
@@ -57,7 +70,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
                 if (isValidForm()) {
 
-                    showToast(requireContext(), "Form is valid..")
+                    initRenterForDtabase()
                 }
 
                 //todo : add renter to database
@@ -68,6 +81,50 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
                 requireActivity().onBackPressed()
             }
         }
+    }
+
+    private fun initRenterForDtabase() {
+
+        val renter = Renter()
+
+        renter.apply {
+            timeStamp = System.currentTimeMillis()
+            name = includeBinding.renterNameET.editText?.text.toString().trim()
+            mobileNumber = includeBinding.mobileNumCodePicker.fullNumberWithPlus
+            emailId = includeBinding.renterEmailET.editText?.text.toString().trim()
+            otherDocumentName = includeBinding.otherDocumentNameET.text.toString().trim()
+            otherDocumentNumber = includeBinding.otherDocumentNumber.text.toString().trim()
+            roomNumber = includeBinding.renterRoomNumberET.editText?.text.toString().trim()
+            address = includeBinding.renterAddressET.editText?.text.toString().trim()
+            uid = getUid()!!
+            renterId = System.currentTimeMillis().toStringM(36)
+            renterPassword = generateRenterPassword(renterId, mobileNumber)
+            key = "${System.currentTimeMillis().toStringM(69)}_${
+                Random.nextLong(
+                    100,
+                    9223372036854775
+                ).toStringM(69)
+            }_${getUid()}"
+            isSynced = getString(R.string.f)
+        }
+
+        if(isInternetAvailable(requireContext())) {
+
+            renter.isSynced = getString(R.string.t)
+            //todo : upload document to firebase
+
+            insertToDatabase(renter)
+        }else {
+
+            insertToDatabase(renter)
+        }
+
+    }
+
+    private fun insertToDatabase(renter : Renter) {
+
+        renterViewModel.insertRenter(renter)
+        showToast(requireContext(), "Renter inserted")
     }
 
     private fun isValidForm(): Boolean {

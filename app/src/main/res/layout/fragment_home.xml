@@ -125,11 +125,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="8dp"
-        tools:listitem="@layout/adapter_show_renter"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
+        tools:listitem="@layout/adapter_show_renter"
+        tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addRenterFAB"
@@ -139,6 +140,18 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_baseline_add_24"
         app:backgroundTint="@color/sky_blue"
-        android:contentDescription="@string/add_renter_button" />
+        android:tooltipText="Add new renter"
+        android:contentDescription="@string/add_renter_button"
+        tools:targetApi="o" />
+
+    <TextView
+        android:id="@+id/noRentersAddedTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/no_renters_added_message"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

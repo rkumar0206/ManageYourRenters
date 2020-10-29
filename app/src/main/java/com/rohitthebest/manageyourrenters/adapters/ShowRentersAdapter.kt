@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 class ShowRentersAdapter :
     ListAdapter<Renter, ShowRentersAdapter.RenterViewHolder>(DiffUtilCallback()) {
 
-    private var mListener : OnClickListener? = null
+    private var mListener: OnClickListener? = null
 
     inner class RenterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener, View.OnCreateContextMenuListener {
@@ -41,8 +41,23 @@ class ShowRentersAdapter :
                 }"
                 adapterRenterMobileTV.text = renter.mobileNumber
                 adapterRenterEmailTV.text = renter.emailId
-                adapterDocumnetNameTV.text = renter.otherDocumentName
+                adapterDocumnetNameTV.text = if(renter.otherDocumentName != "") {
+
+                    "${renter.otherDocumentName} : "
+                }else {
+
+                    "Other document : "
+                }
                 adapterRenterDocNumTV.text = renter.otherDocumentNumber
+                adapterRenterAddressTV.text = renter.address
+
+                if (renter.isSynced == context.getString(R.string.t)) {
+
+                    itemView.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                }else {
+
+                    itemView.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                }
             }
         }
 
@@ -61,7 +76,7 @@ class ShowRentersAdapter :
 
                 itemView.id -> {
 
-                    if(checkForNullability(absoluteAdapterPosition)) {
+                    if (checkForNullability(absoluteAdapterPosition)) {
 
                         mListener!!.onRenterClicked(getItem(absoluteAdapterPosition))
                     }
@@ -69,39 +84,33 @@ class ShowRentersAdapter :
 
                 itemView.adapterExtendRenterInfoBtn.id -> {
 
-                    val interpolator = OvershootInterpolator()
 
                     if (itemView.extendedInfoCL.visibility != View.VISIBLE) {
 
                         itemView.adapterExtendRenterInfoBtn.animate()
-                            .setInterpolator(interpolator)
-                            .rotation(180f).setDuration(200).start()
+                            .rotation(180f).setDuration(350).start()
 
                         itemView.extendedInfoCL.show()
+
                         itemView.extendedInfoCL.animate().translationY(0f).alpha(1f)
-                            .setInterpolator(interpolator)
-                            .setDuration(350).start()
+                            .setDuration(500).start()
 
                     } else {
 
                         itemView.adapterExtendRenterInfoBtn.animate()
-                            .setInterpolator(interpolator)
                             .rotation(0f).setDuration(200).start()
 
-                        itemView.extendedInfoCL.animate().translationY(-140f).alpha(0f)
-                            .setInterpolator(interpolator).setDuration(350).start()
+                        itemView.extendedInfoCL.animate().translationY(0f).alpha(0f)
+                           .setDuration(500).start()
 
-                        GlobalScope.launch {
-                            delay(100)
+                        itemView.extendedInfoCL.hide()
 
-                            itemView.extendedInfoCL.hide()
-                        }
                     }
                 }
 
                 itemView.adapterIsSyncedBtn.id -> {
 
-                    if(checkForNullability(absoluteAdapterPosition)) {
+                    if (checkForNullability(absoluteAdapterPosition)) {
 
                         mListener!!.onSyncButtonClicked(getItem(absoluteAdapterPosition))
                     }
@@ -122,12 +131,12 @@ class ShowRentersAdapter :
             menuInfo: ContextMenu.ContextMenuInfo?
         ) {
 
-            val delete = menu?.add(1,1,1,"Delete")
-            val edit = menu?.add(1,2,2,"Edit")
+            val delete = menu?.add(1, 1, 1, "Delete")
+            val edit = menu?.add(1, 2, 2, "Edit")
 
             delete?.setOnMenuItemClickListener {
 
-                if(checkForNullability(absoluteAdapterPosition)) {
+                if (checkForNullability(absoluteAdapterPosition)) {
 
                     mListener!!.onDeleteClicked(getItem(absoluteAdapterPosition))
                 }
@@ -136,7 +145,7 @@ class ShowRentersAdapter :
 
             edit?.setOnMenuItemClickListener {
 
-                if(checkForNullability(absoluteAdapterPosition)) {
+                if (checkForNullability(absoluteAdapterPosition)) {
 
                     mListener!!.onEditClicked(getItem(absoluteAdapterPosition))
                 }
@@ -179,14 +188,15 @@ class ShowRentersAdapter :
 
     interface OnClickListener {
 
-        fun onRenterClicked(renter : Renter)
-        fun onSyncButtonClicked(renter : Renter)
+        fun onRenterClicked(renter: Renter)
+        fun onSyncButtonClicked(renter: Renter)
+
         //fun onExtendInfoButtonClicked(renter : Renter)
-        fun onDeleteClicked(renter : Renter)
-        fun onEditClicked(renter : Renter)
+        fun onDeleteClicked(renter: Renter)
+        fun onEditClicked(renter: Renter)
     }
 
-    fun setOnClickListener(listener : OnClickListener) {
+    fun setOnClickListener(listener: OnClickListener) {
 
         mListener = listener
     }

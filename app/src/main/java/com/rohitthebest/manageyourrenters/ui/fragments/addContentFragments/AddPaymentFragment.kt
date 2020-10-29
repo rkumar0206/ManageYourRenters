@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPaymentBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AddPaymentFragment : Fragment() {
 
     private var _binding: FragmentAddPaymentBinding? = null

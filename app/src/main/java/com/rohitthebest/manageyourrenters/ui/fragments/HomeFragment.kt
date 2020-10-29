@@ -1,17 +1,25 @@
 package com.rohitthebest.manageyourrenters.ui.fragments
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.ShowRentersAdapter
+import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
+import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.closeKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
@@ -19,15 +27,23 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import java.lang.Exception
+import java.util.*
 
-class HomeFragment : Fragment(), View.OnClickListener {
+@AndroidEntryPoint
+class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClickListener {
+
+    private val renterViewModel: RenterViewModel by viewModels()
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
     private var isSearchViewVisible = false
     private var mAuth: FirebaseAuth? = null
+
+    private lateinit var mAdapter: ShowRentersAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,7 +62,139 @@ class HomeFragment : Fragment(), View.OnClickListener {
 
         mAuth = Firebase.auth
 
+        mAdapter = ShowRentersAdapter()
+
+        GlobalScope.launch {
+
+            delay(100)
+
+            withContext(Dispatchers.Main) {
+
+                getAllRentersList()
+            }
+        }
+
         initListeners()
+    }
+
+    private fun getAllRentersList() {
+
+        try {
+
+            renterViewModel.getAllRentersList().observe(viewLifecycleOwner, {
+
+                if (it.isNotEmpty()) {
+
+                    hideNoRentersAddedTV()
+                    setUpSearchEditText(it)
+                } else {
+
+                    showNoRentersAddedTV()
+                }
+
+                setupRecyclerView(it)
+            })
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun setUpSearchEditText(it: List<Renter>?) {
+
+        binding.searchET.addTextChangedListener(object : TextWatcher {
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+                if (s?.isEmpty()!!) {
+
+                    setupRecyclerView(it)
+                } else {
+
+                    val filteredList = it?.filter { renter ->
+
+                        renter.name.toLowerCase(Locale.ROOT).contains(
+                            s.toString().trim().toLowerCase(Locale.ROOT)
+                        )
+                                ||
+                                renter.roomNumber.toLowerCase(Locale.ROOT).contains(
+                                    s.toString().trim().toLowerCase(Locale.ROOT)
+                                )
+                    }
+
+                    setupRecyclerView(filteredList)
+
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    private fun setupRecyclerView(renterList: List<Renter>?) {
+
+        try {
+
+            renterList?.let {
+
+                mAdapter.submitList(it)
+
+                binding.rentersRV.apply {
+
+                    adapter = mAdapter
+                    layoutManager = LinearLayoutManager(requireContext())
+                    setHasFixedSize(true)
+                }
+            }
+
+            mAdapter.setOnClickListener(this)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onRenterClicked(renter: Renter) {
+
+        //todo : open payment fragment
+    }
+
+    override fun onSyncButtonClicked(renter: Renter) {
+
+        //todo : Sync with firestore
+    }
+
+    override fun onDeleteClicked(renter: Renter) {
+
+        //todo : delete the renter
+    }
+
+    override fun onEditClicked(renter: Renter) {
+
+        //todo : edit the renter
+    }
+
+    private fun hideNoRentersAddedTV() {
+
+        try {
+
+            binding.rentersRV.show()
+            binding.noRentersAddedTV.hide()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+    }
+
+    private fun showNoRentersAddedTV() {
+
+        try {
+
+            binding.rentersRV.hide()
+            binding.noRentersAddedTV.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onStart() {
@@ -76,6 +224,27 @@ class HomeFragment : Fragment(), View.OnClickListener {
         binding.searchRenterBtn.setOnClickListener(this)
         binding.addRenterFAB.setOnClickListener(this)
         binding.profileImage.setOnClickListener(this)
+
+        binding.rentersRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                try {
+                    if (dy > 0 && binding.addRenterFAB.visibility == View.VISIBLE) {
+
+                        binding.addRenterFAB.hide()
+                    } else if (dy < 0 && binding.addRenterFAB.visibility != View.VISIBLE) {
+
+                        binding.addRenterFAB.show()
+
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        })
+
     }
 
     override fun onClick(v: View?) {
@@ -138,4 +307,5 @@ class HomeFragment : Fragment(), View.OnClickListener {
 
         _binding = null
     }
+
 }

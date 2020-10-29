@@ -47,4 +47,5 @@
     <string name="f">false</string>
     <string name="t">true</string>
     <string name="renters">Renters</string>
+    <string name="no_renters_added_message">Looks like your rooms are empty???</string>
 </resources>

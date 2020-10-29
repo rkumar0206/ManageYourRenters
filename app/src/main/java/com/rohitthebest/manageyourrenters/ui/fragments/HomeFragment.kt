@@ -95,13 +95,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
 
             binding.addRenterFAB.id -> {
 
-                if(isInternetAvailable(requireContext())) {
-
-                    findNavController().navigate(R.id.action_homeFragment_to_addRenterFragment)
-                }else {
-
-                    showNoInternetMessage(requireContext())
-                }
+                findNavController().navigate(R.id.action_homeFragment_to_addRenterFragment)
             }
         }
     }

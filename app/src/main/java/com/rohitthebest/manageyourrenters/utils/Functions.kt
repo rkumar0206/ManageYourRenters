@@ -18,6 +18,8 @@ import com.google.gson.Gson
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class Functions {
@@ -107,6 +109,22 @@ class Functions {
 
         }
 
+        fun hideKeyBoard(activity: Activity) {
+
+            try{
+
+                GlobalScope.launch {
+
+                    closeKeyboard(activity)
+                }
+
+            }catch (e : Exception){
+
+                e.printStackTrace()
+            }
+        }
+
+
         suspend fun closeKeyboard(activity: Activity) {
             try {
                 withContext(Dispatchers.IO) {
@@ -155,6 +173,7 @@ class Functions {
             }
         }
 
+
         fun View.hide() {
 
             try {
@@ -164,6 +183,17 @@ class Functions {
                 e.printStackTrace()
             }
         }
+
+        fun View.invisible() {
+
+            try {
+                this.visibility = View.INVISIBLE
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
 
     }
 

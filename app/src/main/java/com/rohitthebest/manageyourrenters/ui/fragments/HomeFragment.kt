@@ -14,6 +14,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.closeKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showKeyboard
@@ -27,7 +28,6 @@ class HomeFragment : Fragment(), View.OnClickListener {
 
     private var isSearchViewVisible = false
     private var mAuth: FirebaseAuth? = null
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -76,12 +76,6 @@ class HomeFragment : Fragment(), View.OnClickListener {
         binding.searchRenterBtn.setOnClickListener(this)
         binding.addRenterFAB.setOnClickListener(this)
         binding.profileImage.setOnClickListener(this)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        _binding = null
     }
 
     override fun onClick(v: View?) {
@@ -143,4 +137,11 @@ class HomeFragment : Fragment(), View.OnClickListener {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        hideKeyBoard(requireActivity())
+
+        _binding = null
+    }
 }

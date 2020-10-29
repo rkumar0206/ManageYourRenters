@@ -20,6 +20,8 @@ import com.rohitthebest.manageyourrenters.adapters.ShowRentersAdapter
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
+import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
+import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.uploadDocumentToFireStore
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.closeKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
@@ -163,8 +165,29 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     override fun onSyncButtonClicked(renter: Renter) {
 
-        showToast(requireContext(), "Sync btn clicked")
-        //todo : Sync with firestore
+        if (isInternetAvailable(requireContext())) {
+
+            if (renter.isSynced == getString(R.string.t)) {
+
+                showToast(requireContext(), "Already Synced")
+            } else {
+
+                renter.isSynced = getString(R.string.t)
+
+                uploadDocumentToFireStore(
+                    requireContext(),
+                    convertRenterToJSONString(renter),
+                    getString(R.string.renters),
+                    renter.key!!
+                )
+
+                renterViewModel.insertRenter(renter)
+            }
+
+        } else {
+
+            showNoInternetMessage(requireContext())
+        }
     }
 
     override fun onDeleteClicked(renter: Renter) {

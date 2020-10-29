@@ -1,0 +1,35 @@
+package com.rohitthebest.manageyourrenters.module
+
+import android.content.Context
+import androidx.room.Room
+import com.rohitthebest.manageyourrenters.database.databases.RenterDatabase
+import com.rohitthebest.manageyourrenters.others.Constants.RENTER_DATABASE_NAME
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Singleton
+
+@Module
+@InstallIn(ApplicationComponent::class)
+object Module {
+
+    //==============================Renter Database========================================
+
+    @Provides
+    @Singleton
+    fun provideRenterDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(
+        context,
+        RenterDatabase::class.java,
+        RENTER_DATABASE_NAME
+    ).build()
+
+    @Provides
+    @Singleton
+    fun provideCategoryDao(db: RenterDatabase) = db.getRenterDao()
+
+
+}

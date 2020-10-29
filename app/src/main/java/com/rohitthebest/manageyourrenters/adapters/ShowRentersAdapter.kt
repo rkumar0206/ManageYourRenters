@@ -1,11 +1,9 @@
 package com.rohitthebest.manageyourrenters.adapters
 
 import android.annotation.SuppressLint
-import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.OvershootInterpolator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -15,9 +13,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import kotlinx.android.synthetic.main.adapter_show_renter.view.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class ShowRentersAdapter :
     ListAdapter<Renter, ShowRentersAdapter.RenterViewHolder>(DiffUtilCallback()) {
@@ -25,7 +20,7 @@ class ShowRentersAdapter :
     private var mListener: OnClickListener? = null
 
     inner class RenterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-        View.OnClickListener, View.OnCreateContextMenuListener {
+        View.OnClickListener {
 
         @SuppressLint("SetTextI18n")
         fun setData(renter: Renter) {
@@ -41,10 +36,10 @@ class ShowRentersAdapter :
                 }"
                 adapterRenterMobileTV.text = renter.mobileNumber
                 adapterRenterEmailTV.text = renter.emailId
-                adapterDocumnetNameTV.text = if(renter.otherDocumentName != "") {
+                adapterDocumnetNameTV.text = if (renter.otherDocumentName != "") {
 
                     "${renter.otherDocumentName} : "
-                }else {
+                } else {
 
                     "Other document : "
                 }
@@ -54,7 +49,7 @@ class ShowRentersAdapter :
                 if (renter.isSynced == context.getString(R.string.t)) {
 
                     itemView.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
-                }else {
+                } else {
 
                     itemView.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24)
                 }
@@ -66,8 +61,9 @@ class ShowRentersAdapter :
             itemView.setOnClickListener(this)
             itemView.adapterIsSyncedBtn.setOnClickListener(this)
             itemView.adapterExtendRenterInfoBtn.setOnClickListener(this)
+            itemView.adapterRenterEditBtn.setOnClickListener(this)
+            itemView.adapterRenterDeleteBtn.setOnClickListener(this)
 
-            itemView.setOnCreateContextMenuListener(this)
         }
 
         override fun onClick(v: View?) {
@@ -79,6 +75,23 @@ class ShowRentersAdapter :
                     if (checkForNullability(absoluteAdapterPosition)) {
 
                         mListener!!.onRenterClicked(getItem(absoluteAdapterPosition))
+                    }
+                }
+
+                itemView.adapterRenterEditBtn.id -> {
+
+                    if (checkForNullability(absoluteAdapterPosition)) {
+
+                        mListener!!.onEditClicked(getItem(absoluteAdapterPosition))
+                    }
+
+                }
+
+                itemView.adapterRenterDeleteBtn.id -> {
+
+                    if (checkForNullability(absoluteAdapterPosition)) {
+
+                        mListener!!.onDeleteClicked(getItem(absoluteAdapterPosition))
                     }
                 }
 
@@ -101,7 +114,7 @@ class ShowRentersAdapter :
                             .rotation(0f).setDuration(200).start()
 
                         itemView.extendedInfoCL.animate().translationY(0f).alpha(0f)
-                           .setDuration(500).start()
+                            .setDuration(500).start()
 
                         itemView.extendedInfoCL.hide()
 
@@ -123,35 +136,6 @@ class ShowRentersAdapter :
 
             return position != RecyclerView.NO_POSITION &&
                     mListener != null
-        }
-
-        override fun onCreateContextMenu(
-            menu: ContextMenu?,
-            v: View?,
-            menuInfo: ContextMenu.ContextMenuInfo?
-        ) {
-
-            val delete = menu?.add(1, 1, 1, "Delete")
-            val edit = menu?.add(1, 2, 2, "Edit")
-
-            delete?.setOnMenuItemClickListener {
-
-                if (checkForNullability(absoluteAdapterPosition)) {
-
-                    mListener!!.onDeleteClicked(getItem(absoluteAdapterPosition))
-                }
-                true
-            }
-
-            edit?.setOnMenuItemClickListener {
-
-                if (checkForNullability(absoluteAdapterPosition)) {
-
-                    mListener!!.onEditClicked(getItem(absoluteAdapterPosition))
-                }
-
-                true
-            }
         }
     }
 

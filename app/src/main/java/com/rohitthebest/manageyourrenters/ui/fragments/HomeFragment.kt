@@ -27,6 +27,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.lang.Exception
@@ -156,21 +157,25 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     override fun onRenterClicked(renter: Renter) {
 
+        showToast(requireContext(), "item click")
         //todo : open payment fragment
     }
 
     override fun onSyncButtonClicked(renter: Renter) {
 
+        showToast(requireContext(), "Sync btn clicked")
         //todo : Sync with firestore
     }
 
     override fun onDeleteClicked(renter: Renter) {
 
+        showToast(requireContext(), "delete click")
         //todo : delete the renter
     }
 
     override fun onEditClicked(renter: Renter) {
 
+        showToast(requireContext(), "edit click")
         //todo : edit the renter
     }
 

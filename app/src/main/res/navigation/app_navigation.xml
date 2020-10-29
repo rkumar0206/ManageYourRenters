@@ -13,13 +13,30 @@
         <action
             android:id="@+id/action_homeFragment_to_loginFragment"
             app:destination="@id/loginFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out"
              />
         <action
             android:id="@+id/action_homeFragment_to_addRenterFragment"
-            app:destination="@id/addRenterFragment" />
+            app:destination="@id/addRenterFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out"
+            />
         <action
             android:id="@+id/action_homeFragment_to_paymentFragment"
-            app:destination="@id/paymentFragment" />
+            app:destination="@id/paymentFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out"
+            />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -30,7 +47,13 @@
             android:id="@+id/action_loginFragment_to_homeFragment"
             app:destination="@id/homeFragment"
             app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="true"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out"
+            />
     </fragment>
     <fragment
         android:id="@+id/addRenterFragment"
@@ -44,7 +67,13 @@
         tools:layout="@layout/fragment_payment" >
         <action
             android:id="@+id/action_paymentFragment_to_addPaymentFragment"
-            app:destination="@id/addPaymentFragment" />
+            app:destination="@id/addPaymentFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out"
+            />
     </fragment>
     <fragment
         android:id="@+id/addPaymentFragment"

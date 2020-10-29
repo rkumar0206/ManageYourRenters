@@ -3,13 +3,14 @@ package com.rohitthebest.manageyourrenters.utils
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
+import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.services.UploadService
 
 import kotlin.random.Random
 
 class FirebaseServiceHelper {
 
     companion object {
-/*
 
         fun uploadDocumentToFireStore(
             context: Context,
@@ -43,7 +44,7 @@ class FirebaseServiceHelper {
             ContextCompat.startForegroundService(context, foregroundService)
         }
 
-        fun updateDocumentOnFireStore(
+    /*    fun updateDocumentOnFireStore(
             context: Context,
             map: HashMap<String, Any?>?,
             collectionKey: String,
@@ -101,7 +102,6 @@ class FirebaseServiceHelper {
 
             ContextCompat.startForegroundService(context, foregroundService)
         }
-
 */
 
     }

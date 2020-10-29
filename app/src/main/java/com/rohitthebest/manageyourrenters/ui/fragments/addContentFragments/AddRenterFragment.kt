@@ -15,6 +15,8 @@ import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddRenterBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
+import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
+import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
@@ -70,10 +72,9 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
                 if (isValidForm()) {
 
-                    initRenterForDtabase()
+                    initRenterForDatabase()
                 }
 
-                //todo : add renter to database
             }
 
             binding.backBtn.id -> {
@@ -83,7 +84,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun initRenterForDtabase() {
+    private fun initRenterForDatabase() {
 
         val renter = Renter()
 
@@ -111,7 +112,13 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
         if(isInternetAvailable(requireContext())) {
 
             renter.isSynced = getString(R.string.t)
-            //todo : upload document to firebase
+
+            FirebaseServiceHelper.uploadDocumentToFireStore(
+                requireContext(),
+                convertRenterToJSONString(renter),
+                getString(R.string.renters),
+                renter.key!!
+            )
 
             insertToDatabase(renter)
         }else {
@@ -125,6 +132,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
         renterViewModel.insertRenter(renter)
         showToast(requireContext(), "Renter inserted")
+        requireActivity().onBackPressed()
     }
 
     private fun isValidForm(): Boolean {

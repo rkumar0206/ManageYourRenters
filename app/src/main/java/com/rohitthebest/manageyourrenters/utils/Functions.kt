@@ -27,8 +27,6 @@ class Functions {
 
     companion object {
 
-
-        private val gson = Gson()
         private val mAuth = Firebase.auth
 
         private const val TAG = "Functions"
@@ -196,7 +194,6 @@ class Functions {
         }
 
         fun generateRenterPassword(renterID: String?, mobileNum: String): String {
-
 
             val firstFour = renterID?.subSequence(
                 (renterID.length / 2),

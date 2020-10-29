@@ -28,4 +28,6 @@ class RenterViewModels @ViewModelInject constructor(
 
     fun getRenterCount() = repo.getRenterCount()
 
+    fun getRenterByIsSynced(isSynced : String) = repo.getRenterByIsSynced(isSynced)
+
 }

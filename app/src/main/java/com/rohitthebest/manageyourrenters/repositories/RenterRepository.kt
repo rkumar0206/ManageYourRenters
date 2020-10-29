@@ -18,4 +18,6 @@ class RenterRepository @Inject constructor(
     fun getAllRentersList() = dao.getAllRentersList()
 
     fun getRenterCount() = dao.getRentersCount()
+
+    fun getRenterByIsSynced(isSynced : String) = dao.getRenterByIsSynced(isSynced)
 }

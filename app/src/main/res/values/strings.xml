@@ -44,4 +44,6 @@
     <string name="_0">₹ 0</string>
     <string name="savebtn">saveBtn</string>
     <string name="add_payment">Add Payment</string>
+    <string name="f">false</string>
+    <string name="t">true</string>
 </resources>

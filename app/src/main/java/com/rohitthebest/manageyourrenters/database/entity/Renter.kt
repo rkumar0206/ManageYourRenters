@@ -19,7 +19,8 @@ data class Renter(
     var uid : String,
     var renterId : String,
     var renterPassword : String,
-    var key : String?
+    var key : String?,
+    var isSynced : String = "false"
 ) {
 
     @Exclude

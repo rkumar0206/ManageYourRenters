@@ -22,4 +22,6 @@ interface RenterDao {
     @Query("SELECT COUNT(id) FROM renter_table")
     fun getRentersCount() : LiveData<Int>
 
+    @Query("SELECT * FROM renter_table WHERE isSynced = :isSynced ORDER BY timeStamp DESC")
+    fun getRenterByIsSynced(isSynced : String) : LiveData<List<Renter>>
 }

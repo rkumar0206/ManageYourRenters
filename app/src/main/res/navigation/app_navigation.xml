@@ -79,10 +79,19 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out"
             />
+        <argument
+            android:name="renterInfoMessage"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/addPaymentFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.addContentFragments.AddPaymentFragment"
         android:label="fragment_add_payment"
-        tools:layout="@layout/fragment_add_payment" />
+        tools:layout="@layout/fragment_add_payment" >
+        <argument
+            android:name="renterInfoMessage"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 </navigation>

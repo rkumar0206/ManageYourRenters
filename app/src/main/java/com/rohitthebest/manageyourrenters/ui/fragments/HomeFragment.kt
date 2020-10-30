@@ -162,7 +162,10 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     override fun onRenterClicked(renter: Renter) {
 
-        findNavController().navigate(R.id.action_homeFragment_to_paymentFragment)
+        val action = HomeFragmentDirections.actionHomeFragmentToPaymentFragment(
+            convertRenterToJSONString(renter)
+        )
+        findNavController().navigate(action)
     }
 
     override fun onSyncButtonClicked(renter: Renter) {

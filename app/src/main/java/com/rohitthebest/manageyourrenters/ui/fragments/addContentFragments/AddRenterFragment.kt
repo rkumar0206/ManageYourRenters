@@ -157,6 +157,11 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
         val renter = Renter()
 
+        if(isMessageReceivesForEditing) {
+
+            renter.id = receivedRenter?.id
+        }
+
         renter.apply {
             timeStamp = System.currentTimeMillis()
             name = includeBinding.renterNameET.editText?.text.toString().trim()
@@ -167,14 +172,31 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             roomNumber = includeBinding.renterRoomNumberET.editText?.text.toString().trim()
             address = includeBinding.renterAddressET.editText?.text.toString().trim()
             uid = getUid()!!
-            renterId = System.currentTimeMillis().toStringM(36)
-            renterPassword = generateRenterPassword(renterId, mobileNumber)
-            key = "${System.currentTimeMillis().toStringM(69)}_${
-                Random.nextLong(
-                    100,
-                    9223372036854775
-                ).toStringM(69)
-            }_${getUid()}"
+
+            renterId = if (!isMessageReceivesForEditing) {
+                System.currentTimeMillis().toStringM(36)
+            } else {
+                receivedRenter?.renterId!!
+            }
+
+            renterPassword = if (!isMessageReceivesForEditing) {
+
+                generateRenterPassword(renterId, mobileNumber)
+            } else {
+                receivedRenter?.renterPassword!!
+            }
+
+            key = if (!isMessageReceivesForEditing) {
+                "${System.currentTimeMillis().toStringM(69)}_${
+                    Random.nextLong(
+                        100,
+                        9223372036854775
+                    ).toStringM(69)
+                }_${getUid()}"
+            } else {
+                receivedRenter?.key
+            }
+
             isSynced = getString(R.string.f)
         }
 
@@ -230,7 +252,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             return false
         }
 
-        if(!isMessageReceivesForEditing) {
+        if (!isMessageReceivesForEditing) {
 
             if (!includeBinding.mobileNumCodePicker.isValidFullNumber) {
 

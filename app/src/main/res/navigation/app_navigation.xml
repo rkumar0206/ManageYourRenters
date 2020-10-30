@@ -59,7 +59,12 @@
         android:id="@+id/addRenterFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.addContentFragments.AddRenterFragment"
         android:label="fragment_add_renter"
-        tools:layout="@layout/fragment_add_renter" />
+        tools:layout="@layout/fragment_add_renter" >
+        <argument
+            android:name="editRenterMessage"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
     <fragment
         android:id="@+id/paymentFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.PaymentFragment"

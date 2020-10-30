@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.addContentFragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,6 +16,7 @@ import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddRenterBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
+import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoRenter
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
@@ -31,12 +33,16 @@ import kotlin.random.Random
 @AndroidEntryPoint
 class AddRenterFragment : Fragment(), View.OnClickListener {
 
-    private val renterViewModel : RenterViewModel by viewModels()
+    private val renterViewModel: RenterViewModel by viewModels()
 
     private var _binding: FragmentAddRenterBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var includeBinding: AddRenterLayoutBinding
+
+    //received for editing vars
+    private var receivedRenter: Renter? = null
+    private var isMessageReceivesForEditing = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,8 +58,71 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         includeBinding = binding.include
+
+        getMessage()
         initListeners()
         textWatchers()
+    }
+
+    private fun getMessage() {
+
+        try {
+            if (!arguments?.isEmpty!!) {
+
+                val args = arguments?.let {
+
+                    AddRenterFragmentArgs.fromBundle(it)
+                }
+
+                val message = args?.editRenterMessage
+
+                receivedRenter = convertJSONtoRenter(message)
+                isMessageReceivesForEditing = true
+
+                updateUI()
+            }
+        } catch (e: Exception) {
+
+            e.printStackTrace()
+        }
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateUI() {
+
+        receivedRenter?.let { renter ->
+
+            binding.addRenterTitileTV.text = "Edit Renter"
+
+            includeBinding.renterNameET.editText?.setText(
+                renter.name
+            )
+
+            includeBinding.renterMobileNumberET.setText(
+                renter.mobileNumber
+            )
+
+            includeBinding.renterEmailET.editText?.setText(
+                renter.emailId
+            )
+
+            includeBinding.otherDocumentNameET.setText(
+                renter.otherDocumentName
+            )
+
+            includeBinding.otherDocumentNumber.setText(
+                renter.otherDocumentNumber
+            )
+
+            includeBinding.renterRoomNumberET.editText?.setText(
+                renter.roomNumber
+            )
+
+            includeBinding.renterAddressET.editText?.setText(
+                renter.address
+            )
+        }
     }
 
     private fun initListeners() {
@@ -109,7 +178,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             isSynced = getString(R.string.f)
         }
 
-        if(isInternetAvailable(requireContext())) {
+        if (isInternetAvailable(requireContext())) {
 
             renter.isSynced = getString(R.string.t)
 
@@ -121,14 +190,14 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             )
 
             insertToDatabase(renter)
-        }else {
+        } else {
 
             insertToDatabase(renter)
         }
 
     }
 
-    private fun insertToDatabase(renter : Renter) {
+    private fun insertToDatabase(renter: Renter) {
 
         renterViewModel.insertRenter(renter)
         showToast(requireContext(), "Renter inserted")
@@ -161,17 +230,22 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             return false
         }
 
-        if (!includeBinding.mobileNumCodePicker.isValidFullNumber) {
+        if(!isMessageReceivesForEditing) {
 
-            showToast(requireContext(),"Please enter a valid mobile number!!", Toast.LENGTH_LONG)
-            return false
+            if (!includeBinding.mobileNumCodePicker.isValidFullNumber) {
+
+                showToast(
+                    requireContext(),
+                    "Please enter a valid mobile number!!",
+                    Toast.LENGTH_LONG
+                )
+                return false
+            }
         }
-
         return includeBinding.renterNameET.error == null
                 && includeBinding.renterRoomNumberET.error == null
                 && includeBinding.renterAddressET.error == null
                 && includeBinding.renterMobileNumberET.text.toString().trim().isNotEmpty()
-                && includeBinding.mobileNumCodePicker.isValidFullNumber
 
     }
 

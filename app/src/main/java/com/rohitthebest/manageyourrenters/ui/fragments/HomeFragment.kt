@@ -255,10 +255,68 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     override fun onEditClicked(renter: Renter) {
 
-        showToast(requireContext(), "edit click")
-        //todo : edit the renter
+    val action = HomeFragmentDirections.actionHomeFragmentToAddRenterFragment(
+        convertRenterToJSONString(renter)
+    )
+
+        findNavController().navigate(action)
+
+/*
+        MaterialDialog(requireContext(), BottomSheet())
+            .show {
+
+                title(text = "Edit ${renter.name} Info")
+
+                customView(
+                    R.layout.add_renter_layout,
+                    noVerticalPadding = true,
+                    scrollable = true
+                )
+
+                fillDocument(this.getCustomView(), renter)
+            }
+            .positiveButton(text = "Save Changes") {
+
+                //todo : edit renter
+            }
+            .negativeButton {
+
+                it.dismiss()
+            }
+*/
     }
 
+   /* private fun fillDocument(customView: View, renter: Renter) {
+
+        customView.findViewById<TextInputLayout>(R.id.renterNameET).editText?.setText(
+            renter.name
+        )
+
+        customView.findViewById<EditText>(R.id.renterMobileNumberET).setText(
+            renter.mobileNumber
+        )
+
+        customView.findViewById<TextInputLayout>(R.id.renterEmailET).editText?.setText(
+            renter.emailId
+        )
+
+        customView.findViewById<EditText>(R.id.otherDocumentNameET).setText(
+            renter.otherDocumentName
+        )
+
+        customView.findViewById<EditText>(R.id.otherDocumentNumber).setText(
+            renter.otherDocumentNumber
+        )
+
+        customView.findViewById<TextInputLayout>(R.id.renterRoomNumberET).editText?.setText(
+            renter.roomNumber
+        )
+
+        customView.findViewById<TextInputLayout>(R.id.renterAddressET).editText?.setText(
+            renter.address
+        )
+    }
+    */
     private fun hideNoRentersAddedTV() {
 
         try {

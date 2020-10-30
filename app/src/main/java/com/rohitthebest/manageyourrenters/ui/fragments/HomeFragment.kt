@@ -12,6 +12,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -21,6 +23,7 @@ import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
+import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.deleteDocumentFromFireStore
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.uploadDocumentToFireStore
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.closeKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
@@ -192,8 +195,62 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     override fun onDeleteClicked(renter: Renter) {
 
-        showToast(requireContext(), "delete click")
-        //todo : delete the renter
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Are you sure?")
+            .setMessage(getString(R.string.delete_warning_message))
+            .setPositiveButton("Delete") { dialogInterface, _ ->
+
+                if (renter.isSynced == getString(R.string.f)) {
+
+                    deleteRenter(renter)
+                } else {
+
+                    if (isInternetAvailable(requireContext())) {
+
+                        deleteRenter(renter)
+                    } else {
+                        showNoInternetMessage(requireContext())
+                    }
+                }
+
+                dialogInterface.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+    }
+
+    private fun deleteRenter(renter: Renter) {
+
+        renterViewModel.deleteRenter(renter)
+
+        var isUndoClicked = false
+        Snackbar.make(binding.homeCoordinatorL, "Renter deleted", Snackbar.LENGTH_LONG)
+            .setAction("Undo") {
+
+                isUndoClicked = true
+
+                renterViewModel.insertRenter(renter)
+                showToast(requireContext(), "Renter restored...")
+            }
+            .addCallback(object : Snackbar.Callback() {
+
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+
+                    if (!isUndoClicked && renter.isSynced == getString(R.string.t)) {
+
+                        deleteDocumentFromFireStore(
+                            context = requireContext(),
+                            collection = getString(R.string.renters),
+                            documentKey = renter.key!!
+                        )
+                    }
+                }
+            })
+            .show()
     }
 
     override fun onEditClicked(renter: Renter) {

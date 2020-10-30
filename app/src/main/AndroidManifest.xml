@@ -24,6 +24,7 @@
         </activity>
 
         <service android:name=".services.UploadService"/>
+        <service android:name=".services.DeleteService"/>
     </application>
 
 </manifest>

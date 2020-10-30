@@ -4,7 +4,9 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.fragments.HomeFragment">
+    tools:context=".ui.fragments.HomeFragment"
+    android:id="@+id/homeCoordinatorL"
+    >
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"

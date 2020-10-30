@@ -50,4 +50,60 @@
     <string name="no_renters_added_message">Looks like your rooms are empty???</string>
     <string name="delete_warning_message">[Warning] : After deletion it CANNOT BE RETRIEVED AGAIN.</string>
 
+
+    <string-array name="currency_symbol">
+        <item>"₹"</item>
+        <item>"Rs"</item>
+        <item>"$"</item>
+        <item>"€"</item>
+        <item>"£"</item>
+        <item>"лв"</item>
+        <item>"CHF"</item>
+        <item>"Kč"</item>
+        <item>"kr"</item>
+        <item>"kn"</item>
+        <item>"₾"</item>
+        <item>"ft"</item>
+        <item>"zł"</item>
+        <item>"₽"</item>
+        <item>"lei"</item>
+        <item>"₺"</item>
+        <item>"₴"</item>
+        <item>"د.إ"</item>
+        <item>"Ksh"</item>
+        <item>".د.م"</item>
+        <item>"₦"</item>
+        <item>"R"</item>
+        <item>"R$"</item>
+        <item>"S/."</item>
+        <item>"৳"</item>
+        <item>"¥"</item>
+        <item>"元"</item>
+        <item>"Rp"</item>
+        <item>"₱"</item>
+        <item>"RM"</item>
+        <item>"₩"</item>
+        <item>"฿"</item>
+        <item>"₫"</item>
+        <item>"ɱ"</item>
+        <item>"Ł"</item>
+        <item>"Ξ"</item>
+    </string-array>
+
+    <string-array name="months">
+
+        <item>"January"</item>
+        <item>"February"</item>
+        <item>"March"</item>
+        <item>"April"</item>
+        <item>"May"</item>
+        <item>"June"</item>
+        <item>"July"</item>
+        <item>"August"</item>
+        <item>"September"</item>
+        <item>"October"</item>
+        <item>"November"</item>
+        <item>"December"</item>
+
+    </string-array>
 </resources>

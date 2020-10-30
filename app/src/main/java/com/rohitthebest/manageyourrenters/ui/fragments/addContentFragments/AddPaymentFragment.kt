@@ -5,15 +5,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.RadioGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.AddPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.fragments.PaymentFragmentArgs
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,6 +34,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private var receivedRenter: Renter? = null
     private var currentTimestamp = 0L
 
+    private var monthList: List<String>? = null
+    private var currencyList: List<String>? = null
+    private var billMonth: String? = null
+    private var currencySymbol: String? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -44,6 +53,19 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         super.onViewCreated(view, savedInstanceState)
 
         includeBinding = binding.include
+
+        monthList = ArrayList()          //List of months
+        currencyList = ArrayList()       //List of currency Symbols
+
+        //List of months
+        monthList = resources.getStringArray(R.array.months).toList()
+
+        //List of currency symbols of different places
+        currencyList = resources.getStringArray(R.array.currency_symbol).toList()
+
+        setUpSpinnerMonth() //Setting the from(month) and till(month) spinners
+        setUpCurrencySymbolList()
+
         getMessage()
         initListeners()
     }
@@ -81,11 +103,84 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 )
             }"
 
-            includeBinding.timeTV.text = "Time : ${WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                currentTimestamp,
-                "hh:mm:ss"
-            )}"
+            includeBinding.timeTV.text = "Time : ${
+                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                    currentTimestamp,
+                    "hh:mm:ss"
+                )
+            }"
         }
+    }
+
+    private fun setUpSpinnerMonth() {
+
+        includeBinding.monthSelectSpinner.let { spinner ->
+
+            if (monthList != null) {
+                spinner.adapter = ArrayAdapter(
+                    requireContext(),
+                    R.layout.support_simple_spinner_dropdown_item,
+                    monthList!!
+                )
+
+                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                        spinner.setSelection(0)
+                        billMonth = monthList!![0]
+                    }
+
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+
+                        spinner.setSelection(position)
+                        billMonth = monthList!![position]
+                    }
+                }
+            }
+        }
+
+    }
+
+    private fun setUpCurrencySymbolList() {
+
+        includeBinding.moneySymbolSpinner.let { spinner ->
+
+            if (currencyList != null) {
+                spinner.adapter = ArrayAdapter(
+                    requireContext(),
+                    R.layout.support_simple_spinner_dropdown_item,
+                    currencyList!!
+                )
+
+                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                        spinner.setSelection(0)
+                        currencySymbol = currencyList!![0]
+                    }
+
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+
+                        spinner.setSelection(position)
+                        currencySymbol = currencyList!![position]
+                        showToast(requireContext(), "${currencyList!![position]} is selected..")
+                    }
+                }
+            }
+        }
+
     }
 
     private fun initListeners() {

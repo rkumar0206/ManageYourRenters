@@ -17,14 +17,14 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.fragments.PaymentFragmentArgs
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnCheckedChangeListener {
-
-    private val renterViewModel: RenterViewModel by viewModels()
 
     private var _binding: FragmentAddPaymentBinding? = null
     private val binding get() = _binding!!
@@ -175,7 +175,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                         spinner.setSelection(position)
                         currencySymbol = currencyList!![position]
-                        showToast(requireContext(), "${currencyList!![position]} is selected..")
+                        //showToast(requireContext(), "${currencyList!![position]} is selected..")
                     }
                 }
             }
@@ -208,8 +208,36 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
 
+        if (checkedId == includeBinding.byMonthRB.id) {
+
+            showByMonthAndHideByDateView()
+        } else {
+
+            hideByMonthAndShowByDateView()
+        }
 
     }
+
+    private fun showByMonthAndHideByDateView() {
+
+        try {
+            includeBinding.byDateCL.hide()
+            includeBinding.monthSelectSpinner.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun hideByMonthAndShowByDateView() {
+
+        try {
+            includeBinding.byDateCL.show()
+            includeBinding.monthSelectSpinner.hide()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -103,7 +103,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider4"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -195,7 +195,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:alpha="0"
+                android:alpha="1"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -321,7 +321,7 @@
                     android:layout_width="1dp"
                     android:layout_height="0dp"
                     android:background="?android:attr/listDivider"
-                    app:layout_constraintBottom_toTopOf="@+id/byDateErrorMessageTV"
+                    app:layout_constraintBottom_toTopOf="@+id/divider16"
                     app:layout_constraintEnd_toStartOf="@+id/textView8"
                     app:layout_constraintStart_toEndOf="@+id/textView7"
                     app:layout_constraintTop_toTopOf="@+id/textView7" />

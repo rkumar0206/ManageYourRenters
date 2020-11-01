@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@id/start"
+        motion:duration="250">
+
+        <OnClick
+            motion:clickAction="toggle"
+            motion:targetId="@+id/adapterExtendRenterInfoBtn" />
+
+        <KeyFrameSet>
+
+            <KeyAttribute
+
+                android:rotation="180"
+                motion:framePosition="50"
+                motion:motionTarget="@+id/adapterExtendRenterInfoBtn" />
+
+            <KeyAttribute
+
+                android:rotation="180"
+                motion:framePosition="100"
+                motion:motionTarget="@+id/adapterExtendRenterInfoBtn" />
+        </KeyFrameSet>
+
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+
+        <Constraint
+            android:id="@+id/adapterRenterNameTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            motion:layout_constraintEnd_toStartOf="@+id/adapterRenterTimeTV"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="@+id/parent" />
+
+        <Constraint
+            android:id="@+id/adapterRenterTimeTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:padding="2dp"
+            android:text="Added on : 02-06-2020"
+            android:textColor="@color/textColor1"
+            android:textSize="10sp"
+            motion:layout_constraintBottom_toBottomOf="@+id/adapterRenterNameTV"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintTop_toTopOf="@+id/adapterRenterNameTV" />
+
+        <Constraint
+            android:id="@+id/adapterRoomNumTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:padding="4dp"
+            android:text="1st floor 1st room"
+            android:textColor="@color/dark_blue"
+            android:textSize="19sp"
+            motion:layout_constraintEnd_toEndOf="@+id/adapterRenterNameTV"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/adapterRenterNameTV" />
+
+        <Constraint
+            android:id="@+id/divider30"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="4dp"
+            android:background="?android:attr/listDivider"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintHorizontal_bias="0.5"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/adapterRoomNumTV" />
+
+
+        <Constraint
+            android:id="@+id/adapterExtendRenterInfoBtn"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@android:color/transparent"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintHorizontal_bias="0.5"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/extendedInfoCL"
+            motion:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24" />
+
+        <Constraint
+            android:id="@+id/extendedInfoCL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:alpha="0"
+            android:visibility="gone"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintHorizontal_bias="0.5"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/divider30" />
+
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+
+        <Constraint
+            android:id="@+id/adapterRenterNameTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            motion:layout_constraintEnd_toStartOf="@+id/adapterRenterTimeTV"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="@+id/parent" />
+
+        <Constraint
+            android:id="@+id/adapterRenterTimeTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:padding="2dp"
+            android:text="Added on : 02-06-2020"
+            android:textColor="@color/textColor1"
+            android:textSize="10sp"
+            motion:layout_constraintBottom_toBottomOf="@+id/adapterRenterNameTV"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintTop_toTopOf="@+id/adapterRenterNameTV" />
+
+        <Constraint
+            android:id="@+id/adapterRoomNumTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:padding="4dp"
+            android:text="1st floor 1st room"
+            android:textColor="@color/dark_blue"
+            android:textSize="19sp"
+            motion:layout_constraintEnd_toEndOf="@+id/adapterRenterNameTV"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/adapterRenterNameTV" />
+
+        <Constraint
+            android:id="@+id/extendedInfoCL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:alpha="1"
+            android:visibility="visible"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintHorizontal_bias="0.5"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/divider30" />
+
+        <Constraint
+            android:id="@+id/adapterExtendRenterInfoBtn"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@android:color/transparent"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintHorizontal_bias="0.5"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/extendedInfoCL"
+            motion:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24" />
+
+
+
+    </ConstraintSet>
+</MotionScene>

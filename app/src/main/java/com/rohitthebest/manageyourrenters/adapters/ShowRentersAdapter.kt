@@ -9,8 +9,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.entity.Renter
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import kotlinx.android.synthetic.main.adapter_show_renter.view.*
 
@@ -60,7 +58,6 @@ class ShowRentersAdapter :
 
             itemView.setOnClickListener(this)
             itemView.adapterIsSyncedBtn.setOnClickListener(this)
-            itemView.adapterExtendRenterInfoBtn.setOnClickListener(this)
             itemView.adapterRenterEditBtn.setOnClickListener(this)
             itemView.adapterRenterDeleteBtn.setOnClickListener(this)
 
@@ -92,32 +89,6 @@ class ShowRentersAdapter :
                     if (checkForNullability(absoluteAdapterPosition)) {
 
                         mListener!!.onDeleteClicked(getItem(absoluteAdapterPosition))
-                    }
-                }
-
-                itemView.adapterExtendRenterInfoBtn.id -> {
-
-
-                    if (itemView.extendedInfoCL.visibility != View.VISIBLE) {
-
-                        itemView.adapterExtendRenterInfoBtn.animate()
-                            .rotation(180f).setDuration(350).start()
-
-                        itemView.extendedInfoCL.show()
-
-                        itemView.extendedInfoCL.animate().translationY(0f).alpha(1f)
-                            .setDuration(500).start()
-
-                    } else {
-
-                        itemView.adapterExtendRenterInfoBtn.animate()
-                            .rotation(0f).setDuration(200).start()
-
-                        itemView.extendedInfoCL.animate().translationY(0f).alpha(0f)
-                            .setDuration(500).start()
-
-                        itemView.extendedInfoCL.hide()
-
                     }
                 }
 

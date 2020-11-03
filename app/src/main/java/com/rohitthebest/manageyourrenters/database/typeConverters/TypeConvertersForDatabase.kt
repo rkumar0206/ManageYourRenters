@@ -6,7 +6,7 @@ import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.database.entity.dataClasses.BillInfo
 import com.rohitthebest.manageyourrenters.database.entity.dataClasses.ElectricityBillInfo
 
-class TypeConverters {
+class TypeConvertersForDatabase {
 
     val gson = Gson()
 

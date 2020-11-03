@@ -2,7 +2,9 @@ package com.rohitthebest.manageyourrenters.module
 
 import android.content.Context
 import androidx.room.Room
+import com.rohitthebest.manageyourrenters.database.databases.PaymentDatabase
 import com.rohitthebest.manageyourrenters.database.databases.RenterDatabase
+import com.rohitthebest.manageyourrenters.others.Constants.PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.RENTER_DATABASE_NAME
 import dagger.Module
 import dagger.Provides
@@ -30,6 +32,22 @@ object Module {
     @Provides
     @Singleton
     fun provideCategoryDao(db: RenterDatabase) = db.getRenterDao()
+
+//==============================Payment Database========================================
+
+    @Provides
+    @Singleton
+    fun providePaymentDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(
+        context,
+        PaymentDatabase::class.java,
+        PAYMENT_DATABASE_NAME
+    ).build()
+
+    @Provides
+    @Singleton
+    fun providePaymentDao(db: PaymentDatabase) = db.getPaymentDao()
 
 
 }

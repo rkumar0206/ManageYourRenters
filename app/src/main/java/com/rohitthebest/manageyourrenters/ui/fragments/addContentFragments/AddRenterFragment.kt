@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
@@ -27,6 +28,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.random.Random
 
@@ -39,6 +41,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
     private val binding get() = _binding!!
 
     private lateinit var includeBinding: AddRenterLayoutBinding
+    private var selectedDate: Long = 0L
 
     //received for editing vars
     private var receivedRenter: Renter? = null
@@ -58,6 +61,12 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         includeBinding = binding.include
+
+        selectedDate = System.currentTimeMillis()
+        includeBinding.dateAddedTV.text =
+            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                selectedDate
+            )
 
         getMessage()
         initListeners()
@@ -122,6 +131,13 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             includeBinding.renterAddressET.editText?.setText(
                 renter.address
             )
+
+            includeBinding.dateAddedTV.text =
+                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                    renter.timeStamp
+                )
+
+            selectedDate = renter.timeStamp!!
         }
     }
 
@@ -129,6 +145,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
         binding.backBtn.setOnClickListener(this)
         binding.addRenterBtn.setOnClickListener(this)
+        includeBinding.dateAddedCalendarPickBtn.setOnClickListener(this)
 
         includeBinding.mobileNumCodePicker.registerCarrierNumberEditText(includeBinding.renterMobileNumberET)
     }
@@ -146,6 +163,11 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
             }
 
+            includeBinding.dateAddedCalendarPickBtn.id -> {
+
+                showCalendarDialog()
+            }
+
             binding.backBtn.id -> {
 
                 requireActivity().onBackPressed()
@@ -153,17 +175,40 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
         }
     }
 
+    private fun showCalendarDialog() {
+
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Select a date")
+            .setSelection(selectedDate)
+
+
+        val builder = datePicker.build()
+
+        builder.show(requireActivity().supportFragmentManager, "datePicker")
+
+        builder.addOnPositiveButtonClickListener {
+
+            selectedDate = it
+
+            includeBinding.dateAddedTV.text =
+                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                    selectedDate
+                )
+        }
+
+    }
+
     private fun initRenterForDatabase() {
 
         val renter = Renter()
 
-        if(isMessageReceivesForEditing) {
+        if (isMessageReceivesForEditing) {
 
             renter.id = receivedRenter?.id
         }
 
         renter.apply {
-            timeStamp = System.currentTimeMillis()
+            timeStamp = selectedDate
             name = includeBinding.renterNameET.editText?.text.toString().trim()
             mobileNumber = includeBinding.mobileNumCodePicker.fullNumberWithPlus
             emailId = includeBinding.renterEmailET.editText?.text.toString().trim()

@@ -348,7 +348,7 @@
                     android:id="@+id/divider16"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="8dp"
                     android:background="?android:attr/listDivider"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -368,7 +368,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -434,7 +434,8 @@
                     android:backgroundTint="@color/white"
                     android:hint="@string/house_rent"
                     android:inputType="numberDecimal"
-                    android:maxLength="12" />
+                    android:maxLength="12"
+                    android:text="0.0" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

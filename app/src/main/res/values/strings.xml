@@ -49,6 +49,7 @@
     <string name="renters">Renters</string>
     <string name="no_renters_added_message">Looks like your rooms are empty???</string>
     <string name="delete_warning_message">[Warning] : After deletion it CANNOT BE RETRIEVED AGAIN.</string>
+    <string name="same_day">Same day</string>
 
 
     <string-array name="currency_symbol">

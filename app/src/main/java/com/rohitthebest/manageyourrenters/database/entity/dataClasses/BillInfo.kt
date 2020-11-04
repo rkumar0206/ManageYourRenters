@@ -4,8 +4,10 @@ data class BillInfo(
     var billPeriodType : String,
     var billDateFrom : Long?,
     var billDateTill : Long?,
+    var numberOfDays : String? = "",
     var billMonth : String?,
-    var billYear : String?,
+    var billMonthNumber : Int?,
+    var billYear : Int?,
     var currencySymbol : String?
 ) {
 
@@ -15,6 +17,8 @@ data class BillInfo(
         0L,
         "",
         "",
+        0,
+        0,
         ""
     )
 }

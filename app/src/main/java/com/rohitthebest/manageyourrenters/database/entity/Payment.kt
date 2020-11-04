@@ -11,7 +11,7 @@ import com.rohitthebest.manageyourrenters.database.entity.dataClasses.Electricit
 @Entity(tableName = "payment_table")
 data class Payment(
     var timeStamp : Long? = System.currentTimeMillis(),
-    var renterKey : String,
+    var renterKey : String,  //used for getting the information of renter
     var bill : BillInfo?,
     var electricBill : ElectricityBillInfo?,
     var houseRent : String,

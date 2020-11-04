@@ -12,7 +12,7 @@
     <color name="sky_blue">#44DFF5</color>
     <color name="colorGrey">#78808f</color>
     <color name="textColor1">#33373D</color>
-    <color name="imageBtnBackgroundColor">#14000000</color>
+    <color name="imageBtnBackgroundColor">#00000000</color>
 
     <color name="rippleColor">#B37AEEFF</color>
 

@@ -2,6 +2,8 @@ package com.rohitthebest.manageyourrenters.ui.fragments.addContentFragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,20 +13,23 @@ import android.widget.RadioGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.database.entity.Payment
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.AddPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPaymentBinding
+import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.fragments.PaymentFragmentArgs
-import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnCheckedChangeListener {
+
+    private val paymentViewModel: PaymentViewModel by viewModels()
 
     private var _binding: FragmentAddPaymentBinding? = null
     private val binding get() = _binding!!
@@ -36,8 +41,17 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private var monthList: List<String>? = null
     private var currencyList: List<String>? = null
+
     private var billMonth: String? = null
+    private var billMonthNumber = 1
     private var currencySymbol: String? = null
+
+    //if selected by_date method
+    private var fromDateTimestamp : Long? = null
+    private var tillDateTimeStamp : Long? = null
+    private var numberOfDays : String? = ""
+
+    private var lastPaymentInfo: Payment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,6 +82,27 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         getMessage()
         initListeners()
+        textWatcher()
+
+        getLastPaymentInfo()
+    }
+
+    private fun getLastPaymentInfo() {
+
+        try {
+            paymentViewModel.getAllPaymentsListOfRenter(receivedRenter?.key!!)
+                .observe(viewLifecycleOwner, {
+
+                    if (it.isNotEmpty()) {
+
+                        lastPaymentInfo = it.last()
+                    }
+
+                })
+
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun getMessage() {
@@ -88,7 +123,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
-
     @SuppressLint("SetTextI18n")
     private fun initialChanges() {
 
@@ -97,6 +131,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             includeBinding.renterNameTV.text = it.name
 
             currentTimestamp = System.currentTimeMillis()
+
             includeBinding.dateTV.text = "Date : ${
                 WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                     currentTimestamp
@@ -109,7 +144,54 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     "hh:mm:ss"
                 )
             }"
+
+            if (lastPaymentInfo != null) {
+
+                if (lastPaymentInfo!!.bill?.billPeriodType == getString(R.string.by_month)) {
+
+                    initializeByMonthField()
+
+                } else if (lastPaymentInfo!!.bill?.billPeriodType == getString(R.string.by_date)) {
+
+                    initialiseByDateField()
+
+                }
+            } else {
+
+                billMonth = monthList?.get(0)
+                billMonthNumber = 1
+
+                fromDateTimestamp = currentTimestamp
+                tillDateTimeStamp = currentTimestamp
+                numberOfDays = getString(R.string.same_day)
+                includeBinding.byDateErrorMessageTV.text = numberOfDays
+            }
         }
+    }
+
+    private fun initialiseByDateField() {
+
+
+        includeBinding.fromDateTV.text =
+            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                lastPaymentInfo!!.bill?.billDateFrom
+            )
+
+        includeBinding.tillDateTV.text =
+            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                lastPaymentInfo!!.bill?.billDateTill
+            )
+
+        //todo : initialize the material date picker
+
+    }
+
+    private fun initializeByMonthField() {
+
+        lastPaymentInfo!!.bill?.billMonthNumber?.minus(
+            1
+        )?.let { it1 -> includeBinding.monthSelectSpinner.setSelection(it1) }
+
     }
 
     private fun setUpSpinnerMonth() {
@@ -129,6 +211,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                         spinner.setSelection(0)
                         billMonth = monthList!![0]
+                        billMonthNumber = 1
                     }
 
                     override fun onItemSelected(
@@ -140,6 +223,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                         spinner.setSelection(position)
                         billMonth = monthList!![position]
+                        billMonthNumber = position + 1
                     }
                 }
             }
@@ -189,6 +273,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         binding.saveBtn.setOnClickListener(this)
         includeBinding.seeTotalBtn.setOnClickListener(this)
 
+        includeBinding.fromDateChooserBtn.setOnClickListener(this)
+        includeBinding.fromDateTV.setOnClickListener(this)
+        includeBinding.tillDateChooserBtn.setOnClickListener(this)
+        includeBinding.tillDateTV.setOnClickListener(this)
+
         includeBinding.periodTypeRG.setOnCheckedChangeListener(this)
     }
 
@@ -218,6 +307,28 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     }
 
+    private fun textWatcher() {
+
+        includeBinding.houseRentET.editText?.addTextChangedListener(object : TextWatcher {
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+                if (s?.isEmpty()!!) {
+
+                    includeBinding.houseRentET.error = EDIT_TEXT_EMPTY_MESSAGE
+                } else {
+
+                    includeBinding.houseRentET.error = null
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+
+    }
+
     private fun showByMonthAndHideByDateView() {
 
         try {
@@ -238,12 +349,10 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
 
         _binding = null
     }
-
 
 }

@@ -208,10 +208,10 @@
 
                 <View
                     android:id="@+id/divider17"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:background="?android:attr/listDivider"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -223,7 +223,7 @@
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintGuide_percent="0.5013193"
+                    app:layout_constraintGuide_percent="0.41"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -246,7 +246,7 @@
                     android:padding="4dp"
                     android:text="@string/till"
                     android:textColor="@color/textColor1"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
                     app:layout_constraintStart_toStartOf="@+id/guideline2"
                     app:layout_constraintTop_toBottomOf="@+id/divider17" />
 
@@ -266,7 +266,7 @@
                     android:layout_height="1dp"
                     android:layout_marginTop="2dp"
                     android:background="?android:attr/listDivider"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
                     app:layout_constraintStart_toStartOf="@+id/guideline2"
                     app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
@@ -274,39 +274,28 @@
                     android:id="@+id/fromDateTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
                     android:layout_marginTop="8dp"
                     android:padding="4dp"
                     android:text="@string/nul"
                     android:textSize="15sp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline2"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/divider7" />
-
-                <ImageButton
-                    android:id="@+id/fromDateChooserBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="2dp"
-                    android:backgroundTint="@color/imageBtnBackgroundColor"
-                    app:layout_constraintBottom_toBottomOf="@+id/fromDateTV"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline2"
-                    app:layout_constraintTop_toTopOf="@+id/fromDateTV"
-                    app:srcCompat="@drawable/ic_baseline_date_range_24" />
 
                 <TextView
                     android:id="@+id/tillDateTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
                     android:layout_marginTop="8dp"
                     android:padding="4dp"
                     android:text="@string/nul"
                     android:textSize="15sp"
+                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
                     app:layout_constraintStart_toStartOf="@+id/guideline2"
                     app:layout_constraintTop_toBottomOf="@+id/divider8" />
 
                 <ImageButton
-                    android:id="@+id/tillDateChooserBtn"
+                    android:id="@+id/dateRangePickerBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="2dp"
@@ -334,26 +323,38 @@
                     android:layout_marginBottom="2dp"
                     android:ellipsize="end"
                     android:maxLines="1"
+                    android:padding="2dp"
                     android:text="@string/enter_a_valid_date"
                     android:textColor="@color/color_orange"
                     android:textSize="12sp"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@+id/tillDateChooserBtn"
+                    app:layout_constraintEnd_toStartOf="@+id/tillDateTV"
                     app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="@+id/fromDateTV"
-                    app:layout_constraintTop_toBottomOf="@+id/divider16" />
+                    app:layout_constraintStart_toEndOf="@+id/fromDateTV"
+                    app:layout_constraintTop_toBottomOf="@+id/divider16"
+                    tools:visibility="visible" />
 
                 <View
                     android:id="@+id/divider16"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
+                    android:layout_marginTop="2dp"
                     android:layout_marginBottom="8dp"
                     android:background="?android:attr/listDivider"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/fromDateChooserBtn" />
+                    app:layout_constraintTop_toBottomOf="@+id/fromDateTV" />
+
+                <View
+                    android:id="@+id/divider33"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toBottomOf="@+id/divider9"
+                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

@@ -10,8 +10,11 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.RadioGroup
+import android.widget.TextView
+import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.entity.Payment
 import com.rohitthebest.manageyourrenters.database.entity.Renter
@@ -25,6 +28,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_add_renter.*
 
 @AndroidEntryPoint
 class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnCheckedChangeListener {
@@ -47,9 +51,9 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private var currencySymbol: String? = null
 
     //if selected by_date method
-    private var fromDateTimestamp : Long? = null
-    private var tillDateTimeStamp : Long? = null
-    private var numberOfDays : String? = ""
+    private var fromDateTimestamp: Long? = null
+    private var tillDateTimeStamp: Long? = null
+    private var numberOfDays: String? = ""
 
     private var lastPaymentInfo: Payment? = null
 
@@ -164,33 +168,35 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 fromDateTimestamp = currentTimestamp
                 tillDateTimeStamp = currentTimestamp
                 numberOfDays = getString(R.string.same_day)
+
                 includeBinding.byDateErrorMessageTV.text = numberOfDays
+
+                includeBinding.fromDateTV.setDateInTextView(fromDateTimestamp)
+
+                includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
             }
         }
     }
 
     private fun initialiseByDateField() {
 
+        fromDateTimestamp = lastPaymentInfo!!.bill?.billDateTill
+        tillDateTimeStamp = currentTimestamp
 
-        includeBinding.fromDateTV.text =
-            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                lastPaymentInfo!!.bill?.billDateFrom
-            )
+        includeBinding.fromDateTV.setDateInTextView(fromDateTimestamp)
 
-        includeBinding.tillDateTV.text =
-            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                lastPaymentInfo!!.bill?.billDateTill
-            )
+        includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
 
-        //todo : initialize the material date picker
+        numberOfDays = calculateNumberOfDays(fromDateTimestamp!!, tillDateTimeStamp!!)
 
+        setNumberOfDays()
     }
 
     private fun initializeByMonthField() {
 
-        lastPaymentInfo!!.bill?.billMonthNumber?.minus(
-            1
-        )?.let { it1 -> includeBinding.monthSelectSpinner.setSelection(it1) }
+        billMonthNumber = lastPaymentInfo?.bill?.billMonthNumber!! + 1
+
+        includeBinding.monthSelectSpinner.setSelection(billMonthNumber - 1)
 
     }
 
@@ -273,9 +279,9 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         binding.saveBtn.setOnClickListener(this)
         includeBinding.seeTotalBtn.setOnClickListener(this)
 
-        includeBinding.fromDateChooserBtn.setOnClickListener(this)
+
         includeBinding.fromDateTV.setOnClickListener(this)
-        includeBinding.tillDateChooserBtn.setOnClickListener(this)
+        includeBinding.dateRangePickerBtn.setOnClickListener(this)
         includeBinding.tillDateTV.setOnClickListener(this)
 
         includeBinding.periodTypeRG.setOnCheckedChangeListener(this)
@@ -292,6 +298,62 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             }
 
         }
+
+        if (v?.id == includeBinding.dateRangePickerBtn.id || v?.id == includeBinding.fromDateTV.id
+            || v?.id == includeBinding.tillDateTV.id
+        ) {
+
+            showDateRangePickerDialog()
+
+        }
+    }
+
+    private fun showDateRangePickerDialog() {
+
+        val builder = MaterialDatePicker.Builder.dateRangePicker()
+            .setSelection(Pair(fromDateTimestamp, tillDateTimeStamp))
+            .setTitleText("Select date range")
+            .build()
+
+        builder.show(requireActivity().supportFragmentManager, "date_range_picker")
+
+
+        builder.addOnPositiveButtonClickListener {
+
+            fromDateTimestamp = it.first
+            tillDateTimeStamp = it.second
+            includeBinding.fromDateTV.setDateInTextView(it.first)
+            includeBinding.tillDateTV.setDateInTextView(it.second)
+
+            numberOfDays = calculateNumberOfDays(it.first!!, it.second!!)
+
+            setNumberOfDays()
+        }
+    }
+
+    private fun setNumberOfDays() {
+
+        includeBinding.byDateErrorMessageTV.text = when {
+            numberOfDays!!.toInt() > 0 -> {
+
+                "Number of Days : $numberOfDays"
+            }
+            numberOfDays!!.toInt() < 0 -> {
+
+                "Please enter a valid date"
+            }
+            else -> {
+
+                numberOfDays = getString(R.string.same_day)
+                getString(R.string.same_day)
+            }
+        }
+
+    }
+
+    private fun calculateNumberOfDays(startDate: Long, endDate: Long): String {
+
+        return ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt().toString()
 
     }
 
@@ -347,6 +409,14 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun TextView.setDateInTextView(timeStamp: Long?) {
+
+        this.text = WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+            timeStamp
+        )
+
     }
 
     override fun onDestroyView() {

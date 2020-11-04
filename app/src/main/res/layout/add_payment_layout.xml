@@ -325,7 +325,7 @@
                     android:maxLines="1"
                     android:padding="2dp"
                     android:text="@string/enter_a_valid_date"
-                    android:textColor="@color/color_orange"
+                    android:textColor="@color/color_green"
                     android:textSize="12sp"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"

@@ -11,6 +11,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -336,19 +337,30 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         includeBinding.byDateErrorMessageTV.text = when {
             numberOfDays!!.toInt() > 0 -> {
 
+                includeBinding.byDateErrorMessageTV.changeTextColor(R.color.color_green)
+
                 "Number of Days : $numberOfDays"
             }
             numberOfDays!!.toInt() < 0 -> {
 
+                includeBinding.byDateErrorMessageTV.changeTextColor(R.color.color_orange)
+
                 "Please enter a valid date"
             }
             else -> {
+
+                includeBinding.byDateErrorMessageTV.changeTextColor(R.color.color_green)
 
                 numberOfDays = getString(R.string.same_day)
                 getString(R.string.same_day)
             }
         }
 
+    }
+
+    private fun TextView.changeTextColor(color: Int) {
+
+        this.setTextColor(ContextCompat.getColor(requireContext(), color))
     }
 
     private fun calculateNumberOfDays(startDate: Long, endDate: Long): String {

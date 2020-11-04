@@ -165,7 +165,18 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 if (lastPaymentInfo?.electricBill?.isTakingElectricBill != getString(R.string.f)) {
 
-                    //todo : initialize the electricity bill
+                    includeBinding.previousReadingET.setText(lastPaymentInfo?.electricBill?.currentReading.toString())
+
+                    //assuming the difference is same for another month calculating current reading
+                    includeBinding.currentReadingET.setText(
+                        (lastPaymentInfo?.electricBill?.currentReading?.plus(
+                            lastPaymentInfo?.electricBill?.differenceInReading!!
+                        )).toString()
+                    )
+
+                    includeBinding.rateET.setText(lastPaymentInfo?.electricBill?.rate.toString())
+
+                    calculateTotalBill()
                 }
 
                 if (lastPaymentInfo?.isTakingParkingBill != getString(R.string.f)) {

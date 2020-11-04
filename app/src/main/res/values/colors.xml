@@ -19,4 +19,7 @@
     <color name="color_Red">#F44336</color>
     <color name="color_green">#3D8C0A</color>
     <color name="color_orange">#FF6D00</color>
+
+    <color name="primary_light">#a5c1ff</color>
+
 </resources>

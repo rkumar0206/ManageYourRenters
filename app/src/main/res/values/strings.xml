@@ -52,6 +52,25 @@
     <string name="same_day">Same day</string>
     <string name="electricity_error_message">Previous reading must be less than current reading</string>
     <string name="total">Total : %1$s</string>
+    <string name="bill">BILL</string>
+    <string name="renter_information">Renter Information</string>
+    <string name="name_">Name : </string>
+    <string name="Null">null</string>
+    <string name="mobile_number_">Mobile Number : </string>
+    <string name="address_n_n">Address : </string>
+    <string name="e_mail_id_">Email-Id : </string>
+    <string name="billing_parameter">Billing Parameters</string>
+    <string name="bill_date_and_time">Bill date and time : </string>
+    <string name="period_">Period : </string>
+    <string name="electricity">Electricity</string>
+    <string name="previous_reading_">Previous Reading : </string>
+    <string name="current_reading_">Current Reading : </string>
+    <string name="rate_">Rate : </string>
+    <string name="difference">Difference</string>
+    <string name="total_">Total : </string>
+    <string name="total_rent">Total Rent</string>
+    <string name="extra_">Extra</string>
+    <string name="net_demand">Net demand</string>
 
     <string-array name="currency_symbol">
         <item>"₹"</item>

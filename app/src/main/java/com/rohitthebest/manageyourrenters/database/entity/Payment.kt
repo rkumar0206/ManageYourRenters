@@ -10,20 +10,21 @@ import com.rohitthebest.manageyourrenters.database.entity.dataClasses.Electricit
 @IgnoreExtraProperties
 @Entity(tableName = "payment_table")
 data class Payment(
-    var timeStamp : Long? = System.currentTimeMillis(),
-    var renterKey : String,  //used for getting the information of renter
-    var bill : BillInfo?,
-    var electricBill : ElectricityBillInfo?,
-    var houseRent : String,
-    var parkingRent : String?,
-    var extraFieldName : String?,
-    var extraAmount : String?,
-    var dueAmount : String?,
-    var messageOrNote : String?,
-    var totalRent : String,
-    var uid : String,
-    var key : String,
-    var isSynced : String = "false"
+    var timeStamp: Long? = System.currentTimeMillis(),
+    var renterKey: String,  //used for getting the information of renter
+    var bill: BillInfo?,
+    var electricBill: ElectricityBillInfo?,
+    var houseRent: String,
+    var isTakingParkingBill: String = "false",
+    var parkingRent: String?,
+    var extraFieldName: String?,
+    var extraAmount: String?,
+    var dueAmount: String?,
+    var messageOrNote: String?,
+    var totalRent: String,
+    var uid: String,
+    var key: String,
+    var isSynced: String = "false"
 ) {
 
     @Exclude
@@ -36,6 +37,7 @@ data class Payment(
         BillInfo(),
         ElectricityBillInfo(),
         "",
+        "false",
         "",
         "",
         "",

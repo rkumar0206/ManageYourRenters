@@ -29,7 +29,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_add_renter.*
 
 @AndroidEntryPoint
 class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnCheckedChangeListener {
@@ -150,18 +149,35 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 )
             }"
 
+
             if (lastPaymentInfo != null) {
 
                 if (lastPaymentInfo!!.bill?.billPeriodType == getString(R.string.by_month)) {
 
+                    showByMonthAndHideByDateView()
                     initializeByMonthField()
 
                 } else if (lastPaymentInfo!!.bill?.billPeriodType == getString(R.string.by_date)) {
 
+                    hideByMonthAndShowByDateView()
                     initialiseByDateField()
-
                 }
+
+                if (lastPaymentInfo?.electricBill?.isTakingElectricBill != getString(R.string.f)) {
+
+                    //todo : initialize the electricity bill
+                }
+
+                if (lastPaymentInfo?.isTakingParkingBill != getString(R.string.f)) {
+
+                    includeBinding.parkingET.editText?.setText(lastPaymentInfo?.parkingRent)
+                }
+
             } else {
+
+                currencySymbol = currencyList?.get(0)
+
+                calculateTotalBill()
 
                 billMonth = monthList?.get(0)
                 billMonthNumber = 1
@@ -266,6 +282,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                         spinner.setSelection(position)
                         currencySymbol = currencyList!![position]
+                        calculateTotalBill()
                         //showToast(requireContext(), "${currencyList!![position]} is selected..")
                     }
                 }
@@ -288,10 +305,20 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         includeBinding.periodTypeRG.setOnCheckedChangeListener(this)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onClick(v: View?) {
 
         when (v?.id) {
 
+            binding.saveBtn.id -> {
+
+                //todo : show bill
+            }
+
+            includeBinding.seeTotalBtn.id -> {
+
+                calculateTotalBill()
+            }
 
             binding.backBtn.id -> {
 
@@ -305,7 +332,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         ) {
 
             showDateRangePickerDialog()
-
         }
     }
 
@@ -367,6 +393,90 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         return ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt().toString()
 
+    }
+
+    private fun calculateElectricBill(): Double {
+
+        val previousReading = if (includeBinding.previousReadingET.text.toString().trim() == "") {
+
+            0.0
+        } else {
+
+            includeBinding.previousReadingET.text.toString().trim().toDouble()
+        }
+
+        val currentReading = if (includeBinding.currentReadingET.text.toString().trim() == "") {
+
+            0.0
+        } else {
+
+            includeBinding.currentReadingET.text.toString().trim().toDouble()
+        }
+
+        if (previousReading > currentReading) {
+
+            includeBinding.electricityErrorTextTV.changeTextColor(R.color.color_orange)
+            includeBinding.electricityErrorTextTV.text =
+                getString(R.string.electricity_error_message)
+            return 0.0
+        }
+
+        val rate = if (includeBinding.rateET.text.toString().trim() == "") {
+
+            0.0
+        } else {
+
+            includeBinding.rateET.text.toString().trim().toDouble()
+        }
+
+        val total = ((currentReading - previousReading)) * rate
+
+        includeBinding.electricityErrorTextTV.changeTextColor(R.color.color_green)
+        includeBinding.electricityErrorTextTV.text = getString(R.string.total, total.toString())
+
+        return total
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun calculateTotalBill(): String {
+
+        val electricBill = calculateElectricBill()
+
+        val parkingBill = if (includeBinding.parkingET.editText?.text.toString().trim() != "") {
+
+            includeBinding.parkingET.editText?.text.toString().trim().toDouble()
+
+        } else {
+
+            0.0
+        }
+
+        val houseRent = if (includeBinding.houseRentET.editText?.text.toString().trim() != "") {
+
+            includeBinding.houseRentET.editText?.text.toString().trim().toDouble()
+        } else {
+            0.0
+        }
+
+        val extraBill = if (includeBinding.extraAmountET.text.toString().trim() != "") {
+
+            includeBinding.extraAmountET.text.toString().trim().toDouble()
+        } else {
+            0.0
+        }
+
+        val dueBill = if (includeBinding.dueAmountET.editText?.text.toString().trim() != "") {
+
+            includeBinding.dueAmountET.editText?.text.toString().trim().toDouble()
+        } else {
+            0.0
+        }
+
+        val total = ((electricBill + parkingBill + houseRent + extraBill) - dueBill).toString()
+
+        includeBinding.totalTV.text = "$currencySymbol $total"
+
+        return total
     }
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {

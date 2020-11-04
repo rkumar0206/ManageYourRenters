@@ -435,8 +435,7 @@
                     android:backgroundTint="@color/white"
                     android:hint="@string/house_rent"
                     android:inputType="numberDecimal"
-                    android:maxLength="12"
-                    android:text="0.0" />
+                    android:maxLength="12" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
@@ -451,7 +450,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView2"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -516,7 +515,6 @@
                 android:gravity="center|center_vertical"
                 android:hint="@string/_0_0"
                 android:inputType="numberDecimal"
-                android:text="@string/_0_0"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="@+id/textView14"
                 app:layout_constraintStart_toStartOf="@+id/textView14"
@@ -590,36 +588,25 @@
                 android:gravity="center|center_vertical"
                 android:hint="@string/_0_0"
                 android:inputType="numberDecimal"
-                android:text="@string/_0_0"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/previousReadingET"
                 app:layout_constraintEnd_toEndOf="@+id/textView15"
                 app:layout_constraintStart_toStartOf="@+id/textView15"
                 app:layout_constraintTop_toTopOf="@+id/previousReadingET" />
 
-            <Spinner
-                android:id="@+id/spinner3"
-                android:layout_width="35dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="3dp"
-                app:layout_constraintBottom_toBottomOf="@+id/currentReadingET"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/divider12" />
-
             <EditText
                 android:id="@+id/rateET"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="16dp"
                 android:ems="10"
                 android:gravity="center"
                 android:hint="@string/_0_0"
                 android:inputType="numberDecimal"
-                android:text="@string/_0_0"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/currentReadingET"
-                app:layout_constraintEnd_toStartOf="@+id/spinner3"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/divider14"
                 app:layout_constraintTop_toTopOf="@+id/currentReadingET" />
 
@@ -628,12 +615,24 @@
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="5dp"
                 android:background="?android:attr/listDivider"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/currentReadingET" />
+
+            <TextView
+                android:id="@+id/electricityErrorTextTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="2dp"
+                android:padding="2dp"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider15" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
@@ -712,8 +711,7 @@
                     android:backgroundTint="@color/white"
                     android:hint="@string/parking"
                     android:inputType="numberDecimal"
-                    android:maxLength="12"
-                    android:text="@string/_0_0" />
+                    android:maxLength="12" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
@@ -805,7 +803,6 @@
                 android:gravity="center"
                 android:hint="@string/amount"
                 android:inputType="numberDecimal"
-                android:text="@string/_0_0"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/extraFieldNameET"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -886,7 +883,6 @@
                     android:backgroundTint="@color/white"
                     android:hint="@string/due_amount"
                     android:inputType="numberDecimal"
-                    android:text="@string/_0_0"
                     android:textColor="@color/color_Red" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

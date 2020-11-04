@@ -50,7 +50,8 @@
     <string name="no_renters_added_message">Looks like your rooms are empty???</string>
     <string name="delete_warning_message">[Warning] : After deletion it CANNOT BE RETRIEVED AGAIN.</string>
     <string name="same_day">Same day</string>
-
+    <string name="electricity_error_message">Previous reading must be less than current reading</string>
+    <string name="total">Total : %1$s</string>
 
     <string-array name="currency_symbol">
         <item>"₹"</item>

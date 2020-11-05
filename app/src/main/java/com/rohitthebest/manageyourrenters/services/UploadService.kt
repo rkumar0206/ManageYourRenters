@@ -13,6 +13,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
+import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoPayment
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoRenter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,10 +60,9 @@ class UploadService : Service() {
                     }
                 }
 
-/*
-                getString(R.string.categories) -> {
+                getString(R.string.payments) -> {
 
-                    if (insertToFireStore(docRef, convertJSONtoCategory(uploadData)!!)) {
+                    if (insertToFireStore(docRef, convertJSONtoPayment(uploadData))) {
 
                         Log.d(
                             TAG,
@@ -71,7 +71,6 @@ class UploadService : Service() {
                         stopSelf()
                     }
                 }
-*/
 
 /*
                 getString(R.string.subCategories) -> {

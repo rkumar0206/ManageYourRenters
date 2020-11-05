@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,20 +24,31 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.entity.Payment
 import com.rohitthebest.manageyourrenters.database.entity.Renter
+import com.rohitthebest.manageyourrenters.database.entity.dataClasses.BillInfo
+import com.rohitthebest.manageyourrenters.database.entity.dataClasses.ElectricityBillInfo
 import com.rohitthebest.manageyourrenters.databinding.AddPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.fragments.PaymentFragmentArgs
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
+import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertPaymentToJSONString
+import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.uploadDocumentToFireStore
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
+import kotlin.random.Random
 
 @AndroidEntryPoint
 class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnCheckedChangeListener {
+
+    private val TAG = "AddPaymentFragment"
 
     private val paymentViewModel: PaymentViewModel by viewModels()
 
@@ -51,6 +63,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private var monthList: List<String>? = null
     private var currencyList: List<String>? = null
 
+    private var periodType: String = ""
     private var billMonth: String? = null
     private var billMonthNumber = 1
     private var currencySymbol: String? = null
@@ -77,6 +90,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.progressBar.show()
 
         includeBinding = binding.include
 
@@ -107,7 +122,23 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                     if (it.isNotEmpty()) {
 
-                        lastPaymentInfo = it.last()
+                        Log.i(TAG, "getLastPaymentInfo: ")
+                        lastPaymentInfo = it.first()
+                        Log.d(TAG, "getLastPaymentInfo: $lastPaymentInfo")
+
+                        GlobalScope.launch {
+
+                            delay(100)
+
+                            withContext(Dispatchers.Main) {
+
+                                initialChanges()
+                            }
+                        }
+                    } else {
+
+                        initialChanges()
+                        binding.progressBar.hide()
                     }
 
                 })
@@ -128,7 +159,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 }
 
                 receivedRenter = ConversionWithGson.convertJSONtoRenter(args?.renterInfoMessage)
-                initialChanges()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -137,6 +167,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     @SuppressLint("SetTextI18n")
     private fun initialChanges() {
+
+        Log.i(TAG, "initialChanges: ")
 
         receivedRenter?.let {
 
@@ -157,6 +189,19 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 )
             }"
 
+            periodType = getString(R.string.by_month)
+
+            billMonth = monthList?.get(0)
+            billMonthNumber = 1
+
+            fromDateTimestamp = currentTimestamp
+            tillDateTimeStamp = currentTimestamp
+            numberOfDays = getString(R.string.same_day)
+            includeBinding.byDateErrorMessageTV.text = numberOfDays
+
+            includeBinding.fromDateTV.setDateInTextView(fromDateTimestamp)
+
+            includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
 
             if (lastPaymentInfo != null) {
 
@@ -167,9 +212,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 } else if (lastPaymentInfo!!.bill?.billPeriodType == getString(R.string.by_date)) {
 
+                    includeBinding.periodTypeRG.check(includeBinding.byDateRB.id)
                     hideByMonthAndShowByDateView()
                     initialiseByDateField()
                 }
+
+                includeBinding.houseRentET.editText?.setText(lastPaymentInfo?.houseRent)
 
                 if (lastPaymentInfo?.electricBill?.isTakingElectricBill != getString(R.string.f)) {
 
@@ -200,23 +248,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 calculateTotalBill()
 
-                billMonth = monthList?.get(0)
-                billMonthNumber = 1
-
-                fromDateTimestamp = currentTimestamp
-                tillDateTimeStamp = currentTimestamp
-                numberOfDays = getString(R.string.same_day)
-
-                includeBinding.byDateErrorMessageTV.text = numberOfDays
-
-                includeBinding.fromDateTV.setDateInTextView(fromDateTimestamp)
-
-                includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
-
                 includeBinding.duesOfLatsPaymentTV.text =
                     "There are no dues and no money given in advance."
             }
         }
+
+        binding.progressBar.hide()
     }
 
     @SuppressLint("SetTextI18n")
@@ -230,6 +267,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 includeBinding.duesOfLatsPaymentTV.text =
                     "Dues of last payments : + ${lastPaymentInfo?.bill?.currencySymbol}${lastPaymentInfo?.dueAmount}"
                 duesFromLastPayment = lastPaymentInfo?.dueAmount?.toDouble()
+
+                calculateTotalBill()
             }
             getString(R.string.paid_in_advance) -> {
 
@@ -238,6 +277,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     "Paid in advance in last payments : - ${lastPaymentInfo?.bill?.currencySymbol}${lastPaymentInfo?.dueAmount}"
                 paidInAdvanceFromLastPayment =
                     lastPaymentInfo?.paidInAdvanceAmount?.toDouble()
+
+                calculateTotalBill()
             }
             else -> {
 
@@ -365,9 +406,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             binding.saveBtn.id -> {
 
-                //todo : validate form
-                calculateTotalBill()
-                showBillInBottomSheet()
+
+                if (validateForm()) {
+
+                    calculateTotalBill()
+                    showBillInBottomSheet()
+                }
             }
 
             includeBinding.seeTotalBtn.id -> {
@@ -390,10 +434,29 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
+    private fun validateForm(): Boolean {
+
+        if (includeBinding.houseRentET.editText?.text.toString().trim().isEmpty()) {
+
+            includeBinding.houseRentET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
+        return includeBinding.houseRentET.error == null
+    }
+
     private fun showDateRangePickerDialog() {
 
+        val endDate = if (fromDateTimestamp!! > tillDateTimeStamp!!) {
+
+            fromDateTimestamp
+        } else {
+
+            tillDateTimeStamp
+        }
+
         val builder = MaterialDatePicker.Builder.dateRangePicker()
-            .setSelection(Pair(fromDateTimestamp, tillDateTimeStamp))
+            .setSelection(Pair(fromDateTimestamp, endDate))
             .setTitleText("Select date range")
             .build()
 
@@ -572,7 +635,9 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             }.positiveButton(text = "Add Payment") {
 
                 isAddPaymentClicked = true
-                //todo : save to database
+
+                saveToDatabase()
+
             }.negativeButton(text = "Edit") {
 
                 it.dismiss()
@@ -594,6 +659,111 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             e.printStackTrace()
         }
+    }
+
+    private fun saveToDatabase() {
+
+        if (periodType == getString(R.string.by_month)) {
+
+            fromDateTimestamp = 0L
+            tillDateTimeStamp = 0L
+            numberOfDays = ""
+        } else {
+
+            billMonth = ""
+            billMonthNumber = 0
+        }
+
+        val billInfo = BillInfo(
+            periodType,
+            fromDateTimestamp,
+            tillDateTimeStamp,
+            numberOfDays,
+            billMonth,
+            billMonthNumber,
+            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                currentTimestamp,
+                "yyyy"
+            )?.toInt(),
+            currencySymbol
+        )
+
+        val isTakingElectricBill = if (calculateElectricBill() != 0.0) {
+
+            getString(R.string.t)
+        } else {
+
+            getString(R.string.f)
+        }
+
+        val electricityBillInfo = ElectricityBillInfo(
+            isTakingElectricBill,
+            previousReading,
+            currentReading,
+            rate,
+            difference,
+            totalElectricBill.toString()
+        )
+
+        val payment = Payment(
+
+            currentTimestamp,
+            receivedRenter?.key!!,
+            billInfo,
+            electricityBillInfo,
+            houseRent.toString(),
+            if (parkingBill == 0.0) {
+                getString(R.string.f)
+            } else {
+                getString(R.string.t)
+            },
+            parkingBill.toString(),
+            includeBinding.extraFieldNameET.text.toString().trim(),
+            extraBillAmount.toString(),
+            amountPaid.toString(),
+            isDueOrPaidInAdvance.toString(),
+            duesFromLastPayment.toString(),
+            paidInAdvanceFromLastPayment.toString(),
+            includeBinding.addNoteET.text.toString().trim(),
+            totalRent.toString(),
+            getUid()!!,
+            "${System.currentTimeMillis().toStringM(69)}_${
+                Random.nextLong(
+                    100,
+                    9223372036854775
+                ).toStringM(69)
+            }_${getUid()}",
+            getString(R.string.f)
+        )
+
+
+        if (isInternetAvailable(requireContext())) {
+
+            payment.isSynced = getString(R.string.t)
+
+            addToFireStore(payment)
+
+            paymentViewModel.insertPayment(payment)
+            requireActivity().onBackPressed()
+        } else {
+
+            payment.isSynced = getString(R.string.f)
+
+            paymentViewModel.insertPayment(payment)
+            requireActivity().onBackPressed()
+        }
+    }
+
+
+    private fun addToFireStore(payment: Payment) {
+
+        uploadDocumentToFireStore(
+            requireContext(),
+            convertPaymentToJSONString(payment),
+            getString(R.string.payments),
+            payment.key
+        )
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -672,12 +842,17 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             when {
                 amountPaid < totalRent -> {
                     isDueOrPaidInAdvance = getString(R.string.due)
+
+                    paidInAdvanceFromLastPayment = 0.0
                     duesFromLastPayment = duesFromLastPayment?.plus((totalRent - amountPaid))
+
                     String.format("%.2f", (totalRent - amountPaid))
                 }
                 amountPaid > totalRent -> {
 
                     isDueOrPaidInAdvance = getString(R.string.paid_in_advance)
+
+                    duesFromLastPayment = 0.0
                     paidInAdvanceFromLastPayment =
                         paidInAdvanceFromLastPayment?.plus((amountPaid - totalRent))
 
@@ -764,6 +939,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private fun showByMonthAndHideByDateView() {
 
         try {
+            periodType = getString(R.string.by_month)
             includeBinding.byDateCL.hide()
             includeBinding.monthSelectSpinner.show()
         } catch (e: Exception) {
@@ -774,6 +950,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private fun hideByMonthAndShowByDateView() {
 
         try {
+            periodType = getString(R.string.by_date)
             includeBinding.byDateCL.show()
             includeBinding.monthSelectSpinner.hide()
         } catch (e: Exception) {

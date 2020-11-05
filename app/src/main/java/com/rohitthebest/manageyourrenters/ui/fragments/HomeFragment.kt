@@ -68,12 +68,15 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         mAdapter = ShowRentersAdapter()
 
+        showProgressBar()
+
         GlobalScope.launch {
 
-            delay(100)
+            delay(270)
 
             withContext(Dispatchers.Main) {
 
+                updateUI()
                 getAllRentersList()
             }
         }
@@ -156,6 +159,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
+        hideProgressBar()
     }
 
     override fun onRenterClicked(renter: Renter) {
@@ -285,8 +290,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    private fun updateUI() {
 
         if (mAuth?.currentUser != null) {
 
@@ -298,12 +302,10 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                         .load(mAuth?.currentUser!!.photoUrl)
                         .into(binding.profileImage)
                 }
-
             } else {
 
                 showNoInternetMessage(requireContext())
             }
-
         }
     }
 
@@ -385,6 +387,30 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                 binding.renterSV.hide()
                 binding.searchET.setText("")
             }
+        }
+    }
+
+    private fun showProgressBar() {
+
+        try {
+
+            binding.homeProgressBar.show()
+            binding.rentersRV.hide()
+        } catch (e: java.lang.Exception) {
+
+            e.printStackTrace()
+        }
+    }
+
+    private fun hideProgressBar() {
+
+        try {
+
+            binding.homeProgressBar.hide()
+            binding.rentersRV.show()
+        } catch (e: java.lang.Exception) {
+
+            e.printStackTrace()
         }
     }
 

@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentBinding
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoRenter
@@ -58,6 +57,7 @@ class PaymentFragment : Fragment(), View.OnClickListener {
     private fun initListener() {
 
         binding.addPyamentFAB.setOnClickListener(this)
+        binding.paymentBackBtn.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
@@ -77,6 +77,11 @@ class PaymentFragment : Fragment(), View.OnClickListener {
 
                     e.printStackTrace()
                 }
+            }
+
+            binding.paymentBackBtn.id -> {
+
+                requireActivity().onBackPressed()
             }
         }
     }

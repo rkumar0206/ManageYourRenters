@@ -30,6 +30,7 @@ import com.rohitthebest.manageyourrenters.ui.fragments.PaymentFragmentArgs
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,6 +61,9 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private var numberOfDays: String? = ""
 
     private var lastPaymentInfo: Payment? = null
+    private var isDueOrPaidInAdvance: String? = ""
+    private var duesFromLastPayment: Double? = 0.0
+    private var paidInAdvanceFromLastPayment: Double? = 0.0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -188,6 +192,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     includeBinding.parkingET.editText?.setText(lastPaymentInfo?.parkingRent)
                 }
 
+                initializeLastPaymentsDuesAndAdvance()
+
             } else {
 
                 currencySymbol = currencyList?.get(0)
@@ -206,8 +212,40 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 includeBinding.fromDateTV.setDateInTextView(fromDateTimestamp)
 
                 includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
+
+                includeBinding.duesOfLatsPaymentTV.text =
+                    "There are no dues and no money given in advance."
             }
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun initializeLastPaymentsDuesAndAdvance() {
+
+        when (lastPaymentInfo?.isDueOrPaidInAdvance) {
+
+            getString(R.string.due) -> {
+
+                includeBinding.duesOfLatsPaymentTV.changeTextColor(R.color.color_orange)
+                includeBinding.duesOfLatsPaymentTV.text =
+                    "Dues of last payments : + ${lastPaymentInfo?.bill?.currencySymbol}${lastPaymentInfo?.dueAmount}"
+                duesFromLastPayment = lastPaymentInfo?.dueAmount?.toDouble()
+            }
+            getString(R.string.paid_in_advance) -> {
+
+                includeBinding.duesOfLatsPaymentTV.changeTextColor(R.color.color_green)
+                includeBinding.duesOfLatsPaymentTV.text =
+                    "Paid in advance in last payments : - ${lastPaymentInfo?.bill?.currencySymbol}${lastPaymentInfo?.dueAmount}"
+                paidInAdvanceFromLastPayment =
+                    lastPaymentInfo?.paidInAdvanceAmount?.toDouble()
+            }
+            else -> {
+
+                includeBinding.duesOfLatsPaymentTV.text =
+                    "There are no dues and no money given in advance."
+            }
+        }
+
     }
 
     private fun initialiseByDateField() {
@@ -327,6 +365,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             binding.saveBtn.id -> {
 
+                //todo : validate form
+                calculateTotalBill()
                 showBillInBottomSheet()
             }
 
@@ -411,11 +451,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     }
 
     //electricity vars
-    var previousReading: Double = 0.0
-    var currentReading: Double = 0.0
-    var rate: Double = 0.0
-    var difference: Double = 0.0
-    var totalElectricBill: Double = 0.0
+    private var previousReading: Double = 0.0
+    private var currentReading: Double = 0.0
+    private var rate: Double = 0.0
+    private var difference: Double = 0.0
+    private var totalElectricBill: Double = 0.0
 
     private fun calculateElectricBill(): Double {
 
@@ -462,11 +502,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     }
 
     //total rent vars
-    var parkingBill: Double = 0.0
-    var houseRent: Double = 0.0
-    var extraBillAmount: Double = 0.0
-    var amountPaid: Double = 0.0
-    var totalRent: Double = 0.0
+    private var parkingBill: Double = 0.0
+    private var houseRent: Double = 0.0
+    private var extraBillAmount: Double = 0.0
+    private var amountPaid: Double = 0.0
+    private var totalRent: Double = 0.0
 
     @SuppressLint("SetTextI18n")
     private fun calculateTotalBill(): String {
@@ -496,7 +536,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             0.0
         }
 
-        totalRent = ((totalElectricBill + parkingBill + houseRent + extraBillAmount))
+        totalRent =
+            ((totalElectricBill + parkingBill + houseRent + extraBillAmount + duesFromLastPayment!!) - paidInAdvanceFromLastPayment!!)
 
         includeBinding.totalTV.text = "$currencySymbol ${String.format("%.2f", totalRent)}"
 
@@ -512,6 +553,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         return totalRent.toString()
     }
 
+    private var isAddPaymentClicked = false
+
     private fun showBillInBottomSheet() {
 
         try {
@@ -526,6 +569,26 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 )
 
                 initializeValues(this.getCustomView())
+            }.positiveButton(text = "Add Payment") {
+
+                isAddPaymentClicked = true
+                //todo : save to database
+            }.negativeButton(text = "Edit") {
+
+                it.dismiss()
+            }.setOnDismissListener {
+
+                if (!isAddPaymentClicked) {
+
+                    if (lastPaymentInfo != null) {
+
+                        initializeLastPaymentsDuesAndAdvance()
+                    } else {
+
+                        duesFromLastPayment = 0.0
+                        paidInAdvanceFromLastPayment = 0.0
+                    }
+                }
             }
         } catch (e: Exception) {
 
@@ -533,6 +596,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initializeValues(customView: View) {
 
         //renter info
@@ -547,6 +611,15 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             .setDateInTextView(currentTimestamp)
         customView.findViewById<TextView>(R.id.showBill_billTime)
             .setDateInTextView(currentTimestamp, "hh:mm:ss")
+        customView.findViewById<TextView>(R.id.showBill_billPeriod).text =
+            if (includeBinding.periodTypeRG.checkedRadioButtonId == includeBinding.byMonthRB.id) {
+
+                billMonth
+            } else {
+                "${
+                    includeBinding.fromDateTV.text.toString().trim()
+                } to ${includeBinding.tillDateTV.text.toString().trim()}"
+            }
 
         //electricity
         customView.findViewById<TextView>(R.id.showBill_previousReading).text =
@@ -580,31 +653,46 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 "0.0"
             } else {
 
-                String.format("%2f", includeBinding.extraAmountET.text.toString().trim().toDouble())
+                String.format(
+                    "%.2f",
+                    includeBinding.extraAmountET.text.toString().trim().toDouble()
+                )
             }
 
         customView.findViewById<TextView>(R.id.showBill_AmountPaid).text =
             String.format("%.2f", amountPaid)
 
+        customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
+            "+ ${String.format("%.2f", duesFromLastPayment)}"
+
+        customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
+            "- ${String.format("%.2f", paidInAdvanceFromLastPayment)}"
 
         customView.findViewById<TextView>(R.id.showBill_dueAmount).text =
             when {
                 amountPaid < totalRent -> {
-
+                    isDueOrPaidInAdvance = getString(R.string.due)
+                    duesFromLastPayment = duesFromLastPayment?.plus((totalRent - amountPaid))
                     String.format("%.2f", (totalRent - amountPaid))
                 }
                 amountPaid > totalRent -> {
 
-                    customView.findViewById<TextView>(R.id.showBill_dueOrArrear).text = "Arrear"
+                    isDueOrPaidInAdvance = getString(R.string.paid_in_advance)
+                    paidInAdvanceFromLastPayment =
+                        paidInAdvanceFromLastPayment?.plus((amountPaid - totalRent))
+
+                    customView.findViewById<TextView>(R.id.show_billDueOrArrearTV).text =
+                        getString(R.string.paid_in_advance)
+
                     String.format("%.2f", (amountPaid - totalRent))
                 }
                 else -> {
+                    isDueOrPaidInAdvance = ""
                     "0.0"
                 }
             }
 
-
-        //customView.findViewById<TextView>(R.id.showBill_netDemand).text = calculateNetDemand()
+        customView.findViewById<TextView>(R.id.showBill_netDemand).text = totalRent.toString()
     }
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
@@ -638,7 +726,39 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             override fun afterTextChanged(s: Editable?) {}
         })
 
+        includeBinding.amountPaidET.editText?.addTextChangedListener(object : TextWatcher {
 
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+                if (s?.toString()?.trim()?.isNotEmpty()!!) {
+
+                    when {
+
+                        s.toString().trim().toDouble() < totalRent -> {
+
+                            includeBinding.amountPaidET.editText?.setTextColor(
+                                ContextCompat.getColor(
+                                    requireContext(), R.color.color_orange
+                                )
+                            )
+                        }
+
+                        else -> {
+
+                            includeBinding.amountPaidET.editText?.setTextColor(
+                                ContextCompat.getColor(
+                                    requireContext(), R.color.color_green
+                                )
+                            )
+                        }
+
+                    }
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
     }
 
     private fun showByMonthAndHideByDateView() {
@@ -672,6 +792,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     override fun onDestroyView() {
         super.onDestroyView()
 
+        try {
+            hideKeyBoard(requireActivity())
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
         _binding = null
     }
 

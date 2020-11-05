@@ -103,7 +103,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider4"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -369,7 +369,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -450,7 +450,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView2"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -833,7 +833,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:padding="4dp"
-                android:text="@string/dues_if_any"
+                android:text="Amount Paid"
                 android:textColor="@color/textColor1"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -863,7 +863,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView20" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/dueAmountET"
+                android:id="@+id/amountPaidET"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -881,9 +881,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
-                    android:hint="@string/due_amount"
+                    android:hint="Amout paid "
                     android:inputType="numberDecimal"
-                    android:textColor="@color/color_Red" />
+                    android:textColor="@color/color_green" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

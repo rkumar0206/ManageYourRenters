@@ -15,6 +15,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.entity.Payment
@@ -323,7 +327,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             binding.saveBtn.id -> {
 
-                //todo : show bill
+                showBillInBottomSheet()
             }
 
             includeBinding.seeTotalBtn.id -> {
@@ -406,9 +410,16 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     }
 
+    //electricity vars
+    var previousReading: Double = 0.0
+    var currentReading: Double = 0.0
+    var rate: Double = 0.0
+    var difference: Double = 0.0
+    var totalElectricBill: Double = 0.0
+
     private fun calculateElectricBill(): Double {
 
-        val previousReading = if (includeBinding.previousReadingET.text.toString().trim() == "") {
+        previousReading = if (includeBinding.previousReadingET.text.toString().trim() == "") {
 
             0.0
         } else {
@@ -416,7 +427,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             includeBinding.previousReadingET.text.toString().trim().toDouble()
         }
 
-        val currentReading = if (includeBinding.currentReadingET.text.toString().trim() == "") {
+        currentReading = if (includeBinding.currentReadingET.text.toString().trim() == "") {
 
             0.0
         } else {
@@ -432,7 +443,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             return 0.0
         }
 
-        val rate = if (includeBinding.rateET.text.toString().trim() == "") {
+        rate = if (includeBinding.rateET.text.toString().trim() == "") {
 
             0.0
         } else {
@@ -440,20 +451,29 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             includeBinding.rateET.text.toString().trim().toDouble()
         }
 
-        val total = ((currentReading - previousReading)) * rate
+        difference = currentReading - previousReading
+        totalElectricBill = difference * rate
 
         includeBinding.electricityErrorTextTV.changeTextColor(R.color.color_green)
-        includeBinding.electricityErrorTextTV.text = getString(R.string.total, total.toString())
+        includeBinding.electricityErrorTextTV.text =
+            getString(R.string.total, String.format("%.2f", totalElectricBill))
 
-        return total
+        return totalElectricBill
     }
+
+    //total rent vars
+    var parkingBill: Double = 0.0
+    var houseRent: Double = 0.0
+    var extraBillAmount: Double = 0.0
+    var amountPaid: Double = 0.0
+    var totalRent: Double = 0.0
 
     @SuppressLint("SetTextI18n")
     private fun calculateTotalBill(): String {
 
-        val electricBill = calculateElectricBill()
+        calculateElectricBill()
 
-        val parkingBill = if (includeBinding.parkingET.editText?.text.toString().trim() != "") {
+        parkingBill = if (includeBinding.parkingET.editText?.text.toString().trim() != "") {
 
             includeBinding.parkingET.editText?.text.toString().trim().toDouble()
 
@@ -462,32 +482,129 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             0.0
         }
 
-        val houseRent = if (includeBinding.houseRentET.editText?.text.toString().trim() != "") {
+        houseRent = if (includeBinding.houseRentET.editText?.text.toString().trim() != "") {
 
             includeBinding.houseRentET.editText?.text.toString().trim().toDouble()
         } else {
             0.0
         }
 
-        val extraBill = if (includeBinding.extraAmountET.text.toString().trim() != "") {
+        extraBillAmount = if (includeBinding.extraAmountET.text.toString().trim() != "") {
 
             includeBinding.extraAmountET.text.toString().trim().toDouble()
         } else {
             0.0
         }
 
-        val dueBill = if (includeBinding.dueAmountET.editText?.text.toString().trim() != "") {
+        totalRent = ((totalElectricBill + parkingBill + houseRent + extraBillAmount))
 
-            includeBinding.dueAmountET.editText?.text.toString().trim().toDouble()
+        includeBinding.totalTV.text = "$currencySymbol ${String.format("%.2f", totalRent)}"
+
+        amountPaid = if (includeBinding.amountPaidET.editText?.text.toString().trim() == "") {
+
+            includeBinding.amountPaidET.editText?.setText(totalRent.toString())
+            totalRent
         } else {
-            0.0
+
+            includeBinding.amountPaidET.editText?.text.toString().trim().toDouble()
         }
 
-        val total = ((electricBill + parkingBill + houseRent + extraBill) - dueBill).toString()
+        return totalRent.toString()
+    }
 
-        includeBinding.totalTV.text = "$currencySymbol $total"
+    private fun showBillInBottomSheet() {
 
-        return total
+        try {
+            MaterialDialog(requireContext(), BottomSheet()).show {
+
+                title(text = "Your Bill")
+
+                customView(
+                    R.layout.show_bill_layout,
+                    scrollable = true,
+                    noVerticalPadding = true
+                )
+
+                initializeValues(this.getCustomView())
+            }
+        } catch (e: Exception) {
+
+            e.printStackTrace()
+        }
+    }
+
+    private fun initializeValues(customView: View) {
+
+        //renter info
+        customView.findViewById<TextView>(R.id.showBill_renterName).text = receivedRenter?.name
+        customView.findViewById<TextView>(R.id.showBill_renterMobile).text =
+            receivedRenter?.mobileNumber
+        customView.findViewById<TextView>(R.id.showBill_renterAddress).text =
+            receivedRenter?.address
+
+        //billing parameter
+        customView.findViewById<TextView>(R.id.showBill_billDate)
+            .setDateInTextView(currentTimestamp)
+        customView.findViewById<TextView>(R.id.showBill_billTime)
+            .setDateInTextView(currentTimestamp, "hh:mm:ss")
+
+        //electricity
+        customView.findViewById<TextView>(R.id.showBill_previousReading).text =
+            String.format("%.2f", previousReading)
+        customView.findViewById<TextView>(R.id.showBill_currentReading).text =
+            String.format("%.2f", currentReading)
+        customView.findViewById<TextView>(R.id.showBill_rate).text = String.format("%.2f", rate)
+        customView.findViewById<TextView>(R.id.showBill_difference).text =
+            String.format("%.2f", difference)
+        customView.findViewById<TextView>(R.id.showBill_electricity_total).text =
+            String.format("%.2f", totalElectricBill)
+
+        //total rent
+        customView.findViewById<TextView>(R.id.showBill_houseRent).text =
+            String.format("%.2f", houseRent)
+        customView.findViewById<TextView>(R.id.showBill_parking).text =
+            String.format("%.2f", parkingBill)
+        customView.findViewById<TextView>(R.id.showBill_electricity).text =
+            String.format("%.2f", totalElectricBill)
+        customView.findViewById<TextView>(R.id.showBill_extraFieldName).text =
+            if (includeBinding.extraFieldNameET.text.toString().trim() == "") {
+
+                "Extra"
+            } else {
+                includeBinding.extraFieldNameET.text.toString().trim()
+            }
+
+        customView.findViewById<TextView>(R.id.showBill_extraFieldAmount).text =
+            if (includeBinding.extraAmountET.text.toString().trim() == "") {
+
+                "0.0"
+            } else {
+
+                String.format("%2f", includeBinding.extraAmountET.text.toString().trim().toDouble())
+            }
+
+        customView.findViewById<TextView>(R.id.showBill_AmountPaid).text =
+            String.format("%.2f", amountPaid)
+
+
+        customView.findViewById<TextView>(R.id.showBill_dueAmount).text =
+            when {
+                amountPaid < totalRent -> {
+
+                    String.format("%.2f", (totalRent - amountPaid))
+                }
+                amountPaid > totalRent -> {
+
+                    customView.findViewById<TextView>(R.id.showBill_dueOrArrear).text = "Arrear"
+                    String.format("%.2f", (amountPaid - totalRent))
+                }
+                else -> {
+                    "0.0"
+                }
+            }
+
+
+        //customView.findViewById<TextView>(R.id.showBill_netDemand).text = calculateNetDemand()
     }
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
@@ -544,10 +661,10 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
-    private fun TextView.setDateInTextView(timeStamp: Long?) {
+    private fun TextView.setDateInTextView(timeStamp: Long?, pattern: String = "dd-MM-yyyy") {
 
         this.text = WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-            timeStamp
+            timeStamp, pattern
         )
 
     }

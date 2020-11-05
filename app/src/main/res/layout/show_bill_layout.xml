@@ -54,7 +54,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider18"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -191,7 +191,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView12"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -536,6 +536,17 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/showBill_extraFieldName" />
 
+            <View
+                android:id="@+id/divider34"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/showBill_extraFieldName" />
+
             <TextView
                 android:id="@+id/textView5"
                 android:layout_width="wrap_content"
@@ -545,13 +556,13 @@
                 android:text="@string/due_amount"
                 android:textSize="17sp"
                 app:layout_constraintStart_toStartOf="@+id/showBill_extraFieldName"
-                app:layout_constraintTop_toBottomOf="@+id/showBill_extraFieldName" />
+                app:layout_constraintTop_toBottomOf="@+id/showBill_dueOrArrear" />
 
             <View
                 android:id="@+id/divider28"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -608,11 +619,32 @@
                 android:layout_marginEnd="16dp"
                 android:padding="2dp"
                 android:text="@string/Null"
-                android:textColor="@color/color_orange"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/textView5"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textView5" />
+
+            <TextView
+                android:id="@+id/showBill_dueOrArrear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="2dp"
+                android:text="@string/amount_paid"
+                android:textSize="17sp"
+                app:layout_constraintStart_toStartOf="@+id/showBill_extraFieldName"
+                app:layout_constraintTop_toBottomOf="@+id/divider34" />
+
+            <TextView
+                android:id="@+id/showBill_AmountPaid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="2dp"
+                android:text="@string/Null"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/textView5"
+                app:layout_constraintEnd_toEndOf="@+id/showBill_extraFieldAmount"
+                app:layout_constraintTop_toTopOf="@+id/showBill_dueOrArrear" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

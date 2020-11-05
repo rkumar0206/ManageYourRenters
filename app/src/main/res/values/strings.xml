@@ -71,6 +71,7 @@
     <string name="total_rent">Total Rent</string>
     <string name="extra_">Extra</string>
     <string name="net_demand">Net demand</string>
+    <string name="amount_paid">Amount Paid</string>
 
     <string-array name="currency_symbol">
         <item>"₹"</item>

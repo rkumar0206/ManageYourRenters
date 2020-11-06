@@ -70,22 +70,22 @@
             android:text="Net demand : 3500"
             android:textColor="@color/primaryTextColor"
             android:textSize="18sp"
-            app:layout_constraintEnd_toStartOf="@+id/imageButton2"
+            app:layout_constraintEnd_toStartOf="@+id/paymentAdapter_syncBtn"
             app:layout_constraintStart_toStartOf="@+id/paymentAdapter_billPeriodTV"
             app:layout_constraintTop_toBottomOf="@+id/divider36" />
 
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/paymentAdapter_syncBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/transparent"
             app:layout_constraintBottom_toBottomOf="@+id/paymentAdapter_neetDemandTV"
-            app:layout_constraintEnd_toStartOf="@+id/imageButton3"
+            app:layout_constraintEnd_toStartOf="@+id/paymentAdapter_deleteBtn"
             app:layout_constraintTop_toTopOf="@+id/paymentAdapter_neetDemandTV"
             app:srcCompat="@drawable/ic_baseline_sync_24" />
 
         <ImageButton
-            android:id="@+id/imageButton3"
+            android:id="@+id/paymentAdapter_deleteBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/transparent"

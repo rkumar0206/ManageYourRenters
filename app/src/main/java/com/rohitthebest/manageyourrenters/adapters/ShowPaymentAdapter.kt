@@ -38,7 +38,7 @@ class ShowPaymentAdapter :
                                 WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                                     it.bill?.billDateFrom
                                 )
-                            }\nTo :  ${
+                            }\nTo    :  ${
                                 WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                                     it.bill?.billDateTill
                                 )
@@ -46,12 +46,22 @@ class ShowPaymentAdapter :
                     }
 
                     paymentAdapter_issueDateTV.text =
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                            it.timeStamp
-                        )
+                        "Issue date : ${
+                            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                it.timeStamp
+                            )
+                        }"
 
-                    paymentAdapter_neetDemandTV.text = it.totalRent
-                    paymentAdapter_amountPaidTV.text = it.amountPaid
+                    paymentAdapter_neetDemandTV.text = "Net demand : ${it.totalRent}"
+                    paymentAdapter_amountPaidTV.text = "Amount paid : ${it.amountPaid}"
+
+                    if (it.isSynced == context.getString(R.string.t)) {
+
+                        itemView.paymentAdapter_syncBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                    } else {
+
+                        itemView.paymentAdapter_syncBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                    }
 
                 }
             }

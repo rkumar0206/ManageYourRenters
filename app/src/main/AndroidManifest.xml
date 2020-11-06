@@ -25,6 +25,7 @@
 
         <service android:name=".services.UploadService" />
         <service android:name=".services.DeleteService" />
+        <service android:name=".services.UpdateService" />
 
         <meta-data
             android:name="io.sentry.dsn"

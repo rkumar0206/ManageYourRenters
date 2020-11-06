@@ -63,31 +63,61 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:padding="4dp"
             android:text="Net demand : 3500"
+            android:textColor="@color/primaryTextColor"
             android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/textView12"
             app:layout_constraintStart_toStartOf="@+id/textView5"
             app:layout_constraintTop_toBottomOf="@+id/divider36" />
 
-        <TextView
-            android:id="@+id/textView12"
+        <ImageButton
+            android:id="@+id/imageButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:padding="4dp"
-            android:text="Due : 3500"
-            android:textSize="16sp"
+            android:backgroundTint="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="@+id/textView10"
+            app:layout_constraintEnd_toStartOf="@+id/imageButton3"
+            app:layout_constraintTop_toTopOf="@+id/textView10"
+            app:srcCompat="@drawable/ic_baseline_sync_24" />
+
+        <ImageButton
+            android:id="@+id/imageButton3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
             app:layout_constraintBottom_toBottomOf="@+id/textView10"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView10" />
+            app:layout_constraintTop_toTopOf="@+id/textView10"
+            app:srcCompat="@drawable/ic_baseline_delete_24" />
+
+        <View
+            android:id="@+id/divider38"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="4dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView10" />
+
+        <TextView
+            android:id="@+id/textView22"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"
+            android:padding="4dp"
+            android:text="Amount Paid : 3500"
+            android:textColor="@color/primaryTextColor"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textView10"
+            app:layout_constraintTop_toBottomOf="@+id/divider38" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

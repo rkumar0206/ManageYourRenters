@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.services.DeleteService
+import com.rohitthebest.manageyourrenters.services.UpdateService
 import com.rohitthebest.manageyourrenters.services.UploadService
 
 import kotlin.random.Random
@@ -45,7 +46,7 @@ class FirebaseServiceHelper {
             ContextCompat.startForegroundService(context, foregroundService)
         }
 
-     /*   fun updateDocumentOnFireStore(
+        fun updateDocumentOnFireStore(
             context: Context,
             map: HashMap<String, Any?>?,
             collectionKey: String,
@@ -75,7 +76,7 @@ class FirebaseServiceHelper {
             )
 
             ContextCompat.startForegroundService(context, foregroundService)
-        }*/
+        }
 
 
         fun deleteDocumentFromFireStore(

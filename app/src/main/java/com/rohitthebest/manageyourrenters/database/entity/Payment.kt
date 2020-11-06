@@ -20,7 +20,7 @@ data class Payment(
     var extraFieldName: String?,
     var extraAmount: String?,
     var amountPaid: String?,
-    var isDueOrPaidInAdvance: String = "due",
+    var isDueOrPaidInAdvance: String = "",
     var dueAmount: String?,
     var paidInAdvanceAmount: String,
     var messageOrNote: String?,

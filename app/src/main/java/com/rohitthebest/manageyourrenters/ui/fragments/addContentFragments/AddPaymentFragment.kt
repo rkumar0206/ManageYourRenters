@@ -33,6 +33,7 @@ import com.rohitthebest.manageyourrenters.ui.fragments.PaymentFragmentArgs
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertPaymentToJSONString
+import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.updateDocumentOnFireStore
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.uploadDocumentToFireStore
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
@@ -77,6 +78,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private var isDueOrPaidInAdvance: String? = ""
     private var duesFromLastPayment: Double? = 0.0
     private var paidInAdvanceFromLastPayment: Double? = 0.0
+    private var presentDue: Double? = 0.0
+    private var presentPaidInAdvance: Double? = 0.0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -176,7 +179,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             currentTimestamp = System.currentTimeMillis()
 
-            includeBinding.dateTV.text = "Date : ${
+            includeBinding.dateTV.text = "Bill Issue Date : ${
                 WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                     currentTimestamp
                 )
@@ -185,7 +188,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             includeBinding.timeTV.text = "Time : ${
                 WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                     currentTimestamp,
-                    "hh:mm:ss"
+                    "hh:mm a"
                 )
             }"
 
@@ -261,6 +264,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 includeBinding.duesOfLatsPaymentTV.changeTextColor(R.color.color_orange)
                 includeBinding.duesOfLatsPaymentTV.text =
                     "Dues of last payments : + ${lastPaymentInfo?.bill?.currencySymbol}${lastPaymentInfo?.dueAmount}"
+
                 duesFromLastPayment = lastPaymentInfo?.dueAmount?.toDouble()
 
                 calculateTotalBill()
@@ -269,9 +273,9 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 includeBinding.duesOfLatsPaymentTV.changeTextColor(R.color.color_green)
                 includeBinding.duesOfLatsPaymentTV.text =
-                    "Paid in advance in last payments : - ${lastPaymentInfo?.bill?.currencySymbol}${lastPaymentInfo?.dueAmount}"
-                paidInAdvanceFromLastPayment =
-                    lastPaymentInfo?.paidInAdvanceAmount?.toDouble()
+                    "Paid in advance in last payments : - ${lastPaymentInfo?.bill?.currencySymbol}${lastPaymentInfo?.paidInAdvanceAmount}"
+
+                paidInAdvanceFromLastPayment = lastPaymentInfo?.paidInAdvanceAmount?.toDouble()
 
                 calculateTotalBill()
             }
@@ -611,8 +615,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         return totalRent.toString()
     }
 
-    private var isAddPaymentClicked = false
-
     private fun showBillInBottomSheet() {
 
         try {
@@ -629,30 +631,78 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 initializeValues(this.getCustomView())
             }.positiveButton(text = "Add Payment") {
 
-                isAddPaymentClicked = true
+                //updating last payment (i.e. due and paid in advance should be 0.0 of last payment)
+                updateLastPayment()
 
                 saveToDatabase()
 
             }.negativeButton(text = "Edit") {
 
                 it.dismiss()
-            }.setOnDismissListener {
-
-                if (!isAddPaymentClicked) {
-
-                    if (lastPaymentInfo != null) {
-
-                        initializeLastPaymentsDuesAndAdvance()
-                    } else {
-
-                        duesFromLastPayment = 0.0
-                        paidInAdvanceFromLastPayment = 0.0
-                    }
-                }
             }
         } catch (e: Exception) {
 
             e.printStackTrace()
+        }
+    }
+
+    private fun updateLastPayment() {
+
+        if (lastPaymentInfo?.isDueOrPaidInAdvance == getString(R.string.due) ||
+            lastPaymentInfo?.isDueOrPaidInAdvance == getString(R.string.paid_in_advance)
+        ) {
+
+            val map = HashMap<String, Any?>()
+
+            if (lastPaymentInfo?.dueAmount?.toDouble() != 0.0) {
+
+                map["dueAmount"] = "0.0"
+            }
+
+            if (lastPaymentInfo?.paidInAdvanceAmount?.toDouble() != 0.0) {
+
+                map["paidInAdvanceAmount"] = "0.0"
+            }
+
+            //fireStore saves isDueOrPaidInAdvance as dueOrPaidInAdvance
+            map["dueOrPaidInAdvance"] = ""
+
+            lastPaymentInfo?.isDueOrPaidInAdvance = ""
+            lastPaymentInfo?.dueAmount = "0.0"
+            lastPaymentInfo?.paidInAdvanceAmount = "0.0"
+
+            if (isInternetAvailable(requireContext())) {
+
+                if (lastPaymentInfo?.isSynced == getString(R.string.t)) {
+
+                    updateDocumentOnFireStore(
+                        requireContext(),
+                        map,
+                        getString(R.string.payments),
+                        lastPaymentInfo?.key!!
+                    )
+
+                    paymentViewModel.insertPayment(lastPaymentInfo!!)
+                } else {
+
+                    lastPaymentInfo?.isSynced = getString(R.string.t)
+
+                    uploadDocumentToFireStore(
+                        requireContext(),
+                        convertPaymentToJSONString(lastPaymentInfo!!),
+                        getString(R.string.payments),
+                        lastPaymentInfo?.key!!
+                    )
+
+                    paymentViewModel.insertPayment(lastPaymentInfo!!)
+                }
+
+            } else {
+
+                lastPaymentInfo?.isSynced = getString(R.string.f)
+                paymentViewModel.insertPayment(lastPaymentInfo!!)
+            }
+
         }
     }
 
@@ -717,8 +767,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             extraBillAmount.toString(),
             amountPaid.toString(),
             isDueOrPaidInAdvance.toString(),
-            duesFromLastPayment.toString(),
-            paidInAdvanceFromLastPayment.toString(),
+            presentDue.toString(),
+            presentPaidInAdvance.toString(),
             includeBinding.addNoteET.text.toString().trim(),
             totalRent.toString(),
             getUid()!!,
@@ -749,7 +799,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
-
     private fun addToFireStore(payment: Payment) {
 
         uploadDocumentToFireStore(
@@ -775,7 +824,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         customView.findViewById<TextView>(R.id.showBill_billDate)
             .setDateInTextView(currentTimestamp)
         customView.findViewById<TextView>(R.id.showBill_billTime)
-            .setDateInTextView(currentTimestamp, "hh:mm:ss")
+            .setDateInTextView(currentTimestamp, "hh:mm a")
         customView.findViewById<TextView>(R.id.showBill_billPeriod).text =
             if (includeBinding.periodTypeRG.checkedRadioButtonId == includeBinding.byMonthRB.id) {
 
@@ -849,23 +898,22 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 amountPaid < totalRent -> {
                     isDueOrPaidInAdvance = getString(R.string.due)
 
-                    paidInAdvanceFromLastPayment = 0.0
-                    duesFromLastPayment = duesFromLastPayment?.plus((totalRent - amountPaid))
+                    presentPaidInAdvance = 0.0
+                    presentDue = totalRent - amountPaid
 
-                    "$currencySymbol ${String.format("%.2f", (totalRent - amountPaid))}"
+                    "$currencySymbol ${String.format("%.2f", presentDue)}"
                 }
                 amountPaid > totalRent -> {
 
                     isDueOrPaidInAdvance = getString(R.string.paid_in_advance)
 
-                    duesFromLastPayment = 0.0
-                    paidInAdvanceFromLastPayment =
-                        paidInAdvanceFromLastPayment?.plus((amountPaid - totalRent))
+                    presentDue = 0.0
+                    presentPaidInAdvance = amountPaid - totalRent
 
                     customView.findViewById<TextView>(R.id.show_billDueOrArrearTV).text =
                         getString(R.string.paid_in_advance)
 
-                    "$currencySymbol ${String.format("%.2f", (amountPaid - totalRent))}"
+                    "$currencySymbol ${String.format("%.2f", presentPaidInAdvance)}"
                 }
                 else -> {
                     isDueOrPaidInAdvance = ""

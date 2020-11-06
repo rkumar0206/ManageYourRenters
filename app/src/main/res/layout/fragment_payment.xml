@@ -72,6 +72,7 @@
         android:id="@+id/paymentRV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        tools:listitem="@layout/adapter_show_payment"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

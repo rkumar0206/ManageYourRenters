@@ -411,7 +411,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             includeBinding.seeTotalBtn.id -> {
 
-                calculateTotalBill()
+                includeBinding.amountPaidET.editText?.setText(calculateTotalBill())
             }
 
             binding.backBtn.id -> {
@@ -779,7 +779,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         customView.findViewById<TextView>(R.id.showBill_billPeriod).text =
             if (includeBinding.periodTypeRG.checkedRadioButtonId == includeBinding.byMonthRB.id) {
 
-                billMonth
+                "$billMonth, ${
+                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        currentTimestamp,
+                        "yyyy"
+                    )
+                }"
             } else {
                 "${
                     includeBinding.fromDateTV.text.toString().trim()
@@ -788,22 +793,26 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         //electricity
         customView.findViewById<TextView>(R.id.showBill_previousReading).text =
-            String.format("%.2f", previousReading)
+            "${String.format("%.2f", previousReading)} unit(s)"
         customView.findViewById<TextView>(R.id.showBill_currentReading).text =
-            String.format("%.2f", currentReading)
-        customView.findViewById<TextView>(R.id.showBill_rate).text = String.format("%.2f", rate)
+            "${String.format("%.2f", currentReading)} unit(s)"
+        customView.findViewById<TextView>(R.id.showBill_rate).text =
+            "${String.format("%.2f", rate)} per/unit"
         customView.findViewById<TextView>(R.id.showBill_difference).text =
-            String.format("%.2f", difference)
+            "${String.format("%.2f", difference)} unit(s)"
         customView.findViewById<TextView>(R.id.showBill_electricity_total).text =
-            String.format("%.2f", totalElectricBill)
+            "$currencySymbol ${String.format("%.2f", totalElectricBill)}"
 
         //total rent
         customView.findViewById<TextView>(R.id.showBill_houseRent).text =
-            String.format("%.2f", houseRent)
+            "$currencySymbol ${String.format("%.2f", houseRent)}"
+
         customView.findViewById<TextView>(R.id.showBill_parking).text =
-            String.format("%.2f", parkingBill)
+            "$currencySymbol ${String.format("%.2f", parkingBill)}"
+
         customView.findViewById<TextView>(R.id.showBill_electricity).text =
-            String.format("%.2f", totalElectricBill)
+            "$currencySymbol ${String.format("%.2f", totalElectricBill)}"
+
         customView.findViewById<TextView>(R.id.showBill_extraFieldName).text =
             if (includeBinding.extraFieldNameET.text.toString().trim() == "") {
 
@@ -815,23 +824,25 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         customView.findViewById<TextView>(R.id.showBill_extraFieldAmount).text =
             if (includeBinding.extraAmountET.text.toString().trim() == "") {
 
-                "0.0"
+                "$currencySymbol 0.0"
             } else {
 
-                String.format(
-                    "%.2f",
-                    includeBinding.extraAmountET.text.toString().trim().toDouble()
-                )
+                "$currencySymbol ${
+                    String.format(
+                        "%.2f",
+                        includeBinding.extraAmountET.text.toString().trim().toDouble()
+                    )
+                }"
             }
 
         customView.findViewById<TextView>(R.id.showBill_AmountPaid).text =
-            String.format("%.2f", amountPaid)
+            "$currencySymbol ${String.format("%.2f", amountPaid)}"
 
         customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
-            "+ ${String.format("%.2f", duesFromLastPayment)}"
+            "+ $currencySymbol ${String.format("%.2f", duesFromLastPayment)}"
 
         customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
-            "- ${String.format("%.2f", paidInAdvanceFromLastPayment)}"
+            "- $currencySymbol ${String.format("%.2f", paidInAdvanceFromLastPayment)}"
 
         customView.findViewById<TextView>(R.id.showBill_dueAmount).text =
             when {
@@ -841,7 +852,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     paidInAdvanceFromLastPayment = 0.0
                     duesFromLastPayment = duesFromLastPayment?.plus((totalRent - amountPaid))
 
-                    String.format("%.2f", (totalRent - amountPaid))
+                    "$currencySymbol ${String.format("%.2f", (totalRent - amountPaid))}"
                 }
                 amountPaid > totalRent -> {
 
@@ -854,15 +865,16 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     customView.findViewById<TextView>(R.id.show_billDueOrArrearTV).text =
                         getString(R.string.paid_in_advance)
 
-                    String.format("%.2f", (amountPaid - totalRent))
+                    "$currencySymbol ${String.format("%.2f", (amountPaid - totalRent))}"
                 }
                 else -> {
                     isDueOrPaidInAdvance = ""
-                    "0.0"
+                    "$currencySymbol 0.0"
                 }
             }
 
-        customView.findViewById<TextView>(R.id.showBill_netDemand).text = totalRent.toString()
+        customView.findViewById<TextView>(R.id.showBill_netDemand).text =
+            "$currencySymbol $totalRent"
     }
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {

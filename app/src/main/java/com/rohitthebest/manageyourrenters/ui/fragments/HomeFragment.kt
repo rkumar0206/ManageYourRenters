@@ -72,7 +72,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         GlobalScope.launch {
 
-            delay(270)
+            delay(350)
 
             withContext(Dispatchers.Main) {
 
@@ -294,7 +294,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         if (mAuth?.currentUser != null) {
 
-            if (isInternetAvailable(requireContext())) {
+            try {
 
                 if (mAuth?.currentUser!!.photoUrl != null) {
 
@@ -302,10 +302,11 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                         .load(mAuth?.currentUser!!.photoUrl)
                         .into(binding.profileImage)
                 }
-            } else {
+            } catch (e: Exception) {
 
-                showNoInternetMessage(requireContext())
+                e.printStackTrace()
             }
+
         }
     }
 

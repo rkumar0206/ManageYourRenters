@@ -266,8 +266,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     "Dues of last payments : + ${lastPaymentInfo?.bill?.currencySymbol}${lastPaymentInfo?.dueAmount}"
 
                 duesFromLastPayment = lastPaymentInfo?.dueAmount?.toDouble()
-
-                calculateTotalBill()
             }
             getString(R.string.paid_in_advance) -> {
 
@@ -276,15 +274,15 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     "Paid in advance in last payments : - ${lastPaymentInfo?.bill?.currencySymbol}${lastPaymentInfo?.paidInAdvanceAmount}"
 
                 paidInAdvanceFromLastPayment = lastPaymentInfo?.paidInAdvanceAmount?.toDouble()
-
-                calculateTotalBill()
             }
             else -> {
 
                 includeBinding.duesOfLatsPaymentTV.text =
                     "There are no dues and no money given in advance."
             }
+
         }
+        calculateTotalBill()
 
     }
 
@@ -304,7 +302,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun initializeByMonthField() {
 
-        billMonthNumber = lastPaymentInfo?.bill?.billMonthNumber!! + 1
+        billMonthNumber = if (lastPaymentInfo?.bill?.billMonthNumber!! + 1 > 12) {
+            1
+        } else {
+
+            lastPaymentInfo?.bill?.billMonthNumber!! + 1
+        }
 
         includeBinding.monthSelectSpinner.setSelection(billMonthNumber - 1)
 

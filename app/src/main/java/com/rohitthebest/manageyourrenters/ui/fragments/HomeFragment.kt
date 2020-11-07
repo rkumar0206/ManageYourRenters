@@ -21,8 +21,11 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.ShowRentersAdapter
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
+import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
+import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
+import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.deleteDocumentFromFireStore
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.uploadDocumentToFireStore
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
@@ -40,6 +43,7 @@ import java.util.*
 class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClickListener {
 
     private val renterViewModel: RenterViewModel by viewModels()
+    private val paymentViewModel: PaymentViewModel by viewModels()
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -253,9 +257,44 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                             documentKey = renter.key!!
                         )
                     }
+
+                    deleteAllPaymentsOfThisRenter(renter)
                 }
             })
             .show()
+    }
+
+    private fun deleteAllPaymentsOfThisRenter(renter: Renter) {
+
+        paymentViewModel.deleteAllPaymentsOfRenter(renter.key!!)
+
+        var paymentKeyList: List<String> = emptyList()
+
+        paymentViewModel.getAllPaymentsListOfRenter(renterKey = renter.key!!)
+            .observe(viewLifecycleOwner) {
+
+                if (it.isNotEmpty()) {
+
+                    paymentKeyList =
+                        it.filter { payment -> payment.isSynced == getString(R.string.t) }
+                            .map { pay ->
+
+                                pay.key
+                            }
+
+                    if (paymentKeyList.isNotEmpty()) {
+
+                        FirebaseServiceHelper.deleteAllDocumentsUsingKey(
+                            requireContext(),
+                            getString(R.string.payments),
+                            ConversionWithGson.convertStringListToJSON(paymentKeyList)
+                        )
+
+                    }
+                }
+
+            }
+
     }
 
     override fun onEditClicked(renter: Renter) {

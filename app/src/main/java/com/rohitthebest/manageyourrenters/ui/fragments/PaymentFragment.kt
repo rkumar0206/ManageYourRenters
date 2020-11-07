@@ -26,7 +26,6 @@ import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.con
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertStringListToJSON
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.deleteAllDocumentsUsingKey
-import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -229,11 +228,11 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     override fun onSyncClicked(payment: Payment) {
 
-        if (Functions.isInternetAvailable(requireContext())) {
+        if (isInternetAvailable(requireContext())) {
 
             if (payment.isSynced == getString(R.string.t)) {
 
-                Functions.showToast(requireContext(), "Already Synced")
+                showToast(requireContext(), "Already Synced")
             } else {
 
                 payment.isSynced = getString(R.string.t)
@@ -250,7 +249,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         } else {
 
-            Functions.showNoInternetMessage(requireContext())
+            showNoInternetMessage(requireContext())
         }
 
     }
@@ -267,11 +266,11 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                     deletePayment(payment)
                 } else {
 
-                    if (Functions.isInternetAvailable(requireContext())) {
+                    if (isInternetAvailable(requireContext())) {
 
                         deletePayment(payment)
                     } else {
-                        Functions.showNoInternetMessage(requireContext())
+                        showNoInternetMessage(requireContext())
                     }
                 }
                 dialogInterface.dismiss()

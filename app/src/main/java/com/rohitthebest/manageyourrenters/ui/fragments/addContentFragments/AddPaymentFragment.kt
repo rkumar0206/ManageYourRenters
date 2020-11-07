@@ -35,6 +35,7 @@ import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertPaymentToJSONString
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.updateDocumentOnFireStore
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.uploadDocumentToFireStore
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
@@ -261,7 +262,10 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             getString(R.string.due) -> {
 
-                includeBinding.duesOfLatsPaymentTV.changeTextColor(R.color.color_orange)
+                includeBinding.duesOfLatsPaymentTV.changeTextColor(
+                    requireContext(),
+                    R.color.color_orange
+                )
                 includeBinding.duesOfLatsPaymentTV.text =
                     "Dues of last payments : + ${lastPaymentInfo?.bill?.currencySymbol}${lastPaymentInfo?.dueAmount}"
 
@@ -269,7 +273,10 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             }
             getString(R.string.paid_in_advance) -> {
 
-                includeBinding.duesOfLatsPaymentTV.changeTextColor(R.color.color_green)
+                includeBinding.duesOfLatsPaymentTV.changeTextColor(
+                    requireContext(),
+                    R.color.color_green
+                )
                 includeBinding.duesOfLatsPaymentTV.text =
                     "Paid in advance in last payments : - ${lastPaymentInfo?.bill?.currencySymbol}${lastPaymentInfo?.paidInAdvanceAmount}"
 
@@ -483,19 +490,28 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         includeBinding.byDateErrorMessageTV.text = when {
             numberOfDays!!.toInt() > 0 -> {
 
-                includeBinding.byDateErrorMessageTV.changeTextColor(R.color.color_green)
+                includeBinding.byDateErrorMessageTV.changeTextColor(
+                    requireContext(),
+                    R.color.color_green
+                )
 
                 "Number of Days : $numberOfDays"
             }
             numberOfDays!!.toInt() < 0 -> {
 
-                includeBinding.byDateErrorMessageTV.changeTextColor(R.color.color_orange)
+                includeBinding.byDateErrorMessageTV.changeTextColor(
+                    requireContext(),
+                    R.color.color_orange
+                )
 
                 "Please enter a valid date"
             }
             else -> {
 
-                includeBinding.byDateErrorMessageTV.changeTextColor(R.color.color_green)
+                includeBinding.byDateErrorMessageTV.changeTextColor(
+                    requireContext(),
+                    R.color.color_green
+                )
 
                 numberOfDays = getString(R.string.same_day)
                 getString(R.string.same_day)
@@ -504,10 +520,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     }
 
-    private fun TextView.changeTextColor(color: Int) {
-
-        this.setTextColor(ContextCompat.getColor(requireContext(), color))
-    }
 
     private fun calculateNumberOfDays(startDate: Long, endDate: Long): String {
 
@@ -542,7 +554,10 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         if (previousReading > currentReading) {
 
-            includeBinding.electricityErrorTextTV.changeTextColor(R.color.color_orange)
+            includeBinding.electricityErrorTextTV.changeTextColor(
+                requireContext(),
+                R.color.color_orange
+            )
             includeBinding.electricityErrorTextTV.text =
                 getString(R.string.electricity_error_message)
             return 0.0
@@ -559,7 +574,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         difference = currentReading - previousReading
         totalElectricBill = difference * rate
 
-        includeBinding.electricityErrorTextTV.changeTextColor(R.color.color_green)
+        includeBinding.electricityErrorTextTV.changeTextColor(requireContext(), R.color.color_green)
         includeBinding.electricityErrorTextTV.text =
             getString(R.string.total, String.format("%.2f", totalElectricBill))
 

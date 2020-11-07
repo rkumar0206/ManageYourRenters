@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.entity.Payment
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import kotlinx.android.synthetic.main.adapter_show_payment.view.*
 
@@ -17,7 +18,8 @@ class ShowPaymentAdapter :
 
     private var mListener: OnClickListener? = null
 
-    inner class ShowPaymentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ShowPaymentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
 
         @SuppressLint("SetTextI18n")
         fun setData(payment: Payment?) {
@@ -26,25 +28,36 @@ class ShowPaymentAdapter :
 
                 payment?.let {
 
+                    //Period
                     if (it.bill?.billPeriodType == context.getString(R.string.by_month)) {
 
                         paymentAdapter_billPeriodTV.text =
                             "${it.bill!!.billMonth}, ${it.bill!!.billYear}"
                     } else {
 
-                        paymentAdapter_billPeriodTV.textSize = 18.0f
-                        paymentAdapter_billPeriodTV.text =
-                            "From : ${
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                    it.bill?.billDateFrom
-                                )
-                            }\nTo    :  ${
+                        if (it.bill?.billDateFrom == it.bill?.billDateTill) {
+
+                            paymentAdapter_billPeriodTV.text =
                                 WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                                     it.bill?.billDateTill
                                 )
-                            }"
+                        } else {
+
+                            paymentAdapter_billPeriodTV.textSize = 18.0f
+                            paymentAdapter_billPeriodTV.text =
+                                "From : ${
+                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                        it.bill?.billDateFrom
+                                    )
+                                }\nTo      :  ${
+                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                        it.bill?.billDateTill
+                                    )
+                                }"
+                        }
                     }
 
+                    //issue date
                     paymentAdapter_issueDateTV.text =
                         "Issue date : ${
                             WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
@@ -52,7 +65,28 @@ class ShowPaymentAdapter :
                             )
                         }"
 
-                    paymentAdapter_neetDemandTV.text = "Net demand : ${it.totalRent}"
+                    //house rent and extra
+                    if ((it.houseRent == "0.0" || it.houseRent == "0") &&
+                        (it.extraAmount != "0.0" || it.extraAmount != "0")
+                    ) {
+
+                        paymentAdapter_neetDemandTV.text =
+                            "${it.extraFieldName} : ${it.extraAmount}"
+
+                    } else {
+
+                        paymentAdapter_neetDemandTV.text = "Net demand : ${it.totalRent}"
+                    }
+
+                    //total rent
+                    if (it.amountPaid?.toDouble()!! < it.totalRent.toDouble()) {
+
+                        paymentAdapter_amountPaidTV.changeTextColor(context, R.color.color_orange)
+                    } else {
+
+                        paymentAdapter_amountPaidTV.changeTextColor(context, R.color.color_green)
+                    }
+
                     paymentAdapter_amountPaidTV.text = "Amount paid : ${it.amountPaid}"
 
                     if (it.isSynced == context.getString(R.string.t)) {
@@ -66,6 +100,51 @@ class ShowPaymentAdapter :
                 }
             }
         }
+
+        init {
+
+            itemView.setOnClickListener(this)
+            itemView.paymentAdapter_syncBtn.setOnClickListener(this)
+            itemView.paymentAdapter_deleteBtn.setOnClickListener(this)
+        }
+
+        override fun onClick(v: View?) {
+
+            when (v?.id) {
+
+                itemView.id -> {
+
+                    if (checkForNullability(absoluteAdapterPosition)) {
+
+                        mListener!!.onPaymentClick(getItem(absoluteAdapterPosition))
+                    }
+                }
+
+                itemView.paymentAdapter_syncBtn.id -> {
+
+                    if (checkForNullability(absoluteAdapterPosition)) {
+
+                        mListener!!.onSyncClicked(getItem(absoluteAdapterPosition))
+                    }
+                }
+
+                itemView.paymentAdapter_deleteBtn.id -> {
+
+                    if (checkForNullability(absoluteAdapterPosition)) {
+
+                        mListener!!.onDeleteClicked(getItem(absoluteAdapterPosition))
+                    }
+                }
+
+            }
+        }
+
+        private fun checkForNullability(position: Int): Boolean {
+
+            return position != RecyclerView.NO_POSITION &&
+                    mListener != null
+        }
+
     }
 
     class DiffUtilCallback : DiffUtil.ItemCallback<Payment>() {

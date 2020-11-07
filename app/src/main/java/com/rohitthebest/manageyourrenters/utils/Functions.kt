@@ -8,7 +8,9 @@ import android.content.Intent
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
@@ -104,14 +106,14 @@ class Functions {
 
         fun hideKeyBoard(activity: Activity) {
 
-            try{
+            try {
 
                 GlobalScope.launch {
 
                     closeKeyboard(activity)
                 }
 
-            }catch (e : Exception){
+            } catch (e: Exception) {
 
                 e.printStackTrace()
             }
@@ -138,7 +140,7 @@ class Functions {
             }
         }
 
-         fun showKeyboard(activity: Activity,view : View) {
+        fun showKeyboard(activity: Activity, view: View) {
             try {
 
                 val inputMethodManager =
@@ -299,6 +301,10 @@ class Functions {
             return d.toString()
         }
 
+        fun TextView.changeTextColor(context: Context, color: Int) {
+
+            this.setTextColor(ContextCompat.getColor(context, color))
+        }
 
     }
 

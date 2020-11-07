@@ -23,11 +23,15 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoRenter
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertPaymentToJSONString
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
+import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertStringListToJSON
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
+import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.deleteAllDocumentsUsingKey
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,6 +47,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     private val binding get() = _binding!!
 
     private var receivedRenter: Renter? = null
+
+    private lateinit var paymentKeyList: List<String>
 
     private lateinit var mAdapter: ShowPaymentAdapter
 
@@ -60,6 +66,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         super.onViewCreated(view, savedInstanceState)
 
         mAdapter = ShowPaymentAdapter()
+        paymentKeyList = emptyList()
 
         getMessage()
         initListener()
@@ -105,6 +112,14 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                         hideNoPaymentsTV()
                         initializeSearchView(it)
+
+                        paymentKeyList =
+                            it.filter { payment -> payment.isSynced == getString(R.string.t) }
+                                .map { pay ->
+
+                                    pay.key
+                                }
+
                     } else {
 
                         showNoPaymentsTV()
@@ -364,7 +379,31 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
             binding.deleteAllPaymentsBtn.id -> {
 
-                //todo : delete all payments
+                if (binding.noPaymentsTV.visibility == View.VISIBLE) {
+
+                    showToast(requireContext(), "No Payments added!!!")
+                } else {
+
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Are you sure?")
+                        .setMessage(getString(R.string.delete_warning_message))
+                        .setPositiveButton("Delete") { dialogInterface, _ ->
+
+                            if (isInternetAvailable(requireContext())) {
+
+                                deleteAllPayments()
+                            } else {
+                                showNoInternetMessage(requireContext())
+                            }
+                            dialogInterface.dismiss()
+                        }
+                        .setNegativeButton("Cancel") { dialog, _ ->
+
+                            dialog.dismiss()
+                        }
+                        .create()
+                        .show()
+                }
             }
 
             binding.paymentBackBtn.id -> {
@@ -372,6 +411,28 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 requireActivity().onBackPressed()
             }
         }
+    }
+
+    private fun deleteAllPayments() {
+
+        deleteFromCloud()
+
+        paymentViewModel.deleteAllPaymentsOfRenter(receivedRenter?.key!!)
+
+        showToast(requireContext(), "Deleted all the payments of ${receivedRenter?.name}")
+    }
+
+    private fun deleteFromCloud() {
+
+        if (paymentKeyList.isNotEmpty()) {
+
+            deleteAllDocumentsUsingKey(
+                requireContext(),
+                getString(R.string.payments),
+                convertStringListToJSON(paymentKeyList)
+            )
+        }
+
     }
 
     private fun showNoPaymentsTV() {

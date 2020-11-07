@@ -32,5 +32,17 @@ class ConversionWithGson {
             val type = object : TypeToken<Payment?>() {}.type
             return gson.fromJson(jsonString, type)
         }
+
+        fun convertStringListToJSON(list: List<String?>): String {
+
+            return gson.toJson(list)
+        }
+
+        fun convertJSONToStringList(jsonString: String?): List<String?> {
+
+            val type = object : TypeToken<List<String?>>() {}.type
+            return gson.fromJson(jsonString, type)
+        }
+
     }
 }

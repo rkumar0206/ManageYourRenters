@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.services.DeleteAllDocumentsService
 import com.rohitthebest.manageyourrenters.services.DeleteService
 import com.rohitthebest.manageyourrenters.services.UpdateService
 import com.rohitthebest.manageyourrenters.services.UploadService
@@ -103,6 +104,33 @@ class FirebaseServiceHelper {
             )
 
             ContextCompat.startForegroundService(context, foregroundService)
+        }
+
+        fun deleteAllDocumentsUsingKey(
+            context: Context,
+            collection: String,
+            keyList: String
+        ) {
+
+            val foregroundService = Intent(context, DeleteAllDocumentsService::class.java)
+
+            foregroundService.putExtra(
+                Constants.COLLECTION_KEY,
+                collection
+            )
+
+            foregroundService.putExtra(
+                Constants.KEY_LIST_KEY,
+                keyList
+            )
+
+            foregroundService.putExtra(
+                Constants.RANDOM_ID_KEY,
+                Random.nextInt(1000, 9999)
+            )
+
+            ContextCompat.startForegroundService(context, foregroundService)
+
         }
 
     }

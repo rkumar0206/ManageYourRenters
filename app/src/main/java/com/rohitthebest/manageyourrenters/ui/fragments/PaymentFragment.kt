@@ -17,7 +17,10 @@ import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoRenter
+import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertPaymentToJSONString
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
+import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
@@ -26,7 +29,7 @@ import kotlinx.coroutines.*
 import java.util.*
 
 @AndroidEntryPoint
-class PaymentFragment : Fragment(), View.OnClickListener {
+class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnClickListener {
 
     private val paymentViewModel: PaymentViewModel by viewModels()
 
@@ -63,6 +66,23 @@ class PaymentFragment : Fragment(), View.OnClickListener {
 
                 getPaymentListOfRenter()
             }
+        }
+    }
+
+    private fun getMessage() {
+
+        try {
+            if (!arguments?.isEmpty!!) {
+
+                val args = arguments?.let {
+
+                    PaymentFragmentArgs.fromBundle(it)
+                }
+
+                receivedRenter = convertJSONtoRenter(args?.renterInfoMessage)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -168,6 +188,8 @@ class PaymentFragment : Fragment(), View.OnClickListener {
                     adapter = mAdapter
                     layoutManager = LinearLayoutManager(requireContext())
                 }
+
+                mAdapter.setOnClickListener(this)
             }
 
         } catch (e: java.lang.Exception) {
@@ -178,21 +200,42 @@ class PaymentFragment : Fragment(), View.OnClickListener {
         hideProgressBar()
     }
 
-    private fun getMessage() {
+    override fun onPaymentClick(payment: Payment) {
 
-        try {
-            if (!arguments?.isEmpty!!) {
+        //todo : show bottom sheet
+    }
 
-                val args = arguments?.let {
+    override fun onSyncClicked(payment: Payment) {
 
-                    PaymentFragmentArgs.fromBundle(it)
-                }
+        if (Functions.isInternetAvailable(requireContext())) {
 
-                receivedRenter = convertJSONtoRenter(args?.renterInfoMessage)
+            if (payment.isSynced == getString(R.string.t)) {
+
+                Functions.showToast(requireContext(), "Already Synced")
+            } else {
+
+                payment.isSynced = getString(R.string.t)
+
+                FirebaseServiceHelper.uploadDocumentToFireStore(
+                    requireContext(),
+                    convertPaymentToJSONString(payment),
+                    getString(R.string.renters),
+                    payment.key
+                )
+
+                paymentViewModel.insertPayment(payment)
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+
+        } else {
+
+            Functions.showNoInternetMessage(requireContext())
         }
+
+    }
+
+    override fun onDeleteClicked(payment: Payment) {
+
+        //todo : delete the payment
     }
 
     private fun initListener() {

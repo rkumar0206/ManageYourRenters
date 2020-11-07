@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.rohitthebest.manageyourrenters.R
@@ -57,6 +58,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        mAdapter = ShowPaymentAdapter()
 
         getMessage()
         initListener()
@@ -183,19 +186,18 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
             paymentList?.let {
 
-                mAdapter = ShowPaymentAdapter()
-
                 mAdapter.submitList(it)
 
                 binding.paymentRV.apply {
 
-                    setHasFixedSize(true)
                     adapter = mAdapter
                     layoutManager = LinearLayoutManager(requireContext())
+                    setHasFixedSize(true)
                 }
 
-                mAdapter.setOnClickListener(this)
             }
+
+            mAdapter.setOnClickListener(this)
 
         } catch (e: java.lang.Exception) {
 
@@ -305,6 +307,27 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         binding.addPyamentFAB.setOnClickListener(this)
         binding.deleteAllPaymentsBtn.setOnClickListener(this)
         binding.paymentBackBtn.setOnClickListener(this)
+
+        binding.paymentRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                try {
+                    if (dy > 0 && binding.addPyamentFAB.visibility == View.VISIBLE) {
+
+                        binding.addPyamentFAB.hide()
+                    } else if (dy < 0 && binding.addPyamentFAB.visibility != View.VISIBLE) {
+
+                        binding.addPyamentFAB.show()
+
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        })
+
 
         /*
                 if (binding.paymentSV.visibility == View.VISIBLE) {

@@ -15,6 +15,8 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoRenter
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
@@ -46,6 +48,8 @@ class PaymentFragment : Fragment(), View.OnClickListener {
         getMessage()
         initListener()
 
+        showProgressBar()
+
         GlobalScope.launch {
 
             delay(300)
@@ -66,7 +70,11 @@ class PaymentFragment : Fragment(), View.OnClickListener {
 
                     if (it.isNotEmpty()) {
 
+                        hideNoPaymentsTV()
+                        initializeSearchView(it)
+                    } else {
 
+                        showNoPaymentsTV()
                     }
 
                     setUpRecyclerView(it)
@@ -75,6 +83,11 @@ class PaymentFragment : Fragment(), View.OnClickListener {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun initializeSearchView(it: List<Payment>?) {
+
+
     }
 
     private fun setUpRecyclerView(paymentList: List<Payment>?) {
@@ -100,6 +113,7 @@ class PaymentFragment : Fragment(), View.OnClickListener {
             e.printStackTrace()
         }
 
+        hideProgressBar()
     }
 
 
@@ -123,6 +137,7 @@ class PaymentFragment : Fragment(), View.OnClickListener {
     private fun initListener() {
 
         binding.addPyamentFAB.setOnClickListener(this)
+        binding.deleteAllPaymentsBtn.setOnClickListener(this)
         binding.paymentBackBtn.setOnClickListener(this)
     }
 
@@ -149,6 +164,52 @@ class PaymentFragment : Fragment(), View.OnClickListener {
 
                 requireActivity().onBackPressed()
             }
+        }
+    }
+
+    private fun showNoPaymentsTV() {
+
+        try {
+
+            binding.noPaymentsTV.show()
+            binding.paymentRV.hide()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun hideNoPaymentsTV() {
+
+        try {
+
+            binding.noPaymentsTV.hide()
+            binding.paymentRV.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun showProgressBar() {
+
+        try {
+
+            binding.paymentFragProgressBar.show()
+            binding.paymentRV.hide()
+        } catch (e: java.lang.Exception) {
+
+            e.printStackTrace()
+        }
+    }
+
+    private fun hideProgressBar() {
+
+        try {
+
+            binding.paymentFragProgressBar.hide()
+            binding.paymentRV.show()
+        } catch (e: java.lang.Exception) {
+
+            e.printStackTrace()
         }
     }
 

@@ -49,7 +49,7 @@ class ShowPaymentAdapter :
                                     WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                                         it.bill?.billDateFrom
                                     )
-                                }\nTo      :  ${
+                                }\nTo      : ${
                                     WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                                         it.bill?.billDateTill
                                     )

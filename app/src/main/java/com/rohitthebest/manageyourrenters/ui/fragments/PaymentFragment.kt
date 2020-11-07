@@ -1,6 +1,8 @@
 package com.rohitthebest.manageyourrenters.ui.fragments
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.ShowPaymentAdapter
 import com.rohitthebest.manageyourrenters.database.entity.Payment
 import com.rohitthebest.manageyourrenters.database.entity.Renter
@@ -17,8 +20,10 @@ import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.con
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import java.util.*
 
 @AndroidEntryPoint
 class PaymentFragment : Fragment(), View.OnClickListener {
@@ -87,7 +92,64 @@ class PaymentFragment : Fragment(), View.OnClickListener {
 
     private fun initializeSearchView(it: List<Payment>?) {
 
+        try {
 
+            binding.paymentSV.addTextChangedListener(object : TextWatcher {
+
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+                    if (s?.isEmpty()!!) {
+
+                        setUpRecyclerView(it)
+                    } else {
+
+
+                        val filteredList = it?.filter { payment ->
+
+                            var from: String? = ""
+                            var till: String? = ""
+
+                            if (payment.bill?.billPeriodType == getString(R.string.by_date)) {
+
+                                from =
+                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                        payment.bill?.billDateFrom
+                                    )
+
+                                till =
+                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                        payment.bill?.billDateTill
+                                    )
+                            }
+
+                            payment.bill?.billMonth?.toLowerCase(Locale.ROOT)?.contains(
+
+                                s.toString().trim().toLowerCase(Locale.ROOT)
+                            )!! ||
+                                    from?.contains(s.toString().trim())!!
+                                    ||
+                                    till?.contains(s.toString().trim())!!
+
+                        }
+
+                        setUpRecyclerView(filteredList)
+                    }
+                }
+
+                override fun afterTextChanged(s: Editable?) {}
+            })
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun setUpRecyclerView(paymentList: List<Payment>?) {
@@ -115,7 +177,6 @@ class PaymentFragment : Fragment(), View.OnClickListener {
 
         hideProgressBar()
     }
-
 
     private fun getMessage() {
 
@@ -158,6 +219,11 @@ class PaymentFragment : Fragment(), View.OnClickListener {
 
                     e.printStackTrace()
                 }
+            }
+
+            binding.deleteAllPaymentsBtn.id -> {
+
+                //todo : delete all payments
             }
 
             binding.paymentBackBtn.id -> {

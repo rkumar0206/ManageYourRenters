@@ -1,10 +1,9 @@
 package com.rohitthebest.manageyourrenters.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.rohitthebest.manageyourrenters.R
 import dagger.hilt.android.AndroidEntryPoint
-import io.sentry.Sentry
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -12,4 +11,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }
+
+
 }

@@ -12,7 +12,9 @@ import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.NOTIFICATION_CHANNEL_ID
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class DeleteService : Service() {
@@ -43,22 +45,7 @@ class DeleteService : Service() {
             if (deleteFromFireStore(docRef)) {
 
                 stopSelf()
-                Log.d(TAG, "onStartCommand: Renter deleted from collection $collection")
-            } else {
-
-                GlobalScope.launch {
-
-                    delay(1000 * (60 * 2))
-
-                    withContext(Dispatchers.Main) {
-
-                        stopSelf()
-                        Log.d(
-                            TAG,
-                            "onStartCommand: Unable to delete renter from collection $collection"
-                        )
-                    }
-                }
+                Log.d(TAG, "onStartCommand: document deleted from collection $collection")
             }
         }
 

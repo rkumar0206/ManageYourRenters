@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,6 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.ShowPaymentAdapter
 import com.rohitthebest.manageyourrenters.database.entity.Payment
@@ -22,7 +25,9 @@ import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.con
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -235,14 +240,84 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     override fun onDeleteClicked(payment: Payment) {
 
-        //todo : delete the payment
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Are you sure?")
+            .setMessage(getString(R.string.delete_warning_message))
+            .setPositiveButton("Delete") { dialogInterface, _ ->
+
+                if (payment.isSynced == getString(R.string.f)) {
+
+                    deletePayment(payment)
+                } else {
+
+                    if (Functions.isInternetAvailable(requireContext())) {
+
+                        deletePayment(payment)
+                    } else {
+                        Functions.showNoInternetMessage(requireContext())
+                    }
+                }
+                dialogInterface.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+
     }
 
+    private fun deletePayment(payment: Payment) {
+
+        paymentViewModel.deletePayment(payment)
+
+        var isUndoClicked = false
+
+        Snackbar.make(binding.paymentCoordL, "Payment deleted", Snackbar.LENGTH_LONG)
+            .setAction("Undo") {
+
+                isUndoClicked = true
+
+                paymentViewModel.insertPayment(payment)
+                showToast(requireContext(), "Payment restored...")
+            }
+            .addCallback(object : Snackbar.Callback() {
+
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+
+                    if (!isUndoClicked && payment.isSynced == getString(R.string.t)) {
+
+                        FirebaseServiceHelper.deleteDocumentFromFireStore(
+                            context = requireContext(),
+                            collection = getString(R.string.payments),
+                            documentKey = payment.key
+                        )
+                    }
+                }
+            })
+            .show()
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     private fun initListener() {
 
         binding.addPyamentFAB.setOnClickListener(this)
         binding.deleteAllPaymentsBtn.setOnClickListener(this)
         binding.paymentBackBtn.setOnClickListener(this)
+
+        /*
+                if (binding.paymentSV.visibility == View.VISIBLE) {
+
+                    binding.paymentSV.requestFocus()
+                    showKeyboard(requireActivity(), binding.paymentSV)
+                } else {
+
+                    hideKeyBoard(requireActivity())
+                    binding.paymentSV.setText("")
+                }
+*/
+
     }
 
     override fun onClick(v: View?) {
@@ -324,6 +399,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        hideKeyBoard(requireActivity())
 
         _binding = null
     }

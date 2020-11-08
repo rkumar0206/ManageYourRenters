@@ -313,6 +313,25 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     }
 
+    override fun onMessageBtnClicked(paymentMessage: String) {
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Message")
+            .setMessage(
+                if (paymentMessage != "") {
+                    paymentMessage
+                } else {
+                    "No message..."
+                }
+            )
+            .setPositiveButton("Ok") { dialogInterface, _ ->
+
+                dialogInterface.dismiss()
+            }
+            .create()
+            .show()
+    }
+
     private fun deletePayment(payment: Payment) {
 
         paymentViewModel.deletePayment(payment)

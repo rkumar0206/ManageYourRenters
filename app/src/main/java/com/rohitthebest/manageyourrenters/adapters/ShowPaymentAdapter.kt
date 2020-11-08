@@ -106,6 +106,7 @@ class ShowPaymentAdapter :
             itemView.setOnClickListener(this)
             itemView.paymentAdapter_syncBtn.setOnClickListener(this)
             itemView.paymentAdapter_deleteBtn.setOnClickListener(this)
+            itemView.paymentAdapter_MessageBtn.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {
@@ -133,6 +134,19 @@ class ShowPaymentAdapter :
                     if (checkForNullability(absoluteAdapterPosition)) {
 
                         mListener!!.onDeleteClicked(getItem(absoluteAdapterPosition))
+                    }
+                }
+
+                itemView.paymentAdapter_MessageBtn.id -> {
+
+                    if (checkForNullability(absoluteAdapterPosition)) {
+
+                        getItem(absoluteAdapterPosition).messageOrNote?.let {
+
+                            mListener!!.onMessageBtnClicked(
+                                it
+                            )
+                        }
                     }
                 }
 
@@ -180,6 +194,7 @@ class ShowPaymentAdapter :
         fun onPaymentClick(payment: Payment)
         fun onSyncClicked(payment: Payment)
         fun onDeleteClicked(payment: Payment)
+        fun onMessageBtnClicked(paymentMessage: String)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

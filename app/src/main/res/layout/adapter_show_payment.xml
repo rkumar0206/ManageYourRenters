@@ -79,9 +79,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/transparent"
-            app:layout_constraintBottom_toBottomOf="@+id/paymentAdapter_amountPaidTV"
-            app:layout_constraintEnd_toStartOf="@+id/paymentAdapter_deleteBtn"
-            app:layout_constraintTop_toTopOf="@+id/paymentAdapter_amountPaidTV"
+            app:layout_constraintBottom_toBottomOf="@+id/paymentAdapter_MessageBtn"
+            app:layout_constraintEnd_toStartOf="@+id/paymentAdapter_MessageBtn"
+            app:layout_constraintTop_toTopOf="@+id/paymentAdapter_MessageBtn"
             app:srcCompat="@drawable/ic_baseline_sync_24" />
 
         <ImageButton
@@ -110,7 +110,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
             android:padding="4dp"
             android:text="Amount Paid : 3500"
@@ -120,6 +120,16 @@
             app:layout_constraintEnd_toStartOf="@+id/paymentAdapter_syncBtn"
             app:layout_constraintStart_toStartOf="@+id/paymentAdapter_neetDemandTV"
             app:layout_constraintTop_toBottomOf="@+id/divider38" />
+
+        <ImageButton
+            android:id="@+id/paymentAdapter_MessageBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/imageBtnBackgroundColor"
+            app:layout_constraintBottom_toBottomOf="@+id/paymentAdapter_deleteBtn"
+            app:layout_constraintEnd_toStartOf="@+id/paymentAdapter_deleteBtn"
+            app:layout_constraintTop_toTopOf="@+id/paymentAdapter_deleteBtn"
+            app:srcCompat="@drawable/ic_baseline_message_24" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

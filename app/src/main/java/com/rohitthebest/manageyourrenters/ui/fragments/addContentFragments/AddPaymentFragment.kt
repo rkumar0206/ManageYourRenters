@@ -40,6 +40,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setDateInTextView
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
@@ -1029,14 +1030,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    private fun TextView.setDateInTextView(timeStamp: Long?, pattern: String = "dd-MM-yyyy") {
-
-        this.text = WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-            timeStamp, pattern
-        )
-
     }
 
     override fun onDestroyView() {

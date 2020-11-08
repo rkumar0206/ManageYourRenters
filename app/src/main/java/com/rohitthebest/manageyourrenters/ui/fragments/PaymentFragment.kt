@@ -7,11 +7,16 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.rohitthebest.manageyourrenters.R
@@ -30,6 +35,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.changeTextCo
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setDateInTextView
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
@@ -252,7 +258,129 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     override fun onPaymentClick(payment: Payment) {
 
-        //todo : show bottom sheet
+        MaterialDialog(requireContext(), BottomSheet())
+            .show {
+
+                title(text = "BILL")
+
+                customView(
+                    R.layout.show_bill_layout,
+                    scrollable = true,
+                    noVerticalPadding = true
+                )
+
+                initializeValuesOfBill(getCustomView(), payment)
+            }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun initializeValuesOfBill(customView: View, payment: Payment) {
+
+        //renter info
+        customView.findViewById<TextView>(R.id.showBill_renterName).text = receivedRenter?.name
+        customView.findViewById<TextView>(R.id.showBill_renterMobile).text =
+            receivedRenter?.mobileNumber
+        customView.findViewById<TextView>(R.id.showBill_renterAddress).text =
+            receivedRenter?.address
+
+        //billing parameter
+        customView.findViewById<TextView>(R.id.showBill_billDate)
+            .setDateInTextView(payment.timeStamp)
+        customView.findViewById<TextView>(R.id.showBill_billTime)
+            .setDateInTextView(payment.timeStamp, "hh:mm a")
+        customView.findViewById<TextView>(R.id.showBill_billPeriod).text =
+            if (payment.bill?.billPeriodType == getString(R.string.by_month)) {
+
+                "${payment.bill!!.billMonth}, ${
+                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        payment.timeStamp,
+                        "yyyy"
+                    )
+                }"
+            } else {
+
+                "${WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(payment.bill?.billDateFrom)}" +
+                        " to ${
+                            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                payment.bill?.billDateTill
+                            )
+                        }"
+            }
+
+        //electricity
+        customView.findViewById<TextView>(R.id.showBill_previousReading).text =
+            "${String.format("%.2f", payment.electricBill?.previousReading)} unit(s)"
+        customView.findViewById<TextView>(R.id.showBill_currentReading).text =
+            "${String.format("%.2f", payment.electricBill?.currentReading)} unit(s)"
+        customView.findViewById<TextView>(R.id.showBill_rate).text =
+            "${String.format("%.2f", payment.electricBill?.rate)} per/unit"
+        customView.findViewById<TextView>(R.id.showBill_difference).text =
+            "${String.format("%.2f", payment.electricBill?.differenceInReading)} unit(s)"
+        customView.findViewById<TextView>(R.id.showBill_electricity_total).text =
+            "${payment.bill?.currencySymbol} ${payment.electricBill?.totalElectricBill}"
+
+        //total rent
+        customView.findViewById<TextView>(R.id.showBill_houseRent).text =
+            "${payment.bill?.currencySymbol} ${payment.houseRent}"
+
+        customView.findViewById<TextView>(R.id.showBill_parking).text =
+            "${payment.bill?.currencySymbol} ${payment.parkingRent}"
+
+        customView.findViewById<TextView>(R.id.showBill_electricity).text =
+            "${payment.bill?.currencySymbol} ${payment.electricBill?.totalElectricBill}"
+
+        customView.findViewById<TextView>(R.id.showBill_extraFieldName).text =
+            if (payment.extraFieldName == "") {
+
+                "Extra"
+            } else {
+                payment.extraFieldName
+            }
+
+        customView.findViewById<TextView>(R.id.showBill_extraFieldAmount).text =
+            if (payment.extraAmount == "") {
+
+                "${payment.bill?.currencySymbol} 0.0"
+            } else {
+
+                "${payment.bill?.currencySymbol} ${payment.extraAmount}"
+            }
+
+        customView.findViewById<TextView>(R.id.showBill_AmountPaid).text =
+            "${payment.bill?.currencySymbol} ${payment.amountPaid}"
+
+
+        customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
+            when (payment.isDueOrPaidInAdvance) {
+
+                getString(R.string.due) -> {
+
+                    payment.dueAmount
+                }
+                else -> {
+
+                    "0.0"
+                }
+            }
+
+        customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
+            when (payment.isDueOrPaidInAdvance) {
+
+                getString(R.string.paid_in_advance) -> {
+
+                    payment.dueAmount
+                }
+                else -> {
+
+                    "0.0"
+                }
+            }
+
+        val due = payment.totalRent.toDouble() - payment.amountPaid?.toDouble()!!
+        customView.findViewById<TextView>(R.id.showBill_dueAmount).text = String.format("%.2f", due)
+
+        customView.findViewById<TextView>(R.id.showBill_netDemand).text =
+            "${payment.bill?.currencySymbol} ${payment.totalRent}"
     }
 
     override fun onSyncClicked(payment: Payment) {

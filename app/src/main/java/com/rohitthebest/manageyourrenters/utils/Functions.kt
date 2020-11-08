@@ -306,6 +306,14 @@ class Functions {
             this.setTextColor(ContextCompat.getColor(context, color))
         }
 
+        fun TextView.setDateInTextView(timeStamp: Long?, pattern: String = "dd-MM-yyyy") {
+
+            this.text = WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                timeStamp, pattern
+            )
+
+        }
+
     }
 
 }

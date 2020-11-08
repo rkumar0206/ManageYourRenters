@@ -26,6 +26,7 @@ import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.con
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertStringListToJSON
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.deleteAllDocumentsUsingKey
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -119,6 +120,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                                     pay.key
                                 }
 
+                        updateCurrentDueOrAdvanceTV(it.first())
+
                     } else {
 
                         showNoPaymentsTV()
@@ -129,6 +132,32 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateCurrentDueOrAdvanceTV(lastPayment: Payment) {
+
+        when (lastPayment.isDueOrPaidInAdvance) {
+
+            getString(R.string.due) -> {
+
+                binding.dueOrAdvancedTV.changeTextColor(requireContext(), R.color.color_orange)
+                binding.dueOrAdvancedTV.text =
+                    "Current due of ${receivedRenter?.name} : ${lastPayment.dueAmount}"
+            }
+            getString(R.string.paid_in_advance) -> {
+
+                binding.dueOrAdvancedTV.changeTextColor(requireContext(), R.color.color_green)
+                binding.dueOrAdvancedTV.text =
+                    "Current advance of ${receivedRenter?.name} : ${lastPayment.paidInAdvanceAmount}"
+            }
+            else -> {
+
+                binding.dueOrAdvancedTV.changeTextColor(requireContext(), R.color.color_green)
+                binding.dueOrAdvancedTV.text =
+                    "There is no due or advance of ${receivedRenter?.name}"
+            }
         }
     }
 

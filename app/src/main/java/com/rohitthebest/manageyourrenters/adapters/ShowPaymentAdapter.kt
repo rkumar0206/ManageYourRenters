@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.entity.Payment
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.changeTextColor
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import kotlinx.android.synthetic.main.adapter_show_payment.view.*
 
@@ -27,6 +29,14 @@ class ShowPaymentAdapter :
             itemView.apply {
 
                 payment?.let {
+
+                    if (absoluteAdapterPosition == 0) {
+
+                        paymentAdapter_deleteBtn.show()
+                    } else {
+
+                        paymentAdapter_deleteBtn.hide()
+                    }
 
                     //Period
                     if (it.bill?.billPeriodType == context.getString(R.string.by_month)) {

@@ -502,7 +502,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                 payment.isSynced = getString(R.string.t)
 
-                FirebaseServiceHelper.uploadDocumentToFireStore(
+                uploadDocumentToFireStore(
                     requireContext(),
                     convertPaymentToJSONString(payment),
                     getString(R.string.renters),

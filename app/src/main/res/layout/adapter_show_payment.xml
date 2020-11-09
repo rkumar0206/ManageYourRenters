@@ -89,6 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/transparent"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/paymentAdapter_amountPaidTV"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/paymentAdapter_amountPaidTV"

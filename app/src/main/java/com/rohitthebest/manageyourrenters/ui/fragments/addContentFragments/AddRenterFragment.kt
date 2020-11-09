@@ -241,6 +241,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             } else {
                 receivedRenter?.key
             }
+            dueOrAdvanceAmount = 0.0
 
             isSynced = getString(R.string.f)
         }

@@ -30,4 +30,5 @@ class RenterViewModel @ViewModelInject constructor(
 
     fun getRenterByIsSynced(isSynced : String) = repo.getRenterByIsSynced(isSynced)
 
+    fun getRenterByKey(renterKey: String) = repo.getRenterByKey(renterKey)
 }

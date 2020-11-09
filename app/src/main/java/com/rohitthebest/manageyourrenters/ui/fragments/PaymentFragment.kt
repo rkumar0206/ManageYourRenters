@@ -25,12 +25,14 @@ import com.rohitthebest.manageyourrenters.database.entity.Payment
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
-import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoRenter
+import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertPaymentToJSONString
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertStringListToJSON
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.deleteAllDocumentsUsingKey
+import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.updateDocumentOnFireStore
+import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.uploadDocumentToFireStore
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
@@ -43,10 +45,14 @@ import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.util.*
+import kotlin.collections.HashMap
+import kotlin.math.abs
 
+@SuppressLint("SetTextI18n")
 @AndroidEntryPoint
 class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnClickListener {
 
+    private val renterViewModel: RenterViewModel by viewModels()
     private val paymentViewModel: PaymentViewModel by viewModels()
 
     private var _binding: FragmentPaymentBinding? = null
@@ -55,7 +61,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     private var receivedRenter: Renter? = null
 
     private lateinit var paymentKeyList: List<String>
-
     private lateinit var mAdapter: ShowPaymentAdapter
 
     override fun onCreateView(
@@ -77,17 +82,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         getMessage()
         initListener()
 
-        showProgressBar()
 
-        GlobalScope.launch {
-
-            delay(300)
-
-            withContext(Dispatchers.Main) {
-
-                getPaymentListOfRenter()
-            }
-        }
     }
 
     private fun getMessage() {
@@ -100,10 +95,32 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                     PaymentFragmentArgs.fromBundle(it)
                 }
 
-                receivedRenter = convertJSONtoRenter(args?.renterInfoMessage)
+                val renterKey = args?.renterInfoMessage
+                getTheRenter(renterKey)
+                //receivedRenter = convertJSONtoRenter(args?.renterInfoMessage)
             }
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    private fun getTheRenter(renterKey: String?) {
+
+        renterViewModel.getRenterByKey(renterKey!!).observe(viewLifecycleOwner) {
+
+            receivedRenter = it
+
+            showProgressBar()
+
+            GlobalScope.launch {
+
+                delay(300)
+
+                withContext(Dispatchers.Main) {
+
+                    getPaymentListOfRenter()
+                }
+            }
         }
     }
 
@@ -126,7 +143,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                                     pay.key
                                 }
 
-                        updateCurrentDueOrAdvanceTV(it.first())
+                        updateCurrentDueOrAdvanceTV()
 
                     } else {
 
@@ -142,21 +159,21 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateCurrentDueOrAdvanceTV(lastPayment: Payment) {
+    private fun updateCurrentDueOrAdvanceTV() {
 
-        when (lastPayment.isDueOrPaidInAdvance) {
+        when {
 
-            getString(R.string.due) -> {
+            receivedRenter?.dueOrAdvanceAmount!! < 0.0 -> {
 
                 binding.dueOrAdvancedTV.changeTextColor(requireContext(), R.color.color_orange)
                 binding.dueOrAdvancedTV.text =
-                    "Current due of ${receivedRenter?.name} : ${lastPayment.dueAmount}"
+                    "Current due of ${receivedRenter?.name} : ${abs(receivedRenter?.dueOrAdvanceAmount!!)}"
             }
-            getString(R.string.paid_in_advance) -> {
+            receivedRenter?.dueOrAdvanceAmount!! > 0.0 -> {
 
                 binding.dueOrAdvancedTV.changeTextColor(requireContext(), R.color.color_green)
                 binding.dueOrAdvancedTV.text =
-                    "Current advance of ${receivedRenter?.name} : ${lastPayment.paidInAdvanceAmount}"
+                    "Current advance of ${receivedRenter?.name} : ${receivedRenter?.dueOrAdvanceAmount}"
             }
             else -> {
 
@@ -258,6 +275,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     override fun onPaymentClick(payment: Payment) {
 
+        //showToast(requireContext(), payment.id.toString())
+
         MaterialDialog(requireContext(), BottomSheet())
             .show {
 
@@ -269,12 +288,30 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                     noVerticalPadding = true
                 )
 
-                initializeValuesOfBill(getCustomView(), payment)
+                initializeValuesToBill(getCustomView(), payment)
             }
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun initializeValuesOfBill(customView: View, payment: Payment) {
+    private fun initializeValuesToBill(customView: View, payment: Payment) {
+
+        setRenterInfo(customView)
+
+        setBillingParameters(customView, payment)
+
+        setElectricFields(customView, payment)
+
+        setDuesOrAdvanceOdLastPayment(customView, payment)
+
+        setExtraFields(customView, payment)
+
+        setDuesOrAdvance(customView, payment)
+
+        setTotalRent(customView, payment)
+    }
+
+    //[Start of setting fields in bills textViews]
+
+    private fun setRenterInfo(customView: View) {
 
         //renter info
         customView.findViewById<TextView>(R.id.showBill_renterName).text = receivedRenter?.name
@@ -282,6 +319,10 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
             receivedRenter?.mobileNumber
         customView.findViewById<TextView>(R.id.showBill_renterAddress).text =
             receivedRenter?.address
+
+    }
+
+    private fun setBillingParameters(customView: View, payment: Payment) {
 
         //billing parameter
         customView.findViewById<TextView>(R.id.showBill_billDate)
@@ -306,6 +347,9 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                             )
                         }"
             }
+    }
+
+    private fun setElectricFields(customView: View, payment: Payment) {
 
         //electricity
         customView.findViewById<TextView>(R.id.showBill_previousReading).text =
@@ -319,16 +363,11 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         customView.findViewById<TextView>(R.id.showBill_electricity_total).text =
             "${payment.bill?.currencySymbol} ${payment.electricBill?.totalElectricBill}"
 
-        //total rent
-        customView.findViewById<TextView>(R.id.showBill_houseRent).text =
-            "${payment.bill?.currencySymbol} ${payment.houseRent}"
+    }
 
-        customView.findViewById<TextView>(R.id.showBill_parking).text =
-            "${payment.bill?.currencySymbol} ${payment.parkingRent}"
+    private fun setExtraFields(customView: View, payment: Payment) {
 
-        customView.findViewById<TextView>(R.id.showBill_electricity).text =
-            "${payment.bill?.currencySymbol} ${payment.electricBill?.totalElectricBill}"
-
+        //Extra
         customView.findViewById<TextView>(R.id.showBill_extraFieldName).text =
             if (payment.extraFieldName == "") {
 
@@ -345,42 +384,111 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                 "${payment.bill?.currencySymbol} ${payment.extraAmount}"
             }
+    }
+
+    private fun setDuesOrAdvanceOdLastPayment(customView: View, payment: Payment) {
+
+        val dueOfLastPayment = getDuesOfLastPayment(payment)
+
+        when {
+
+            dueOfLastPayment > 0.0 -> {
+
+                //due
+                customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
+                    "${payment.bill?.currencySymbol} $dueOfLastPayment"
+
+                customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
+                    "${payment.bill?.currencySymbol} 0.0"
+
+            }
+
+            dueOfLastPayment < 0.0 -> {
+
+                //advance
+                customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
+                    "${payment.bill?.currencySymbol} 0.0"
+
+                customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
+                    "${payment.bill?.currencySymbol} $dueOfLastPayment"
+            }
+
+            else -> {
+                customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
+                    "${payment.bill?.currencySymbol} 0.0"
+
+                customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
+                    "${payment.bill?.currencySymbol} 0.0"
+            }
+        }
+    }
+
+    private fun setDuesOrAdvance(customView: View, payment: Payment) {
+
+        val dueOrAdvance = payment.amountPaid?.toDouble()?.minus(payment.totalRent.toDouble())!!
+
+        customView.findViewById<TextView>(R.id.showBill_dueAmount).text =
+
+            when {
+
+                dueOrAdvance < 0.0 -> {
+
+                    //due
+                    "${payment.bill?.currencySymbol} ${String.format("%.2f", abs(dueOrAdvance))}"
+                }
+
+                dueOrAdvance > 0.0 -> {
+
+                    customView.findViewById<TextView>(R.id.show_billDueOrArrearTV).text =
+                        "Paid in advance"
+                    "${payment.bill?.currencySymbol} ${String.format("%.2f", dueOrAdvance)}"
+                }
+                else -> {
+
+                    "${payment.bill?.currencySymbol} 0.0"
+                }
+            }
+
+    }
+
+    private fun setTotalRent(customView: View, payment: Payment) {
+
+        //total rent
+        customView.findViewById<TextView>(R.id.showBill_houseRent).text =
+            "${payment.bill?.currencySymbol} ${payment.houseRent}"
+
+        customView.findViewById<TextView>(R.id.showBill_parking).text =
+            "${payment.bill?.currencySymbol} ${payment.parkingRent}"
+
+        customView.findViewById<TextView>(R.id.showBill_electricity).text =
+            "${payment.bill?.currencySymbol} ${payment.electricBill?.totalElectricBill}"
 
         customView.findViewById<TextView>(R.id.showBill_AmountPaid).text =
             "${payment.bill?.currencySymbol} ${payment.amountPaid}"
 
-
-        customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
-            when (payment.isDueOrPaidInAdvance) {
-
-                getString(R.string.due) -> {
-
-                    payment.dueAmount
-                }
-                else -> {
-
-                    "0.0"
-                }
-            }
-
-        customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
-            when (payment.isDueOrPaidInAdvance) {
-
-                getString(R.string.paid_in_advance) -> {
-
-                    payment.dueAmount
-                }
-                else -> {
-
-                    "0.0"
-                }
-            }
-
-        val due = payment.totalRent.toDouble() - payment.amountPaid?.toDouble()!!
-        customView.findViewById<TextView>(R.id.showBill_dueAmount).text = String.format("%.2f", due)
-
         customView.findViewById<TextView>(R.id.showBill_netDemand).text =
             "${payment.bill?.currencySymbol} ${payment.totalRent}"
+    }
+
+    //[END of setting fields in bills textViews]
+
+    private fun getDuesOfLastPayment(payment: Payment): Double {
+
+        val houseRent = payment.houseRent.toDouble()
+        val parking = if (payment.isTakingParkingBill == getString(R.string.t))
+            payment.parkingRent?.toDouble()!!
+        else
+            0.0
+        val electricBill = if (payment.electricBill?.isTakingElectricBill == getString(R.string.t))
+            payment.electricBill?.totalElectricBill?.toDouble()!!
+        else
+            0.0
+        val extra = if (payment.extraAmount != "")
+            payment.extraAmount?.toDouble()!!
+        else
+            0.0
+
+        return payment.totalRent.toDouble() - (houseRent + parking + electricBill + extra)
     }
 
     override fun onSyncClicked(payment: Payment) {
@@ -480,6 +588,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                     if (!isUndoClicked && payment.isSynced == getString(R.string.t)) {
 
+                        updateRenterDuesOrAdvance()
+
                         FirebaseServiceHelper.deleteDocumentFromFireStore(
                             context = requireContext(),
                             collection = getString(R.string.payments),
@@ -489,6 +599,70 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 }
             })
             .show()
+    }
+
+    private fun updateRenterDuesOrAdvance() {
+
+        var dueOrAdvance = 0.0
+        paymentViewModel.getAllPaymentsListOfRenter(receivedRenter?.key!!).observe(
+            viewLifecycleOwner
+        ) {
+
+            try {
+                it.forEach { payment ->
+
+                    dueOrAdvance += (payment.amountPaid?.toDouble()
+                        ?.minus(payment.totalRent.toDouble())!!)
+                }
+
+                receivedRenter!!.dueOrAdvanceAmount = dueOrAdvance
+
+                editRenterInDatabase(receivedRenter!!)
+
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun editRenterInDatabase(renter: Renter) {
+
+        if (isInternetAvailable(requireContext())) {
+
+            if (renter.isSynced == getString(R.string.t)) {
+
+                //update on firestore
+                val map = HashMap<String, Any?>()
+                map["dueOrAdvanceAmount"] = renter.dueOrAdvanceAmount
+
+                updateDocumentOnFireStore(
+                    requireContext(),
+                    map,
+                    getString(R.string.renters),
+                    renter.key!!
+                )
+
+                renterViewModel.insertRenter(renter)
+            } else {
+
+                renter.isSynced = getString(R.string.t)
+
+                //insert on firestore
+                uploadDocumentToFireStore(
+                    requireContext(),
+                    convertRenterToJSONString(renter),
+                    getString(R.string.renters),
+                    renter.key!!
+                )
+
+                renterViewModel.insertRenter(renter)
+            }
+
+        } else {
+
+            renter.isSynced = getString(R.string.f)
+            renterViewModel.insertRenter(renter)
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -517,20 +691,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 }
             }
         })
-
-
-        /*
-                if (binding.paymentSV.visibility == View.VISIBLE) {
-
-                    binding.paymentSV.requestFocus()
-                    showKeyboard(requireActivity(), binding.paymentSV)
-                } else {
-
-                    hideKeyBoard(requireActivity())
-                    binding.paymentSV.setText("")
-                }
-*/
-
     }
 
     override fun onClick(v: View?) {
@@ -608,6 +768,9 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
             )
         }
 
+        receivedRenter?.dueOrAdvanceAmount = 0.0
+
+        editRenterInDatabase(receivedRenter!!)
     }
 
     private fun showNoPaymentsTV() {
@@ -616,6 +779,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
             binding.noPaymentsTV.show()
             binding.paymentRV.hide()
+            binding.paymentAppBarLL.hide()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -627,6 +791,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
             binding.noPaymentsTV.hide()
             binding.paymentRV.show()
+            binding.paymentAppBarLL.show()
         } catch (e: Exception) {
             e.printStackTrace()
         }

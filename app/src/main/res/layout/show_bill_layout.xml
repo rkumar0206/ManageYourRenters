@@ -688,7 +688,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:padding="2dp"
-                android:text="Paid in advance\nin last paymnets"
+                android:text="Advance of last\npayments"
                 android:textSize="17sp"
                 app:layout_constraintStart_toStartOf="@+id/showBill_dueOfLastPay"
                 app:layout_constraintTop_toBottomOf="@+id/showBill_dueOfLastPay" />

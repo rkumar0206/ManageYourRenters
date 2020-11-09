@@ -170,7 +170,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     override fun onRenterClicked(renter: Renter) {
 
         val action = HomeFragmentDirections.actionHomeFragmentToPaymentFragment(
-            convertRenterToJSONString(renter)
+            renter.key
+            //convertRenterToJSONString(renter)
         )
         findNavController().navigate(action)
     }

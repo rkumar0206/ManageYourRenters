@@ -8,19 +8,20 @@ import com.google.firebase.firestore.IgnoreExtraProperties
 @Entity(tableName = "renter_table")
 @IgnoreExtraProperties
 data class Renter(
-    var timeStamp : Long? = System.currentTimeMillis(),
-    var name : String,
-    var mobileNumber : String,
-    var emailId : String?,
-    var otherDocumentName : String?,
-    var otherDocumentNumber : String?,
-    var roomNumber : String,
-    var address : String,
-    var uid : String,
-    var renterId : String,
-    var renterPassword : String,
-    var key : String?,
-    var isSynced : String = "false"
+    var timeStamp: Long? = System.currentTimeMillis(),
+    var name: String,
+    var mobileNumber: String,
+    var emailId: String?,
+    var otherDocumentName: String?,
+    var otherDocumentNumber: String?,
+    var roomNumber: String,
+    var address: String,
+    var dueOrAdvanceAmount: Double = 0.0,
+    var uid: String,
+    var renterId: String,
+    var renterPassword: String,
+    var key: String?,
+    var isSynced: String = "false"
 ) {
 
     @Exclude
@@ -36,6 +37,7 @@ data class Renter(
         "",
         "",
         "",
+        0.0,
         "",
         "",
         "",

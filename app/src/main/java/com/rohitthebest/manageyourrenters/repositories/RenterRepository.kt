@@ -11,7 +11,7 @@ class RenterRepository @Inject constructor(
 
     suspend fun insertRenter(renter : Renter) = dao.insertRenter(renter)
 
-    suspend fun deleteRenter(renter : Renter) = dao.deleteRenter(renter)
+    suspend fun deleteRenter(renter: Renter) = dao.deleteRenter(renter)
 
     suspend fun deleteAllRenter() = dao.deleteAll()
 
@@ -19,5 +19,7 @@ class RenterRepository @Inject constructor(
 
     fun getRenterCount() = dao.getRentersCount()
 
-    fun getRenterByIsSynced(isSynced : String) = dao.getRenterByIsSynced(isSynced)
+    fun getRenterByIsSynced(isSynced: String) = dao.getRenterByIsSynced(isSynced)
+
+    fun getRenterByKey(renterKey: String) = dao.getRenterByKey(renterKey)
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +25,16 @@ class ShowRentersAdapter :
         fun setData(renter: Renter) {
 
             itemView.apply {
+
+                if (renter.dueOrAdvanceAmount < 0.0) {
+
+                    renterAdapter_CV.strokeColor =
+                        ContextCompat.getColor(context, R.color.color_orange)
+                } else {
+
+                    renterAdapter_CV.strokeColor =
+                        ContextCompat.getColor(context, R.color.colorGrey)
+                }
 
                 adapterRenterNameTV.text = renter.name
                 adapterRoomNumTV.text = renter.roomNumber

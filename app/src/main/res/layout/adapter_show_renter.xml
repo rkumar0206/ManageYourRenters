@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
     app:cardCornerRadius="5dp"
+    android:id="@+id/renterAdapter_CV"
     app:rippleColor="@color/rippleColor"
     app:strokeColor="@color/colorGrey"
     app:strokeWidth="0.5dp">

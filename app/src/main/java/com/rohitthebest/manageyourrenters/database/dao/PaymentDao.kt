@@ -17,14 +17,17 @@ interface PaymentDao {
     suspend fun deleteAllPayment()
 
     @Query("DELETE FROM payment_table WHERE renterKey =:renterKey")
-    suspend fun deleteAllPaymentsOfRenter(renterKey : String)
+    suspend fun deleteAllPaymentsOfRenter(renterKey: String)
 
     @Query("SELECT * FROM payment_table ORDER BY timeStamp DESC")
-    fun getAllPaymentsList() : LiveData<List<Payment>>
+    fun getAllPaymentsList(): LiveData<List<Payment>>
 
     @Query("SELECT * FROM payment_table WHERE renterKey =:renterKey ORDER BY timeStamp DESC")
-    fun getAllPaymentsListOfRenter(renterKey: String) : LiveData<List<Payment>>
+    fun getAllPaymentsListOfRenter(renterKey: String): LiveData<List<Payment>>
 
     @Query("SELECT COUNT(id) FROM payment_table WHERE renterKey =:renterKey")
-    fun getCountOfPaymentsOfRenter(renterKey : String) : LiveData<Int>
+    fun getCountOfPaymentsOfRenter(renterKey: String): LiveData<Int>
+
+    @Query("SELECT SUM(amountPaid - totalRent) FROM payment_table WHERE renterKey =:renterKey")
+    fun getSumOfDueOrAdvance(renterKey: String): LiveData<Double>
 }

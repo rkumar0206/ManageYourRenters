@@ -38,4 +38,6 @@ class PaymentViewModel @ViewModelInject constructor(
 
     fun getCountOfPaymentsOfRenter(renterKey: String) =
         repository.getCountOfPaymentsOfRenter(renterKey)
+
+    fun getSumOfDueOrAdvance(renterKey: String) = repository.getSumOfDueOrAdvance(renterKey)
 }

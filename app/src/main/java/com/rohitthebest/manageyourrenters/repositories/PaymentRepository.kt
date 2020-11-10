@@ -14,11 +14,14 @@ class PaymentRepository @Inject constructor(
 
     suspend fun deleteAllPayments() = dao.deleteAllPayment()
 
-    suspend fun deleteAllPaymentsOfRenter(renterKey : String) = dao.deleteAllPaymentsOfRenter(renterKey)
+    suspend fun deleteAllPaymentsOfRenter(renterKey: String) =
+        dao.deleteAllPaymentsOfRenter(renterKey)
 
     fun getAllPaymentsList() = dao.getAllPaymentsList()
 
     fun getAllPaymentsListOfRenter(renterKey: String) = dao.getAllPaymentsListOfRenter(renterKey)
 
-    fun getCountOfPaymentsOfRenter(renterKey : String) = dao.getCountOfPaymentsOfRenter(renterKey)
+    fun getCountOfPaymentsOfRenter(renterKey: String) = dao.getCountOfPaymentsOfRenter(renterKey)
+
+    fun getSumOfDueOrAdvance(renterKey: String) = dao.getSumOfDueOrAdvance(renterKey)
 }

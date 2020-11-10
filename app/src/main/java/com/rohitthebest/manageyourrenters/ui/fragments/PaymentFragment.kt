@@ -571,6 +571,9 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     private fun deletePayment(payment: Payment) {
 
         paymentViewModel.deletePayment(payment)
+        updateRenterDuesOrAdvance()
+
+        getPaymentListOfRenter()
 
         var isUndoClicked = false
 
@@ -580,6 +583,9 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 isUndoClicked = true
 
                 paymentViewModel.insertPayment(payment)
+                updateRenterDuesOrAdvance()
+                getPaymentListOfRenter()
+
                 showToast(requireContext(), "Payment restored...")
             }
             .addCallback(object : Snackbar.Callback() {
@@ -588,7 +594,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                     if (!isUndoClicked && payment.isSynced == getString(R.string.t)) {
 
-                        updateRenterDuesOrAdvance()
+                        //updateRenterDuesOrAdvance()
+                        editRenterInDatabase(receivedRenter!!)
 
                         FirebaseServiceHelper.deleteDocumentFromFireStore(
                             context = requireContext(),
@@ -603,21 +610,22 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     private fun updateRenterDuesOrAdvance() {
 
-        var dueOrAdvance = 0.0
+        var dueOrAdvance: Double
         paymentViewModel.getAllPaymentsListOfRenter(receivedRenter?.key!!).observe(
             viewLifecycleOwner
         ) {
 
             try {
-                it.forEach { payment ->
+                val payment = it.first()
 
-                    dueOrAdvance += (payment.amountPaid?.toDouble()
-                        ?.minus(payment.totalRent.toDouble())!!)
-                }
+                dueOrAdvance = (payment.amountPaid?.toDouble()
+                    ?.minus(payment.totalRent.toDouble())!!)
+
 
                 receivedRenter!!.dueOrAdvanceAmount = dueOrAdvance
+                renterViewModel.insertRenter(receivedRenter!!)
 
-                editRenterInDatabase(receivedRenter!!)
+                //editRenterInDatabase(receivedRenter!!)
 
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()

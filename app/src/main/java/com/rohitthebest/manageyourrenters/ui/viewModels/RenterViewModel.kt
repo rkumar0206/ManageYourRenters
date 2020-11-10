@@ -15,11 +15,12 @@ class RenterViewModel @ViewModelInject constructor(
 
         repo.insertRenter(renter)
     }
-    fun deleteRenter(renter : Renter) = viewModelScope.launch {
+    fun deleteRenter(renter: Renter) = viewModelScope.launch {
 
         repo.deleteRenter(renter)
     }
-    fun deleteAllRenter(renter : Renter) = viewModelScope.launch {
+
+    fun deleteAllRenter() = viewModelScope.launch {
 
         repo.deleteAllRenter()
     }

@@ -15,4 +15,7 @@ object Constants {
     const val UPLOAD_DATA_KEY = "UPLOAD_TAG_sdhaasdfhkjvhkjvhjkvhbjkvb"
     const val RANDOM_ID_KEY = "RANDOM_ID_KEY_sdjhdsdvjkbvbavbhbvhjbhjbvdb"
     const val KEY_LIST_KEY = "KEY_LIST_KEY_fdhvjkhjkvkjvkbvk"
+
+    const val SHARED_PREFS_HOME_IS_SYNCED_KEY = "SHARED_PREFS_HOME_IS_SYNCED_KEY_sldghhfjfsahn"
+    const val SHARED_PREFS_IS_SYNCED = "SHARED_PREFS_IS_SYNCED_kjzdfsggjkshd"
 }

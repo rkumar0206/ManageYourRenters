@@ -1,8 +1,10 @@
 package com.rohitthebest.manageyourrenters.ui.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,11 +18,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.ShowRentersAdapter
+import com.rohitthebest.manageyourrenters.database.entity.Payment
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
+import com.rohitthebest.manageyourrenters.others.Constants.SHARED_PREFS_HOME_IS_SYNCED_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.SHARED_PREFS_IS_SYNCED
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
@@ -28,6 +34,7 @@ import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.con
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.deleteDocumentFromFireStore
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.uploadDocumentToFireStore
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -42,6 +49,8 @@ import java.util.*
 @AndroidEntryPoint
 class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClickListener {
 
+    private val TAG = "HomeFragment"
+
     private val renterViewModel: RenterViewModel by viewModels()
     private val paymentViewModel: PaymentViewModel by viewModels()
 
@@ -52,6 +61,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     private var mAuth: FirebaseAuth? = null
 
     private lateinit var mAdapter: ShowRentersAdapter
+
+    private var isSynced = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,25 +79,155 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        loadIsSyncedValue()
+
         mAuth = Firebase.auth
 
         mAdapter = ShowRentersAdapter()
 
         showProgressBar()
 
-        GlobalScope.launch {
+        if (isSynced) {
 
-            delay(350)
+            GlobalScope.launch {
 
-            withContext(Dispatchers.Main) {
+                delay(350)
 
-                updateUI()
-                getAllRentersList()
+                withContext(Dispatchers.Main) {
+
+                    updateUI()
+                    getAllRentersList()
+                }
+            }
+        } else {
+
+            if (isInternetAvailable(requireContext())) {
+
+                if (mAuth!!.currentUser != null) {
+
+                    syncDocumentsFromFireStore()
+                }
+
+            } else {
+
+                showNoInternetMessage(requireContext())
             }
         }
-
         initListeners()
     }
+
+    private fun syncDocumentsFromFireStore() {
+
+        showToast(requireContext(), "Please wait we are fetching documents saved on cloud...")
+
+        try {
+
+            FirebaseFirestore.getInstance()
+                .collection(getString(R.string.renters))
+                .whereEqualTo("uid", getUid())
+                .get()
+                .addOnSuccessListener {
+
+                    if (it.size() != 0) {
+
+                        renterViewModel.deleteAllRenter()
+
+                        for (snapshot in it) {
+
+                            val renter = snapshot.toObject(Renter::class.java)
+
+                            renterViewModel.insertRenter(renter)
+                        }
+
+                        syncPayments()
+
+                        GlobalScope.launch {
+
+                            delay(200)
+
+                            withContext(Dispatchers.Main) {
+
+                                getAllRentersList()
+                            }
+                        }
+                    } else {
+
+                        isSynced = true
+                        saveIsSyncedValue()
+                        hideProgressBar()
+
+                        getAllRentersList()
+                    }
+                }.addOnFailureListener {
+
+                    showToast(requireContext(), it.message.toString())
+                }
+
+
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun syncPayments() {
+
+        FirebaseFirestore.getInstance()
+            .collection(getString(R.string.payments))
+            .whereEqualTo("uid", getUid())
+            .get()
+            .addOnSuccessListener {
+
+                if (it.size() != 0) {
+
+                    paymentViewModel.deleteAllPayments()
+
+                    for (snapshot in it) {
+
+                        val payment = snapshot.toObject(Payment::class.java)
+
+                        paymentViewModel.insertPayment(payment)
+                        isSynced = true
+                    }
+
+                    saveIsSyncedValue()
+
+                } else {
+
+                    isSynced = true
+                    saveIsSyncedValue()
+                }
+            }
+    }
+
+    private fun saveIsSyncedValue() {
+
+        try {
+            val sharedPreferences =
+                requireActivity().getSharedPreferences(SHARED_PREFS_IS_SYNCED, Context.MODE_PRIVATE)
+
+            val edit = sharedPreferences.edit()
+
+            edit.putBoolean(SHARED_PREFS_HOME_IS_SYNCED_KEY, isSynced)
+
+            edit.apply()
+        } catch (e: Exception) {
+            Log.e(TAG, "saveData: ${e.message}")
+        }
+    }
+
+    private fun loadIsSyncedValue() {
+
+        try {
+            val sharedPreferences =
+                requireActivity().getSharedPreferences(SHARED_PREFS_IS_SYNCED, Context.MODE_PRIVATE)
+
+            isSynced = sharedPreferences.getBoolean(SHARED_PREFS_HOME_IS_SYNCED_KEY, false)
+        } catch (e: Exception) {
+            Log.e(TAG, "saveData: ${e.message}")
+        }
+
+    }
+
 
     private fun getAllRentersList() {
 
@@ -269,7 +410,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         paymentViewModel.deleteAllPaymentsOfRenter(renter.key!!)
 
-        var paymentKeyList: List<String> = emptyList()
+        var paymentKeyList: List<String>
 
         paymentViewModel.getAllPaymentsListOfRenter(renterKey = renter.key!!)
             .observe(viewLifecycleOwner) {

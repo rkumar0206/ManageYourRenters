@@ -74,6 +74,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private var billMonth: String? = null
     private var billMonthNumber = 1
     private var currencySymbol: String? = null
+    private var selectedYear: Int = 0
 
     //if selected by_date method
     private var fromDateTimestamp: Long? = null
@@ -91,7 +92,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = FragmentAddPaymentBinding.inflate(inflater, container, false)
         return binding.root
@@ -115,6 +116,14 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         setUpSpinnerMonth() //Setting the from(month) and till(month) spinners
         setUpCurrencySymbolList()
+
+        selectedYear =
+            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                System.currentTimeMillis(),
+                "yyyy"
+            )?.toInt()!!
+
+        setUpSpinnerYear()
 
         getMessage()
         initListeners()
@@ -252,7 +261,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 calculateTotalBill()
 
-                includeBinding.duesOfLatsPaymentTV.text =
+                includeBinding.duesOfLastPaymentTV.text =
                     "There are no dues and no money given in advance."
             }
         }
@@ -268,11 +277,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         when {
             receivedRenter?.dueOrAdvanceAmount!! < 0.0 -> {
 
-                includeBinding.duesOfLatsPaymentTV.changeTextColor(
+                includeBinding.duesOfLastPaymentTV.changeTextColor(
                     requireContext(),
                     R.color.color_orange
                 )
-                includeBinding.duesOfLatsPaymentTV.text =
+                includeBinding.duesOfLastPaymentTV.text =
                     "Dues from last payments : + ${lastPaymentInfo?.bill?.currencySymbol} ${
                         abs(receivedRenter?.dueOrAdvanceAmount!!)
                     }"
@@ -281,18 +290,18 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             }
             receivedRenter?.dueOrAdvanceAmount!! > 0.0 -> {
 
-                includeBinding.duesOfLatsPaymentTV.changeTextColor(
+                includeBinding.duesOfLastPaymentTV.changeTextColor(
                     requireContext(),
                     R.color.color_green
                 )
-                includeBinding.duesOfLatsPaymentTV.text =
+                includeBinding.duesOfLastPaymentTV.text =
                     "Paid in advance in last payments : - ${lastPaymentInfo?.bill?.currencySymbol}${receivedRenter?.dueOrAdvanceAmount}"
 
                 duesOrAdvanceAmount = receivedRenter?.dueOrAdvanceAmount!!
             }
             else -> {
 
-                includeBinding.duesOfLatsPaymentTV.text =
+                includeBinding.duesOfLastPaymentTV.text =
                     "There are no dues and no money given in advance."
             }
         }
@@ -365,6 +374,55 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     }
 
+    private fun setUpSpinnerYear() {
+
+        val yearList = populateYearList(selectedYear)
+
+        includeBinding.selectYearSpinner.apply {
+
+            adapter = ArrayAdapter(
+                requireContext(),
+                R.layout.support_simple_spinner_dropdown_item,
+                yearList
+            )
+
+            onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+
+                        setSelection(position)
+                        selectedYear = yearList[position]
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                        setSelection(0)
+                        selectedYear = yearList[0]
+                    }
+                }
+
+        }
+    }
+
+    private fun populateYearList(selectedYear: Int): java.util.ArrayList<Int> {
+
+        val yearList = ArrayList<Int>()
+
+        for (year in selectedYear downTo selectedYear - 5) {
+
+            yearList.add(year)
+        }
+
+        return yearList
+    }
+
+
     private fun setUpCurrencySymbolList() {
 
         includeBinding.moneySymbolSpinner.let { spinner ->
@@ -407,7 +465,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         binding.backBtn.setOnClickListener(this)
         binding.saveBtn.setOnClickListener(this)
         includeBinding.seeTotalBtn.setOnClickListener(this)
-
+        includeBinding.calculateElectrictyBtn.setOnClickListener(this)
 
         includeBinding.fromDateTV.setOnClickListener(this)
         includeBinding.dateRangePickerBtn.setOnClickListener(this)
@@ -434,6 +492,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             includeBinding.seeTotalBtn.id -> {
 
                 includeBinding.amountPaidET.editText?.setText(calculateTotalBill())
+            }
+
+            includeBinding.calculateElectrictyBtn.id -> {
+
+                calculateElectricBill()
             }
 
             binding.backBtn.id -> {
@@ -527,7 +590,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
 
     }
-
 
     private fun calculateNumberOfDays(startDate: Long, endDate: Long): String {
 
@@ -629,7 +691,9 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         includeBinding.totalTV.text = "$currencySymbol ${String.format("%.2f", totalRent)}"
 
-        amountPaid = if (includeBinding.amountPaidET.editText?.text.toString().trim() == "") {
+        amountPaid = if (includeBinding.amountPaidET.editText?.text.toString().trim() == ""
+            || includeBinding.amountPaidET.editText?.text.toString().trim() == "0.0"
+        ) {
 
             includeBinding.amountPaidET.editText?.setText(totalRent.toString())
             totalRent
@@ -687,12 +751,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         customView.findViewById<TextView>(R.id.showBill_billPeriod).text =
             if (includeBinding.periodTypeRG.checkedRadioButtonId == includeBinding.byMonthRB.id) {
 
-                "$billMonth, ${
-                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                        currentTimestamp,
-                        "yyyy"
-                    )
-                }"
+                "$billMonth, $selectedYear"
             } else {
                 "${
                     includeBinding.fromDateTV.text.toString().trim()
@@ -813,6 +872,10 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 billMonth = ""
                 billMonthNumber = 0
+                selectedYear = WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                    fromDateTimestamp,
+                    "yyyy"
+                )?.toInt()!!
             }
 
             val billInfo = BillInfo(
@@ -822,10 +885,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 numberOfDays,
                 billMonth,
                 billMonthNumber,
-                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                    currentTimestamp,
-                    "yyyy"
-                )?.toInt(),
+                selectedYear,
                 currencySymbol
             )
 
@@ -1053,6 +1113,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             periodType = getString(R.string.by_month)
             includeBinding.byDateCL.hide()
             includeBinding.monthSelectSpinner.show()
+            includeBinding.selectYearSpinner.show()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -1064,6 +1125,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             periodType = getString(R.string.by_date)
             includeBinding.byDateCL.show()
             includeBinding.monthSelectSpinner.hide()
+            includeBinding.selectYearSpinner.hide()
         } catch (e: Exception) {
             e.printStackTrace()
         }

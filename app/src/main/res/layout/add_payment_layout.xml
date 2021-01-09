@@ -183,11 +183,21 @@
                 android:alpha="1"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/selectYearSpinner"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/periodTypeRG"
-                tools:visibility="gone" />
+                tools:visibility="visible" />
+
+            <Spinner
+                android:id="@+id/selectYearSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/monthSelectSpinner"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/monthSelectSpinner"
+                app:layout_constraintTop_toTopOf="@+id/monthSelectSpinner" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/byDateCL"
@@ -204,7 +214,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/periodTypeRG"
                 app:layout_constraintVertical_bias="0.0"
                 tools:alpha="1"
-                tools:visibility="visible">
+                tools:visibility="gone">
 
                 <View
                     android:id="@+id/divider17"
@@ -450,7 +460,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView2"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -476,7 +486,7 @@
                 android:textColor="@color/textColor1"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/calculateElectrictyBtn"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider10" />
@@ -485,12 +495,11 @@
                 android:id="@+id/divider11"
                 android:layout_width="377dp"
                 android:layout_height="1dp"
-                android:layout_marginTop="2dp"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView13" />
+                app:layout_constraintTop_toBottomOf="@+id/calculateElectrictyBtn" />
 
             <TextView
                 android:id="@+id/textView14"
@@ -633,6 +642,17 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider15" />
+
+            <ImageButton
+                android:id="@+id/calculateElectrictyBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:backgroundTint="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="@+id/textView13"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView13"
+                app:srcCompat="@drawable/ic_baseline_calculate_24" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
@@ -931,7 +951,7 @@
         android:background="?android:attr/listDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/seeTotalBtn"
-        app:layout_constraintTop_toBottomOf="@+id/duesOfLatsPaymentTV" />
+        app:layout_constraintTop_toBottomOf="@+id/duesOfLastPaymentTV" />
 
     <Button
         android:id="@+id/seeTotalBtn"
@@ -978,7 +998,7 @@
         app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
 
     <TextView
-        android:id="@+id/duesOfLatsPaymentTV"
+        android:id="@+id/duesOfLastPaymentTV"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"

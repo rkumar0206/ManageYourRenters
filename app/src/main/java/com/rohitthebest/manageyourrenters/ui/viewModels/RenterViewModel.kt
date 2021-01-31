@@ -11,10 +11,16 @@ class RenterViewModel @ViewModelInject constructor(
     val repo : RenterRepository
 ) : ViewModel() {
 
-    fun insertRenter(renter : Renter) = viewModelScope.launch {
+    fun insertRenter(renter: Renter) = viewModelScope.launch {
 
         repo.insertRenter(renter)
     }
+
+    fun insertRenters(renters: List<Renter>) = viewModelScope.launch {
+
+        repo.insertRenters(renters)
+    }
+
     fun deleteRenter(renter: Renter) = viewModelScope.launch {
 
         repo.deleteRenter(renter)

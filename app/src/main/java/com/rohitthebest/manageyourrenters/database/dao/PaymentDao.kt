@@ -8,7 +8,10 @@ import com.rohitthebest.manageyourrenters.database.entity.Payment
 interface PaymentDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPayment(payment : Payment) : Long
+    suspend fun insertPayment(payment: Payment): Long
+
+    @Insert
+    suspend fun insertPayments(payments: List<Payment>)
 
     @Delete
     suspend fun deletePayment(payment: Payment)

@@ -24,8 +24,11 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
+
 
     private val TAG = "LoginFragment"
     private lateinit var mAuth: FirebaseAuth

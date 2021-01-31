@@ -23,5 +23,6 @@
     <color name="primary_light">#a5c1ff</color>
     <color name="primaryTextColor">#212121</color>
     <color name="secondaryTextColor">#4D4C4C</color>
+    <color name="color_white">#FFFFFF</color>
 
 </resources>

@@ -8,7 +8,10 @@ import com.rohitthebest.manageyourrenters.database.entity.Renter
 interface RenterDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRenter(renter : Renter)
+    suspend fun insertRenter(renter: Renter)
+
+    @Insert
+    suspend fun insertRenters(renters: List<Renter>)
 
     @Delete
     suspend fun deleteRenter(renter: Renter)

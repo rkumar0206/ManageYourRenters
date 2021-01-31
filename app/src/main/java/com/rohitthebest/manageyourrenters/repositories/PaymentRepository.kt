@@ -8,7 +8,9 @@ class PaymentRepository @Inject constructor(
     val dao : PaymentDao
 ) {
 
-    suspend fun insertPayment(payment : Payment) = dao.insertPayment(payment)
+    suspend fun insertPayment(payment: Payment) = dao.insertPayment(payment)
+
+    suspend fun insertPayments(payments: List<Payment>) = dao.insertPayments(payments)
 
     suspend fun deletePayment(payment: Payment) = dao.deletePayment(payment)
 

@@ -9,7 +9,9 @@ class RenterRepository @Inject constructor(
     val dao : RenterDao
 ) {
 
-    suspend fun insertRenter(renter : Renter) = dao.insertRenter(renter)
+    suspend fun insertRenter(renter: Renter) = dao.insertRenter(renter)
+
+    suspend fun insertRenters(renters: List<Renter>) = dao.insertRenters(renters)
 
     suspend fun deleteRenter(renter: Renter) = dao.deleteRenter(renter)
 

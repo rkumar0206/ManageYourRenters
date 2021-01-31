@@ -16,6 +16,11 @@ class PaymentViewModel @ViewModelInject constructor(
         repository.insertPayment(payment)
     }
 
+    fun insertPayments(payments: List<Payment>) = viewModelScope.launch {
+
+        repository.insertPayments(payments)
+    }
+
     fun deletePayment(payment: Payment) = viewModelScope.launch {
 
         repository.deletePayment(payment)

@@ -22,7 +22,7 @@
         tools:text="User Name" />
 
     <TextView
-        android:id="@+id/wserEmailTV"
+        android:id="@+id/userEmailTV"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -47,7 +47,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/userNameTV"
-        app:layout_constraintTop_toBottomOf="@+id/wserEmailTV" />
+        app:layout_constraintTop_toBottomOf="@+id/userEmailTV" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/signOutBtn"

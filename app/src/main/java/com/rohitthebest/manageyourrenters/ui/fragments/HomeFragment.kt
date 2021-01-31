@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
@@ -8,12 +9,20 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.bumptech.glide.Glide
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -25,6 +34,8 @@ import com.rohitthebest.manageyourrenters.adapters.ShowRentersAdapter
 import com.rohitthebest.manageyourrenters.database.entity.Payment
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
+import com.rohitthebest.manageyourrenters.others.Constants.IS_SYNCED_SHARED_PREF_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.IS_SYNCED_SHARED_PREF_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.SHARED_PREFS_HOME_IS_SYNCED_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.SHARED_PREFS_IS_SYNCED
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
@@ -38,6 +49,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBooleanToSharedPreference
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
@@ -68,7 +80,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
@@ -538,8 +550,132 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                 findNavController().navigate(R.id.action_homeFragment_to_addRenterFragment)
             }
+
+            binding.profileImage.id -> {
+
+                showBottomSheetDialog()
+            }
         }
     }
+
+    @SuppressLint("SetTextI18n")
+    private fun showBottomSheetDialog() {
+
+        MaterialDialog(requireActivity(), BottomSheet()).show {
+
+            customView(
+                R.layout.user_info_with_sign_out_layout,
+                scrollable = true
+            )
+
+            val userName = getCustomView().findViewById<TextView>(R.id.userNameTV)
+            val emailId = getCustomView().findViewById<TextView>(R.id.userEmailTV)
+            val noOfRenters = getCustomView().findViewById<TextView>(R.id.noOfRentersTV)
+            val signOutBtn = getCustomView().findViewById<MaterialCardView>(R.id.signOutBtn)
+
+            userName.text = mAuth?.currentUser?.displayName
+            emailId.text = mAuth?.currentUser?.email
+            renterViewModel.getRenterCount().observe(viewLifecycleOwner) {
+
+                noOfRenters.text = "Number of renters : $it"
+            }
+
+            signOutBtn.setOnClickListener {
+
+                if (isInternetAvailable(requireContext())) {
+
+                    signOut()
+
+                    dismiss()
+                } else {
+
+                    showNoInternetMessage(requireContext())
+                }
+            }
+        }
+    }
+
+    private fun signOut() {
+
+        try {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Are You Sure?")
+                .setPositiveButton("Yes") { _, _ ->
+
+                    mAuth?.signOut()
+
+                    //[Google Sign Out]
+                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(getString(R.string.default_web_client_id))
+                        .requestEmail()
+                        .build()
+                    val googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
+
+                    googleSignInClient?.signOut()?.addOnCompleteListener {
+                        Log.i(TAG, "Google signOut Successful")
+
+                        try {
+                            Log.i(TAG, "signOut: Google signOut Successful")
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                    showToast(requireContext(), "SignOut Successful")
+
+                    //deleting everything saved on SQLite
+                    deleteEverythingFromSQLite()
+
+                }
+                .setNegativeButton("No") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .create()
+                .show()
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun deleteEverythingFromSQLite() {
+
+        try {
+            renterViewModel.deleteAllRenter()
+            paymentViewModel.deleteAllPayments()
+            changeIsSyncedValue()
+
+        } catch (e: Exception) {
+        }
+    }
+
+    private fun changeIsSyncedValue() {
+
+        try {
+
+            saveBooleanToSharedPreference(
+                requireActivity(),
+                IS_SYNCED_SHARED_PREF_NAME,
+                IS_SYNCED_SHARED_PREF_KEY,
+                false
+            )
+
+            Log.i(TAG, "saveIsSyncedValue: changed the value of isSynced to false")
+
+            GlobalScope.launch {
+
+                delay(200)
+
+                withContext(Dispatchers.Main) {
+
+                    findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+                }
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "saveData: ${e.message}")
+        }
+
+    }
+
 
     private fun showSearchView() {
 

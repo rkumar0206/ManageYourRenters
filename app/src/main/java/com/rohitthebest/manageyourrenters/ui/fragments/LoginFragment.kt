@@ -37,7 +37,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_login.*
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -118,12 +117,18 @@ class LoginFragment : Fragment() {
 
                     if (it.size() != 0) {
 
-                        showSyncingInfoTV.text = "syncing renters..."
+                        try {
+                            binding.showSyncingInfoTV.text = "syncing renters..."
 
-                        val listOfRenters = it.toObjects(Renter::class.java)
-                        renterViewModel.insertRenters(listOfRenters)
+                            val listOfRenters = it.toObjects(Renter::class.java)
+                            renterViewModel.insertRenters(listOfRenters)
 
-                        syncPayments()
+                            syncPayments()
+                        } catch (e: NullPointerException) {
+                            e.printStackTrace()
+                        } catch (e: IllegalStateException) {
+                            e.printStackTrace()
+                        }
 
                     } else {
 
@@ -163,9 +168,16 @@ class LoginFragment : Fragment() {
 
                     if (it.size() != 0) {
 
-                        showSyncingInfoTV.text = "syncing payments..."
-                        paymentViewModel.insertPayments(it.toObjects(Payment::class.java))
-                        Log.i(TAG, "syncPayments: inserted")
+                        try {
+
+                            binding.showSyncingInfoTV.text = "syncing payments..."
+                            paymentViewModel.insertPayments(it.toObjects(Payment::class.java))
+                            Log.i(TAG, "syncPayments: inserted")
+                        } catch (e: NullPointerException) {
+                            e.printStackTrace()
+                        } catch (e: IllegalStateException) {
+                            e.printStackTrace()
+                        }
                     }
                 }
 

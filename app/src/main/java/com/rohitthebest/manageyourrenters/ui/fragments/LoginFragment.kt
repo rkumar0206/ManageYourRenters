@@ -37,6 +37,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -181,16 +182,29 @@ class LoginFragment : Fragment() {
                     }
                 }
 
-            isSynced = true
+            showProgressBar()
 
-            saveBooleanToSharedPreference(
-                requireActivity(),
-                IS_SYNCED_SHARED_PREF_NAME,
-                IS_SYNCED_SHARED_PREF_KEY,
-                isSynced
-            )
+            GlobalScope.launch {
 
-            findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                delay(200)
+
+                withContext(Dispatchers.Main) {
+
+                    isSynced = true
+
+                    saveBooleanToSharedPreference(
+                        requireActivity(),
+                        IS_SYNCED_SHARED_PREF_NAME,
+                        IS_SYNCED_SHARED_PREF_KEY,
+                        isSynced
+                    )
+
+                    hideProgressBar()
+
+                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+
+                }
+            }
 
         } catch (e: java.lang.Exception) {
             e.printStackTrace()

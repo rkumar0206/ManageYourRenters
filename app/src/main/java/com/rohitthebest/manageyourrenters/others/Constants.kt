@@ -16,9 +16,6 @@ object Constants {
     const val RANDOM_ID_KEY = "RANDOM_ID_KEY_sdjhdsdvjkbvbavbhbvhjbhjbvdb"
     const val KEY_LIST_KEY = "KEY_LIST_KEY_fdhvjkhjkvkjvkbvk"
 
-    const val SHARED_PREFS_HOME_IS_SYNCED_KEY = "SHARED_PREFS_HOME_IS_SYNCED_KEY_sldghhfjfsahn"
-    const val SHARED_PREFS_IS_SYNCED = "SHARED_PREFS_IS_SYNCED_kjzdfsggjkshd"
-
     const val IS_SYNCED_SHARED_PREF_NAME = "IS_SYNCED_SHARED_PREF_NAME_fdkdnf"
     const val IS_SYNCED_SHARED_PREF_KEY = "IS_SYNCED_SHARED_PREF_KEY_fkjdvkjdbdnf"
 }

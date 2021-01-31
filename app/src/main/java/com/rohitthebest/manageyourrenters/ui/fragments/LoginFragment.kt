@@ -152,6 +152,7 @@ class LoginFragment : Fragment() {
 
                     showToast(requireContext(), it.message!!)
 
+                    signIn()
                 }
         }
     }
@@ -174,42 +175,55 @@ class LoginFragment : Fragment() {
                             binding.showSyncingInfoTV.text = "syncing payments..."
                             paymentViewModel.insertPayments(it.toObjects(Payment::class.java))
                             Log.i(TAG, "syncPayments: inserted")
+
+                            saveIsSyncedValueAndNavigateToHomeFragment()
                         } catch (e: NullPointerException) {
                             e.printStackTrace()
                         } catch (e: IllegalStateException) {
                             e.printStackTrace()
                         }
+                    } else {
+
+                        saveIsSyncedValueAndNavigateToHomeFragment()
                     }
+                }.addOnFailureListener {
+
+                    showToast(requireContext(), it.message.toString())
+
+                    syncPayments()
                 }
-
-            showProgressBar()
-
-            GlobalScope.launch {
-
-                delay(200)
-
-                withContext(Dispatchers.Main) {
-
-                    isSynced = true
-
-                    saveBooleanToSharedPreference(
-                        requireActivity(),
-                        IS_SYNCED_SHARED_PREF_NAME,
-                        IS_SYNCED_SHARED_PREF_KEY,
-                        isSynced
-                    )
-
-                    hideProgressBar()
-
-                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-
-                }
-            }
 
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
 
+    }
+
+    private fun saveIsSyncedValueAndNavigateToHomeFragment() {
+
+        showProgressBar()
+
+        GlobalScope.launch {
+
+            delay(200)
+
+            withContext(Dispatchers.Main) {
+
+                isSynced = true
+
+                saveBooleanToSharedPreference(
+                    requireActivity(),
+                    IS_SYNCED_SHARED_PREF_NAME,
+                    IS_SYNCED_SHARED_PREF_KEY,
+                    isSynced
+                )
+
+                hideProgressBar()
+
+                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+
+            }
+        }
     }
 
 

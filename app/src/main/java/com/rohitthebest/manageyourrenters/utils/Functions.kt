@@ -168,6 +168,48 @@ class Functions {
 
         }
 
+        fun saveBooleanToSharedPreference(
+            activity: Activity,
+            sharedPrefName: String,
+            key: String,
+            value: Boolean
+        ) {
+
+            try {
+                val sharedPreferences =
+                    activity.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
+
+                val edit = sharedPreferences.edit()
+
+                edit.putBoolean(key, value)
+
+                edit.apply()
+            } catch (e: Exception) {
+                Log.e(TAG, "saveData: ${e.message}")
+            }
+
+        }
+
+        fun loadBooleanFromSharedPreference(
+            activity: Activity,
+            sharedPrefName: String,
+            key: String
+        ): Boolean {
+
+            return try {
+                val sharedPreferences =
+                    activity.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
+
+                sharedPreferences.getBoolean(key, false)
+
+            } catch (e: Exception) {
+                Log.e(TAG, "saveData: ${e.message}")
+                false
+            }
+
+        }
+
+
         fun Long.toStringM(radix: Int = 0): String {
 
             val values = arrayOf(

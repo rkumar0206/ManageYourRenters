@@ -19,6 +19,9 @@ interface RenterDao {
     @Query("DELETE FROM renter_table")
     suspend fun deleteAll()
 
+    @Query("DELETE FROM renter_table WHERE isSynced = :isSynced")
+    suspend fun deleteRenterByIsSynced(isSynced: String)
+
     @Query("SELECT * FROM renter_table ORDER BY timeStamp DESC")
     fun getAllRentersList(): LiveData<List<Renter>>
 

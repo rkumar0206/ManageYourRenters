@@ -19,6 +19,9 @@ class PaymentRepository @Inject constructor(
     suspend fun deleteAllPaymentsOfRenter(renterKey: String) =
         dao.deleteAllPaymentsOfRenter(renterKey)
 
+    suspend fun deleteAllPaymentsByIsSynced(isSynced: String) =
+        dao.deleteAllPaymentsByIsSynced(isSynced)
+
     fun getAllPaymentsList() = dao.getAllPaymentsList()
 
     fun getAllPaymentsListOfRenter(renterKey: String) = dao.getAllPaymentsListOfRenter(renterKey)

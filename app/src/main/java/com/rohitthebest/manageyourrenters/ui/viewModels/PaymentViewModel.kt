@@ -36,6 +36,11 @@ class PaymentViewModel @ViewModelInject constructor(
         repository.deleteAllPaymentsOfRenter(renterKey)
     }
 
+    fun deleteAllPaymentsByIsSynced(isSynced: String) = viewModelScope.launch {
+
+        repository.deleteAllPaymentsByIsSynced(isSynced)
+    }
+
     fun getAllPaymentsList() = repository.getAllPaymentsList()
 
     fun getAllPaymentsListOfRenter(renterKey: String) =

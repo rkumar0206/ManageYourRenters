@@ -31,11 +31,16 @@ class RenterViewModel @ViewModelInject constructor(
         repo.deleteAllRenter()
     }
 
+    fun deleteRenterByIsSynced(isSynced: String) = viewModelScope.launch {
+
+        repo.deleteRenterByIsSynced(isSynced)
+    }
+
     fun getAllRentersList() = repo.getAllRentersList()
 
     fun getRenterCount() = repo.getRenterCount()
 
-    fun getRenterByIsSynced(isSynced : String) = repo.getRenterByIsSynced(isSynced)
+    fun getRenterByIsSynced(isSynced: String) = repo.getRenterByIsSynced(isSynced)
 
     fun getRenterByKey(renterKey: String) = repo.getRenterByKey(renterKey)
 }

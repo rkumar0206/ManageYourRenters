@@ -372,6 +372,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         binding.searchRenterBtn.setOnClickListener(this)
         binding.addRenterFAB.setOnClickListener(this)
         binding.profileImage.setOnClickListener(this)
+        binding.downloadChangesBtn.setOnClickListener(this)
 
         binding.rentersRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
@@ -417,13 +418,56 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             binding.profileImage.id -> {
 
-                showBottomSheetDialog()
+                showBottomSheetProfileDialog()
+            }
+
+            binding.downloadChangesBtn.id -> {
+
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Sync changes from cloud?")
+                    .setMessage("If any changes has been done on cloud this will sync them with your phone.")
+                    .setPositiveButton("Request sync") { d, _ ->
+
+                        if (isInternetAvailable(requireContext())) {
+
+                            saveBooleanToSharedPreference(
+                                requireActivity(),
+                                IS_SYNCED_SHARED_PREF_NAME,
+                                IS_SYNCED_SHARED_PREF_KEY,
+                                false
+                            )
+
+                            showProgressBar()
+
+                            GlobalScope.launch {
+
+                                delay(200)
+
+                                withContext(Dispatchers.Main) {
+
+                                    hideProgressBar()
+
+                                    findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+                                }
+                            }
+
+                            d.dismiss()
+                        } else {
+
+                            showNoInternetMessage(requireContext())
+                        }
+                    }.setNegativeButton("Cancel") { d, _ ->
+
+                        d.dismiss()
+                    }
+                    .create()
+                    .show()
             }
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun showBottomSheetDialog() {
+    private fun showBottomSheetProfileDialog() {
 
         MaterialDialog(requireActivity(), BottomSheet(layoutMode = LayoutMode.WRAP_CONTENT)).show {
 
@@ -592,6 +636,17 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
             binding.rentersRV.show()
         } catch (e: java.lang.Exception) {
 
+            e.printStackTrace()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        try {
+
+            hideKeyBoard(requireActivity())
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

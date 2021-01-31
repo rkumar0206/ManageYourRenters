@@ -119,12 +119,23 @@ class LoginFragment : Fragment() {
                     if (it.size() != 0) {
 
                         try {
+
                             binding.showSyncingInfoTV.text = "syncing renters..."
 
-                            val listOfRenters = it.toObjects(Renter::class.java)
-                            renterViewModel.insertRenters(listOfRenters)
+                            renterViewModel.deleteRenterByIsSynced(getString(R.string.t))
 
-                            syncPayments()
+                            GlobalScope.launch {
+
+                                delay(150)
+
+                                withContext(Dispatchers.Main) {
+
+                                    val listOfRenters = it.toObjects(Renter::class.java)
+                                    renterViewModel.insertRenters(listOfRenters)
+
+                                    syncPayments()
+                                }
+                            }
                         } catch (e: NullPointerException) {
                             e.printStackTrace()
                         } catch (e: IllegalStateException) {
@@ -135,16 +146,7 @@ class LoginFragment : Fragment() {
 
                         showToast(requireContext(), "You have not added any renters yet!!")
 
-                        isSynced = true
-
-                        saveBooleanToSharedPreference(
-                            requireActivity(),
-                            IS_SYNCED_SHARED_PREF_NAME,
-                            IS_SYNCED_SHARED_PREF_KEY,
-                            isSynced
-                        )
-
-                        findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                        saveIsSyncedValueAndNavigateToHomeFragment()
                     }
 
                 }
@@ -173,10 +175,23 @@ class LoginFragment : Fragment() {
                         try {
 
                             binding.showSyncingInfoTV.text = "syncing payments..."
-                            paymentViewModel.insertPayments(it.toObjects(Payment::class.java))
-                            Log.i(TAG, "syncPayments: inserted")
 
-                            saveIsSyncedValueAndNavigateToHomeFragment()
+                            paymentViewModel.deleteAllPaymentsByIsSynced(getString(R.string.t))
+
+                            GlobalScope.launch {
+
+                                delay(150)
+
+                                withContext(Dispatchers.Main) {
+
+                                    paymentViewModel.insertPayments(it.toObjects(Payment::class.java))
+                                    Log.i(TAG, "syncPayments: inserted")
+
+                                    saveIsSyncedValueAndNavigateToHomeFragment()
+
+                                }
+                            }
+
                         } catch (e: NullPointerException) {
                             e.printStackTrace()
                         } catch (e: IllegalStateException) {

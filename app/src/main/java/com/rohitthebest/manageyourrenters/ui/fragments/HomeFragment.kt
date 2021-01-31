@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
@@ -561,7 +562,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     @SuppressLint("SetTextI18n")
     private fun showBottomSheetDialog() {
 
-        MaterialDialog(requireActivity(), BottomSheet()).show {
+        MaterialDialog(requireActivity(), BottomSheet(layoutMode = LayoutMode.WRAP_CONTENT)).show {
 
             customView(
                 R.layout.user_info_with_sign_out_layout,

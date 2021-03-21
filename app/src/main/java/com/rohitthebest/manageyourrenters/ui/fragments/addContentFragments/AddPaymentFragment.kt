@@ -1010,25 +1010,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             requireActivity().onBackPressed()
         }
 
-/*
-        try{
-
-            GlobalScope.launch {
-                delay(300)
-
-                withContext(Dispatchers.Main){
-
-                    binding.progressBar.hide()
-                    requireActivity().onBackPressed()
-                }
-            }
-
-        }catch (e : java.lang.Exception) {
-
-            e.printStackTrace()
-        }
-*/
-
     }
 
     private fun addToFireStore(payment: Payment) {

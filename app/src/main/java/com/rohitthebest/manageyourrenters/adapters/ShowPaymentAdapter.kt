@@ -69,7 +69,7 @@ class ShowPaymentAdapter :
 
                     //issue date
                     paymentAdapter_issueDateTV.text =
-                        "Issue date : ${
+                        "Payment date : ${
                             WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                                 it.timeStamp
                             )
@@ -80,8 +80,15 @@ class ShowPaymentAdapter :
                         (it.extraAmount != "0.0" || it.extraAmount != "0")
                     ) {
 
-                        paymentAdapter_neetDemandTV.text =
-                            "${it.extraFieldName} : ${it.extraAmount}"
+                        if(it.extraFieldName?.trim()?.isEmpty()!!){
+
+                            paymentAdapter_neetDemandTV.text =
+                                "Net demand : ${it.extraAmount}"
+                        }else {
+
+                            paymentAdapter_neetDemandTV.text =
+                                "${it.extraFieldName} : ${it.extraAmount}"
+                        }
 
                     } else {
 

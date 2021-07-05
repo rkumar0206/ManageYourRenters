@@ -1,13 +1,15 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.entity.Payment
 import com.rohitthebest.manageyourrenters.repositories.PaymentRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PaymentViewModel @ViewModelInject constructor(
+@HiltViewModel
+class PaymentViewModel @Inject constructor(
     val repository: PaymentRepository
 ) : ViewModel() {
 

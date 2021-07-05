@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,6 +42,7 @@ import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.con
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.deleteDocumentFromFireStore
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.uploadDocumentToFireStore
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.closeKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -50,7 +52,10 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 @AndroidEntryPoint
@@ -90,17 +95,16 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         showProgressBar()
 
+        lifecycleScope.launch {
 
-            GlobalScope.launch {
+            delay(350)
 
-                delay(350)
+            withContext(Dispatchers.Main) {
 
-                withContext(Dispatchers.Main) {
-
-                    updateUI()
-                    getAllRentersList()
-                }
+                updateUI()
+                getAllRentersList()
             }
+        }
 
         initListeners()
     }
@@ -439,7 +443,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                             showProgressBar()
 
-                            GlobalScope.launch {
+                            lifecycleScope.launch {
 
                                 delay(200)
 
@@ -568,7 +572,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             Log.i(TAG, "saveIsSyncedValue: changed the value of isSynced to false")
 
-            GlobalScope.launch {
+            lifecycleScope.launch {
 
                 delay(200)
 
@@ -603,11 +607,12 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         binding.renterSV.animate().translationY(-50f).alpha(0f).setDuration(350).start()
 
-        GlobalScope.launch {
+        lifecycleScope.launch {
+
+            closeKeyboard(requireActivity())
 
             delay(360)
 
-            hideKeyBoard(requireActivity())
             withContext(Dispatchers.Main) {
 
                 binding.renterSV.hide()

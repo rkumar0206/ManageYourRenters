@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -37,7 +38,10 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -124,7 +128,7 @@ class LoginFragment : Fragment() {
 
                             renterViewModel.deleteRenterByIsSynced(getString(R.string.t))
 
-                            GlobalScope.launch {
+                            lifecycleScope.launch {
 
                                 delay(150)
 
@@ -178,7 +182,7 @@ class LoginFragment : Fragment() {
 
                             paymentViewModel.deleteAllPaymentsByIsSynced(getString(R.string.t))
 
-                            GlobalScope.launch {
+                            lifecycleScope.launch {
 
                                 delay(150)
 
@@ -218,7 +222,7 @@ class LoginFragment : Fragment() {
 
         showProgressBar()
 
-        GlobalScope.launch {
+        lifecycleScope.launch {
 
             delay(200)
 
@@ -240,7 +244,6 @@ class LoginFragment : Fragment() {
             }
         }
     }
-
 
     private fun initListeners() {
 
@@ -358,7 +361,6 @@ class LoginFragment : Fragment() {
             e.printStackTrace()
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

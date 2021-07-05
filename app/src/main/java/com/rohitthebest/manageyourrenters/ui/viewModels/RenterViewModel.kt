@@ -1,14 +1,16 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RenterViewModel @ViewModelInject constructor(
-    val repo : RenterRepository
+@HiltViewModel
+class RenterViewModel @Inject constructor(
+    val repo: RenterRepository
 ) : ViewModel() {
 
     fun insertRenter(renter: Renter) = viewModelScope.launch {

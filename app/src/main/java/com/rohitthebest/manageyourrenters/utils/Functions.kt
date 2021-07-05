@@ -14,8 +14,8 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -71,7 +71,7 @@ class Functions {
 
             try {
 
-                GlobalScope.launch {
+                CoroutineScope(Dispatchers.Main).launch {
 
                     closeKeyboard(activity)
                 }
@@ -83,7 +83,7 @@ class Functions {
         }
 
 
-        private suspend fun closeKeyboard(activity: Activity) {
+        suspend fun closeKeyboard(activity: Activity) {
             try {
                 withContext(Dispatchers.IO) {
 

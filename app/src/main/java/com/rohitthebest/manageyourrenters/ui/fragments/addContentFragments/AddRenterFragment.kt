@@ -51,7 +51,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = FragmentAddRenterBinding.inflate(inflater, container, false)
         return binding.root

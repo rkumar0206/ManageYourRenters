@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
@@ -22,11 +23,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
+import com.rohitthebest.manageyourrenters.data.RenterTypes
 import com.rohitthebest.manageyourrenters.databinding.ActivityHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -36,7 +40,7 @@ import kotlinx.coroutines.withContext
 private const val TAG = "HomeActivity"
 
 @AndroidEntryPoint
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var mAuth: FirebaseAuth
@@ -44,6 +48,8 @@ class HomeActivity : AppCompatActivity() {
     private val renterViewModel: RenterViewModel by viewModels()
     private val paymentViewModel: PaymentViewModel by viewModels()
 
+    private lateinit var renterTypeList: ArrayList<RenterTypes>
+    private lateinit var renterTypeAdapter: RenterTypeAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +76,73 @@ class HomeActivity : AppCompatActivity() {
         binding.downloadChangesBtn.setOnClickListener {
 
             showAlertMessageAndNavigateToLoginActivity()
+        }
+
+        populateRenterTypeList()
+
+        renterTypeAdapter = RenterTypeAdapter()
+        setUpRecyclerView()
+        renterTypeAdapter.submitList(renterTypeList)
+
+    }
+
+    private fun populateRenterTypeList() {
+
+        renterTypeList = ArrayList()
+
+        renterTypeList.add(
+            RenterTypes(
+                id = 1,
+                renterType = getString(R.string.house_renters),
+                image = R.drawable.ic_baseline_house_24
+            )
+        )
+
+        renterTypeList.add(
+            RenterTypes(
+                id = 2,
+                renterType = getString(R.string.individual_renters),
+                image = R.drawable.ic_baseline_person_24
+            )
+        )
+
+        renterTypeList.add(
+            RenterTypes(
+                id = 3,
+                renterType = getString(R.string.manage_money),
+                image = R.drawable.ic_baseline_attach_money_24
+            )
+        )
+    }
+
+
+    private fun setUpRecyclerView() {
+
+        binding.renterTypesRV.apply {
+
+            adapter = renterTypeAdapter
+            layoutManager = GridLayoutManager(this@HomeActivity, 2)
+            setHasFixedSize(true)
+        }
+
+        renterTypeAdapter.setOnClickListener(this)
+    }
+
+    override fun onItemClick(renterType: RenterTypes) {
+
+        when (renterType.id) {
+
+            1 -> {
+
+                val intent = Intent(this, HouseRentersActivity::class.java)
+                startActivity(intent)
+            }
+
+            else -> {
+
+                showToast(this, renterType.toString())
+            }
+
         }
     }
 
@@ -188,7 +261,7 @@ class HomeActivity : AppCompatActivity() {
                             e.printStackTrace()
                         }
                     }
-                    Functions.showToast(this, "SignOut Successful")
+                    showToast(this, "SignOut Successful")
 
                     //deleting everything saved on SQLite
                     deleteEverythingFromSQLite()
@@ -243,4 +316,5 @@ class HomeActivity : AppCompatActivity() {
         }
 
     }
+
 }

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_blue"
     android:elevation="10dp"
-    tools:context=".ui.fragments.houseRenters.LoginFragment">
+    tools:context=".ui.activities.LoginActivity">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout

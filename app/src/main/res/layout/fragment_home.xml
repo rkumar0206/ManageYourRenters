@@ -25,6 +25,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <ImageButton
+                    android:id="@+id/searchRenterBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/searchbtn"
+                    app:layout_constraintBottom_toBottomOf="@+id/addRenterTitileTV"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/addRenterTitileTV"
+                    app:srcCompat="@drawable/ic_baseline_search_24" />
+
                 <TextView
                     android:id="@+id/addRenterTitileTV"
                     android:layout_width="wrap_content"
@@ -33,46 +44,13 @@
                     android:layout_marginTop="8dp"
                     android:fontFamily="serif"
                     android:padding="4dp"
-                    android:text="@string/your_renters"
+                    android:text="@string/house_renters"
                     android:textColor="@color/textColor1"
                     android:textSize="24sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toEndOf="@+id/searchRenterBtn"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.mikhaellopez.circularimageview.CircularImageView
-                    android:id="@+id/profileImage"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="4dp"
-                    android:scaleType="centerCrop"
-                    app:layout_constraintBottom_toBottomOf="@+id/addRenterTitileTV"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/addRenterTitileTV"
-                    app:srcCompat="@drawable/ic_baseline_account_circle_24" />
-
-                <ImageButton
-                    android:id="@+id/searchRenterBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/transparent"
-                    app:layout_constraintBottom_toBottomOf="@+id/addRenterTitileTV"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/addRenterTitileTV"
-                    app:srcCompat="@drawable/ic_baseline_search_24"
-                    android:contentDescription="@string/searchbtn" />
-
-                <ImageButton
-                    android:id="@+id/downloadChangesBtn"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:layout_marginEnd="8dp"
-                    android:backgroundTint="@android:color/transparent"
-                    android:src="@drawable/ic_baseline_cloud_download_24"
-                    app:layout_constraintBottom_toBottomOf="@+id/profileImage"
-                    app:layout_constraintEnd_toStartOf="@+id/profileImage"
-                    app:layout_constraintTop_toTopOf="@+id/profileImage" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

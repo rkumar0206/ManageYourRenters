@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
     <application
         android:name=".BaseApplication"
         android:allowBackup="true"
@@ -15,9 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ManageYourRenters">
+        <activity android:name=".ui.activities.LoginActivity">
 
+        </activity>
         <activity android:name=".ui.activities.HouseRentersActivity" />
-
         <activity android:name=".ui.activities.HomeActivity">
 
             <intent-filter>
@@ -25,6 +25,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <service android:name=".services.UploadService" />

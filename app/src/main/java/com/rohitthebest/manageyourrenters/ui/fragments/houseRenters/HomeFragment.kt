@@ -1,29 +1,17 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.afollestad.materialdialogs.LayoutMode
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.bottomsheets.BottomSheet
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
-import com.bumptech.glide.Glide
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -33,8 +21,6 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.ShowRentersAdapter
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
-import com.rohitthebest.manageyourrenters.others.Constants.IS_SYNCED_SHARED_PREF_KEY
-import com.rohitthebest.manageyourrenters.others.Constants.IS_SYNCED_SHARED_PREF_NAME
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
@@ -46,7 +32,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.closeKeyboar
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBooleanToSharedPreference
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
@@ -101,7 +86,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             withContext(Dispatchers.Main) {
 
-                updateUI()
                 getAllRentersList()
             }
         }
@@ -351,33 +335,10 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         }
     }
 
-    private fun updateUI() {
-
-        if (mAuth?.currentUser != null) {
-
-            try {
-
-                if (mAuth?.currentUser!!.photoUrl != null) {
-
-                    Glide.with(this)
-                        .load(mAuth?.currentUser!!.photoUrl)
-                        .into(binding.profileImage)
-                }
-            } catch (e: Exception) {
-
-                e.printStackTrace()
-            }
-
-        }
-    }
-
     private fun initListeners() {
 
         binding.searchRenterBtn.setOnClickListener(this)
         binding.addRenterFAB.setOnClickListener(this)
-        binding.profileImage.setOnClickListener(this)
-        binding.downloadChangesBtn.setOnClickListener(this)
-
         binding.rentersRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -419,175 +380,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                 findNavController().navigate(R.id.action_homeFragment_to_addRenterFragment)
             }
-
-            binding.profileImage.id -> {
-
-                showBottomSheetProfileDialog()
-            }
-
-            binding.downloadChangesBtn.id -> {
-
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Sync changes from cloud?")
-                    .setMessage("If any changes has been done on cloud this will sync them with your phone.")
-                    .setPositiveButton("Request sync") { d, _ ->
-
-                        if (isInternetAvailable(requireContext())) {
-
-                            saveBooleanToSharedPreference(
-                                requireActivity(),
-                                IS_SYNCED_SHARED_PREF_NAME,
-                                IS_SYNCED_SHARED_PREF_KEY,
-                                false
-                            )
-
-                            showProgressBar()
-
-                            lifecycleScope.launch {
-
-                                delay(200)
-
-                                withContext(Dispatchers.Main) {
-
-                                    hideProgressBar()
-
-                                    findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
-                                }
-                            }
-
-                            d.dismiss()
-                        } else {
-
-                            showNoInternetMessage(requireContext())
-                        }
-                    }.setNegativeButton("Cancel") { d, _ ->
-
-                        d.dismiss()
-                    }
-                    .create()
-                    .show()
-            }
         }
     }
-
-    @SuppressLint("SetTextI18n")
-    private fun showBottomSheetProfileDialog() {
-
-        MaterialDialog(requireActivity(), BottomSheet(layoutMode = LayoutMode.WRAP_CONTENT)).show {
-
-            customView(
-                R.layout.user_info_with_sign_out_layout,
-                scrollable = true
-            )
-
-            val userName = getCustomView().findViewById<TextView>(R.id.userNameTV)
-            val emailId = getCustomView().findViewById<TextView>(R.id.userEmailTV)
-            val noOfRenters = getCustomView().findViewById<TextView>(R.id.noOfRentersTV)
-            val signOutBtn = getCustomView().findViewById<MaterialCardView>(R.id.signOutBtn)
-
-            userName.text = mAuth?.currentUser?.displayName
-            emailId.text = mAuth?.currentUser?.email
-            renterViewModel.getRenterCount().observe(viewLifecycleOwner) {
-
-                noOfRenters.text = "Number of renters : $it"
-            }
-
-            signOutBtn.setOnClickListener {
-
-                if (isInternetAvailable(requireContext())) {
-
-                    signOut()
-
-                    dismiss()
-                } else {
-
-                    showNoInternetMessage(requireContext())
-                }
-            }
-        }
-    }
-
-    private fun signOut() {
-
-        try {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Are You Sure?")
-                .setPositiveButton("Yes") { _, _ ->
-
-                    mAuth?.signOut()
-
-                    //[Google Sign Out]
-                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(getString(R.string.default_web_client_id))
-                        .requestEmail()
-                        .build()
-                    val googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
-
-                    googleSignInClient?.signOut()?.addOnCompleteListener {
-                        Log.i(TAG, "Google signOut Successful")
-
-                        try {
-                            Log.i(TAG, "signOut: Google signOut Successful")
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                    showToast(requireContext(), "SignOut Successful")
-
-                    //deleting everything saved on SQLite
-                    deleteEverythingFromSQLite()
-
-                }
-                .setNegativeButton("No") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .create()
-                .show()
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun deleteEverythingFromSQLite() {
-
-        try {
-            renterViewModel.deleteAllRenter()
-            paymentViewModel.deleteAllPayments()
-            changeIsSyncedValue()
-
-        } catch (e: Exception) {
-        }
-    }
-
-    private fun changeIsSyncedValue() {
-
-        try {
-
-            saveBooleanToSharedPreference(
-                requireActivity(),
-                IS_SYNCED_SHARED_PREF_NAME,
-                IS_SYNCED_SHARED_PREF_KEY,
-                false
-            )
-
-            Log.i(TAG, "saveIsSyncedValue: changed the value of isSynced to false")
-
-            lifecycleScope.launch {
-
-                delay(200)
-
-                withContext(Dispatchers.Main) {
-
-                    findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
-                }
-            }
-
-        } catch (e: Exception) {
-            Log.e(TAG, "saveData: ${e.message}")
-        }
-
-    }
-
 
     private fun showSearchView() {
 

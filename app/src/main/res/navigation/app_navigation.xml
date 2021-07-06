@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.rohitthebest.manageyourrenters.ui.fragments.HomeFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -41,7 +41,7 @@
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.rohitthebest.manageyourrenters.ui.fragments.LoginFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
         <action
@@ -58,7 +58,7 @@
     </fragment>
     <fragment
         android:id="@+id/addRenterFragment"
-        android:name="com.rohitthebest.manageyourrenters.ui.fragments.addContentFragments.AddRenterFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.addContentFragments.AddRenterFragment"
         android:label="fragment_add_renter"
         tools:layout="@layout/fragment_add_renter" >
         <argument
@@ -68,7 +68,7 @@
     </fragment>
     <fragment
         android:id="@+id/paymentFragment"
-        android:name="com.rohitthebest.manageyourrenters.ui.fragments.PaymentFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.PaymentFragment"
         android:label="fragment_payment"
         tools:layout="@layout/fragment_payment" >
         <action
@@ -87,7 +87,7 @@
     </fragment>
     <fragment
         android:id="@+id/addPaymentFragment"
-        android:name="com.rohitthebest.manageyourrenters.ui.fragments.addContentFragments.AddPaymentFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.addContentFragments.AddPaymentFragment"
         android:label="fragment_add_payment"
         tools:layout="@layout/fragment_add_payment" >
         <argument

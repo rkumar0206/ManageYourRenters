@@ -1,4 +1,4 @@
-package com.rohitthebest.manageyourrenters.ui.fragments
+package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -85,8 +85,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         getMessage()
         initListener()
-
-
     }
 
     private fun getMessage() {

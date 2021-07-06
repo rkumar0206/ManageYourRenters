@@ -1,4 +1,4 @@
-package com.rohitthebest.manageyourrenters.ui.fragments.addContentFragments
+package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.addContentFragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle

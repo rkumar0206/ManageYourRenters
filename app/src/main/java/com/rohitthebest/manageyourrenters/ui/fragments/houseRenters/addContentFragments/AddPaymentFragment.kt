@@ -1,4 +1,4 @@
-package com.rohitthebest.manageyourrenters.ui.fragments.addContentFragments
+package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.addContentFragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -30,7 +30,6 @@ import com.rohitthebest.manageyourrenters.database.entity.dataClasses.Electricit
 import com.rohitthebest.manageyourrenters.databinding.AddPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
-import com.rohitthebest.manageyourrenters.ui.fragments.PaymentFragmentArgs
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
@@ -177,7 +176,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 val args = arguments?.let {
 
-                    PaymentFragmentArgs.fromBundle(it)
+                    AddPaymentFragmentArgs.fromBundle(it)
                 }
 
                 receivedRenter = ConversionWithGson.convertJSONtoRenter(args?.renterInfoMessage)

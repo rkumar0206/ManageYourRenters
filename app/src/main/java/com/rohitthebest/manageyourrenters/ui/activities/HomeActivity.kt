@@ -138,6 +138,12 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
                 startActivity(intent)
             }
 
+            2 -> {
+
+                val intent = Intent(this, IndividualRentersActivity::class.java)
+                startActivity(intent)
+            }
+
             else -> {
 
                 showToast(this, renterType.toString())

@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/individual_renters_navigation">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/individual_renters_navigation"
+    app:startDestination="@id/individualRenterHomeFragment">
 
+    <fragment
+        android:id="@+id/individualRenterHomeFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.individualRenters.IndividualRenterHomeFragment"
+        android:label="IndividualRenterHomeFragment"
+        tools:layout="@layout/fragment_individual_renter_home" />
 </navigation>

@@ -12,16 +12,11 @@
         tools:layout="@layout/fragment_individual_renter_home">
         <action
             android:id="@+id/action_individualRenterHomeFragment_to_addIndividualRenterFragment"
-            app:destination="@id/addIndividualRenterFragment"
-
-            app:enterAnim="@anim/fade_in"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/fade_out" />
+            app:destination="@id/addIndividualRenterFragment" />
     </fragment>
     <fragment
         android:id="@+id/addIndividualRenterFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.individualRenters.AddIndividualRenterFragment"
-        android:label="fragment_add_invidual_renter"
-        tools:layout="@layout/fragment_add_invidual_renter" />
+        android:label="AddIndividualRenterFragment"
+        tools:layout="@layout/fragment_add_renter" />
 </navigation>

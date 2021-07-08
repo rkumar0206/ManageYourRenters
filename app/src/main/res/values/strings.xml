@@ -74,8 +74,10 @@
     <string name="amount_paid">Amount Paid</string>
     <string name="due">due</string>
     <string name="paid_in_advance">Paid in advance </string>
-    <string name="individual_renters">Individual Renters</string>
+    <string name="borrower">Borrowers</string>
     <string name="manage_money">Manage money</string>
+    <string name="mobileNumberErrorMessage">Please enter a valid mobile number!!</string>
+    <string name="add_borrower">Add borrower</string>
 
 
     <string-array name="currency_symbol">

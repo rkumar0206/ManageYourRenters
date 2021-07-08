@@ -293,7 +293,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
                 showToast(
                     requireContext(),
-                    "Please enter a valid mobile number!!",
+                    getString(R.string.mobileNumberErrorMessage),
                     Toast.LENGTH_LONG
                 )
                 return false
@@ -325,6 +325,11 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             if (s?.isEmpty()!!) {
 
                 showMobileErrorTV()
+            } else if (!includeBinding.mobileNumCodePicker.isValidFullNumber) {
+
+                showMobileErrorTV()
+                includeBinding.mobileNumErrorTV.text = getString(R.string.mobileNumberErrorMessage)
+
             } else {
 
                 hideMobileErrorTV()

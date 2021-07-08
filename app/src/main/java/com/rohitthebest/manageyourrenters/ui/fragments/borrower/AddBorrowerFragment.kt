@@ -1,4 +1,4 @@
-package com.rohitthebest.manageyourrenters.ui.fragments.individualRenters
+package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.os.Bundle
 import android.view.View
@@ -18,7 +18,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoIntern
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 
-class AddIndividualRenterFragment : Fragment(R.layout.fragment_add_renter), View.OnClickListener {
+class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClickListener {
 
     private var _binding: FragmentAddRenterBinding? = null
     private val binding get() = _binding!!
@@ -42,6 +42,8 @@ class AddIndividualRenterFragment : Fragment(R.layout.fragment_add_renter), View
         // removing the views that is not required here
         includeBinding.renterRoomNumberET.hide()
         includeBinding.renterAddressET.hide()
+
+        binding.addRenterTitileTV.text = getString(R.string.add_borrower)
 
         initListeners()
         textWatchers()
@@ -122,7 +124,7 @@ class AddIndividualRenterFragment : Fragment(R.layout.fragment_add_renter), View
 
                 showToast(
                     requireContext(),
-                    "Please enter a valid mobile number!!",
+                    getString(R.string.mobileNumberErrorMessage),
                     Toast.LENGTH_LONG
                 )
                 return false
@@ -154,6 +156,11 @@ class AddIndividualRenterFragment : Fragment(R.layout.fragment_add_renter), View
             if (s?.isEmpty()!!) {
 
                 showMobileErrorTV()
+            } else if (!includeBinding.mobileNumCodePicker.isValidFullNumber) {
+
+                showMobileErrorTV()
+                includeBinding.mobileNumErrorTV.text = getString(R.string.mobileNumberErrorMessage)
+
             } else {
 
                 hideMobileErrorTV()

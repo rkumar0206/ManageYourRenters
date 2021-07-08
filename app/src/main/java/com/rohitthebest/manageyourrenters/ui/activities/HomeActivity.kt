@@ -101,7 +101,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
         renterTypeList.add(
             RenterTypes(
                 id = 2,
-                renterType = getString(R.string.individual_renters),
+                renterType = getString(R.string.borrower),
                 image = R.drawable.ic_baseline_person_24
             )
         )
@@ -140,7 +140,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
 
             2 -> {
 
-                val intent = Intent(this, IndividualRentersActivity::class.java)
+                val intent = Intent(this, BorrowerActivity::class.java)
                 startActivity(intent)
             }
 

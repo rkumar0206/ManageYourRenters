@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/individual_renters_navigation"
+    app:startDestination="@id/borrowerHomeFragment">
+
+    <fragment
+        android:id="@+id/borrowerHomeFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.borrower.BorrowerHomeFragment"
+        android:label="IndividualRenterHomeFragment"
+        tools:layout="@layout/fragment_borrower_home">
+
+        <action
+            android:id="@+id/action_borrowerHomeFragment_to_addBorrowerFragment"
+            app:destination="@id/addBorrowerFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/addBorrowerFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.borrower.AddBorrowerFragment"
+        android:label="AddIndividualRenterFragment"
+        tools:layout="@layout/fragment_add_renter" />
+</navigation>

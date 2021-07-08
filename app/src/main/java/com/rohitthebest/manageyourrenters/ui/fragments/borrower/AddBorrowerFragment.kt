@@ -4,11 +4,20 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddRenterBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
+import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.fromBorrowerToString
+import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isTextValid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.onTextChangedListener
@@ -16,8 +25,11 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClickListener {
 
     private var _binding: FragmentAddRenterBinding? = null
@@ -26,6 +38,8 @@ class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClick
     private lateinit var includeBinding: AddRenterLayoutBinding
     private var selectedDate: Long = 0L
     private var isMessageReceivesForEditing = false
+
+    private val borrowerViewModel by viewModels<BorrowerViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,7 +82,7 @@ class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClick
 
                     if (isValidForm()) {
 
-                        // todo : add renter to the database
+                        initBorrowerData()
                     }
 
                 } else {
@@ -102,6 +116,55 @@ class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClick
         }
 
     }
+
+    private fun initBorrowerData() {
+
+        val borrower = Borrower()
+
+        borrower.apply {
+
+            created = selectedDate
+            modified = selectedDate
+            name = includeBinding.renterNameET.editText?.text.toString().trim()
+            mobileNumber = includeBinding.mobileNumCodePicker.fullNumberWithPlus
+            emailId = includeBinding.renterEmailET.editText?.text.toString().trim()
+            otherDocumentName = includeBinding.otherDocumentNameET.text.toString().trim()
+            otherDocumentNumber = includeBinding.otherDocumentNumber.text.toString().trim()
+
+            uid = getUid()!!
+
+            borrowerId = System.currentTimeMillis().toStringM(36)
+            borrowerPassword = generateRenterPassword(borrowerId, mobileNumber)
+            key = generateKey("_${uid}")
+            totalDueAmount = 0.0
+            isSynced = false
+        }
+
+        if (isInternetAvailable(requireContext())) {
+
+            borrower.isSynced = true
+
+            FirebaseServiceHelper.uploadDocumentToFireStore(
+                requireContext(),
+                fromBorrowerToString(borrower),
+                getString(R.string.borrowers),
+                borrower.key
+            )
+
+            insertToDatabase(borrower)
+        } else {
+
+            insertToDatabase(borrower)
+        }
+    }
+
+    private fun insertToDatabase(borrower: Borrower) {
+
+        borrowerViewModel.insertBorrower(borrower)
+        showToast(requireContext(), "Borrower added")
+        requireActivity().onBackPressed()
+    }
+
 
     private fun isValidForm(): Boolean {
 
@@ -193,6 +256,9 @@ class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClick
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        hideKeyBoard(requireActivity())
+
         _binding = null
     }
 }

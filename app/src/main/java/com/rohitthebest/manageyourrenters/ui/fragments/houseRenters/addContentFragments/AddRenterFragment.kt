@@ -17,6 +17,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoRenter
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
@@ -30,7 +31,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.random.Random
 
 @AndroidEntryPoint
 class AddRenterFragment : Fragment(), View.OnClickListener {
@@ -221,12 +221,9 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             }
 
             key = if (!isMessageReceivesForEditing) {
-                "${System.currentTimeMillis().toStringM(69)}_${
-                    Random.nextLong(
-                        100,
-                        9223372036854775
-                    ).toStringM(69)
-                }_${getUid()}"
+
+                generateKey("_${getUid()}")
+
             } else {
                 receivedRenter?.key
             }

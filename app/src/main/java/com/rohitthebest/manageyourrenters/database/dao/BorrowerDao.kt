@@ -22,12 +22,12 @@ interface BorrowerDao {
     @Query("DELETE FROM borrower_table")
     suspend fun deleteAllBorrower()
 
-    @Query("SELECT * FROM borrower_table ORDER BY timeStamp DESC")
+    @Query("SELECT * FROM borrower_table ORDER BY totalDueAmount DESC, modified DESC")
     fun getAllBorrower(): Flow<List<Borrower>>
 
     @Query("SELECT * FROM borrower_table WHERE `key` = :borrowerKey")
     fun getBorrowerByKey(borrowerKey: String): Flow<Borrower>
 
-    @Query("SELECT * FROM borrower_table WHERE isSynced = :isSynced ORDER BY timeStamp DESC")
+    @Query("SELECT * FROM borrower_table WHERE isSynced = :isSynced ORDER BY totalDueAmount DESC, modified DESC")
     fun getBorrowerByIsSynced(isSynced: Boolean): Flow<List<Borrower>>
 }

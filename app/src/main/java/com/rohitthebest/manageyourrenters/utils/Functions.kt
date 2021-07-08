@@ -23,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
 
 class Functions {
 
@@ -309,6 +310,16 @@ class Functions {
             }
 
             return d.toString()
+        }
+
+        fun generateKey(appendString: String = "", radix: Int = 69): String {
+
+            return "${System.currentTimeMillis().toStringM(radix)}_${
+                Random.nextLong(
+                    100,
+                    9223372036854775
+                ).toStringM(radix)
+            }$appendString"
         }
 
         fun TextView.changeTextColor(context: Context, color: Int) {

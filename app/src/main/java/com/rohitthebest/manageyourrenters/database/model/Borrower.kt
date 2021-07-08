@@ -8,7 +8,8 @@ import com.google.firebase.firestore.IgnoreExtraProperties
 @Entity(tableName = "borrower_table")
 data class Borrower(
     @PrimaryKey(autoGenerate = true) var id: Int?,
-    val timeStamp: Long = System.currentTimeMillis(),
+    var created: Long = System.currentTimeMillis(),
+    var modified: Long = System.currentTimeMillis(),
     var borrowerId: String,  // it is the id which will be used by the borrower to access his account
     var borrowerPassword: String, // it is the password which will act as a key to the borrower id
     var key: String,  // it will be the firestore document id
@@ -18,11 +19,13 @@ data class Borrower(
     var otherDocumentName: String?,
     var otherDocumentNumber: String?,
     var isSynced: Boolean = false,
+    var totalDueAmount: Double = 0.0,
     var uid: String
 ) {
 
     constructor() : this(
         null,
+        System.currentTimeMillis(),
         System.currentTimeMillis(),
         "",
         "",
@@ -33,6 +36,7 @@ data class Borrower(
         "",
         "",
         false,
+        0.0,
         ""
     )
 }

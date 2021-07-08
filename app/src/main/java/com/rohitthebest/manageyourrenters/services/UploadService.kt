@@ -15,6 +15,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoPayment
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoRenter
+import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.fromStringToBorrower
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,39 +74,23 @@ class UploadService : Service() {
 
                         Log.d(
                             TAG,
-                            "onStartCommand: Uploaded This category to collection $collection and key $key"
+                            "onStartCommand: Uploaded payment to collection $collection with key $key"
                         )
                         stopSelf()
                     }
                 }
 
-/*
-                getString(R.string.subCategories) -> {
+                getString(R.string.borrowers) -> {
 
-                    if (insertToFireStore(docRef, convertJSONtoSubCategory(uploadData)!!)) {
+                    if (insertToFireStore(docRef, fromStringToBorrower(uploadData!!))) {
 
                         Log.d(
                             TAG,
-                            "onStartCommand: Uploaded This sub-category to collection $collection and key $key"
+                            "onStartCommand: Uploaded borrower to collection $collection with key $key"
                         )
                         stopSelf()
                     }
                 }
-*/
-
-/*
-                getString(R.string.texts) -> {
-
-                    if (insertToFireStore(docRef, convertJSONtoText(uploadData)!!)) {
-
-                        Log.d(
-                            TAG,
-                            "onStartCommand: Uploaded This note to collection $collection and key $key"
-                        )
-                        stopSelf()
-                    }
-                }
-*/
 
                 else -> {
 

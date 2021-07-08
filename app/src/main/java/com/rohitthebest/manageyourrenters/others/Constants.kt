@@ -9,9 +9,6 @@ object Constants {
     const val PAYMENT_DATABASE_NAME = "paymentdatabase.db"
     const val NOTIFICATION_CHANNEL_ID = "NotificationChannelID"
 
-    const val FALSE = "false"
-    const val TRUE = "true"
-
     const val COLLECTION_KEY = "Colection_key_dskjsadaaddhadkjhbskjbvjhb"
     const val DOCUMENT_KEY = "Document_key_dskjshfjksadadbskjbvjhb"
     const val UPDATE_DOCUMENT_MAP_KEY = "UPDATE_DOCUMENT_MAP_KEYadsadsaDF_dskjshfdfsdadkjhbskjbvjhb"

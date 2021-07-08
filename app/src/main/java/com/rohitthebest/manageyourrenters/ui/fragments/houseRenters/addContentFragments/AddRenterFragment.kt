@@ -2,15 +2,12 @@ package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.addContentF
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.entity.Renter
 import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
@@ -25,7 +22,10 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isTextValid
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.onTextChangedListener
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
@@ -165,7 +165,19 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
             includeBinding.dateAddedCalendarPickBtn.id -> {
 
-                showCalendarDialog()
+                showCalendarDialog(
+                    selectedDate,
+                    { requireActivity().supportFragmentManager },
+                    {
+
+                        selectedDate = it
+
+                        includeBinding.dateAddedTV.text =
+                            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                selectedDate
+                            )
+                    }
+                )
             }
 
             binding.backBtn.id -> {
@@ -173,29 +185,6 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
                 requireActivity().onBackPressed()
             }
         }
-    }
-
-    private fun showCalendarDialog() {
-
-        val datePicker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText("Select a date")
-            .setSelection(selectedDate)
-
-
-        val builder = datePicker.build()
-
-        builder.show(requireActivity().supportFragmentManager, "datePicker")
-
-        builder.addOnPositiveButtonClickListener {
-
-            selectedDate = it
-
-            includeBinding.dateAddedTV.text =
-                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                    selectedDate
-                )
-        }
-
     }
 
     private fun initRenterForDatabase() {
@@ -274,25 +263,25 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
     private fun isValidForm(): Boolean {
 
-        if (includeBinding.renterNameET.editText?.text.toString().trim().isEmpty()) {
+        if (!includeBinding.renterNameET.editText?.isTextValid()!!) {
 
             includeBinding.renterNameET.error = EDIT_TEXT_EMPTY_MESSAGE
             return false
         }
 
-        if (includeBinding.renterMobileNumberET.text.toString().trim().isEmpty()) {
+        if (!includeBinding.renterMobileNumberET.isTextValid()) {
 
             showMobileErrorTV()
             return false
         }
 
-        if (includeBinding.renterAddressET.editText?.text.toString().trim().isEmpty()) {
+        if (!includeBinding.renterAddressET.editText?.isTextValid()!!) {
 
             includeBinding.renterAddressET.error = EDIT_TEXT_EMPTY_MESSAGE
             return false
         }
 
-        if (includeBinding.renterRoomNumberET.editText?.text.toString().trim().isEmpty()) {
+        if (!includeBinding.renterRoomNumberET.editText?.isTextValid()!!) {
 
             includeBinding.renterRoomNumberET.error = EDIT_TEXT_EMPTY_MESSAGE
             return false
@@ -313,79 +302,58 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
         return includeBinding.renterNameET.error == null
                 && includeBinding.renterRoomNumberET.error == null
                 && includeBinding.renterAddressET.error == null
-                && includeBinding.renterMobileNumberET.text.toString().trim().isNotEmpty()
+                && includeBinding.renterMobileNumberET.isTextValid()
 
     }
 
     private fun textWatchers() {
 
-        includeBinding.renterNameET.editText?.addTextChangedListener(object : TextWatcher {
+        includeBinding.renterNameET.editText?.onTextChangedListener { s ->
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            if (s?.isEmpty()!!) {
 
-                if (s?.isEmpty()!!) {
+                includeBinding.renterNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+            } else {
 
-                    includeBinding.renterNameET.error = EDIT_TEXT_EMPTY_MESSAGE
-                } else {
-
-                    includeBinding.renterNameET.error = null
-                }
+                includeBinding.renterNameET.error = null
             }
 
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        }
 
-        includeBinding.renterMobileNumberET.addTextChangedListener(object : TextWatcher {
+        includeBinding.renterMobileNumberET.onTextChangedListener { s ->
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            if (s?.isEmpty()!!) {
 
-                if (s?.isEmpty()!!) {
+                showMobileErrorTV()
+            } else {
 
-                    showMobileErrorTV()
-                } else {
+                hideMobileErrorTV()
+            }
+        }
 
-                    hideMobileErrorTV()
-                }
+        includeBinding.renterRoomNumberET.editText?.onTextChangedListener { s ->
+
+            if (s?.isEmpty()!!) {
+
+                includeBinding.renterRoomNumberET.error = EDIT_TEXT_EMPTY_MESSAGE
+            } else {
+
+                includeBinding.renterRoomNumberET.error = null
             }
 
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        }
 
-        includeBinding.renterRoomNumberET.editText?.addTextChangedListener(object : TextWatcher {
+        includeBinding.renterAddressET.editText?.onTextChangedListener { s ->
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            if (s?.isEmpty()!!) {
 
-                if (s?.isEmpty()!!) {
+                includeBinding.renterAddressET.error = EDIT_TEXT_EMPTY_MESSAGE
+            } else {
 
-                    includeBinding.renterRoomNumberET.error = EDIT_TEXT_EMPTY_MESSAGE
-                } else {
-
-                    includeBinding.renterRoomNumberET.error = null
-                }
+                includeBinding.renterAddressET.error = null
             }
 
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        includeBinding.renterAddressET.editText?.addTextChangedListener(object : TextWatcher {
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-                if (s?.isEmpty()!!) {
-
-                    includeBinding.renterAddressET.error = EDIT_TEXT_EMPTY_MESSAGE
-                } else {
-
-                    includeBinding.renterAddressET.error = null
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        }
     }
 
     private fun showMobileErrorTV() {

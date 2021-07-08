@@ -5,12 +5,17 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
@@ -316,6 +321,62 @@ class Functions {
             this.text = WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                 timeStamp, pattern
             )
+
+        }
+
+        fun EditText.isTextValid(): Boolean {
+
+            return this.text.toString().trim().isNotEmpty()
+                    && this.text.toString().trim().isNotBlank()
+                    && this.text.toString().trim() != "null"
+        }
+
+        inline fun showCalendarDialog(
+            selectedDate: Long,
+            crossinline show: () -> FragmentManager,
+            crossinline positiveListener: (time: Long) -> Unit
+        ) {
+
+            val datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select a date")
+                .setSelection(selectedDate)
+
+            val builder = datePicker.build()
+
+            builder.show(
+                show(),
+                "datePicker"
+            )
+
+            //builder.show(requireActivity().supportFragmentManager, "datePicker")
+
+            builder.addOnPositiveButtonClickListener {
+
+                positiveListener(it)
+            }
+        }
+
+        inline fun EditText.onTextChangedListener(
+            crossinline onTextChanged: (s: CharSequence?) -> Unit
+        ) {
+
+            this.addTextChangedListener(object : TextWatcher {
+
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+                    onTextChanged(s)
+                }
+
+                override fun afterTextChanged(s: Editable?) {}
+            })
 
         }
 

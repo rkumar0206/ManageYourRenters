@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.adapters.borrowerAdapters
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -20,16 +21,50 @@ class BorrowerAdapter :
     private var mListener: OnClickListener? = null
 
     inner class BorrowerViewHolder(val binding: AdapterShowRenterBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         init {
+
+            binding.root.setOnClickListener(this)
+            binding.adapterIsSyncedBtn.setOnClickListener(this)
+            binding.adapterRenterDeleteBtn.setOnClickListener(this)
+            binding.adapterRenterEditBtn.setOnClickListener(this)
+        }
+
+        override fun onClick(v: View?) {
+
+            if (checkForNullability(absoluteAdapterPosition)) {
+
+                when (v?.id) {
+
+                    binding.root.id -> {
+
+                        mListener!!.onBorrowerClicked(getItem(absoluteAdapterPosition))
+                    }
+
+                    binding.adapterIsSyncedBtn.id -> {
+
+                        mListener!!.onSyncButtonClicked(getItem(absoluteAdapterPosition))
+                    }
+
+                    binding.adapterRenterDeleteBtn.id -> {
+
+                        mListener!!.onDeleteClicked(getItem(absoluteAdapterPosition))
+                    }
+
+                    binding.adapterRenterEditBtn.id -> {
+
+                        mListener!!.onEditClicked(getItem(absoluteAdapterPosition))
+                    }
+                }
+            }
 
         }
 
         @SuppressLint("SetTextI18n")
         fun setData(borrower: Borrower?) {
 
-            borrower?.let { borrower ->
+            borrower?.let { b ->
 
                 binding.apply {
 
@@ -37,20 +72,26 @@ class BorrowerAdapter :
                     adapterRenterAddressTV.hide()
 
                     // using room number textView for showing the due amount of the borrower
-                    adapterRoomNumTV.text = "Total Due : ${borrower.totalDueAmount}"
+                    adapterRoomNumTV.text = "Total Due : ₹ ${b.totalDueAmount}"
 
-                    adapterRenterNameTV.text = borrower.name
-                    adapterRenterEmailTV.text = borrower.emailId
-                    adapterDocumnetNameTV.text = borrower.otherDocumentName
-                    adapterRenterDocNumTV.text = borrower.otherDocumentNumber
-                    adapterRenterMobileTV.text = borrower.mobileNumber
+                    adapterRenterNameTV.text = b.name
+                    adapterRenterEmailTV.text = b.emailId
+                    adapterDocumnetNameTV.text = if (b.otherDocumentName != "") {
+
+                        "${b.otherDocumentName} : "
+                    } else {
+
+                        "Other document : "
+                    }
+                    adapterRenterDocNumTV.text = b.otherDocumentNumber
+                    adapterRenterMobileTV.text = b.mobileNumber
                     adapterRenterTimeTV.text = "Added on : ${
                         WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                            borrower.created
+                            b.created
                         )
                     }"
 
-                    if (borrower.totalDueAmount > 0.0) {
+                    if (b.totalDueAmount > 0.0) {
 
                         root.strokeColor =
                             ContextCompat.getColor(root.context, R.color.color_orange)
@@ -60,7 +101,7 @@ class BorrowerAdapter :
                             ContextCompat.getColor(root.context, R.color.colorGrey)
                     }
 
-                    if (borrower.isSynced) {
+                    if (b.isSynced) {
 
                         itemView.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
                     } else {
@@ -70,6 +111,13 @@ class BorrowerAdapter :
                 }
             }
         }
+
+        private fun checkForNullability(position: Int): Boolean {
+
+            return position != RecyclerView.NO_POSITION &&
+                    mListener != null
+        }
+
     }
 
     companion object {
@@ -99,7 +147,10 @@ class BorrowerAdapter :
 
     interface OnClickListener {
 
-        fun onItemClick(borrower: Borrower)
+        fun onBorrowerClicked(borrower: Borrower?)
+        fun onSyncButtonClicked(borrower: Borrower?)
+        fun onDeleteClicked(borrower: Borrower?)
+        fun onEditClicked(borrower: Borrower?)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

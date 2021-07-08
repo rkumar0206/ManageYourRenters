@@ -1,16 +1,20 @@
 # ManageYourRenters
 
-This app helps you to keep track of your renters.
+This app helps you to keep track of your renters. It makes your life easier by: 
+- doing calculations
+- eliminating paper work
+- tracking payments
+- automaticity
 
-There are several categories : 
+This app include several categories like : 
 - House Renters
 - Borrowers
-- Track payments
+- Track your money
 
 ---
 ### House Renters
 
-Here you can add renters of your apartment with various details like :
+Using this category you can add renters of your apartment with various details like :
 - name
 - mobile number
 - date on which renter moved
@@ -26,3 +30,8 @@ For adding the payment of a renter you just need to select the renter -> click o
 I have provided every possible fields in the payment which you can fill and keep track of.
 
 Afer adding one payment, the next time you add payment, everything is prefilled automatically based on the previous payment. If you need you can edit the fields.
+
+---
+### Borrowers
+
+In this category you can keep track of the borrowers (the person to whom you have lend some money.)

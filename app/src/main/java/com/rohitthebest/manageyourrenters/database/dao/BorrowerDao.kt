@@ -11,7 +11,7 @@ interface BorrowerDao {
     suspend fun insertBorrower(borrower: Borrower)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllBorrower(vararg borrowers: Borrower)
+    suspend fun insertBorrowers(borrowers: List<Borrower>)
 
     @Update
     suspend fun update(borrower: Borrower)

@@ -20,7 +20,7 @@ class BorrowerRepository @Inject constructor(
 
     fun getAllBorrower() = dao.getAllBorrower()
 
-    fun getBorrowerKey(borrowerKey: String) = dao.getBorrowerKey(borrowerKey)
+    fun getBorrowerByKey(borrowerKey: String) = dao.getBorrowerByKey(borrowerKey)
 
     fun getBorrowerByIsSynced(isSynced: Boolean) = dao.getBorrowerByIsSynced(isSynced)
 }

@@ -26,7 +26,7 @@ interface BorrowerDao {
     fun getAllBorrower(): Flow<List<Borrower>>
 
     @Query("SELECT * FROM borrower_table WHERE `key` = :borrowerKey")
-    fun getBorrowerKey(borrowerKey: String): Flow<Borrower>
+    fun getBorrowerByKey(borrowerKey: String): Flow<Borrower>
 
     @Query("SELECT * FROM borrower_table WHERE isSynced = :isSynced ORDER BY timeStamp DESC")
     fun getBorrowerByIsSynced(isSynced: Boolean): Flow<List<Borrower>>

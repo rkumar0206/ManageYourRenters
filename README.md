@@ -4,7 +4,7 @@ This app helps you to keep track of your renters. It makes your life easier by:
 - doing calculations
 - eliminating paper work
 - tracking payments
-- automaticity
+- automate
 
 This app include several categories like : 
 - House Renters

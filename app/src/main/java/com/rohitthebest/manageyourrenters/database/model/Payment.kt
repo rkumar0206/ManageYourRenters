@@ -1,11 +1,11 @@
-package com.rohitthebest.manageyourrenters.database.entity
+package com.rohitthebest.manageyourrenters.database.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
-import com.rohitthebest.manageyourrenters.database.entity.dataClasses.BillInfo
-import com.rohitthebest.manageyourrenters.database.entity.dataClasses.ElectricityBillInfo
+import com.rohitthebest.manageyourrenters.data.BillInfo
+import com.rohitthebest.manageyourrenters.data.ElectricityBillInfo
 
 @IgnoreExtraProperties
 @Entity(tableName = "payment_table")

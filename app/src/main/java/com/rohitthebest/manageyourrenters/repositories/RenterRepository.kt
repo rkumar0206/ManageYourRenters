@@ -1,7 +1,7 @@
 package com.rohitthebest.manageyourrenters.repositories
 
 import com.rohitthebest.manageyourrenters.database.dao.RenterDao
-import com.rohitthebest.manageyourrenters.database.entity.Renter
+import com.rohitthebest.manageyourrenters.database.model.Renter
 import javax.inject.Inject
 
 

@@ -21,9 +21,9 @@ import com.afollestad.materialdialogs.customview.getCustomView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.adapters.ShowPaymentAdapter
-import com.rohitthebest.manageyourrenters.database.entity.Payment
-import com.rohitthebest.manageyourrenters.database.entity.Renter
+import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowPaymentAdapter
+import com.rohitthebest.manageyourrenters.database.model.Payment
+import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel

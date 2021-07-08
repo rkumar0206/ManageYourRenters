@@ -2,7 +2,7 @@ package com.rohitthebest.manageyourrenters.database.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.rohitthebest.manageyourrenters.database.entity.Payment
+import com.rohitthebest.manageyourrenters.database.model.Payment
 
 @Dao
 interface PaymentDao {

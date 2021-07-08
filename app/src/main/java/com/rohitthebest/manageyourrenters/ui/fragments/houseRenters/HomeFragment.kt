@@ -18,8 +18,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.adapters.ShowRentersAdapter
-import com.rohitthebest.manageyourrenters.database.entity.Renter
+import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowRentersAdapter
+import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel

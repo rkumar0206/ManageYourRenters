@@ -2,7 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rohitthebest.manageyourrenters.database.entity.Renter
+import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

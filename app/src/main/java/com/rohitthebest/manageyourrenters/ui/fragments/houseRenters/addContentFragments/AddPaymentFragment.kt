@@ -23,10 +23,10 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.entity.Payment
-import com.rohitthebest.manageyourrenters.database.entity.Renter
-import com.rohitthebest.manageyourrenters.database.entity.dataClasses.BillInfo
-import com.rohitthebest.manageyourrenters.database.entity.dataClasses.ElectricityBillInfo
+import com.rohitthebest.manageyourrenters.data.BillInfo
+import com.rohitthebest.manageyourrenters.data.ElectricityBillInfo
+import com.rohitthebest.manageyourrenters.database.model.Payment
+import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.AddPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE

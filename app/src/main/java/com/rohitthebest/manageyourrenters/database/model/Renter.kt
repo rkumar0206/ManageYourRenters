@@ -1,4 +1,4 @@
-package com.rohitthebest.manageyourrenters.database.entity
+package com.rohitthebest.manageyourrenters.database.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

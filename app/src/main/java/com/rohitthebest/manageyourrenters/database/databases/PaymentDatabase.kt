@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.rohitthebest.manageyourrenters.database.dao.PaymentDao
-import com.rohitthebest.manageyourrenters.database.entity.Payment
+import com.rohitthebest.manageyourrenters.database.model.Payment
 import com.rohitthebest.manageyourrenters.database.typeConverters.TypeConvertersForDatabase
 
 @Database(

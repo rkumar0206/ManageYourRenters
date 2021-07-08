@@ -1,4 +1,4 @@
-package com.rohitthebest.manageyourrenters.adapters
+package com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.entity.Renter
+import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import kotlinx.android.synthetic.main.adapter_show_renter.view.*
 

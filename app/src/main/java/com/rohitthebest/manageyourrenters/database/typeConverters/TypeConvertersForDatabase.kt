@@ -3,8 +3,8 @@ package com.rohitthebest.manageyourrenters.database.typeConverters
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.rohitthebest.manageyourrenters.database.entity.dataClasses.BillInfo
-import com.rohitthebest.manageyourrenters.database.entity.dataClasses.ElectricityBillInfo
+import com.rohitthebest.manageyourrenters.data.BillInfo
+import com.rohitthebest.manageyourrenters.data.ElectricityBillInfo
 
 class TypeConvertersForDatabase {
 

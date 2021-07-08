@@ -1,4 +1,4 @@
-package com.rohitthebest.manageyourrenters.database.entity.dataClasses
+package com.rohitthebest.manageyourrenters.data
 
 data class BillInfo(
     var billPeriodType : String,

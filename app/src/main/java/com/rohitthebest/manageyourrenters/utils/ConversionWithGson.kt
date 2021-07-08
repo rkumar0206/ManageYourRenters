@@ -2,8 +2,8 @@ package com.rohitthebest.manageyourrenters.utils
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.rohitthebest.manageyourrenters.database.entity.Payment
-import com.rohitthebest.manageyourrenters.database.entity.Renter
+import com.rohitthebest.manageyourrenters.database.model.Payment
+import com.rohitthebest.manageyourrenters.database.model.Renter
 
 class ConversionWithGson {
 

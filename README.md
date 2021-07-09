@@ -7,8 +7,8 @@ This app helps you to keep track of your renters. It makes your life easier by:
 - automate
 
 This app include several categories like : 
-- House Renters
-- Borrowers
+- [House Renters](#house-renters)
+- [Borrowers](#borrowers)
 - Track your money
 
 ---

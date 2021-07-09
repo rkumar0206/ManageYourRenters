@@ -17,6 +17,9 @@ import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showAlertDialogForDeletion
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showSnackbarWithActionAndDismissListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -107,13 +110,75 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
         } else {
 
-            Functions.showNoInternetMessage(requireContext())
+            showNoInternetMessage(requireContext())
         }
 
     }
 
     override fun onDeleteClicked(borrower: Borrower?) {
-        //TODO("Not yet implemented")
+
+        showAlertDialogForDeletion(
+            requireContext(),
+            positiveButtonListener = {
+
+                if (!borrower?.isSynced!!) {
+
+                    deleteBorrower(borrower)
+                } else {
+
+                    if (isInternetAvailable(requireContext())) {
+
+                        deleteBorrower(borrower)
+                    } else {
+                        showNoInternetMessage(requireContext())
+                    }
+                }
+
+                it.dismiss()
+
+            },
+            negativeButtonListener = {
+
+                it.dismiss()
+            }
+        )
+    }
+
+    private fun deleteBorrower(borrower: Borrower) {
+
+        borrowerViewModel.deleteBorrower(borrower)
+
+        var isUndoClicked = false
+
+        binding.root.showSnackbarWithActionAndDismissListener(
+            text = "Borrower deleted",
+            actionText = "Undo",
+            action = {
+
+                isUndoClicked = true
+
+                borrowerViewModel.insertBorrower(borrower)
+                Functions.showToast(requireContext(), "Borrower restored...")
+            },
+            dismissListener = {
+
+                if (!isUndoClicked && borrower.isSynced) {
+
+                    FirebaseServiceHelper.deleteDocumentFromFireStore(
+                        context = requireContext(),
+                        collection = getString(R.string.borrowers),
+                        documentKey = borrower.key
+                    )
+                }
+
+                deleteAllPaymentsOfThisBorrower(borrower)
+            }
+        )
+    }
+
+    private fun deleteAllPaymentsOfThisBorrower(borrower: Borrower) {
+
+        // todo : delete all the payments related to this borrower
     }
 
     override fun onEditClicked(borrower: Borrower?) {

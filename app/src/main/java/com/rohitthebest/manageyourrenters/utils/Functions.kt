@@ -1,10 +1,7 @@
 package com.rohitthebest.manageyourrenters.utils
 
 import android.app.Activity
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -16,8 +13,11 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -389,6 +389,50 @@ class Functions {
                 override fun afterTextChanged(s: Editable?) {}
             })
 
+        }
+
+        inline fun showAlertDialogForDeletion(
+            context: Context,
+            crossinline positiveButtonListener: (DialogInterface) -> Unit,
+            crossinline negativeButtonListener: (DialogInterface) -> Unit
+        ) {
+
+            MaterialAlertDialogBuilder(context)
+                .setTitle("Are you sure?")
+                .setMessage(context.getString(R.string.delete_warning_message))
+                .setPositiveButton("Delete") { dialogInterface, _ ->
+
+                    positiveButtonListener(dialogInterface)
+                }
+                .setNegativeButton("Cancel") { dialogInterface, _ ->
+
+                    negativeButtonListener(dialogInterface)
+                }
+                .create()
+                .show()
+
+        }
+
+        inline fun View.showSnackbarWithActionAndDismissListener(
+            text: String,
+            actionText: String,
+            crossinline action: (View) -> Unit,
+            crossinline dismissListener: () -> Unit
+        ) {
+
+            Snackbar.make(this, text, Snackbar.LENGTH_LONG)
+                .setAction(actionText) {
+
+                    action(it)
+                }
+                .addCallback(object : Snackbar.Callback() {
+                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                        super.onDismissed(transientBottomBar, event)
+
+                        dismissListener()
+                    }
+                })
+                .show()
         }
 
     }

@@ -12,8 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -33,8 +31,10 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showAlertDialogForDeletion
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showSnackbarWithActionAndDismissListener
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -210,10 +210,9 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     override fun onDeleteClicked(renter: Renter) {
 
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Are you sure?")
-            .setMessage(getString(R.string.delete_warning_message))
-            .setPositiveButton("Delete") { dialogInterface, _ ->
+        showAlertDialogForDeletion(
+            requireContext(),
+            {
 
                 if (renter.isSynced == getString(R.string.f)) {
 
@@ -228,46 +227,43 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     }
                 }
 
-                dialogInterface.dismiss()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
+                it.dismiss()
+            },
+            {
 
-                dialog.dismiss()
+                it.dismiss()
             }
-            .create()
-            .show()
+        )
     }
 
     private fun deleteRenter(renter: Renter) {
 
         renterViewModel.deleteRenter(renter)
-
         var isUndoClicked = false
-        Snackbar.make(binding.homeCoordinatorL, "Renter deleted", Snackbar.LENGTH_LONG)
-            .setAction("Undo") {
+
+        binding.homeCoordinatorL.showSnackbarWithActionAndDismissListener(
+            text = "Renter deleted",
+            actionText = "Undo",
+            action = {
 
                 isUndoClicked = true
 
                 renterViewModel.insertRenter(renter)
                 showToast(requireContext(), "Renter restored...")
-            }
-            .addCallback(object : Snackbar.Callback() {
+            },
+            dismissListener = {
+                if (!isUndoClicked && renter.isSynced == getString(R.string.t)) {
 
-                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-
-                    if (!isUndoClicked && renter.isSynced == getString(R.string.t)) {
-
-                        deleteDocumentFromFireStore(
-                            context = requireContext(),
-                            collection = getString(R.string.renters),
-                            documentKey = renter.key!!
-                        )
-                    }
-
-                    deleteAllPaymentsOfThisRenter(renter)
+                    deleteDocumentFromFireStore(
+                        context = requireContext(),
+                        collection = getString(R.string.renters),
+                        documentKey = renter.key!!
+                    )
                 }
-            })
-            .show()
+
+                deleteAllPaymentsOfThisRenter(renter)
+            }
+        )
     }
 
     private fun deleteAllPaymentsOfThisRenter(renter: Renter) {

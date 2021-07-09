@@ -259,7 +259,6 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
         requireActivity().onBackPressed()
     }
 
-
     private fun isValidForm(): Boolean {
 
         if (!includeBinding.renterNameET.editText?.isTextValid()!!) {
@@ -292,7 +291,6 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
                 && includeBinding.renterMobileNumberET.isTextValid()
 
     }
-
 
     private fun textWatchers() {
 
@@ -346,7 +344,6 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
             e.printStackTrace()
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

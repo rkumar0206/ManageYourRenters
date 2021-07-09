@@ -11,7 +11,7 @@ import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
-import com.rohitthebest.manageyourrenters.databinding.FragmentAddRenterBinding
+import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditRenterBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoRenter
@@ -37,7 +37,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
     private val renterViewModel: RenterViewModel by viewModels()
 
-    private var _binding: FragmentAddRenterBinding? = null
+    private var _binding: FragmentAddEditRenterBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var includeBinding: AddRenterLayoutBinding
@@ -53,7 +53,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View {
 
-        _binding = FragmentAddRenterBinding.inflate(inflater, container, false)
+        _binding = FragmentAddEditRenterBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -109,7 +109,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             )
 
             includeBinding.renterMobileNumberET.setText(
-                renter.mobileNumber
+                renter.mobileNumber.substring(3)
             )
 
             includeBinding.renterEmailET.editText?.setText(
@@ -227,7 +227,8 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             } else {
                 receivedRenter?.key
             }
-            dueOrAdvanceAmount = 0.0
+            dueOrAdvanceAmount =
+                if (!isMessageReceivesForEditing) 0.0 else receivedRenter?.dueOrAdvanceAmount!!
 
             isSynced = getString(R.string.f)
         }

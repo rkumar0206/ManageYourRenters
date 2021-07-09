@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
-import com.rohitthebest.manageyourrenters.databinding.FragmentAddRenterBinding
+import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditRenterBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.fromBorrowerToString
@@ -30,20 +30,22 @@ import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClickListener {
+class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), View.OnClickListener {
 
-    private var _binding: FragmentAddRenterBinding? = null
+    private var _binding: FragmentAddEditRenterBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var includeBinding: AddRenterLayoutBinding
     private var selectedDate: Long = 0L
-    private var isMessageReceivesForEditing = false
+    private var isMessageReceivedForEditing = false
+    private var receivedBorrower: Borrower? = null
+    private var receivedBorrowerKey: String = ""
 
     private val borrowerViewModel by viewModels<BorrowerViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentAddRenterBinding.bind(view)
+        _binding = FragmentAddEditRenterBinding.bind(view)
 
         includeBinding = binding.include
 
@@ -61,6 +63,78 @@ class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClick
 
         initListeners()
         textWatchers()
+        getMessage()
+    }
+
+    private fun getMessage() {
+
+        try {
+
+            if (!arguments?.isEmpty!!) {
+
+                val args = arguments?.let {
+
+                    AddEditBorrowerFragmentArgs.fromBundle(it)
+                }
+
+                args?.borrowerKey?.let { key ->
+                    receivedBorrowerKey = key
+                }
+
+                isMessageReceivedForEditing = true
+
+                getTheBorrower()
+
+            }
+
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun getTheBorrower() {
+
+        borrowerViewModel.getBorrowerByKey(receivedBorrowerKey)
+            .observe(viewLifecycleOwner, { borrower ->
+
+                receivedBorrower = borrower
+                updateUI()
+            })
+    }
+
+    private fun updateUI() {
+
+        receivedBorrower?.let { b ->
+
+            binding.addRenterTitileTV.text = "Edit Borrower"
+
+            includeBinding.renterNameET.editText?.setText(
+                b.name
+            )
+
+            includeBinding.renterMobileNumberET.setText(
+                b.mobileNumber.substring(3)
+            )
+
+            includeBinding.renterEmailET.editText?.setText(
+                b.emailId
+            )
+
+            includeBinding.otherDocumentNameET.setText(
+                b.otherDocumentName
+            )
+
+            includeBinding.otherDocumentNumber.setText(
+                b.otherDocumentNumber
+            )
+
+            includeBinding.dateAddedTV.text =
+                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                    b.created
+                )
+
+            selectedDate = b.created
+        }
     }
 
     private fun initListeners() {
@@ -119,12 +193,19 @@ class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClick
 
     private fun initBorrowerData() {
 
-        val borrower = Borrower()
+        var borrower = Borrower()
+
+        if (isMessageReceivedForEditing) {
+
+            borrower = receivedBorrower!!
+        }
 
         borrower.apply {
 
             created = selectedDate
-            modified = selectedDate
+            modified =
+                if (!isMessageReceivedForEditing) selectedDate else System.currentTimeMillis()
+
             name = includeBinding.renterNameET.editText?.text.toString().trim()
             mobileNumber = includeBinding.mobileNumCodePicker.fullNumberWithPlus
             emailId = includeBinding.renterEmailET.editText?.text.toString().trim()
@@ -133,10 +214,16 @@ class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClick
 
             uid = getUid()!!
 
-            borrowerId = System.currentTimeMillis().toStringM(36)
-            borrowerPassword = generateRenterPassword(borrowerId, mobileNumber)
-            key = generateKey("_${uid}")
-            totalDueAmount = 0.0
+            borrowerId = if (!isMessageReceivedForEditing)
+                System.currentTimeMillis().toStringM(36) else receivedBorrower?.borrowerId!!
+
+            borrowerPassword =
+                if (!isMessageReceivedForEditing) generateRenterPassword(borrowerId, mobileNumber)
+                else receivedBorrower?.borrowerPassword!!
+
+            key = if (!isMessageReceivedForEditing) generateKey("_${uid}") else receivedBorrowerKey
+            totalDueAmount =
+                if (!isMessageReceivedForEditing) 0.0 else receivedBorrower?.totalDueAmount!!
             isSynced = false
         }
 
@@ -160,8 +247,15 @@ class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClick
 
     private fun insertToDatabase(borrower: Borrower) {
 
-        borrowerViewModel.insertBorrower(borrower)
-        showToast(requireContext(), "Borrower added")
+        if (!isMessageReceivedForEditing) {
+
+            borrowerViewModel.insertBorrower(borrower)
+            showToast(requireContext(), "Borrower added")
+        } else {
+            borrowerViewModel.updateBorrower(borrower)
+            showToast(requireContext(), "Borrower info updated")
+        }
+
         requireActivity().onBackPressed()
     }
 
@@ -181,7 +275,7 @@ class AddBorrowerFragment : Fragment(R.layout.fragment_add_renter), View.OnClick
         }
 
 
-        if (!isMessageReceivesForEditing) {
+        if (!isMessageReceivedForEditing) {
 
             if (!includeBinding.mobileNumCodePicker.isValidFullNumber) {
 

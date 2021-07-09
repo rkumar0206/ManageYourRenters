@@ -24,6 +24,11 @@ class BorrowerViewModel @Inject constructor(
         repository.insertBorrowers(borrowers)
     }
 
+    fun updateBorrower(borrower: Borrower) = viewModelScope.launch {
+
+        repository.update(borrower)
+    }
+
     fun deleteBorrower(borrower: Borrower) = viewModelScope.launch {
 
         repository.delete(borrower)

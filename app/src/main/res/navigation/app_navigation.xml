@@ -33,7 +33,7 @@
         android:id="@+id/addRenterFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.addContentFragments.AddRenterFragment"
         android:label="fragment_add_renter"
-        tools:layout="@layout/fragment_add_renter" >
+        tools:layout="@layout/fragment_add_edit_renter">
         <argument
             android:name="editRenterMessage"
             app:argType="string"

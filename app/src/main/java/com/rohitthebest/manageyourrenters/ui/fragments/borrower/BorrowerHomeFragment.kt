@@ -182,7 +182,12 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
     }
 
     override fun onEditClicked(borrower: Borrower?) {
-        //TODO("Not yet implemented")
+
+        val action = BorrowerHomeFragmentDirections.actionBorrowerHomeFragmentToAddBorrowerFragment(
+            borrower?.key
+        )
+
+        findNavController().navigate(action)
     }
 
     private fun showHideProgressBar(isVisible: Boolean) {

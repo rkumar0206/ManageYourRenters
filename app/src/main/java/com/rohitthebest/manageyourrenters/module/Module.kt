@@ -3,9 +3,11 @@ package com.rohitthebest.manageyourrenters.module
 import android.content.Context
 import androidx.room.Room
 import com.rohitthebest.manageyourrenters.database.databases.BorrowerDatabase
+import com.rohitthebest.manageyourrenters.database.databases.BorrowerPaymentDatabase
 import com.rohitthebest.manageyourrenters.database.databases.PaymentDatabase
 import com.rohitthebest.manageyourrenters.database.databases.RenterDatabase
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_DATABASE_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.RENTER_DATABASE_NAME
 import dagger.Module
@@ -66,6 +68,22 @@ object Module {
     @Provides
     @Singleton
     fun provideBorrowerDao(db: BorrowerDatabase) = db.getBorrowerDao()
+
+    //============================== Borrower Payment Database========================================
+
+    @Provides
+    @Singleton
+    fun provideBorrowerPaymentDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(
+        context,
+        BorrowerPaymentDatabase::class.java,
+        BORROWER_PAYMENT_DATABASE_NAME
+    ).build()
+
+    @Provides
+    @Singleton
+    fun provideBorrowerPaymentDao(db: BorrowerPaymentDatabase) = db.getBorrowerPaymentDao()
 
 
 }

@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.CompoundButton
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
@@ -20,7 +22,8 @@ import dagger.hilt.android.AndroidEntryPoint
 private const val TAG = "AddBorrowerPaymentFragm"
 
 @AndroidEntryPoint
-class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payment) {
+class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payment),
+    CompoundButton.OnCheckedChangeListener {
 
     private var _binding: FragmentAddBorrowerPaymentBinding? = null
     private val binding get() = _binding!!
@@ -52,7 +55,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         getMessage()
 
         initListeners()
-        setUpCurrencySymbolList()
     }
 
 
@@ -62,6 +64,8 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                 selectedDate, "dd-MMMM-yyyy"
             )
+
+        setUpCurrencySymbolList()
     }
 
     private fun getMessage() {
@@ -154,10 +158,35 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
             requireActivity().onBackPressed()
         }
+
+        includeBinding.addInterestCB.setOnCheckedChangeListener(this)
+        includeBinding.addSupprtingDocCB.setOnCheckedChangeListener(this)
+    }
+
+    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+
+        when (buttonView?.id) {
+
+            includeBinding.addInterestCB.id -> showHideInterestCardView(isChecked)
+
+            includeBinding.addSupprtingDocCB.id -> showHideAddSupportingDocCardView(isChecked)
+        }
+
+    }
+
+    private fun showHideInterestCardView(isVisible: Boolean) {
+
+        includeBinding.interestCV.isVisible = isVisible
+    }
+
+    private fun showHideAddSupportingDocCardView(isVisible: Boolean) {
+
+        includeBinding.supportingDocCV.isVisible = isVisible
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
 }

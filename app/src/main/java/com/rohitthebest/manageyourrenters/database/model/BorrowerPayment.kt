@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.google.firebase.firestore.IgnoreExtraProperties
 
 @IgnoreExtraProperties
-@Entity(tableName = "borrower_table")
+@Entity(tableName = "borrower_payment_table")
 data class BorrowerPayment(
     @PrimaryKey(autoGenerate = true) val id: Int?,
     var created: Long = System.currentTimeMillis(),
@@ -13,6 +13,7 @@ data class BorrowerPayment(
     var borrowerId: String,
     var borrowerKey: String,
     var amountTakenOnRent: Double = 0.0,
+    var isDueCleared: Boolean = false,
     var key: String,
     var uid: String,
     var isSynced: Boolean = false,
@@ -25,6 +26,7 @@ data class BorrowerPayment(
         "",
         "",
         0.0,
+        false,
         "",
         "",
         false,

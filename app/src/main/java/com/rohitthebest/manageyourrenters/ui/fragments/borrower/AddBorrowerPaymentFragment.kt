@@ -3,6 +3,8 @@ package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
@@ -29,6 +31,8 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     private var receivedBorrower: Borrower? = null
     private var receivedBorrowerKey: String = ""
     private lateinit var includeBinding: AddBorrowerPaymentLayoutBinding
+    private lateinit var currencySymbols: List<String>
+    private var selectedCurrencySymbol: String = ""
 
     private var selectedDate: Long = 0L
 
@@ -40,11 +44,15 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         selectedDate = System.currentTimeMillis()
 
+        //List of currency symbols of different places
+        currencySymbols = resources.getStringArray(R.array.currency_symbol).toList()
+
         initUI()
 
         getMessage()
 
         initListeners()
+        setUpCurrencySymbolList()
     }
 
 
@@ -90,6 +98,40 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             }
         })
     }
+
+    private fun setUpCurrencySymbolList() {
+
+        includeBinding.moneySymbolSpinner.let { spinner ->
+
+            spinner.adapter = ArrayAdapter(
+                requireContext(),
+                R.layout.support_simple_spinner_dropdown_item,
+                currencySymbols
+            )
+
+            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                    spinner.setSelection(0)
+                    selectedCurrencySymbol = currencySymbols[0]
+                }
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+
+                    spinner.setSelection(position)
+                    selectedCurrencySymbol = currencySymbols[position]
+                }
+            }
+        }
+
+    }
+
 
     private fun initListeners() {
 

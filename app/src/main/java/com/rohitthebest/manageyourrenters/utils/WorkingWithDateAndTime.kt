@@ -57,6 +57,18 @@ class WorkingWithDateAndTime {
         }
     }
 
+    /**
+     * converts milliseconds in any date pattern
+     *
+     * @param timeInMillis
+     * @param pattern
+     * pattern types :
+     *  1. dd-M-yyyy hh:mm:ss	        02-1-2018 06:07:59
+     *  2. dd MMMM yyyy	                02 January 2018
+     *  3. dd MMMM yyyy zzzz	        02 January 2018 India Standard Time
+     *  4. E, dd MMM yyyy HH:mm:ss z	Tue, 02 Jan 2018 18:07:59 IST
+     */
+
     fun convertMillisecondsToDateAndTimePattern(
         timeInMillis: Long? = System.currentTimeMillis(),
         pattern: String? = "dd-MM-yyyy"

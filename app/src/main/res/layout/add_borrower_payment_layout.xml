@@ -65,13 +65,13 @@
         android:padding="4dp"
         android:textColor="@color/textColor1"
         android:textSize="18sp"
-        app:layout_constraintEnd_toStartOf="@+id/selectTvBtn"
+        app:layout_constraintEnd_toStartOf="@+id/selectDateBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider3"
         tools:text="02-06-2000" />
 
     <ImageButton
-        android:id="@+id/selectTvBtn"
+        android:id="@+id/selectDateBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

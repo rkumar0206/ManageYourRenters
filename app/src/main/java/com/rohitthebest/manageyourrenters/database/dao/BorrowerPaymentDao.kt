@@ -1,13 +1,10 @@
 package com.rohitthebest.manageyourrenters.database.dao
 
 import androidx.room.*
+import com.rohitthebest.manageyourrenters.data.KeyAndIsSyncedTuple
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import kotlinx.coroutines.flow.Flow
 
-data class KeyAndIsSyncedTuple(
-    @ColumnInfo(name = "key") val key: String,
-    @ColumnInfo(name = "isSynced") val isSynced: Boolean
-)
 
 @Dao
 interface BorrowerPaymentDao {

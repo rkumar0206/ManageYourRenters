@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -268,34 +269,32 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private fun deleteAllPaymentsOfThisRenter(renter: Renter) {
 
-        var paymentKeyList: List<String>
+        paymentViewModel.getPaymentKeysByRenterKey(renterKey = renter.key!!)
+            .observe(viewLifecycleOwner,
+                { keysAndIsSyncedList ->
 
-        paymentViewModel.getAllPaymentsListOfRenter(renterKey = renter.key!!)
-            .observe(viewLifecycleOwner) {
+                    if (keysAndIsSyncedList.isNotEmpty()) {
 
-                if (it.isNotEmpty()) {
+                        Log.d(TAG, "deleteAllPaymentsOfThisRenter: $keysAndIsSyncedList")
 
-                    paymentKeyList =
-                        it.filter { payment -> payment.isSynced == getString(R.string.t) }
-                            .map { pay ->
+                        val paymentToDeleteFromFirestore =
+                            keysAndIsSyncedList.filter { k -> k.isSynced == getString(R.string.t) }
+                                .map { k -> k.key }
 
-                                pay.key
-                            }
+                        if (paymentToDeleteFromFirestore.isNotEmpty()) {
 
-                    if (paymentKeyList.isNotEmpty()) {
+                            FirebaseServiceHelper.deleteAllDocumentsUsingKey(
+                                requireContext(),
+                                getString(R.string.payments),
+                                ConversionWithGson.convertStringListToJSON(
+                                    paymentToDeleteFromFirestore
+                                )
+                            )
+                        }
 
-                        FirebaseServiceHelper.deleteAllDocumentsUsingKey(
-                            requireContext(),
-                            getString(R.string.payments),
-                            ConversionWithGson.convertStringListToJSON(paymentKeyList)
-                        )
-
+                        paymentViewModel.deleteAllPaymentsOfRenter(renter.key!!)
                     }
-
-                    paymentViewModel.deleteAllPaymentsOfRenter(renter.key!!)
-                }
-            }
-
+                })
     }
 
     override fun onEditClicked(renter: Renter) {

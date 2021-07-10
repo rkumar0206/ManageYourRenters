@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
@@ -34,6 +35,18 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment) {
         binding.borrowerPaymentToolbar.setNavigationOnClickListener {
 
             requireActivity().onBackPressed()
+        }
+
+        binding.addPaymentFAB.setOnClickListener {
+
+            if (receivedBorrowerKey != "") {
+
+                val action =
+                    BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
+                        receivedBorrowerKey
+                    )
+                findNavController().navigate(action)
+            }
         }
 
         getMessage()

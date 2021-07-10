@@ -22,6 +22,9 @@ class BorrowerPaymentRepository @Inject constructor(
 
     suspend fun deleteAllBorrowerPayments() = dao.deleteAllBorrowerPayments()
 
+    suspend fun deleteAllBorrowerPaymentsByBorrowerKey(borrowerKey: String) =
+        dao.deleteAllBorrowerPaymentsByBorrowerKey(borrowerKey)
+
     fun getAllBorrowerPayments() = dao.getAllBorrowerPayments()
 
     fun getPaymentsByBorrowerKey(borrowerKey: String) = dao.getPaymentsByBorrowerKey(borrowerKey)

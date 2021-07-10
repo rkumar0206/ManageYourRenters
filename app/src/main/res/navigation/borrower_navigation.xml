@@ -19,6 +19,15 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_borrowerHomeFragment_to_borrowerPaymentFragment"
+            app:destination="@id/borrowerPaymentFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+
     </fragment>
     <fragment
         android:id="@+id/addBorrowerFragment"
@@ -30,4 +39,9 @@
             app:argType="string"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/borrowerPaymentFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.borrower.BorrowerPaymentFragment"
+        android:label="BorrowerPaymentFragment"
+        tools:layout="@layout/fragment_borrower_payment" />
 </navigation>

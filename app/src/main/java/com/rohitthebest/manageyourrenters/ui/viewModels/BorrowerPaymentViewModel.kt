@@ -34,6 +34,11 @@ class BorrowerPaymentViewModel @Inject constructor(
         repository.deleteAllBorrowerPayments()
     }
 
+    fun deleteAllBorrowerPaymentsByBorrowerKey(borrowerKey: String) = viewModelScope.launch {
+
+        repository.deleteAllBorrowerPaymentsByBorrowerKey(borrowerKey)
+    }
+
     fun getAllBorrowerPayments() = repository.getAllBorrowerPayments().asLiveData()
 
     fun getPaymentsByBorrowerKey(borrowerKey: String) =

@@ -22,6 +22,9 @@ interface BorrowerPaymentDao {
     @Query("DELETE FROM borrower_payment_table")
     suspend fun deleteAllBorrowerPayments()
 
+    @Query("DELETE FROM borrower_payment_table WHERE borrowerKey= :borrowerKey")
+    suspend fun deleteAllBorrowerPaymentsByBorrowerKey(borrowerKey: String)
+
     @Query("SELECT * FROM borrower_payment_table ORDER BY modified desc")
     fun getAllBorrowerPayments(): Flow<List<BorrowerPayment>>
 
@@ -29,7 +32,7 @@ interface BorrowerPaymentDao {
     fun getPaymentsByBorrowerKey(borrowerKey: String): Flow<List<BorrowerPayment>>
 
     // getting the due amount of the borrower where isDueCleared is false
-    @Query("SELECT SUM(amountTakenOnRent) as total FROM borrower_payment_table WHERE isDueCleared = 0")
+    @Query("SELECT SUM(amountTakenOnRent) as total FROM borrower_payment_table WHERE borrowerKey = :borrowerKey AND isDueCleared = 0")
     fun getTotalDueOfTheBorrower(borrowerKey: String): Flow<Double>
 
     @Query("SELECT * FROM borrower_payment_table WHERE `key` = :paymentKey")

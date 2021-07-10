@@ -10,67 +10,68 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Renter
+import com.rohitthebest.manageyourrenters.databinding.AdapterShowRenterBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
-import kotlinx.android.synthetic.main.adapter_show_renter.view.*
 
 class ShowRentersAdapter :
     ListAdapter<Renter, ShowRentersAdapter.RenterViewHolder>(DiffUtilCallback()) {
 
     private var mListener: OnClickListener? = null
 
-    inner class RenterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+    inner class RenterViewHolder(val binding: AdapterShowRenterBinding) :
+        RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
 
         @SuppressLint("SetTextI18n")
         fun setData(renter: Renter) {
 
-            itemView.apply {
+            binding.apply {
 
                 if (renter.dueOrAdvanceAmount < 0.0) {
 
-                    renterAdapter_CV.strokeColor =
-                        ContextCompat.getColor(context, R.color.color_orange)
+                    binding.renterAdapterCV.strokeColor =
+                        ContextCompat.getColor(binding.root.context, R.color.color_orange)
                 } else {
 
-                    renterAdapter_CV.strokeColor =
-                        ContextCompat.getColor(context, R.color.colorGrey)
+                    binding.renterAdapterCV.strokeColor =
+                        ContextCompat.getColor(binding.root.context, R.color.colorGrey)
                 }
 
-                adapterRenterNameTV.text = renter.name
-                adapterRoomNumTV.text = renter.roomNumber
-                adapterRenterTimeTV.text = "Added on : ${
+                binding.adapterRenterNameTV.text = renter.name
+                binding.adapterRoomNumTV.text = renter.roomNumber
+                binding.adapterRenterTimeTV.text = "Added on : ${
                     WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                         renter.timeStamp
                     )
                 }"
-                adapterRenterMobileTV.text = renter.mobileNumber
-                adapterRenterEmailTV.text = renter.emailId
-                adapterDocumnetNameTV.text = if (renter.otherDocumentName != "") {
+                binding.adapterRenterMobileTV.text = renter.mobileNumber
+                binding.adapterRenterEmailTV.text = renter.emailId
+                binding.adapterDocumnetNameTV.text = if (renter.otherDocumentName != "") {
 
                     "${renter.otherDocumentName} : "
                 } else {
 
                     "Other document : "
                 }
-                adapterRenterDocNumTV.text = renter.otherDocumentNumber
-                adapterRenterAddressTV.text = renter.address
+                binding.adapterRenterDocNumTV.text = renter.otherDocumentNumber
+                binding.adapterRenterAddressTV.text = renter.address
 
-                if (renter.isSynced == context.getString(R.string.t)) {
+                if (renter.isSynced == binding.root.context.getString(R.string.t)) {
 
-                    itemView.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                    binding.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
                 } else {
 
-                    itemView.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                    binding.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24)
                 }
             }
         }
 
         init {
 
-            itemView.setOnClickListener(this)
-            itemView.adapterIsSyncedBtn.setOnClickListener(this)
-            itemView.adapterRenterEditBtn.setOnClickListener(this)
-            itemView.adapterRenterDeleteBtn.setOnClickListener(this)
+            binding.root.setOnClickListener(this)
+            binding.adapterIsSyncedBtn.setOnClickListener(this)
+            binding.adapterRenterEditBtn.setOnClickListener(this)
+            binding.adapterRenterDeleteBtn.setOnClickListener(this)
 
         }
 
@@ -78,7 +79,7 @@ class ShowRentersAdapter :
 
             when (v?.id) {
 
-                itemView.id -> {
+                binding.root.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
@@ -86,7 +87,7 @@ class ShowRentersAdapter :
                     }
                 }
 
-                itemView.adapterRenterEditBtn.id -> {
+                binding.adapterRenterEditBtn.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
@@ -95,7 +96,7 @@ class ShowRentersAdapter :
 
                 }
 
-                itemView.adapterRenterDeleteBtn.id -> {
+                binding.adapterRenterDeleteBtn.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
@@ -103,7 +104,7 @@ class ShowRentersAdapter :
                     }
                 }
 
-                itemView.adapterIsSyncedBtn.id -> {
+                binding.adapterIsSyncedBtn.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
@@ -139,9 +140,10 @@ class ShowRentersAdapter :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RenterViewHolder {
 
-        return RenterViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.adapter_show_renter, parent, false)
-        )
+        val binding =
+            AdapterShowRenterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+        return RenterViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: RenterViewHolder, position: Int) {

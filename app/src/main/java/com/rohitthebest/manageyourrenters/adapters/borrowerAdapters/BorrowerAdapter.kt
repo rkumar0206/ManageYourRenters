@@ -13,7 +13,6 @@ import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.AdapterShowRenterBinding
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
-import kotlinx.android.synthetic.main.adapter_show_renter.view.*
 
 class BorrowerAdapter :
     ListAdapter<Borrower, BorrowerAdapter.BorrowerViewHolder>(DiffUtilCallback()) {
@@ -103,10 +102,10 @@ class BorrowerAdapter :
 
                     if (b.isSynced) {
 
-                        itemView.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                        binding.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
                     } else {
 
-                        itemView.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                        binding.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24)
                     }
                 }
             }

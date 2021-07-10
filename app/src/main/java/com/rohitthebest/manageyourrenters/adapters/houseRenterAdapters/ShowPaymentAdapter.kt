@@ -9,52 +9,53 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Payment
+import com.rohitthebest.manageyourrenters.databinding.AdapterShowPaymentBinding
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
-import kotlinx.android.synthetic.main.adapter_show_payment.view.*
 
 class ShowPaymentAdapter :
     ListAdapter<Payment, ShowPaymentAdapter.ShowPaymentViewHolder>(DiffUtilCallback()) {
 
     private var mListener: OnClickListener? = null
 
-    inner class ShowPaymentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+    inner class ShowPaymentViewHolder(val binding: AdapterShowPaymentBinding) :
+        RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
 
         @SuppressLint("SetTextI18n")
         fun setData(payment: Payment?) {
 
-            itemView.apply {
+            binding.apply {
 
                 payment?.let {
 
                     if (absoluteAdapterPosition == 0) {
 
-                        paymentAdapter_deleteBtn.show()
+                        paymentAdapterDeleteBtn.show()
                     } else {
 
-                        paymentAdapter_deleteBtn.hide()
+                        paymentAdapterDeleteBtn.hide()
                     }
 
                     //Period
-                    if (it.bill?.billPeriodType == context.getString(R.string.by_month)) {
+                    if (it.bill?.billPeriodType == binding.root.context.getString(R.string.by_month)) {
 
-                        paymentAdapter_billPeriodTV.text =
+                        paymentAdapterBillPeriodTV.text =
                             "${it.bill!!.billMonth}, ${it.bill!!.billYear}"
                     } else {
 
                         if (it.bill?.billDateFrom == it.bill?.billDateTill) {
 
-                            paymentAdapter_billPeriodTV.text =
+                            paymentAdapterBillPeriodTV.text =
                                 WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                                     it.bill?.billDateTill
                                 )
                         } else {
 
-                            paymentAdapter_billPeriodTV.textSize = 18.0f
-                            paymentAdapter_billPeriodTV.text =
+                            paymentAdapterBillPeriodTV.textSize = 18.0f
+                            paymentAdapterBillPeriodTV.text =
                                 "From : ${
                                     WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                                         it.bill?.billDateFrom
@@ -68,7 +69,7 @@ class ShowPaymentAdapter :
                     }
 
                     //issue date
-                    paymentAdapter_issueDateTV.text =
+                    paymentAdapterIssueDateTV.text =
                         "Payment date : ${
                             WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                                 it.timeStamp
@@ -82,36 +83,42 @@ class ShowPaymentAdapter :
 
                         if(it.extraFieldName?.trim()?.isEmpty()!!){
 
-                            paymentAdapter_neetDemandTV.text =
+                            paymentAdapterNetDemandTV.text =
                                 "Net demand : ${it.extraAmount}"
                         }else {
 
-                            paymentAdapter_neetDemandTV.text =
+                            paymentAdapterNetDemandTV.text =
                                 "${it.extraFieldName} : ${it.extraAmount}"
                         }
 
                     } else {
 
-                        paymentAdapter_neetDemandTV.text = "Net demand : ${it.totalRent}"
+                        paymentAdapterNetDemandTV.text = "Net demand : ${it.totalRent}"
                     }
 
                     //total rent
                     if (it.amountPaid?.toDouble()!! < it.totalRent.toDouble()) {
 
-                        paymentAdapter_amountPaidTV.changeTextColor(context, R.color.color_orange)
+                        paymentAdapterAmountPaidTV.changeTextColor(
+                            binding.root.context,
+                            R.color.color_orange
+                        )
                     } else {
 
-                        paymentAdapter_amountPaidTV.changeTextColor(context, R.color.color_green)
+                        paymentAdapterAmountPaidTV.changeTextColor(
+                            binding.root.context,
+                            R.color.color_green
+                        )
                     }
 
-                    paymentAdapter_amountPaidTV.text = "Amount paid : ${it.amountPaid}"
+                    paymentAdapterAmountPaidTV.text = "Amount paid : ${it.amountPaid}"
 
-                    if (it.isSynced == context.getString(R.string.t)) {
+                    if (it.isSynced == binding.root.context.getString(R.string.t)) {
 
-                        itemView.paymentAdapter_syncBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                        paymentAdapterSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
                     } else {
 
-                        itemView.paymentAdapter_syncBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                        paymentAdapterSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24)
                     }
 
                 }
@@ -120,17 +127,17 @@ class ShowPaymentAdapter :
 
         init {
 
-            itemView.setOnClickListener(this)
-            itemView.paymentAdapter_syncBtn.setOnClickListener(this)
-            itemView.paymentAdapter_deleteBtn.setOnClickListener(this)
-            itemView.paymentAdapter_MessageBtn.setOnClickListener(this)
+            binding.root.setOnClickListener(this)
+            binding.paymentAdapterSyncBtn.setOnClickListener(this)
+            binding.paymentAdapterDeleteBtn.setOnClickListener(this)
+            binding.paymentAdapterMessageBtn.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {
 
             when (v?.id) {
 
-                itemView.id -> {
+                binding.root.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
@@ -138,7 +145,7 @@ class ShowPaymentAdapter :
                     }
                 }
 
-                itemView.paymentAdapter_syncBtn.id -> {
+                binding.paymentAdapterSyncBtn.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
@@ -146,7 +153,7 @@ class ShowPaymentAdapter :
                     }
                 }
 
-                itemView.paymentAdapter_deleteBtn.id -> {
+                binding.paymentAdapterDeleteBtn.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
@@ -154,7 +161,7 @@ class ShowPaymentAdapter :
                     }
                 }
 
-                itemView.paymentAdapter_MessageBtn.id -> {
+                binding.paymentAdapterDeleteBtn.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
@@ -195,10 +202,10 @@ class ShowPaymentAdapter :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShowPaymentViewHolder {
 
-        return ShowPaymentViewHolder(
-            LayoutInflater.from(parent.context)
-                .inflate(R.layout.adapter_show_payment, parent, false)
-        )
+        val binding =
+            AdapterShowPaymentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+        return ShowPaymentViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ShowPaymentViewHolder, position: Int) {

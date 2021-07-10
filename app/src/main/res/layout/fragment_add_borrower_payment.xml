@@ -23,7 +23,9 @@
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <include layout="@layout/add_borrower_payment_layout" />
+        <include
+            android:id="@+id/include"
+            layout="@layout/add_borrower_payment_layout" />
 
     </androidx.core.widget.NestedScrollView>
 

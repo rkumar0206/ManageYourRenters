@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.data.BillInfo
 import com.rohitthebest.manageyourrenters.data.ElectricityBillInfo
+import com.rohitthebest.manageyourrenters.data.Interest
 
 class TypeConvertersForDatabase {
 
@@ -36,5 +37,17 @@ class TypeConvertersForDatabase {
         val type = object : TypeToken<ElectricityBillInfo>() {}.type
 
         return gson.fromJson(electricBillInfoString, type)
+    }
+
+    @TypeConverter
+    fun fromInterestToString(interest: Interest?): String? {
+
+        return Gson().toJson(interest)
+    }
+
+    @TypeConverter
+    fun fromStringToInterest(str: String): Interest? {
+
+        return Gson().fromJson(str, object : TypeToken<Interest?>() {}.type)
     }
 }

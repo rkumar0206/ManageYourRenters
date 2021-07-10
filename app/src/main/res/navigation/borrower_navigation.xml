@@ -48,5 +48,18 @@
             android:name="borrowerKeyMessage"
             app:argType="string"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_borrowerPaymentFragment_to_addBorrowerPaymentFragment"
+            app:destination="@id/addBorrowerPaymentFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
+    <fragment
+        android:id="@+id/addBorrowerPaymentFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.borrower.AddBorrowerPaymentFragment"
+        android:label="AddBorrowerPaymentFragment"
+        tools:layout="@layout/fragment_add_borrower_payment" />
 </navigation>

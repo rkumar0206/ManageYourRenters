@@ -14,6 +14,8 @@ data class BorrowerPayment(
     var borrowerKey: String,
     var amountTakenOnRent: Double = 0.0,
     var isDueCleared: Boolean = false,
+    var supportingDocumentUrl: String? = null,
+    var supportingDocumentType: String? = null,  //select from pdf, image, and url
     var key: String,
     var uid: String,
     var isSynced: Boolean = false,
@@ -27,6 +29,8 @@ data class BorrowerPayment(
         "",
         0.0,
         false,
+        "",
+        "",
         "",
         "",
         false,

@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Borrower
+import com.rohitthebest.manageyourrenters.databinding.AddBorrowerPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
@@ -25,10 +26,15 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private var receivedBorrower: Borrower? = null
     private var receivedBorrowerKey: String = ""
+    private lateinit var includeBinding: AddBorrowerPaymentLayoutBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAddBorrowerPaymentBinding.bind(view)
+
+        includeBinding = binding.include
+
+        
 
         getMessage()
     }

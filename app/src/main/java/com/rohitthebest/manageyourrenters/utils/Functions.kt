@@ -12,6 +12,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -352,6 +354,12 @@ class Functions {
                 .setTitleText("Select a date")
                 .setSelection(selectedDate)
 
+            val constrainBuilder = CalendarConstraints.Builder()
+                .setValidator(DateValidatorPointBackward.now())
+                .build()
+
+            datePicker.setCalendarConstraints(constrainBuilder)
+
             val builder = datePicker.build()
 
             builder.show(
@@ -366,6 +374,7 @@ class Functions {
                 positiveListener(it)
             }
         }
+
 
         inline fun EditText.onTextChangedListener(
             crossinline onTextChanged: (s: CharSequence?) -> Unit

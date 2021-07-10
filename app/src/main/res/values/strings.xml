@@ -83,6 +83,9 @@
     <string name="borrowed_amount">Borrowed Amount</string>
     <string name="add_a_note_optional_n_n_n_n_n_n_n">Add a note.... (Optional) \n\n\n\n\n\n\n</string>
     <string name="select_date_button">select_date_button</string>
+    <string name="supporting_document">Supporting document (Optional)</string>
+    <string name="interest">Interest</string>
+    <string name="type">Type</string>
 
 
     <string-array name="currency_symbol">

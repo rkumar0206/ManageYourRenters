@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/menu_show_bill"
-        android:icon="@drawable/ic_baseline_receipt_long_24"
+        android:icon="@drawable/ic_baseline_save_24"
         android:title="Show bill"
         app:showAsAction="always" />
 </menu>

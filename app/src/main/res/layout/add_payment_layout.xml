@@ -935,7 +935,7 @@
                 android:backgroundTint="@android:color/transparent"
                 android:ems="10"
                 android:gravity="start|top"
-                android:hint="Add a note....\n\n\n\n\n\n\n"
+                android:hint="@string/add_a_note_optional_n_n_n_n_n_n_n"
                 android:inputType="textMultiLine"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

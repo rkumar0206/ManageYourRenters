@@ -78,6 +78,7 @@
     <string name="manage_money">Manage money</string>
     <string name="mobileNumberErrorMessage">Please enter a valid mobile number!!</string>
     <string name="add_borrower">Add borrower</string>
+    <string name="borrowerPayments">Borrower_Payments</string>
 
 
     <string-array name="currency_symbol">

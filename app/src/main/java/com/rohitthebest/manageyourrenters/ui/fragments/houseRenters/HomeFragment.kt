@@ -268,8 +268,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private fun deleteAllPaymentsOfThisRenter(renter: Renter) {
 
-        paymentViewModel.deleteAllPaymentsOfRenter(renter.key!!)
-
         var paymentKeyList: List<String>
 
         paymentViewModel.getAllPaymentsListOfRenter(renterKey = renter.key!!)
@@ -293,8 +291,9 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                         )
 
                     }
-                }
 
+                    paymentViewModel.deleteAllPaymentsOfRenter(renter.key!!)
+                }
             }
 
     }

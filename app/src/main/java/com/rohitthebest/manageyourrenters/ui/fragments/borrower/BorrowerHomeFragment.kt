@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.BorrowerAdapter
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerHomeBinding
+import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
@@ -34,6 +35,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
     private val binding get() = _binding!!
 
     private val borrowerViewModel by viewModels<BorrowerViewModel>()
+    private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
     private lateinit var borrowerAdapter: BorrowerAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -178,7 +180,24 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     private fun deleteAllPaymentsOfThisBorrower(borrower: Borrower) {
 
-        // todo : delete all the payments related to this borrower
+        borrowerPaymentViewModel.getPaymentKeysByBorrowerKey(borrower.key)
+            .observe(viewLifecycleOwner, { keysAndIsSyncedList ->
+
+                if (keysAndIsSyncedList.isNotEmpty()) {
+
+                    val paymentToDeleteFromFirestore =
+                        keysAndIsSyncedList.filter { k -> k.isSynced }.map { k -> k.key }
+
+                    FirebaseServiceHelper.deleteAllDocumentsUsingKey(
+                        requireContext(),
+                        getString(R.string.borrowerPayments),
+                        ConversionWithGson.convertStringListToJSON(paymentToDeleteFromFirestore)
+                    )
+
+                    borrowerPaymentViewModel.deleteAllBorrowerPaymentsByBorrowerKey(borrowerKey = borrower.key)
+                }
+            })
+
     }
 
     override fun onEditClicked(borrower: Borrower?) {

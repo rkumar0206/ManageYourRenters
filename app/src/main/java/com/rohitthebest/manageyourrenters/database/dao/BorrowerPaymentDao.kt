@@ -4,6 +4,11 @@ import androidx.room.*
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import kotlinx.coroutines.flow.Flow
 
+data class KeyAndIsSyncedTuple(
+    @ColumnInfo(name = "key") val key: String,
+    @ColumnInfo(name = "isSynced") val isSynced: Boolean
+)
+
 @Dao
 interface BorrowerPaymentDao {
 
@@ -38,8 +43,8 @@ interface BorrowerPaymentDao {
     @Query("SELECT * FROM borrower_payment_table WHERE `key` = :paymentKey")
     fun getBorrowerPaymentByKey(paymentKey: String): Flow<BorrowerPayment>
 
-    @Query("SELECT (`key`) FROM borrower_payment_table WHERE borrowerKey = :borrowerKey")
-    fun getPaymentKeysByBorrowerKey(borrowerKey: String): Flow<List<String>>
+    @Query("SELECT `key`, isSynced FROM borrower_payment_table WHERE borrowerKey = :borrowerKey")
+    fun getPaymentKeysByBorrowerKey(borrowerKey: String): Flow<List<KeyAndIsSyncedTuple>>
 }
 
 

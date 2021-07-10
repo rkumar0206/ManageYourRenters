@@ -58,7 +58,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
         lifecycleScope.launch {
 
-            delay(250)
+            delay(300)
             getAllBorrowers()
         }
     }
@@ -85,8 +85,14 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         borrowerAdapter.setOnClickListener(this)
     }
 
-    override fun onBorrowerClicked(borrower: Borrower?) {
-        //todo : open borrower payment fragment
+    override fun onBorrowerClicked(borrowerKey: String) {
+
+        val action =
+            BorrowerHomeFragmentDirections.actionBorrowerHomeFragmentToBorrowerPaymentFragment(
+                borrowerKey
+            )
+
+        findNavController().navigate(action)
     }
 
     override fun onSyncButtonClicked(borrower: Borrower?) {
@@ -200,10 +206,10 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     }
 
-    override fun onEditClicked(borrower: Borrower?) {
+    override fun onEditClicked(borrowerKey: String) {
 
         val action = BorrowerHomeFragmentDirections.actionBorrowerHomeFragmentToAddBorrowerFragment(
-            borrower?.key
+            borrowerKey
         )
 
         findNavController().navigate(action)

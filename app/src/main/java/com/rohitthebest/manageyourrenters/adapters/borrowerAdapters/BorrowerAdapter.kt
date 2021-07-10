@@ -38,7 +38,7 @@ class BorrowerAdapter :
 
                     binding.root.id -> {
 
-                        mListener!!.onBorrowerClicked(getItem(absoluteAdapterPosition))
+                        mListener!!.onBorrowerClicked(getItem(absoluteAdapterPosition).key)
                     }
 
                     binding.adapterIsSyncedBtn.id -> {
@@ -53,7 +53,7 @@ class BorrowerAdapter :
 
                     binding.adapterRenterEditBtn.id -> {
 
-                        mListener!!.onEditClicked(getItem(absoluteAdapterPosition))
+                        mListener!!.onEditClicked(getItem(absoluteAdapterPosition).key)
                     }
                 }
             }
@@ -146,10 +146,10 @@ class BorrowerAdapter :
 
     interface OnClickListener {
 
-        fun onBorrowerClicked(borrower: Borrower?)
+        fun onBorrowerClicked(borrowerKey: String)
         fun onSyncButtonClicked(borrower: Borrower?)
         fun onDeleteClicked(borrower: Borrower?)
-        fun onEditClicked(borrower: Borrower?)
+        fun onEditClicked(borrowerKey: String)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

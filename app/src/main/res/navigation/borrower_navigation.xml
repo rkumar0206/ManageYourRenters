@@ -43,5 +43,10 @@
         android:id="@+id/borrowerPaymentFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.borrower.BorrowerPaymentFragment"
         android:label="BorrowerPaymentFragment"
-        tools:layout="@layout/fragment_borrower_payment" />
+        tools:layout="@layout/fragment_borrower_payment">
+        <argument
+            android:name="borrowerKeyMessage"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 </navigation>

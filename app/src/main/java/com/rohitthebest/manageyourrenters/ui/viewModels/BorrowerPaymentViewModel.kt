@@ -49,4 +49,7 @@ class BorrowerPaymentViewModel @Inject constructor(
 
     fun getBorrowerPaymentByKey(paymentKey: String) =
         repository.getBorrowerPaymentByKey(paymentKey).asLiveData()
+
+    fun getPaymentKeysByBorrowerKey(borrowerKey: String) =
+        repository.getPaymentKeysByBorrowerKey(borrowerKey).asLiveData()
 }

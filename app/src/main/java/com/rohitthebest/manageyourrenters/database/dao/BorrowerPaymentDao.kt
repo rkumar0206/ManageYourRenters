@@ -37,6 +37,9 @@ interface BorrowerPaymentDao {
 
     @Query("SELECT * FROM borrower_payment_table WHERE `key` = :paymentKey")
     fun getBorrowerPaymentByKey(paymentKey: String): Flow<BorrowerPayment>
+
+    @Query("SELECT (`key`) FROM borrower_payment_table WHERE borrowerKey = :borrowerKey")
+    fun getPaymentKeysByBorrowerKey(borrowerKey: String): Flow<List<String>>
 }
 
 

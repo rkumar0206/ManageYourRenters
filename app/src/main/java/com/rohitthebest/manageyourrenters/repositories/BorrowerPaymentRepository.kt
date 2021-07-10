@@ -32,4 +32,7 @@ class BorrowerPaymentRepository @Inject constructor(
     fun getTotalDueOfTheBorrower(borrowerKey: String) = dao.getTotalDueOfTheBorrower(borrowerKey)
 
     fun getBorrowerPaymentByKey(paymentKey: String) = dao.getBorrowerPaymentByKey(paymentKey)
+
+    fun getPaymentKeysByBorrowerKey(borrowerKey: String) =
+        dao.getPaymentKeysByBorrowerKey(borrowerKey)
 }

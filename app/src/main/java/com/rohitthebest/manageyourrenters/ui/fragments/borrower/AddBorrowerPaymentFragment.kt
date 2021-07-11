@@ -6,10 +6,12 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.CompoundButton
+import android.widget.RadioGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.InterestType
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.AddBorrowerPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddBorrowerPaymentBinding
@@ -25,7 +27,7 @@ private const val TAG = "AddBorrowerPaymentFragm"
 
 @AndroidEntryPoint
 class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payment),
-    CompoundButton.OnCheckedChangeListener {
+    CompoundButton.OnCheckedChangeListener, RadioGroup.OnCheckedChangeListener {
 
     private var _binding: FragmentAddBorrowerPaymentBinding? = null
     private val binding get() = _binding!!
@@ -40,6 +42,8 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     private var selectedCurrencySymbol: String = ""
 
     private var selectedDate: Long = 0L
+    private var docType = ""
+    private var interestType: InterestType = InterestType.SIMPLE_INTEREST
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -166,6 +170,8 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         includeBinding.addInterestCB.setOnCheckedChangeListener(this)
         includeBinding.addSupprtingDocCB.setOnCheckedChangeListener(this)
+        includeBinding.docTypeRG.setOnCheckedChangeListener(this)
+        includeBinding.interestTypeRG.setOnCheckedChangeListener(this)
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
@@ -178,6 +184,48 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         }
 
     }
+
+    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+
+        when (checkedId) {
+
+            includeBinding.pdfRB.id -> {
+
+                includeBinding.fileNameET.hint = "Enter file name"
+                docType = getString(R.string.pdf)
+
+                //todo : handle editext and add file btn visiblity
+            }
+
+            includeBinding.imageRB.id -> {
+
+                includeBinding.fileNameET.hint = "Enter image name"
+                docType = getString(R.string.image)
+
+                //todo : handle editext and add file btn visiblity
+            }
+
+            includeBinding.urlRB.id -> {
+
+                includeBinding.fileNameET.hint = "Enter url here"
+                docType = getString(R.string.url)
+
+                showHideFileNameEditText(true)
+                showHideAddFileBtn(false)
+                showHideRemoveFileBtn(false)
+            }
+
+            includeBinding.simpleIntRB.id -> {
+
+                interestType = InterestType.SIMPLE_INTEREST
+            }
+
+            includeBinding.compundIntRB.id -> {
+                interestType = InterestType.COMPOUND_INTEREST
+            }
+        }
+    }
+
 
     private fun textWatchers() {
 
@@ -215,7 +263,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         }
     }
 
-
     private fun showHideInterestCardView(isVisible: Boolean) {
 
         includeBinding.interestCV.isVisible = isVisible
@@ -226,9 +273,25 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         includeBinding.supportingDocCV.isVisible = isVisible
     }
 
+    private fun showHideAddFileBtn(isVisible: Boolean) {
+
+        includeBinding.addFileMCV.isVisible = isVisible
+    }
+
+    private fun showHideFileNameEditText(isVisible: Boolean) {
+
+        includeBinding.fileNameET.isVisible = isVisible
+    }
+
+    private fun showHideRemoveFileBtn(isVisible: Boolean) {
+
+        includeBinding.removeFileBtn.isVisible = isVisible
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
 
 }

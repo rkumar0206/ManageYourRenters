@@ -87,6 +87,9 @@
     <string name="interest">Interest</string>
     <string name="type">Type</string>
     <string name="edit_borrower">Edit Borrower</string>
+    <string name="pdf">pdf</string>
+    <string name="image">image</string>
+    <string name="url">url</string>
 
 
     <string-array name="currency_symbol">

@@ -11,22 +11,17 @@ import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditRenterBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.fromBorrowerToString
-import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isTextValid
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.onTextChangedListener
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -106,7 +101,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
 
         receivedBorrower?.let { b ->
 
-            binding.addRenterTitileTV.text = "Edit Borrower"
+            binding.addRenterTitileTV.text = getString(R.string.edit_borrower)
 
             includeBinding.renterNameET.editText?.setText(
                 b.name

@@ -14,13 +14,9 @@ import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerHomeBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
-import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
-import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
-import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showAlertDialogForDeletion
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showSnackbarWithActionAndDismissListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

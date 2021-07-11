@@ -32,20 +32,15 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
-import com.rohitthebest.manageyourrenters.utils.ConversionWithGson
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertPaymentToJSONString
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.updateDocumentOnFireStore
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.uploadDocumentToFireStore
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setDateInTextView
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -54,10 +49,10 @@ import kotlinx.coroutines.withContext
 import kotlin.math.abs
 import kotlin.random.Random
 
+private const val TAG = "AddPaymentFragment"
+
 @AndroidEntryPoint
 class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnCheckedChangeListener {
-
-    private val TAG = "AddPaymentFragment"
 
     private val renterViewModel: RenterViewModel by viewModels()
     private val paymentViewModel: PaymentViewModel by viewModels()

@@ -55,8 +55,8 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         getMessage()
 
         initListeners()
+        textWatchers()
     }
-
 
     private fun initUI() {
 
@@ -136,7 +136,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     }
 
-
     private fun initListeners() {
 
         includeBinding.selectDateBtn.setOnClickListener {
@@ -152,6 +151,10 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                     initUI()
                 }
             )
+        }
+        includeBinding.calculateInterestBtn.setOnClickListener {
+
+            //todo : handle this button
         }
 
         binding.addBorrowerPaymentToolBar.setNavigationOnClickListener {
@@ -173,6 +176,12 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         }
 
     }
+
+    private fun textWatchers() {
+
+
+    }
+
 
     private fun showHideInterestCardView(isVisible: Boolean) {
 

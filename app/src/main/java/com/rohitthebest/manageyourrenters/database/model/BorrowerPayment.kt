@@ -14,6 +14,7 @@ data class BorrowerPayment(
     var borrowerId: String,
     var borrowerKey: String,
     var amountTakenOnRent: Double = 0.0,
+    var dueLeftAmount: Double = 0.0,   // will be updated if the borrower does the partial payments
     var isDueCleared: Boolean = false,
     var isSupportingDocAdded: Boolean = false,
     var supportingDocumentUrl: String? = null,
@@ -32,6 +33,7 @@ data class BorrowerPayment(
         0L,
         "",
         "",
+        0.0,
         0.0,
         false,
         false,

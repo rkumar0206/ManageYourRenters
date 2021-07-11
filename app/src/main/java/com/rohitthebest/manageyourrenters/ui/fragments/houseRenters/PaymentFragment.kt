@@ -19,7 +19,6 @@ import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowPaymentAdapter
 import com.rohitthebest.manageyourrenters.database.model.Payment
@@ -27,22 +26,17 @@ import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertPaymentToJSONString
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
 import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertStringListToJSON
-import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.deleteAllDocumentsUsingKey
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.updateDocumentOnFireStore
 import com.rohitthebest.manageyourrenters.utils.FirebaseServiceHelper.Companion.uploadDocumentToFireStore
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.changeTextColor
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setDateInTextView
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -579,9 +573,10 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         var isUndoClicked = false
 
-        Snackbar.make(binding.paymentCoordL, "Payment deleted", Snackbar.LENGTH_LONG)
-            .setAction("Undo") {
-
+        binding.paymentCoordL.showSnackbarWithActionAndDismissListener(
+            "Payment deleted",
+            "Undo",
+            {
                 isUndoClicked = true
 
                 paymentViewModel.insertPayment(payment)
@@ -589,25 +584,22 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 getPaymentListOfRenter()
 
                 showToast(requireContext(), "Payment restored...")
-            }
-            .addCallback(object : Snackbar.Callback() {
+            },
+            {
+                if (!isUndoClicked && payment.isSynced == getString(R.string.t)) {
 
-                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    //updateRenterDuesOrAdvance()
+                    editRenterInDatabase(receivedRenter!!)
 
-                    if (!isUndoClicked && payment.isSynced == getString(R.string.t)) {
-
-                        //updateRenterDuesOrAdvance()
-                        editRenterInDatabase(receivedRenter!!)
-
-                        FirebaseServiceHelper.deleteDocumentFromFireStore(
-                            context = requireContext(),
-                            collection = getString(R.string.payments),
-                            documentKey = payment.key
-                        )
-                    }
+                    FirebaseServiceHelper.deleteDocumentFromFireStore(
+                        context = requireContext(),
+                        collection = getString(R.string.payments),
+                        documentKey = payment.key
+                    )
                 }
-            })
-            .show()
+
+            }
+        )
     }
 
     private fun updateRenterDuesOrAdvance() {

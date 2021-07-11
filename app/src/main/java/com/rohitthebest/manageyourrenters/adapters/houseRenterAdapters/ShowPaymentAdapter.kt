@@ -10,10 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Payment
 import com.rohitthebest.manageyourrenters.databinding.AdapterShowPaymentBinding
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.changeTextColor
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hide
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.show
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.changeTextColor
+import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.show
 
 class ShowPaymentAdapter :
     ListAdapter<Payment, ShowPaymentAdapter.ShowPaymentViewHolder>(DiffUtilCallback()) {

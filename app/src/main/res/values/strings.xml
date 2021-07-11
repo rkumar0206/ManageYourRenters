@@ -92,6 +92,13 @@
     <string name="url">url</string>
 
 
+    <string-array name="interest_time_schedule">
+
+        <item>"Annually"</item>
+        <item>"Monthly"</item>
+        <item>"Daily"</item>
+    </string-array>
+
     <string-array name="currency_symbol">
         <item>"₹"</item>
         <item>"Rs"</item>

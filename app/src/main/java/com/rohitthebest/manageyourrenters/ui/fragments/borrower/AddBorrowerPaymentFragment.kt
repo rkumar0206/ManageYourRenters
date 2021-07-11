@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.InterestTimeSchedule
 import com.rohitthebest.manageyourrenters.data.InterestType
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.AddBorrowerPaymentLayoutBinding
@@ -39,7 +40,9 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     private var receivedBorrowerKey: String = ""
     private lateinit var includeBinding: AddBorrowerPaymentLayoutBinding
     private lateinit var currencySymbols: List<String>
+    private lateinit var interestTimeSchedules: List<String>
     private var selectedCurrencySymbol: String = ""
+    private var selectedInterestTimeSchedule = InterestTimeSchedule.ANNUALLY
 
     private var selectedDate: Long = 0L
     private var docType = ""
@@ -55,6 +58,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         //List of currency symbols of different places
         currencySymbols = resources.getStringArray(R.array.currency_symbol).toList()
+        interestTimeSchedules = resources.getStringArray(R.array.interest_time_schedule).toList()
 
         initUI()
 
@@ -62,16 +66,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         initListeners()
         textWatchers()
-    }
-
-    private fun initUI() {
-
-        includeBinding.dateTV.text =
-            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                selectedDate, "dd-MMMM-yyyy"
-            )
-
-        setUpCurrencySymbolList()
     }
 
     private fun getMessage() {
@@ -109,21 +103,71 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         })
     }
 
-    private fun setUpCurrencySymbolList() {
+    private fun initUI() {
 
-        includeBinding.moneySymbolSpinner.let { spinner ->
+        includeBinding.dateTV.text =
+            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                selectedDate, "dd-MMMM-yyyy"
+            )
 
-            spinner.adapter = ArrayAdapter(
+        setUpCurrencySymbolSpinner()
+        setUpTimeScheduleSpinner()
+    }
+
+    private fun setUpTimeScheduleSpinner() {
+
+        includeBinding.timeScheduleSpinner.apply {
+
+            adapter = ArrayAdapter(
+                requireContext(),
+                R.layout.support_simple_spinner_dropdown_item,
+                interestTimeSchedules
+            )
+
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                    selectedInterestTimeSchedule = InterestTimeSchedule.ANNUALLY
+                }
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+
+                    setSelection(position)
+                    selectedInterestTimeSchedule = when (position) {
+
+                        0 -> InterestTimeSchedule.ANNUALLY
+
+                        1 -> InterestTimeSchedule.MONTHLY
+
+                        else -> InterestTimeSchedule.DAILY
+                    }
+                }
+            }
+
+        }
+    }
+
+    private fun setUpCurrencySymbolSpinner() {
+
+        includeBinding.moneySymbolSpinner.apply {
+
+            adapter = ArrayAdapter(
                 requireContext(),
                 R.layout.support_simple_spinner_dropdown_item,
                 currencySymbols
             )
 
-            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
 
-                    spinner.setSelection(0)
+                    setSelection(0)
                     selectedCurrencySymbol = currencySymbols[0]
                 }
 
@@ -134,7 +178,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                     id: Long
                 ) {
 
-                    spinner.setSelection(position)
+                    setSelection(position)
                     selectedCurrencySymbol = currencySymbols[position]
                 }
             }

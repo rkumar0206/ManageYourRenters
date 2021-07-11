@@ -13,10 +13,12 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.AddBorrowerPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddBorrowerPaymentBinding
+import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "AddBorrowerPaymentFragm"
@@ -179,7 +181,38 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private fun textWatchers() {
 
+        includeBinding.borrowerPaymentET.editText?.onTextChangedListener { s ->
 
+            if (s?.trim()?.isEmpty()!!) {
+
+                includeBinding.borrowerPaymentET.error = EDIT_TEXT_EMPTY_MESSAGE
+            } else {
+
+                includeBinding.borrowerPaymentET.error = null
+            }
+        }
+
+        includeBinding.ratePercentET.onTextChangedListener { s ->
+
+            if (s?.trim()?.isEmpty()!!) {
+
+                includeBinding.ratePercentET.error = EDIT_TEXT_EMPTY_MESSAGE
+            } else {
+
+                includeBinding.ratePercentET.error = null
+            }
+        }
+
+        includeBinding.fileNameET.onTextChangedListener { s ->
+
+            if (s?.trim()?.isEmpty()!!) {
+
+                includeBinding.fileNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+            } else {
+
+                includeBinding.fileNameET.error = null
+            }
+        }
     }
 
 

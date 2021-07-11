@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
+import android.Manifest
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -7,6 +8,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.CompoundButton
 import android.widget.RadioGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,16 +22,20 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddBorrowerPayment
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
-import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
+import com.rohitthebest.manageyourrenters.utils.showSnackbarWithActionAndDismissListener
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "AddBorrowerPaymentFragm"
 
 @AndroidEntryPoint
 class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payment),
-    CompoundButton.OnCheckedChangeListener, RadioGroup.OnCheckedChangeListener {
+    CompoundButton.OnCheckedChangeListener, RadioGroup.OnCheckedChangeListener,
+    View.OnClickListener {
 
     private var _binding: FragmentAddBorrowerPaymentBinding? = null
     private val binding get() = _binding!!
@@ -45,7 +52,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     private var selectedInterestTimeSchedule = InterestTimeSchedule.ANNUALLY
 
     private var selectedDate: Long = 0L
-    private var docType = ""
+    private var docType = "pdf"
     private var interestType: InterestType = InterestType.SIMPLE_INTEREST
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -188,24 +195,9 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private fun initListeners() {
 
-        includeBinding.selectDateBtn.setOnClickListener {
-
-            Functions.showCalendarDialog(
-                selectedDate,
-                {
-                    requireActivity().supportFragmentManager
-                },
-                { newDate ->
-
-                    selectedDate = newDate
-                    initUI()
-                }
-            )
-        }
-        includeBinding.calculateInterestBtn.setOnClickListener {
-
-            //todo : handle this button
-        }
+        includeBinding.selectDateBtn.setOnClickListener(this)
+        includeBinding.calculateInterestBtn.setOnClickListener(this)
+        includeBinding.addFileMCV.setOnClickListener(this)
 
         binding.addBorrowerPaymentToolBar.setNavigationOnClickListener {
 
@@ -216,7 +208,121 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         includeBinding.addSupprtingDocCB.setOnCheckedChangeListener(this)
         includeBinding.docTypeRG.setOnCheckedChangeListener(this)
         includeBinding.interestTypeRG.setOnCheckedChangeListener(this)
+
     }
+
+
+    override fun onClick(v: View?) {
+
+        when (v?.id) {
+
+            includeBinding.selectDateBtn.id -> {
+
+                showCalendarDialog(
+                    selectedDate,
+                    {
+                        requireActivity().supportFragmentManager
+                    },
+                    { newDate ->
+
+                        selectedDate = newDate
+                        initUI()
+                    }
+                )
+            }
+
+            includeBinding.calculateInterestBtn.id -> {
+                //todo : handle this button
+            }
+
+            includeBinding.addFileMCV.id -> {
+
+                if (requireContext().checkIfPermissionsGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                    if (docType == getString(R.string.pdf)) {
+
+                        chooseImageLauncher.launch("application/pdf")
+                    } else {
+
+                        chooseImageLauncher.launch("image/*")
+                    }
+
+                } else {
+
+                    requestPermission()
+                }
+            }
+        }
+    }
+
+    private fun requestPermission() {
+
+        when {
+
+            //check if permission already granted
+            requireContext().checkIfPermissionsGranted(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+
+                //permission is granted
+            }
+
+            // if the app deems that they should show the request permission rationale
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) -> {
+
+                binding.root.showSnackbarWithActionAndDismissListener(
+                    "Permission is required for selecting image from your storage.",
+                    "Ok",
+                    {
+                        requestPermissionLauncher.launch(
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        )
+                    },
+                    {
+                        //null
+                    }
+                )
+            }
+
+            // request for permission
+            else -> {
+
+                requestPermissionLauncher.launch(
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            }
+        }
+    }
+
+    //[START OF LAUNCHERS]
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+
+        if (isGranted) {
+            Log.i(TAG, "Permission granted: ")
+        } else {
+            Log.i(TAG, "Permission denied: ")
+        }
+    }
+
+    private val chooseImageLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) {
+
+        if (docType == getString(R.string.pdf)) {
+
+            //pdf uri
+            showToast(requireContext(), "Pdf selected")
+
+        } else {
+
+            // image uri
+            showToast(requireContext(), "image selected")
+        }
+    }
+    //[END OF LAUNCHERS]
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
 
@@ -269,7 +375,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             }
         }
     }
-
 
     private fun textWatchers() {
 

@@ -1,7 +1,10 @@
 package com.rohitthebest.manageyourrenters.utils
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.DialogInterface
+import android.net.Uri
+import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -57,9 +60,15 @@ fun TextView.setDateInTextView(timeStamp: Long?, pattern: String = "dd-MM-yyyy")
 
 fun EditText.isTextValid(): Boolean {
 
-    return this.text.toString().trim().isNotEmpty()
-            && this.text.toString().trim().isNotBlank()
-            && this.text.toString().trim() != "null"
+    return this.text.toString().isValid()
+}
+
+fun String?.isValid(): Boolean {
+
+    return this != null
+            && this.trim().isNotEmpty()
+            && this.trim().isNotBlank()
+            && this.trim() != "null"
 }
 
 inline fun EditText.onTextChangedListener(
@@ -128,4 +137,21 @@ inline fun View.showSnackbarWithActionAndDismissListener(
             }
         })
         .show()
+}
+
+fun Uri.getFileName(contentResolver: ContentResolver): String {
+
+    contentResolver
+        .query(
+            this, null, null, null, null
+        )?.use { cursor ->
+
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            //val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+
+            cursor.moveToFirst()
+            return cursor.getString(nameIndex)
+        }
+
+    return ""
 }

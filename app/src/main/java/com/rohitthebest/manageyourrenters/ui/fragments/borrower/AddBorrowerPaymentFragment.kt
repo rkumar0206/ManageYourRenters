@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.Manifest
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -22,12 +23,9 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddBorrowerPayment
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
-import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
-import com.rohitthebest.manageyourrenters.utils.showSnackbarWithActionAndDismissListener
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "AddBorrowerPaymentFragm"
@@ -54,6 +52,9 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     private var selectedDate: Long = 0L
     private var docType = "pdf"
     private var interestType: InterestType = InterestType.SIMPLE_INTEREST
+
+    private var pdfUri: Uri? = null
+    private var imageUri: Uri? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -198,6 +199,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         includeBinding.selectDateBtn.setOnClickListener(this)
         includeBinding.calculateInterestBtn.setOnClickListener(this)
         includeBinding.addFileMCV.setOnClickListener(this)
+        includeBinding.removeFileBtn.setOnClickListener(this)
 
         binding.addBorrowerPaymentToolBar.setNavigationOnClickListener {
 
@@ -241,10 +243,10 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
                     if (docType == getString(R.string.pdf)) {
 
-                        chooseImageLauncher.launch("application/pdf")
+                        chooseDocumentLauncher.launch("application/pdf")
                     } else {
 
-                        chooseImageLauncher.launch("image/*")
+                        chooseDocumentLauncher.launch("image/*")
                     }
 
                 } else {
@@ -252,9 +254,106 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                     requestPermission()
                 }
             }
+
+            includeBinding.removeFileBtn.id -> {
+
+                if (docType == getString(R.string.pdf)) {
+
+                    pdfUri = null
+                } else {
+
+                    imageUri = null
+                }
+
+                includeBinding.fileNameET.setText("")
+
+                showRemoveFileBtn(false)
+                showFileNameEditText(false)
+                showAddFileBtn(true)
+            }
         }
     }
 
+    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+
+        when (buttonView?.id) {
+
+            includeBinding.addInterestCB.id -> showInterestCardView(isChecked)
+
+            includeBinding.addSupprtingDocCB.id -> showAddSupportingDocCardView(isChecked)
+        }
+
+    }
+
+    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+
+        when (checkedId) {
+
+            includeBinding.pdfRB.id -> {
+
+                docType = getString(R.string.pdf)
+                includeBinding.fileNameET.hint = "Enter file name"
+
+                if (pdfUri != null) {
+
+                    showFileNameEditText(true)
+                    showRemoveFileBtn(true)
+                    showAddFileBtn(false)
+                    includeBinding.fileNameET.setText(pdfUri?.getFileName(requireActivity().contentResolver))
+
+                } else {
+
+                    showFileNameEditText(false)
+                    showRemoveFileBtn(false)
+                    showAddFileBtn(true)
+                }
+
+            }
+
+            includeBinding.imageRB.id -> {
+
+                includeBinding.fileNameET.hint = "Enter image name"
+                docType = getString(R.string.image)
+
+                if (imageUri != null) {
+
+                    showFileNameEditText(true)
+                    showRemoveFileBtn(true)
+                    showAddFileBtn(false)
+                    includeBinding.fileNameET.setText(imageUri?.getFileName(requireActivity().contentResolver))
+
+                } else {
+
+                    showFileNameEditText(false)
+                    showRemoveFileBtn(false)
+                    showAddFileBtn(true)
+                }
+            }
+
+            includeBinding.urlRB.id -> {
+
+                includeBinding.fileNameET.hint = "Enter url here"
+                docType = getString(R.string.url)
+
+                includeBinding.fileNameET.setText("")
+
+                showFileNameEditText(true)
+                showAddFileBtn(false)
+                showRemoveFileBtn(false)
+            }
+
+            includeBinding.simpleIntRB.id -> {
+
+                interestType = InterestType.SIMPLE_INTEREST
+            }
+
+            includeBinding.compundIntRB.id -> {
+                interestType = InterestType.COMPOUND_INTEREST
+            }
+        }
+    }
+
+    // adding conditions for requesting permission
     private fun requestPermission() {
 
         when {
@@ -307,74 +406,35 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         }
     }
 
-    private val chooseImageLauncher = registerForActivityResult(
+    private val chooseDocumentLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
-    ) {
+    ) { uri ->
 
-        if (docType == getString(R.string.pdf)) {
+        uri?.let {
 
-            //pdf uri
-            showToast(requireContext(), "Pdf selected")
+            if (docType == getString(R.string.pdf)) {
 
-        } else {
+                //pdf uri
+                pdfUri = uri
+            } else {
 
-            // image uri
-            showToast(requireContext(), "image selected")
+                // image uri
+                imageUri = uri
+            }
+
+            val fileName = it.getFileName(requireActivity().contentResolver)
+
+            if (fileName.isValid()) {
+
+                includeBinding.fileNameET.setText(fileName)
+            }
+
+            showAddFileBtn(false)
+            showFileNameEditText(true)
+            showRemoveFileBtn(true)
         }
     }
     //[END OF LAUNCHERS]
-
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-
-        when (buttonView?.id) {
-
-            includeBinding.addInterestCB.id -> showHideInterestCardView(isChecked)
-
-            includeBinding.addSupprtingDocCB.id -> showHideAddSupportingDocCardView(isChecked)
-        }
-
-    }
-
-    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
-
-        when (checkedId) {
-
-            includeBinding.pdfRB.id -> {
-
-                includeBinding.fileNameET.hint = "Enter file name"
-                docType = getString(R.string.pdf)
-
-                //todo : handle editext and add file btn visiblity
-            }
-
-            includeBinding.imageRB.id -> {
-
-                includeBinding.fileNameET.hint = "Enter image name"
-                docType = getString(R.string.image)
-
-                //todo : handle editext and add file btn visiblity
-            }
-
-            includeBinding.urlRB.id -> {
-
-                includeBinding.fileNameET.hint = "Enter url here"
-                docType = getString(R.string.url)
-
-                showHideFileNameEditText(true)
-                showHideAddFileBtn(false)
-                showHideRemoveFileBtn(false)
-            }
-
-            includeBinding.simpleIntRB.id -> {
-
-                interestType = InterestType.SIMPLE_INTEREST
-            }
-
-            includeBinding.compundIntRB.id -> {
-                interestType = InterestType.COMPOUND_INTEREST
-            }
-        }
-    }
 
     private fun textWatchers() {
 
@@ -412,27 +472,27 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         }
     }
 
-    private fun showHideInterestCardView(isVisible: Boolean) {
+    private fun showInterestCardView(isVisible: Boolean) {
 
         includeBinding.interestCV.isVisible = isVisible
     }
 
-    private fun showHideAddSupportingDocCardView(isVisible: Boolean) {
+    private fun showAddSupportingDocCardView(isVisible: Boolean) {
 
         includeBinding.supportingDocCV.isVisible = isVisible
     }
 
-    private fun showHideAddFileBtn(isVisible: Boolean) {
+    private fun showAddFileBtn(isVisible: Boolean) {
 
         includeBinding.addFileMCV.isVisible = isVisible
     }
 
-    private fun showHideFileNameEditText(isVisible: Boolean) {
+    private fun showFileNameEditText(isVisible: Boolean) {
 
         includeBinding.fileNameET.isVisible = isVisible
     }
 
-    private fun showHideRemoveFileBtn(isVisible: Boolean) {
+    private fun showRemoveFileBtn(isVisible: Boolean) {
 
         includeBinding.removeFileBtn.isVisible = isVisible
     }

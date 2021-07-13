@@ -58,9 +58,9 @@ fun TextView.setDateInTextView(timeStamp: Long?, pattern: String = "dd-MM-yyyy")
 
 }
 
-fun EditText.isTextValid(): Boolean {
+fun EditText?.isTextValid(): Boolean {
 
-    return this.text.toString().isValid()
+    return this?.text.toString().isValid()
 }
 
 fun String?.isValid(): Boolean {

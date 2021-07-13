@@ -5,10 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.CompoundButton
-import android.widget.RadioGroup
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
@@ -26,6 +23,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "AddBorrowerPaymentFragm"
@@ -211,6 +209,67 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         includeBinding.docTypeRG.setOnCheckedChangeListener(this)
         includeBinding.interestTypeRG.setOnCheckedChangeListener(this)
 
+        binding.addBorrowerPaymentToolBar.menu.getItem(R.id.menu_show_bill)
+            .setOnMenuItemClickListener {
+
+                // checking if the form is valid and saving to database
+                if (isFormValid()) {
+
+                }
+                true
+            }
+    }
+
+    private fun isFormValid(): Boolean {
+
+        if (!includeBinding.borrowerPaymentET.editText?.isTextValid()!!) {
+
+            includeBinding.borrowerPaymentET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
+        if (includeBinding.addInterestCB.isChecked) {
+
+            if (!includeBinding.ratePercentET.isTextValid()) {
+
+                includeBinding.ratePercentET.requestFocus()
+                includeBinding.ratePercentET.error = EDIT_TEXT_EMPTY_MESSAGE
+                return false
+            }
+        }
+
+        if (!includeBinding.addSupprtingDocCB.isChecked) {
+
+            if (!includeBinding.fileNameET.isTextValid()) {
+
+                includeBinding.fileNameET.requestFocus()
+                includeBinding.fileNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+                return false
+            }
+
+            if (docType == getString(R.string.pdf) && pdfUri == null) {
+
+                showToast(
+                    requireContext(),
+                    "Please add a pdf file as supporting document.",
+                    duration = Toast.LENGTH_LONG
+                )
+                return false
+            }
+
+            if (docType == getString(R.string.image) && imageUri == null) {
+
+                showToast(
+                    requireContext(),
+                    "Please add an image as supporting document.",
+                    duration = Toast.LENGTH_LONG
+                )
+                return false
+            }
+
+        }
+
+        return includeBinding.borrowerPaymentET.editText?.isTextValid()!!
     }
 
 

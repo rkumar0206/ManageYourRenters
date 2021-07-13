@@ -188,7 +188,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addInterestCB"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -456,17 +456,31 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="32dp"
+                android:layout_marginBottom="24dp"
                 android:hint="File name"
                 android:inputType="textPersonName"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/uploadingFileNoteTV"
                 app:layout_constraintEnd_toStartOf="@+id/removeFileBtn"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView5"
+                app:layout_constraintTop_toBottomOf="@+id/docTypeRG"
                 tools:visibility="gone" />
+
+            <TextView
+                android:id="@+id/uploadingFileNoteTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:padding="3dp"
+                android:text="*For uploading file you need to have  active internet connection."
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/textView5"
+                tools:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/removeFileBtn"
@@ -485,16 +499,16 @@
                 android:id="@+id/addFileMCV"
                 android:layout_width="150dp"
                 android:layout_height="40dp"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="32dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
                 android:visibility="visible"
                 app:cardBackgroundColor="#DEDEDE"
-                app:strokeColor="@color/textColor1"
-                app:strokeWidth="0.5dp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/uploadingFileNoteTV"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView5"
+                app:layout_constraintTop_toBottomOf="@+id/docTypeRG"
+                app:strokeColor="@color/textColor1"
+                app:strokeWidth="0.5dp"
                 tools:visibility="visible">
 
                 <LinearLayout

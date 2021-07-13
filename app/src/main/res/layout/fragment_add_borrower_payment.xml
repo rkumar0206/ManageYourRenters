@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/addBorrowerPaymentAppBar"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
-        android:background="@color/color_white">
+        android:background="@color/color_white"
+        android:visibility="visible"
+        tools:visibility="visible">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/add_borrowerPaymentToolBar"
@@ -29,5 +33,47 @@
             layout="@layout/add_borrower_payment_layout" />
 
     </androidx.core.widget.NestedScrollView>
+
+
+    <LinearLayout
+        android:id="@+id/fileUploadingLL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="#CE1C1B1B"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Please wait while file is uploading."
+            android:textColor="@color/color_white"
+            android:textSize="22sp" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:max="100"
+            android:progress="20" />
+
+        <TextView
+            android:id="@+id/progressTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="0%"
+            android:textColor="@color/color_white"
+            android:textSize="18sp" />
+
+
+    </LinearLayout>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

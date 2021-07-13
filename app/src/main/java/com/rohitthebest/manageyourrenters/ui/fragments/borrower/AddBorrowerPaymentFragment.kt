@@ -15,6 +15,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.InterestTimeSchedule
 import com.rohitthebest.manageyourrenters.data.InterestType
 import com.rohitthebest.manageyourrenters.database.model.Borrower
+import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.AddBorrowerPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
@@ -53,6 +54,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private var pdfUri: Uri? = null
     private var imageUri: Uri? = null
+    private var docUrl = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -195,6 +197,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     private fun initListeners() {
 
         includeBinding.selectDateBtn.setOnClickListener(this)
+        includeBinding.dateTV.setOnClickListener(this)
         includeBinding.calculateInterestBtn.setOnClickListener(this)
         includeBinding.addFileMCV.setOnClickListener(this)
         includeBinding.removeFileBtn.setOnClickListener(this)
@@ -209,15 +212,47 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         includeBinding.docTypeRG.setOnCheckedChangeListener(this)
         includeBinding.interestTypeRG.setOnCheckedChangeListener(this)
 
-        binding.addBorrowerPaymentToolBar.menu.getItem(R.id.menu_show_bill)
+        binding.addBorrowerPaymentToolBar.menu.findItem(R.id.menu_show_bill)
             .setOnMenuItemClickListener {
 
-                // checking if the form is valid and saving to database
-                if (isFormValid()) {
-
-                }
+                checkFormAndInitDatabase()
                 true
             }
+    }
+
+    private fun checkFormAndInitDatabase() {
+
+        // checking if the form is valid and saving to database
+        if (isFormValid()) {
+
+            // checking if the addSupportDocument enabled and the doc type is pdf or image
+            if (includeBinding.addSupprtingDocCB.isChecked
+                && (docType == getString(R.string.pdf) || docType == getString(
+                    R.string.image
+                ))
+            ) {
+
+                // upload the pdf or the image to the firebase storage
+                uploadDocToFirebaseStorage()
+            } else {
+
+            }
+
+            initBorrowerPayment()
+        }
+    }
+
+    private fun uploadDocToFirebaseStorage() {
+
+        // todo : upload the document to the firestore
+    }
+
+    private fun initBorrowerPayment() {
+
+        val borrowerPayment = BorrowerPayment()
+
+        borrowerPayment.modified = System.currentTimeMillis()
+
     }
 
     private fun isFormValid(): Boolean {
@@ -272,25 +307,24 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         return includeBinding.borrowerPaymentET.editText?.isTextValid()!!
     }
 
-
     override fun onClick(v: View?) {
 
+        if (v?.id == includeBinding.dateTV.id || v?.id == includeBinding.selectDateBtn.id) {
+
+            showCalendarDialog(
+                selectedDate,
+                {
+                    requireActivity().supportFragmentManager
+                },
+                { newDate ->
+
+                    selectedDate = newDate
+                    initUI()
+                }
+            )
+        }
+
         when (v?.id) {
-
-            includeBinding.selectDateBtn.id -> {
-
-                showCalendarDialog(
-                    selectedDate,
-                    {
-                        requireActivity().supportFragmentManager
-                    },
-                    { newDate ->
-
-                        selectedDate = newDate
-                        initUI()
-                    }
-                )
-            }
 
             includeBinding.calculateInterestBtn.id -> {
                 //todo : handle this button
@@ -352,6 +386,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
                 docType = getString(R.string.pdf)
                 includeBinding.fileNameET.hint = "Enter file name"
+                showFileUploadNoteTV(true)
 
                 if (pdfUri != null) {
 
@@ -373,6 +408,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
                 includeBinding.fileNameET.hint = "Enter image name"
                 docType = getString(R.string.image)
+                showFileUploadNoteTV(true)
 
                 if (imageUri != null) {
 
@@ -399,6 +435,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 showFileNameEditText(true)
                 showAddFileBtn(false)
                 showRemoveFileBtn(false)
+                showFileUploadNoteTV(false)
             }
 
             includeBinding.simpleIntRB.id -> {
@@ -554,6 +591,30 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     private fun showRemoveFileBtn(isVisible: Boolean) {
 
         includeBinding.removeFileBtn.isVisible = isVisible
+    }
+
+    private fun showFileUploadNoteTV(isVisible: Boolean) {
+
+        includeBinding.uploadingFileNoteTV.isVisible = isVisible
+    }
+
+    private fun showFileUploadLinearLayout() {
+
+        binding.fileUploadingLL.isVisible = true
+        binding.addBorrowerPaymentAppBar.isVisible = false
+
+        //disabling vies
+        includeBinding.calculateInterestBtn.isEnabled = false
+        includeBinding.addSupprtingDocCB.isEnabled = false
+        includeBinding.addInterestCB.isEnabled = false
+        includeBinding.dateTV.isEnabled = false
+        includeBinding.selectDateBtn.isEnabled = false
+        includeBinding.fileNameET.isEnabled = false
+        includeBinding.ratePercentET.isEnabled = false
+        includeBinding.addNoteET.isEnabled = false
+        includeBinding.timeScheduleSpinner.isEnabled = false
+        includeBinding.moneySymbolSpinner.isEnabled = false
+        includeBinding.borrowerPaymentET.isEnabled = false
     }
 
     override fun onDestroyView() {

@@ -226,7 +226,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
 
             borrower.isSynced = true
 
-            FirebaseServiceHelper.uploadDocumentToFireStore(
+            uploadDocumentToFireStore(
                 requireContext(),
                 fromBorrowerToString(borrower),
                 getString(R.string.borrowers),

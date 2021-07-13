@@ -232,7 +232,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
             renter.isSynced = getString(R.string.t)
 
-            FirebaseServiceHelper.uploadDocumentToFireStore(
+            uploadDocumentToFireStore(
                 requireContext(),
                 convertRenterToJSONString(renter),
                 getString(R.string.renters),

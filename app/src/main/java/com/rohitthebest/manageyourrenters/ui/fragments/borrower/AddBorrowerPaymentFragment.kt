@@ -615,6 +615,8 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         includeBinding.timeScheduleSpinner.isEnabled = false
         includeBinding.moneySymbolSpinner.isEnabled = false
         includeBinding.borrowerPaymentET.isEnabled = false
+        includeBinding.interestTypeRG.isEnabled = false
+        includeBinding.docTypeRG.isEnabled = false
     }
 
     override fun onDestroyView() {

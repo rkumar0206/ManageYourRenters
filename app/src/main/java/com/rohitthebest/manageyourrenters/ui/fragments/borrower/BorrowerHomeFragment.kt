@@ -102,7 +102,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
                 borrower.isSynced = true
 
-                FirebaseServiceHelper.uploadDocumentToFireStore(
+                uploadDocumentToFireStore(
                     requireContext(),
                     ConversionWithGson.fromBorrowerToString(borrower),
                     getString(R.string.borrowers),
@@ -168,7 +168,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
                 if (!isUndoClicked && borrower.isSynced) {
 
-                    FirebaseServiceHelper.deleteDocumentFromFireStore(
+                    deleteDocumentFromFireStore(
                         context = requireContext(),
                         collection = getString(R.string.borrowers),
                         documentKey = borrower.key
@@ -190,7 +190,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                     val paymentToDeleteFromFirestore =
                         keysAndIsSyncedList.filter { k -> k.isSynced }.map { k -> k.key }
 
-                    FirebaseServiceHelper.deleteAllDocumentsUsingKey(
+                    deleteAllDocumentsUsingKey(
                         requireContext(),
                         getString(R.string.borrowerPayments),
                         ConversionWithGson.convertStringListToJSON(paymentToDeleteFromFirestore)

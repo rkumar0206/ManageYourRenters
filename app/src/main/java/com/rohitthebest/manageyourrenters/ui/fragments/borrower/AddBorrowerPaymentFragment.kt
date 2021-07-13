@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -11,7 +12,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.Interest
 import com.rohitthebest.manageyourrenters.data.InterestTimeSchedule
 import com.rohitthebest.manageyourrenters.data.InterestType
 import com.rohitthebest.manageyourrenters.database.model.Borrower
@@ -23,6 +27,10 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,7 +62,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private var pdfUri: Uri? = null
     private var imageUri: Uri? = null
-    private var docUrl = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -215,6 +222,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         binding.addBorrowerPaymentToolBar.menu.findItem(R.id.menu_show_bill)
             .setOnMenuItemClickListener {
 
+                Log.d(TAG, "initListeners: Menu item clicked")
                 checkFormAndInitDatabase()
                 true
             }
@@ -222,8 +230,12 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private fun checkFormAndInitDatabase() {
 
+        Log.d(TAG, "checkFormAndInitDatabase: ")
+
         // checking if the form is valid and saving to database
         if (isFormValid()) {
+
+            Log.d(TAG, "checkFormAndInitDatabase: isFormValid")
 
             // checking if the addSupportDocument enabled and the doc type is pdf or image
             if (includeBinding.addSupprtingDocCB.isChecked
@@ -233,26 +245,192 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             ) {
 
                 // upload the pdf or the image to the firebase storage
-                uploadDocToFirebaseStorage()
+
+                if (isInternetAvailable(requireContext())) {
+
+                    uploadDocToFirebaseStorage()
+                } else {
+
+                    showToast(
+                        requireContext(),
+                        "Internet connection required to upload the $docType.",
+                        Toast.LENGTH_LONG
+                    )
+                }
+
             } else {
 
+                // insert the data to the database
+
+                initBorrowerPayment("")
             }
 
-            initBorrowerPayment()
         }
     }
 
+    private var mUploadTask: UploadTask? = null
+
+    @SuppressLint("SetTextI18n")
     private fun uploadDocToFirebaseStorage() {
 
-        // todo : upload the document to the firestore
+        Log.d(TAG, "uploadDocToFirebaseStorage: ")
+
+        try {
+            val fileName = if (docType == getString(R.string.pdf)) {
+
+                "${includeBinding.fileNameET.text.trim()}_${generateKey()}.pdf"
+            } else {
+
+                "${includeBinding.fileNameET.text.trim()}_${generateKey()}.jpg"
+            }
+
+            if (fileName.contains("/")) {
+
+                includeBinding.fileNameET.requestFocus()
+                includeBinding.fileNameET.error = "file name should not contain any '/'"
+                return
+            }
+
+            val storageRef = FirebaseStorage.getInstance()
+                .getReference("${getUid()}/BorrowerPaymentDoc/$docType")
+
+            val fileRef = storageRef.child(fileName)
+
+            showFileUploadLinearLayout()
+
+            uploadFileToFirebaseStorage(
+                if (docType == getString(R.string.pdf)) pdfUri!! else imageUri!!,
+                fileRef,
+                { uploadTask ->
+
+                    Log.d(TAG, "uploadDocToFirebaseStorage: Initialized upload task")
+                    mUploadTask = uploadTask
+                },
+                { task ->
+                    // progress
+
+                    try {
+                        // catching nullPointerException because when
+                        // the upload is interrupted in between by the user when he presses
+                        // back button then binding will become null
+
+                        val progress = (100 * task.bytesTransferred) / task.totalByteCount
+
+                        binding.progressTV.text = "${progress.toInt()}%"
+                        binding.progressBar.progress = progress.toInt()
+
+                    } catch (e: NullPointerException) {
+                        e.printStackTrace()
+                    }
+                },
+                { downloadUrl ->
+                    // complete
+                    Log.d(TAG, "uploadDocToFirebaseStorage: Download url : $downloadUrl")
+
+                    initBorrowerPayment(downloadUrl)
+                },
+                {
+                    // success
+                    Log.d(TAG, "uploadDocToFirebaseStorage: file uploading success")
+                },
+                {
+                    // failure
+                    Log.d(
+                        TAG,
+                        "uploadDocToFirebaseStorage: file uploading failure with exception $it"
+                    )
+                    showToast(requireContext(), "Something went wrong. Please try again...")
+                },
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 
-    private fun initBorrowerPayment() {
+    private fun initBorrowerPayment(downloadUrl: String) {
+
+        Log.d(TAG, "initBorrowerPayment: ")
 
         val borrowerPayment = BorrowerPayment()
 
         borrowerPayment.modified = System.currentTimeMillis()
+        borrowerPayment.isSynced = false
 
+        borrowerPayment.apply {
+
+            created = selectedDate
+            borrowerId = receivedBorrower?.borrowerId!!
+            borrowerKey = receivedBorrowerKey
+            amountTakenOnRent =
+                includeBinding.borrowerPaymentET.editText?.text.toString().toDouble()
+            dueLeftAmount = amountTakenOnRent
+            isDueCleared = false
+            isSupportingDocAdded = includeBinding.addSupprtingDocCB.isChecked
+
+            if (isSupportingDocAdded) {
+
+                supportingDocumentType = docType
+
+                supportingDocumentUrl = if (docType == getString(R.string.url)) {
+
+                    includeBinding.fileNameET.text.toString().trim()
+                } else {
+
+                    downloadUrl
+                }
+            }
+
+            isInterestAdded = includeBinding.addInterestCB.isChecked
+
+            if (isInterestAdded) {
+
+                interest = Interest(
+                    interestType,
+                    includeBinding.ratePercentET.text.toString().toDouble(),
+                    selectedInterestTimeSchedule
+                )
+            }
+
+            uid = getUid()!!
+
+            key = generateKey("_${uid}")
+
+            messageOrNote = includeBinding.addNoteET.text.toString()
+        }
+
+        if (isInternetAvailable(requireContext())) {
+
+            borrowerPayment.isSynced = true
+
+            uploadDocumentToFireStore(
+                requireContext(),
+                fromBorrowerPaymentToString(borrowerPayment),
+                getString(R.string.borrowerPayments),
+                borrowerPayment.key
+            )
+
+            insertToDatabase(borrowerPayment)
+        } else {
+
+            borrowerPayment.isSynced = false
+            insertToDatabase(borrowerPayment)
+        }
+    }
+
+    private fun insertToDatabase(borrowerPayment: BorrowerPayment) {
+
+        Log.d(TAG, "insertToDatabase: ")
+
+        borrowerPaymentViewModel.insertBorrowerPayment(
+            borrowerPayment
+        )
+
+        receivedBorrower?.modified = System.currentTimeMillis()
+
+        borrowerViewModel.updateBorrower(receivedBorrower!!)
+
+        requireActivity().onBackPressed()
     }
 
     private fun isFormValid(): Boolean {
@@ -273,7 +451,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             }
         }
 
-        if (!includeBinding.addSupprtingDocCB.isChecked) {
+        if (includeBinding.addSupprtingDocCB.isChecked) {
 
             if (!includeBinding.fileNameET.isTextValid()) {
 
@@ -369,6 +547,8 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
 
+        hideKeyBoard(requireActivity())
+
         when (buttonView?.id) {
 
             includeBinding.addInterestCB.id -> showInterestCardView(isChecked)
@@ -379,6 +559,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     }
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+        hideKeyBoard(requireActivity())
 
         when (checkedId) {
 
@@ -602,8 +783,9 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         binding.fileUploadingLL.isVisible = true
         binding.addBorrowerPaymentAppBar.isVisible = false
+        hideKeyBoard(requireActivity())
 
-        //disabling vies
+        //disabling views
         includeBinding.calculateInterestBtn.isEnabled = false
         includeBinding.addSupprtingDocCB.isEnabled = false
         includeBinding.addInterestCB.isEnabled = false
@@ -616,11 +798,27 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         includeBinding.moneySymbolSpinner.isEnabled = false
         includeBinding.borrowerPaymentET.isEnabled = false
         includeBinding.interestTypeRG.isEnabled = false
-        includeBinding.docTypeRG.isEnabled = false
+        includeBinding.compundIntRB.isEnabled = false
+        includeBinding.simpleIntRB.isEnabled = false
+        includeBinding.imageRB.isEnabled = false
+        includeBinding.pdfRB.isEnabled = false
+        includeBinding.urlRB.isEnabled = false
+        includeBinding.addFileMCV.isEnabled = false
+        includeBinding.removeFileBtn.isEnabled = false
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+
+        if (mUploadTask != null && (mUploadTask?.isInProgress!! || !mUploadTask?.isComplete!!)) {
+
+            mUploadTask!!.pause()
+        }
+
+        hideKeyBoard(requireActivity())
+
+
         _binding = null
     }
 

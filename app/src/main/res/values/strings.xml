@@ -90,6 +90,7 @@
     <string name="pdf">pdf</string>
     <string name="image">image</string>
     <string name="url">url</string>
+    <string name="please_wait_while_file_is_uploading">Please wait while file is uploading…</string>
 
 
     <string-array name="interest_time_schedule">

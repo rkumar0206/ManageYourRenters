@@ -182,7 +182,7 @@ class Functions {
         }
 
 
-        fun Long.toStringM(radix: Int = 0): String {
+        fun Long.toStringM(radix: Int = 65): String {
 
             val values = arrayOf(
                 "0",
@@ -278,7 +278,7 @@ class Functions {
             return d.toString()
         }
 
-        fun generateKey(appendString: String = "", radix: Int = 69): String {
+        fun generateKey(appendString: String = "", radix: Int = 68): String {
 
             return "${System.currentTimeMillis().toStringM(radix)}_${
                 Random.nextLong(

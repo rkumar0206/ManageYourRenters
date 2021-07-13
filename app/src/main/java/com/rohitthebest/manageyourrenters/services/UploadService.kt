@@ -13,9 +13,10 @@ import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
-import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoPayment
-import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONtoRenter
-import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.fromStringToBorrower
+import com.rohitthebest.manageyourrenters.utils.convertJSONtoPayment
+import com.rohitthebest.manageyourrenters.utils.convertJSONtoRenter
+import com.rohitthebest.manageyourrenters.utils.fromStringToBorrower
+import com.rohitthebest.manageyourrenters.utils.fromStringToBorrowerPayment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -90,6 +91,19 @@ class UploadService : Service() {
                         )
                         stopSelf()
                     }
+                }
+
+                getString(R.string.borrowerPayments) -> {
+
+                    if (insertToFireStore(docRef, fromStringToBorrowerPayment(uploadData!!))) {
+
+                        Log.d(
+                            TAG,
+                            "onStartCommand: Uploaded borrower payment to collection $collection with key $key"
+                        )
+                        stopSelf()
+                    }
+
                 }
 
                 else -> {

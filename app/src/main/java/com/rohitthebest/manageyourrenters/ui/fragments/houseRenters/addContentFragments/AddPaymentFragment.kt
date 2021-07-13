@@ -33,8 +33,6 @@ import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSA
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
-import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertPaymentToJSONString
-import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertRenterToJSONString
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -172,7 +170,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     AddPaymentFragmentArgs.fromBundle(it)
                 }
 
-                receivedRenter = ConversionWithGson.convertJSONtoRenter(args?.renterInfoMessage)
+                receivedRenter = convertJSONtoRenter(args?.renterInfoMessage)
             }
         } catch (e: Exception) {
             e.printStackTrace()

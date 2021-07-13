@@ -10,7 +10,7 @@ import com.google.firebase.firestore.WriteBatch
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.KEY_LIST_KEY
-import com.rohitthebest.manageyourrenters.utils.ConversionWithGson.Companion.convertJSONToStringList
+import com.rohitthebest.manageyourrenters.utils.convertJSONToStringList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

@@ -104,7 +104,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
                 uploadDocumentToFireStore(
                     requireContext(),
-                    ConversionWithGson.fromBorrowerToString(borrower),
+                    fromBorrowerToString(borrower),
                     getString(R.string.borrowers),
                     borrower.key
                 )
@@ -193,7 +193,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                     deleteAllDocumentsUsingKey(
                         requireContext(),
                         getString(R.string.borrowerPayments),
-                        ConversionWithGson.convertStringListToJSON(paymentToDeleteFromFirestore)
+                        convertStringListToJSON(paymentToDeleteFromFirestore)
                     )
 
                     borrowerPaymentViewModel.deleteAllBorrowerPaymentsByBorrowerKey(borrowerKey = borrower.key)

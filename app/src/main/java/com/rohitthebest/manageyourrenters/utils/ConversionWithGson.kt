@@ -3,57 +3,61 @@ package com.rohitthebest.manageyourrenters.utils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.database.model.Borrower
+import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.database.model.Payment
 import com.rohitthebest.manageyourrenters.database.model.Renter
 
-class ConversionWithGson {
+private val gson = Gson()
 
-    companion object {
+fun convertRenterToJSONString(renter: Renter): String {
 
-        private val gson = Gson()
+    return gson.toJson(renter)
+}
 
-        fun convertRenterToJSONString(renter: Renter): String {
+fun convertJSONtoRenter(jsonString: String?): Renter {
 
-            return gson.toJson(renter)
-        }
+    val type = object : TypeToken<Renter?>() {}.type
+    return gson.fromJson(jsonString, type)
+}
 
-        fun convertJSONtoRenter(jsonString: String?): Renter {
+fun convertPaymentToJSONString(payment: Payment): String {
 
-            val type = object : TypeToken<Renter?>() {}.type
-            return gson.fromJson(jsonString, type)
-        }
+    return gson.toJson(payment)
+}
 
-        fun convertPaymentToJSONString(payment: Payment): String {
+fun convertJSONtoPayment(jsonString: String?): Payment {
 
-            return gson.toJson(payment)
-        }
+    val type = object : TypeToken<Payment?>() {}.type
+    return gson.fromJson(jsonString, type)
+}
 
-        fun convertJSONtoPayment(jsonString: String?): Payment {
+fun convertStringListToJSON(list: List<String?>): String {
 
-            val type = object : TypeToken<Payment?>() {}.type
-            return gson.fromJson(jsonString, type)
-        }
+    return gson.toJson(list)
+}
 
-        fun convertStringListToJSON(list: List<String?>): String {
+fun convertJSONToStringList(jsonString: String?): List<String?> {
 
-            return gson.toJson(list)
-        }
+    val type = object : TypeToken<List<String?>>() {}.type
+    return gson.fromJson(jsonString, type)
+}
 
-        fun convertJSONToStringList(jsonString: String?): List<String?> {
+fun fromBorrowerToString(borrower: Borrower): String {
 
-            val type = object : TypeToken<List<String?>>() {}.type
-            return gson.fromJson(jsonString, type)
-        }
+    return gson.toJson(borrower)
+}
 
-        fun fromBorrowerToString(borrower: Borrower): String {
+fun fromStringToBorrower(str: String): Borrower {
 
-            return gson.toJson(borrower)
-        }
+    return gson.fromJson(str, object : TypeToken<Borrower>() {}.type)
+}
 
-        fun fromStringToBorrower(str: String): Borrower {
+fun fromBorrowerPaymentToString(borrowerPayment: BorrowerPayment): String {
 
-            return gson.fromJson(str, object : TypeToken<Borrower>() {}.type)
-        }
+    return Gson().toJson(borrowerPayment)
+}
 
-    }
+fun fromStringToBorrowerPayment(str: String): BorrowerPayment {
+
+    return Gson().fromJson(str, object : TypeToken<BorrowerPayment>() {}.type)
 }

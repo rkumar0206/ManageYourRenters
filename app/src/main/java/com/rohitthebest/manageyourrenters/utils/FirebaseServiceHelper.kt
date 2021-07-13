@@ -134,15 +134,18 @@ fun deleteAllDocumentsUsingKey(
 inline fun uploadFileToFirebaseStorage(
     documentUri: Uri,
     fileReference: StorageReference,  // should be complete reference like mStorageRef.child(fileName)
+    crossinline uploadTask: (UploadTask) -> Unit,
     crossinline progressListener: (UploadTask.TaskSnapshot) -> Unit,
     crossinline completeListener: (String) -> Unit,  // sending download url
     crossinline successListener: (Uri) -> Unit,
     crossinline failureListener: (Exception) -> Unit
 ) {
 
-    fileReference.putFile(documentUri).let { uploadTask ->
+    fileReference.putFile(documentUri).let { mUploadTask ->
 
-        uploadTask.addOnProgressListener { taskSnapshot -> // UploadTask.TaskSnapshot
+        uploadTask(mUploadTask)
+
+        mUploadTask.addOnProgressListener { taskSnapshot -> // UploadTask.TaskSnapshot
 
             progressListener(taskSnapshot)
         }.continueWithTask { task -> // Task<UploadTask.TaskSnapshot!>

@@ -84,16 +84,17 @@ class ShowPaymentAdapter :
                         if(it.extraFieldName?.trim()?.isEmpty()!!){
 
                             paymentAdapterNetDemandTV.text =
-                                "Net demand : ${it.extraAmount}"
+                                "Net demand : ${it.currencySymbol} ${it.extraAmount}"
                         }else {
 
                             paymentAdapterNetDemandTV.text =
-                                "${it.extraFieldName} : ${it.extraAmount}"
+                                "${it.extraFieldName} : ${it.currencySymbol} ${it.extraAmount}"
                         }
 
                     } else {
 
-                        paymentAdapterNetDemandTV.text = "Net demand : ${it.totalRent}"
+                        paymentAdapterNetDemandTV.text =
+                            "Net demand : ${it.currencySymbol} ${it.totalRent}"
                     }
 
                     //total rent
@@ -111,7 +112,8 @@ class ShowPaymentAdapter :
                         )
                     }
 
-                    paymentAdapterAmountPaidTV.text = "Amount paid : ${it.amountPaid}"
+                    paymentAdapterAmountPaidTV.text =
+                        "Amount paid : ${it.currencySymbol} ${it.amountPaid}"
 
                     if (it.isSynced == binding.root.context.getString(R.string.t)) {
 

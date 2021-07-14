@@ -14,6 +14,7 @@ data class Payment(
     var renterKey: String,  //used for getting the information of renter
     var bill: BillInfo?,
     var electricBill: ElectricityBillInfo?,
+    var currencySymbol: String = "₹",
     var houseRent: String,
     var isTakingParkingBill: String = "false",
     var parkingRent: String?,
@@ -36,6 +37,7 @@ data class Payment(
         "",
         BillInfo(),
         ElectricityBillInfo(),
+        "₹",
         "",
         "false",
         "",

@@ -61,19 +61,19 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private var receivedRenter: Renter? = null
     private var currentTimestamp = 0L
 
-    private var monthList: List<String>? = null
-    private var currencyList: List<String>? = null
+    private lateinit var monthList: List<String>
+    private lateinit var currencyList: List<String>
 
     private var periodType: String = ""
     private var billMonth: String? = null
     private var billMonthNumber = 1
-    private var currencySymbol: String? = null
+    private var currencySymbol: String = ""
     private var selectedYear: Int = 0
 
     //if selected by_date method
     private var fromDateTimestamp: Long? = null
     private var tillDateTimeStamp: Long? = null
-    private var numberOfDays: String? = ""
+    private var numberOfDays: String = ""
 
     private var lastPaymentInfo: Payment? = null
     private var duesOrAdvanceAmount: Double = 0.0
@@ -203,7 +203,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             periodType = getString(R.string.by_month)
 
-            billMonth = monthList?.get(0)
+            billMonth = monthList[0]
             billMonthNumber = 1
 
             fromDateTimestamp = currentTimestamp
@@ -251,7 +251,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             } else {
 
-                currencySymbol = currencyList?.get(0)
+                currencySymbol = currencyList[0]
 
                 calculateTotalBill()
 
@@ -335,33 +335,31 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         includeBinding.monthSelectSpinner.let { spinner ->
 
-            if (monthList != null) {
-                spinner.adapter = ArrayAdapter(
-                    requireContext(),
-                    R.layout.support_simple_spinner_dropdown_item,
-                    monthList!!
-                )
+            spinner.adapter = ArrayAdapter(
+                requireContext(),
+                R.layout.support_simple_spinner_dropdown_item,
+                monthList
+            )
 
-                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                override fun onNothingSelected(parent: AdapterView<*>?) {
 
-                        spinner.setSelection(0)
-                        billMonth = monthList!![0]
-                        billMonthNumber = 1
-                    }
+                    spinner.setSelection(0)
+                    billMonth = monthList[0]
+                    billMonthNumber = 1
+                }
 
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
 
-                        spinner.setSelection(position)
-                        billMonth = monthList!![position]
-                        billMonthNumber = position + 1
-                    }
+                    spinner.setSelection(position)
+                    billMonth = monthList[position]
+                    billMonthNumber = position + 1
                 }
             }
         }
@@ -421,33 +419,31 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         includeBinding.moneySymbolSpinner.let { spinner ->
 
-            if (currencyList != null) {
-                spinner.adapter = ArrayAdapter(
-                    requireContext(),
-                    R.layout.support_simple_spinner_dropdown_item,
-                    currencyList!!
-                )
+            spinner.adapter = ArrayAdapter(
+                requireContext(),
+                R.layout.support_simple_spinner_dropdown_item,
+                currencyList
+            )
 
-                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                override fun onNothingSelected(parent: AdapterView<*>?) {
 
-                        spinner.setSelection(0)
-                        currencySymbol = currencyList!![0]
-                    }
+                    spinner.setSelection(0)
+                    currencySymbol = currencyList[0]
+                }
 
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
 
-                        spinner.setSelection(position)
-                        currencySymbol = currencyList!![position]
-                        calculateTotalBill()
-                        //showToast(requireContext(), "${currencyList!![position]} is selected..")
-                    }
+                    spinner.setSelection(position)
+                    currencySymbol = currencyList[position]
+                    calculateTotalBill()
+                    //showToast(requireContext(), "${currencyList!![position]} is selected..")
                 }
             }
         }
@@ -553,7 +549,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private fun setNumberOfDays() {
 
         includeBinding.byDateErrorMessageTV.text = when {
-            numberOfDays!!.toInt() > 0 -> {
+            numberOfDays.toInt() > 0 -> {
 
                 includeBinding.byDateErrorMessageTV.changeTextColor(
                     requireContext(),
@@ -562,7 +558,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 "Number of Days : $numberOfDays"
             }
-            numberOfDays!!.toInt() < 0 -> {
+            numberOfDays.toInt() < 0 -> {
 
                 includeBinding.byDateErrorMessageTV.changeTextColor(
                     requireContext(),
@@ -906,6 +902,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 receivedRenter?.key!!,
                 billInfo,
                 electricityBillInfo,
+                currencySymbol,
                 houseRent.toString(),
                 if (parkingBill == 0.0) {
                     getString(R.string.f)

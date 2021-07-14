@@ -13,6 +13,7 @@ data class BorrowerPayment(
     var modified: Long = System.currentTimeMillis(),
     var borrowerId: String,
     var borrowerKey: String,
+    var currencySymbol: String = "₹",
     var amountTakenOnRent: Double = 0.0,
     var dueLeftAmount: Double = 0.0,   // will be updated if the borrower does the partial payments
     var isDueCleared: Boolean = false,
@@ -33,6 +34,7 @@ data class BorrowerPayment(
         0L,
         "",
         "",
+        "₹",
         0.0,
         0.0,
         false,

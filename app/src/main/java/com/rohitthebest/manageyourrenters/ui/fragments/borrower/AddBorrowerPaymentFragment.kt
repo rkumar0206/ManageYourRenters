@@ -77,7 +77,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         initUI()
 
-        getMessage()
+        getMessage()  // getting the message passed by thr BorrowerPaymentFragment
 
         initListeners()
         textWatchers()
@@ -356,6 +356,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         borrowerPayment.modified = System.currentTimeMillis()
         borrowerPayment.isSynced = false
+        borrowerPayment.currencySymbol = selectedCurrencySymbol
 
         borrowerPayment.apply {
 
@@ -814,6 +815,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         if (mUploadTask != null && (mUploadTask?.isInProgress!! || !mUploadTask?.isComplete!!)) {
 
             mUploadTask!!.pause()
+            mUploadTask!!.cancel()
         }
 
         hideKeyBoard(requireActivity())

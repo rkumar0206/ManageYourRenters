@@ -91,7 +91,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         findNavController().navigate(action)
     }
 
-    override fun onSyncButtonClicked(borrower: Borrower?) {
+    override fun onSyncButtonClicked(borrower: Borrower?, position: Int) {
 
         if (isInternetAvailable(requireContext())) {
 
@@ -109,7 +109,9 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                     borrower.key
                 )
 
-                borrowerViewModel.insertBorrower(borrower)
+                borrowerViewModel.updateBorrower(borrower)
+
+                borrowerAdapter.notifyItemChanged(position)
             }
 
         } else {

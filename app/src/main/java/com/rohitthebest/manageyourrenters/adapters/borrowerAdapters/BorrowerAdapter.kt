@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.AdapterShowRenterBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.hide
 
 class BorrowerAdapter :
@@ -43,7 +44,10 @@ class BorrowerAdapter :
 
                     binding.adapterIsSyncedBtn.id -> {
 
-                        mListener!!.onSyncButtonClicked(getItem(absoluteAdapterPosition))
+                        mListener!!.onSyncButtonClicked(
+                            getItem(absoluteAdapterPosition),
+                            absoluteAdapterPosition
+                        )
                     }
 
                     binding.adapterRenterDeleteBtn.id -> {
@@ -69,6 +73,11 @@ class BorrowerAdapter :
 
                     textView23.hide()
                     adapterRenterAddressTV.hide()
+
+                    adapterRoomNumTV.changeTextColor(
+                        binding.root.context,
+                        R.color.color_orange
+                    )
 
                     // using room number textView for showing the due amount of the borrower
                     adapterRoomNumTV.text = "Total Due : ₹ ${b.totalDueAmount}"
@@ -147,7 +156,7 @@ class BorrowerAdapter :
     interface OnClickListener {
 
         fun onBorrowerClicked(borrowerKey: String)
-        fun onSyncButtonClicked(borrower: Borrower?)
+        fun onSyncButtonClicked(borrower: Borrower?, position: Int)
         fun onDeleteClicked(borrower: Borrower?)
         fun onEditClicked(borrowerKey: String)
     }

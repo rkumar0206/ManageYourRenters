@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.rohitthebest.manageyourrenters.R
@@ -34,6 +35,8 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val TAG = "AddBorrowerPaymentFragm"
 
@@ -427,11 +430,38 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             borrowerPayment
         )
 
-        receivedBorrower?.modified = System.currentTimeMillis()
+        borrowerPaymentViewModel.getTotalDueOfTheBorrower(receivedBorrowerKey).observe(
+            viewLifecycleOwner, {
 
-        borrowerViewModel.updateBorrower(receivedBorrower!!)
+                receivedBorrower?.totalDueAmount = it
+                receivedBorrower?.modified = System.currentTimeMillis()
+                receivedBorrower?.isSynced = false
 
-        requireActivity().onBackPressed()
+                val map = HashMap<String, Any?>()
+                map["totalDueAmount"] = it
+
+                if (isInternetAvailable(requireContext())) {
+
+                    receivedBorrower?.isSynced = true
+
+                    updateDocumentOnFireStore(
+                        requireContext(),
+                        map = map,
+                        getString(R.string.borrowers),
+                        receivedBorrowerKey
+                    )
+                }
+
+                borrowerViewModel.updateBorrower(receivedBorrower!!)
+            }
+        )
+
+        lifecycleScope.launch {
+
+            delay(150)
+
+            requireActivity().onBackPressed()
+        }
     }
 
     private fun isFormValid(): Boolean {

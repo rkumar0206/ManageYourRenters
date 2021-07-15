@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.BorrowerPaymentAdapter
 import com.rohitthebest.manageyourrenters.database.model.Borrower
@@ -14,6 +15,7 @@ import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
+import com.rohitthebest.manageyourrenters.utils.isValid
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "BorrowerPaymentFragment"
@@ -123,8 +125,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     }
 
     override fun onItemClick(borrowerPayment: BorrowerPayment) {
-
-
+        //todo  : open bottom sheet to add partial payment
     }
 
     override fun onDeleteBtnClick(borrowerPayment: BorrowerPayment) {
@@ -136,7 +137,23 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     }
 
     override fun onShowMessageBtnClick(message: String) {
-        //TODO("Not yet implemented")
+
+        var m = message
+
+        if (!message.isValid()) {
+
+            m = "No message added!!!"
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Message")
+            .setMessage(m)
+            .setPositiveButton("Ok") { dialog, _ ->
+
+                dialog.dismiss()
+            }
+            .create()
+            .show()
     }
 
     override fun onShowDocumentBtnClick(borrowerPayment: BorrowerPayment) {

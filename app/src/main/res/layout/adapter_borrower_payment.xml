@@ -8,6 +8,7 @@
     app:cardCornerRadius="5dp">
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/adapterBorrowerPaymentMCV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:cardCornerRadius="5dp"
@@ -26,10 +27,10 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:ellipsize="end"
-                android:maxLines="2"
+                android:maxLines="1"
                 android:padding="4dp"
                 android:textColor="@color/color_green"
-                android:textSize="22sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toStartOf="@+id/dueAmountTV"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -43,7 +44,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:ellipsize="end"
-                android:maxLines="2"
+                android:gravity="end"
+                android:maxLines="1"
                 android:padding="4dp"
                 android:textColor="@color/color_Red"
                 android:textSize="22sp"
@@ -61,10 +63,10 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:ellipsize="end"
-                android:maxLines="2"
+                android:maxLines="1"
                 android:padding="4dp"
-                android:textColor="@color/color_orange"
-                android:textSize="22sp"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toStartOf="@+id/borrowedPaymentDateTV"
                 app:layout_constraintStart_toStartOf="parent"
@@ -107,7 +109,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/paidAmountTV" />
+                app:layout_constraintTop_toBottomOf="@id/dueAmountTV" />
 
             <ImageButton
                 android:id="@+id/interestBtn"
@@ -122,7 +124,6 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider40"
-                app:layout_constraintVertical_bias="0.0"
                 app:srcCompat="@drawable/ic_interest"
                 tools:targetApi="o" />
 
@@ -160,11 +161,11 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/color_white"
                 android:tooltipText="delete"
-                app:layout_constraintBottom_toBottomOf="@+id/syncBtn"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/syncBtn"
-                app:layout_constraintTop_toTopOf="@+id/syncBtn"
+                app:layout_constraintStart_toEndOf="@+id/editBorrowerPaymentBtn"
+                app:layout_constraintTop_toTopOf="@+id/editBorrowerPaymentBtn"
                 app:srcCompat="@drawable/ic_baseline_delete_24"
                 tools:targetApi="o" />
 
@@ -175,12 +176,24 @@
                 android:backgroundTint="@color/color_white"
                 android:tooltipText="sync with cloud"
                 app:layout_constraintBottom_toBottomOf="@+id/messageBtn"
-                app:layout_constraintEnd_toStartOf="@+id/deleteBtn"
+                app:layout_constraintEnd_toStartOf="@+id/editBorrowerPaymentBtn"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/messageBtn"
                 app:layout_constraintTop_toTopOf="@+id/messageBtn"
                 app:srcCompat="@drawable/ic_baseline_sync_24_green"
                 tools:targetApi="o" />
+
+            <ImageButton
+                android:id="@+id/editBorrowerPaymentBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/color_white"
+                app:layout_constraintBottom_toBottomOf="@+id/syncBtn"
+                app:layout_constraintEnd_toStartOf="@+id/deleteBtn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/syncBtn"
+                app:layout_constraintTop_toTopOf="@+id/syncBtn"
+                app:srcCompat="@drawable/ic_baseline_edit_24" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

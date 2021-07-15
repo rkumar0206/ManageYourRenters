@@ -472,6 +472,12 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             return false
         }
 
+        if (includeBinding.borrowerPaymentET.editText?.text.toString().toDouble() <= 0) {
+
+            includeBinding.borrowerPaymentET.error = "Please enter amount greater than 0."
+            return false
+        }
+
         if (includeBinding.addInterestCB.isChecked) {
 
             if (!includeBinding.ratePercentET.isTextValid()) {

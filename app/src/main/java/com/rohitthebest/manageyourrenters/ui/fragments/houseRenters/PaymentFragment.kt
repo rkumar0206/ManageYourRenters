@@ -2,8 +2,6 @@ package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,6 +71,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         getMessage()
         initListener()
+        setUpRecyclerView()
     }
 
     private fun getMessage() {
@@ -119,15 +118,15 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         try {
 
             paymentViewModel.getAllPaymentsListOfRenter(receivedRenter?.key!!)
-                .observe(viewLifecycleOwner) {
+                .observe(viewLifecycleOwner) { paymentList ->
 
-                    if (it.isNotEmpty()) {
+                    if (paymentList.isNotEmpty()) {
 
                         hideNoPaymentsTV()
-                        initializeSearchView(it)
+                        initializeSearchView(paymentList)
 
                         paymentKeyList =
-                            it.filter { payment -> payment.isSynced == getString(R.string.t) }
+                            paymentList.filter { payment -> payment.isSynced == getString(R.string.t) }
                                 .map { pay ->
 
                                     pay.key
@@ -135,12 +134,14 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                         updateCurrentDueOrAdvanceTV()
 
+                        mAdapter.submitList(paymentList)
+
                     } else {
 
                         showNoPaymentsTV()
                     }
 
-                    setUpRecyclerView(it)
+                    hideProgressBar()
                 }
 
         } catch (e: Exception) {
@@ -174,83 +175,64 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         }
     }
 
-    private fun initializeSearchView(it: List<Payment>?) {
+    private fun initializeSearchView(paymentList: List<Payment>?) {
 
         try {
 
-            binding.paymentSV.addTextChangedListener(object : TextWatcher {
+            binding.paymentSV.onTextChangedListener { s ->
 
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
+                if (s?.isEmpty()!!) {
 
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    binding.paymentRV.scrollToPosition(0)
+                    mAdapter.submitList(paymentList)
+                } else {
 
-                    if (s?.isEmpty()!!) {
+                    val filteredList = paymentList?.filter { payment ->
 
-                        setUpRecyclerView(it)
-                    } else {
+                        var from: String? = ""
+                        var till: String? = ""
 
+                        if (payment.bill?.billPeriodType == getString(R.string.by_date)) {
 
-                        val filteredList = it?.filter { payment ->
+                            from =
+                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                    payment.bill?.billDateFrom
+                                )
 
-                            var from: String? = ""
-                            var till: String? = ""
-
-                            if (payment.bill?.billPeriodType == getString(R.string.by_date)) {
-
-                                from =
-                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                        payment.bill?.billDateFrom
-                                    )
-
-                                till =
-                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                        payment.bill?.billDateTill
-                                    )
-                            }
-
-                            payment.bill?.billMonth?.toLowerCase(Locale.ROOT)?.contains(
-
-                                s.toString().trim().toLowerCase(Locale.ROOT)
-                            )!! ||
-                                    from?.contains(s.toString().trim())!!
-                                    ||
-                                    till?.contains(s.toString().trim())!!
-
+                            till =
+                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                    payment.bill?.billDateTill
+                                )
                         }
 
-                        setUpRecyclerView(filteredList)
+                        payment.bill?.billMonth?.toLowerCase(Locale.ROOT)?.contains(
+
+                            s.toString().trim().toLowerCase(Locale.ROOT)
+                        )!! ||
+                                from?.contains(s.toString().trim())!!
+                                ||
+                                till?.contains(s.toString().trim())!!
+
                     }
+
+                    mAdapter.submitList(filteredList)
                 }
 
-                override fun afterTextChanged(s: Editable?) {}
-            })
-
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private fun setUpRecyclerView(paymentList: List<Payment>?) {
+    private fun setUpRecyclerView() {
 
         try {
 
-            paymentList?.let {
+            binding.paymentRV.apply {
 
-                mAdapter.submitList(it)
-
-                binding.paymentRV.apply {
-
-                    adapter = mAdapter
-                    layoutManager = LinearLayoutManager(requireContext())
-                    setHasFixedSize(true)
-                }
-
+                adapter = mAdapter
+                layoutManager = LinearLayoutManager(requireContext())
+                setHasFixedSize(true)
             }
 
             mAdapter.setOnClickListener(this)
@@ -259,8 +241,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
             e.printStackTrace()
         }
-
-        hideProgressBar()
     }
 
     override fun onPaymentClick(payment: Payment) {
@@ -561,7 +541,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     private fun deletePayment(payment: Payment) {
 
         paymentViewModel.deletePayment(payment)
-        updateRenterDuesOrAdvance()
+        updateRenterDuesOrAdvanceTextView()
 
         getPaymentListOfRenter()
 
@@ -574,7 +554,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 isUndoClicked = true
 
                 paymentViewModel.insertPayment(payment)
-                updateRenterDuesOrAdvance()
+                updateRenterDuesOrAdvanceTextView()
                 getPaymentListOfRenter()
 
                 showToast(requireContext(), "Payment restored...")
@@ -583,7 +563,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 if (!isUndoClicked && payment.isSynced == getString(R.string.t)) {
 
                     //updateRenterDuesOrAdvance()
-                    editRenterInDatabase(receivedRenter!!)
+                    updateRenterInDatabase(receivedRenter!!)
 
                     deleteDocumentFromFireStore(
                         context = requireContext(),
@@ -596,7 +576,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         )
     }
 
-    private fun updateRenterDuesOrAdvance() {
+    private fun updateRenterDuesOrAdvanceTextView() {
 
         var dueOrAdvance: Double
         paymentViewModel.getAllPaymentsListOfRenter(receivedRenter?.key!!).observe(
@@ -621,7 +601,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         }
     }
 
-    private fun editRenterInDatabase(renter: Renter) {
+    private fun updateRenterInDatabase(renter: Renter) {
 
         if (isInternetAvailable(requireContext())) {
 
@@ -716,9 +696,9 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 } else {
 
                     MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Are you sure?")
+                        .setTitle("Delete all payments?")
                         .setMessage(getString(R.string.delete_warning_message))
-                        .setPositiveButton("Delete") { dialogInterface, _ ->
+                        .setPositiveButton("Delete All") { dialogInterface, _ ->
 
                             if (isInternetAvailable(requireContext())) {
 
@@ -766,7 +746,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         receivedRenter?.dueOrAdvanceAmount = 0.0
 
-        editRenterInDatabase(receivedRenter!!)
+        updateRenterInDatabase(receivedRenter!!)
     }
 
     private fun showNoPaymentsTV() {

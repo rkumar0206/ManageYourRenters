@@ -18,6 +18,8 @@ class BorrowerRepository @Inject constructor(
 
     suspend fun deleteAllBorrower() = dao.deleteAllBorrower()
 
+    suspend fun deleteBorrowerByIsSynced(isSynced: Boolean) = dao.deleteBorrowerByIsSynced(isSynced)
+
     fun getAllBorrower() = dao.getAllBorrower()
 
     fun getBorrowerByKey(borrowerKey: String) = dao.getBorrowerByKey(borrowerKey)

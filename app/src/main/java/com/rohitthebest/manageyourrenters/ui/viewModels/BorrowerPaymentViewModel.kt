@@ -18,7 +18,7 @@ class BorrowerPaymentViewModel @Inject constructor(
         repository.insertBorrowerPayment(borrowerPayment)
     }
 
-    fun insertAllBorrowerPayment(borrowerPayments: List<BorrowerPayment>) = viewModelScope.launch {
+    fun insertBorrowerPayments(borrowerPayments: List<BorrowerPayment>) = viewModelScope.launch {
         repository.insertAllBorrowerPayment(borrowerPayments)
     }
 
@@ -38,6 +38,12 @@ class BorrowerPaymentViewModel @Inject constructor(
 
         repository.deleteAllBorrowerPaymentsByBorrowerKey(borrowerKey)
     }
+
+    fun deleteBorrowerPaymentsByIsSynced(isSynced: Boolean) = viewModelScope.launch {
+
+        repository.deleteBorrowerPaymentsByIsSynced(isSynced)
+    }
+
 
     fun getAllBorrowerPayments() = repository.getAllBorrowerPayments().asLiveData()
 

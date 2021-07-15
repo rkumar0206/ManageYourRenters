@@ -27,6 +27,9 @@ interface BorrowerPaymentDao {
     @Query("DELETE FROM borrower_payment_table WHERE borrowerKey= :borrowerKey")
     suspend fun deleteAllBorrowerPaymentsByBorrowerKey(borrowerKey: String)
 
+    @Query("DELETE FROM borrower_payment_table  WHERE isSynced = :isSynced")
+    suspend fun deleteBorrowerPaymentsByIsSynced(isSynced: Boolean)
+
     @Query("SELECT * FROM borrower_payment_table ORDER BY modified desc")
     fun getAllBorrowerPayments(): Flow<List<BorrowerPayment>>
 

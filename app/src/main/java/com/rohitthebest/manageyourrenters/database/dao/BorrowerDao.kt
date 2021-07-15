@@ -22,6 +22,9 @@ interface BorrowerDao {
     @Query("DELETE FROM borrower_table")
     suspend fun deleteAllBorrower()
 
+    @Query("DELETE FROM borrower_table WHERE isSynced = :isSynced")
+    suspend fun deleteBorrowerByIsSynced(isSynced: Boolean)
+
     @Query("SELECT * FROM borrower_table ORDER BY totalDueAmount DESC, modified DESC")
     fun getAllBorrower(): Flow<List<Borrower>>
 

@@ -11,8 +11,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BorrowerViewModel @Inject constructor(
-    private val repository: BorrowerRepository
+    private val repository: BorrowerRepository,
 ) : ViewModel() {
+
 
     fun insertBorrower(borrower: Borrower) = viewModelScope.launch {
 
@@ -37,6 +38,11 @@ class BorrowerViewModel @Inject constructor(
     fun deleteAllBorrower() = viewModelScope.launch {
 
         repository.deleteAllBorrower()
+    }
+
+    fun deleteBorrowerByIsSynced(isSynced: Boolean) = viewModelScope.launch {
+
+        repository.deleteBorrowerByIsSynced(isSynced)
     }
 
     fun getAllBorrower() = repository.getAllBorrower().asLiveData()

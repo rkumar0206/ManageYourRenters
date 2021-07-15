@@ -957,6 +957,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         Log.d(TAG, "addToDatabase: ")
 
+        renter.modified = System.currentTimeMillis()
+
         if (isInternetAvailable(requireContext())) {
 
             payment.isSynced = getString(R.string.t)

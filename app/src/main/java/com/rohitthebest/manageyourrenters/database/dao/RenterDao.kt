@@ -22,13 +22,13 @@ interface RenterDao {
     @Query("DELETE FROM renter_table WHERE isSynced = :isSynced")
     suspend fun deleteRenterByIsSynced(isSynced: String)
 
-    @Query("SELECT * FROM renter_table ORDER BY timeStamp DESC")
+    @Query("SELECT * FROM renter_table ORDER BY modified DESC, timeStamp DESC")
     fun getAllRentersList(): LiveData<List<Renter>>
 
     @Query("SELECT COUNT(id) FROM renter_table")
     fun getRentersCount(): LiveData<Int>
 
-    @Query("SELECT * FROM renter_table WHERE isSynced = :isSynced ORDER BY timeStamp DESC")
+    @Query("SELECT * FROM renter_table WHERE isSynced = :isSynced ORDER BY modified DESC, timeStamp DESC")
     fun getRenterByIsSynced(isSynced: String): LiveData<List<Renter>>
 
     @Query("SELECT * FROM renter_table WHERE `key` =:renterKey")

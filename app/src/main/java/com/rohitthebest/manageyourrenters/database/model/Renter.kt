@@ -9,6 +9,7 @@ import com.google.firebase.firestore.IgnoreExtraProperties
 @IgnoreExtraProperties
 data class Renter(
     var timeStamp: Long? = System.currentTimeMillis(),
+    var modified: Long = System.currentTimeMillis(),
     var name: String,
     var mobileNumber: String,
     var emailId: String?,
@@ -29,6 +30,7 @@ data class Renter(
     var id : Int? = null
 
     constructor() : this(
+        System.currentTimeMillis(),
         System.currentTimeMillis(),
         "",
         "",

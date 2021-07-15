@@ -246,6 +246,8 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
     private fun insertToDatabase(renter: Renter) {
 
+        renter.modified = System.currentTimeMillis()
+
         renterViewModel.insertRenter(renter)
         showToast(requireContext(), "Renter inserted")
         requireActivity().onBackPressed()

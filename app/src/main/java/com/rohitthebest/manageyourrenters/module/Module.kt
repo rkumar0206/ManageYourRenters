@@ -2,6 +2,8 @@ package com.rohitthebest.manageyourrenters.module
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.rohitthebest.manageyourrenters.database.databases.BorrowerDatabase
 import com.rohitthebest.manageyourrenters.database.databases.BorrowerPaymentDatabase
 import com.rohitthebest.manageyourrenters.database.databases.PaymentDatabase
@@ -23,6 +25,14 @@ object Module {
 
     //==============================Renter Database========================================
 
+    private val migration = object : Migration(123, 124) {
+
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+            database.execSQL("ALTER TABLE 'renter_table' ADD COLUMN 'modified' INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
     @Provides
     @Singleton
     fun provideRenterDatabase(
@@ -31,7 +41,9 @@ object Module {
         context,
         RenterDatabase::class.java,
         RENTER_DATABASE_NAME
-    ).build()
+    )
+        .addMigrations(migration)
+        .build()
 
     @Provides
     @Singleton

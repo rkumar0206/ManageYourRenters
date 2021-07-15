@@ -163,7 +163,7 @@ class ShowPaymentAdapter :
                     }
                 }
 
-                binding.paymentAdapterDeleteBtn.id -> {
+                binding.paymentAdapterMessageBtn.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 

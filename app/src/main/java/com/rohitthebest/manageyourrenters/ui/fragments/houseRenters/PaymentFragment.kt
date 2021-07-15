@@ -51,7 +51,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     private var receivedRenter: Renter? = null
 
     private lateinit var paymentKeyList: List<String>
-    private lateinit var mAdapter: ShowPaymentAdapter
+    private lateinit var paymentAdapter: ShowPaymentAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,7 +66,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mAdapter = ShowPaymentAdapter()
+        paymentAdapter = ShowPaymentAdapter()
         paymentKeyList = emptyList()
 
         getMessage()
@@ -134,7 +134,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                         updateCurrentDueOrAdvanceTV()
 
-                        mAdapter.submitList(paymentList)
+                        paymentAdapter.submitList(paymentList)
 
                     } else {
 
@@ -184,7 +184,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 if (s?.isEmpty()!!) {
 
                     binding.paymentRV.scrollToPosition(0)
-                    mAdapter.submitList(paymentList)
+                    paymentAdapter.submitList(paymentList)
                 } else {
 
                     val filteredList = paymentList?.filter { payment ->
@@ -215,7 +215,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                     }
 
-                    mAdapter.submitList(filteredList)
+                    paymentAdapter.submitList(filteredList)
                 }
 
             }
@@ -230,12 +230,12 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
             binding.paymentRV.apply {
 
-                adapter = mAdapter
+                adapter = paymentAdapter
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true)
             }
 
-            mAdapter.setOnClickListener(this)
+            paymentAdapter.setOnClickListener(this)
 
         } catch (e: java.lang.Exception) {
 

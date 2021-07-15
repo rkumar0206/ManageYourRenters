@@ -18,7 +18,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,7 +52,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
         includeBinding.renterRoomNumberET.hide()
         includeBinding.renterAddressET.hide()
 
-        binding.addRenterTitileTV.text = getString(R.string.add_borrower)
+        binding.addRenterToolbar.title = getString(R.string.add_borrower)
 
         initListeners()
         textWatchers()
@@ -100,7 +99,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
 
         receivedBorrower?.let { b ->
 
-            binding.addRenterTitileTV.text = getString(R.string.edit_borrower)
+            binding.addRenterToolbar.title = getString(R.string.edit_borrower)
 
             includeBinding.renterNameET.editText?.setText(
                 b.name
@@ -133,8 +132,21 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
 
     private fun initListeners() {
 
-        binding.backBtn.setOnClickListener(this)
-        binding.addRenterBtn.setOnClickListener(this)
+        binding.addRenterToolbar.setNavigationOnClickListener {
+
+            requireActivity().onBackPressed()
+        }
+
+        binding.addRenterToolbar.menu.findItem(R.id.menu_add_person).setOnMenuItemClickListener {
+
+            if (isValidForm()) {
+
+                initBorrowerData()
+            }
+
+            true
+        }
+
         includeBinding.dateAddedCalendarPickBtn.setOnClickListener(this)
         includeBinding.mobileNumCodePicker.registerCarrierNumberEditText(includeBinding.renterMobileNumberET)
 
@@ -143,22 +155,6 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
     override fun onClick(v: View?) {
 
         when (v?.id) {
-
-            binding.addRenterBtn.id -> {
-
-                if (isInternetAvailable(requireContext())) {
-
-                    if (isValidForm()) {
-
-                        initBorrowerData()
-                    }
-
-                } else {
-
-                    showNoInternetMessage(requireContext())
-                }
-            }
-
 
             includeBinding.dateAddedCalendarPickBtn.id -> {
 
@@ -177,10 +173,6 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
                 )
             }
 
-            binding.backBtn.id -> {
-
-                requireActivity().onBackPressed()
-            }
         }
 
     }

@@ -336,6 +336,11 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
             }
         })
 
+        binding.houseRentersHomeToolBar.setNavigationOnClickListener {
+
+            requireActivity().onBackPressed()
+        }
+
     }
 
     override fun onClick(v: View?) {

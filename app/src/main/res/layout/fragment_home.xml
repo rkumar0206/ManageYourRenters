@@ -22,6 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:menu="@menu/house_renters_home_menu"
+            app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
             app:title="@string/house_renters">
 
         </com.google.android.material.appbar.MaterialToolbar>

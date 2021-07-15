@@ -95,7 +95,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
         receivedRenter?.let { renter ->
 
-            binding.addRenterTitileTV.text = "Edit Renter"
+            binding.addRenterToolbar.title = "Edit Renter"
 
             includeBinding.renterNameET.editText?.setText(
                 renter.name
@@ -136,8 +136,21 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
     private fun initListeners() {
 
-        binding.backBtn.setOnClickListener(this)
-        binding.addRenterBtn.setOnClickListener(this)
+        binding.addRenterToolbar.setNavigationOnClickListener {
+
+            requireActivity().onBackPressed()
+        }
+
+        binding.addRenterToolbar.menu.findItem(R.id.menu_add_person).setOnMenuItemClickListener {
+
+            if (isValidForm()) {
+
+                initRenterForDatabase()
+            }
+
+            true
+        }
+
         includeBinding.dateAddedCalendarPickBtn.setOnClickListener(this)
 
         includeBinding.mobileNumCodePicker.registerCarrierNumberEditText(includeBinding.renterMobileNumberET)
@@ -146,15 +159,6 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
 
         when (v?.id) {
-
-            binding.addRenterBtn.id -> {
-
-                if (isValidForm()) {
-
-                    initRenterForDatabase()
-                }
-
-            }
 
             includeBinding.dateAddedCalendarPickBtn.id -> {
 
@@ -171,11 +175,6 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
                             )
                     }
                 )
-            }
-
-            binding.backBtn.id -> {
-
-                requireActivity().onBackPressed()
             }
         }
     }

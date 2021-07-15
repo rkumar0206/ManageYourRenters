@@ -10,6 +10,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -154,4 +155,22 @@ fun Uri.getFileName(contentResolver: ContentResolver): String {
         }
 
     return ""
+}
+
+inline fun SearchView.searchText(
+
+    crossinline onTextChanged: (newText: String?) -> Unit
+) {
+
+    this.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(query: String?): Boolean =
+            true
+
+        override fun onQueryTextChange(newText: String?): Boolean {
+
+            onTextChanged(newText)
+            return true
+        }
+
+    })
 }

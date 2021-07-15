@@ -1,12 +1,11 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -23,10 +22,8 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.closeKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showKeyboard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,7 +44,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private var isSearchViewVisible = false
     private var mAuth: FirebaseAuth? = null
 
     private lateinit var mAdapter: ShowRentersAdapter
@@ -72,6 +68,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         mAdapter = ShowRentersAdapter()
 
         showProgressBar()
+
+        setupRecyclerView()
 
         lifecycleScope.launch {
 
@@ -101,7 +99,9 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     showNoRentersAddedTV()
                 }
 
-                setupRecyclerView(it)
+                mAdapter.submitList(it)
+
+                hideProgressBar()
             })
         } catch (e: Exception) {
             e.printStackTrace()
@@ -110,59 +110,51 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private fun setUpSearchEditText(it: List<Renter>?) {
 
-        binding.searchET.addTextChangedListener(object : TextWatcher {
+        val searchView =
+            binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_search_home).actionView as SearchView
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        searchView.searchText { s ->
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            if (s?.isEmpty()!!) {
 
-                if (s?.isEmpty()!!) {
+                binding.rentersRV.scrollToPosition(0)
+                mAdapter.submitList(it)
+            } else {
 
-                    setupRecyclerView(it)
-                } else {
+                val filteredList = it?.filter { renter ->
 
-                    val filteredList = it?.filter { renter ->
-
-                        renter.name.toLowerCase(Locale.ROOT).contains(
-                            s.toString().trim().toLowerCase(Locale.ROOT)
-                        )
-                                ||
-                                renter.roomNumber.toLowerCase(Locale.ROOT).contains(
-                                    s.toString().trim().toLowerCase(Locale.ROOT)
-                                )
-                    }
-
-                    setupRecyclerView(filteredList)
-
+                    renter.name.toLowerCase(Locale.ROOT).contains(
+                        s.toString().trim().toLowerCase(Locale.ROOT)
+                    )
+                            ||
+                            renter.roomNumber.toLowerCase(Locale.ROOT).contains(
+                                s.toString().trim().toLowerCase(Locale.ROOT)
+                            )
                 }
+
+                mAdapter.submitList(filteredList)
+
             }
 
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        }
     }
 
-    private fun setupRecyclerView(renterList: List<Renter>?) {
+    private fun setupRecyclerView() {
 
         try {
 
-            renterList?.let {
+            binding.rentersRV.apply {
 
-                mAdapter.submitList(it)
-
-                binding.rentersRV.apply {
-
-                    adapter = mAdapter
-                    layoutManager = LinearLayoutManager(requireContext())
-                    setHasFixedSize(true)
-                }
+                adapter = mAdapter
+                layoutManager = LinearLayoutManager(requireContext())
+                setHasFixedSize(true)
             }
+
 
             mAdapter.setOnClickListener(this)
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-        hideProgressBar()
     }
 
     override fun onRenterClicked(renter: Renter) {
@@ -323,7 +315,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private fun initListeners() {
 
-        binding.searchRenterBtn.setOnClickListener(this)
         binding.addRenterFAB.setOnClickListener(this)
         binding.rentersRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
@@ -351,52 +342,9 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         when (v?.id) {
 
-            binding.searchRenterBtn.id -> {
-
-                if (!isSearchViewVisible) {
-
-                    showSearchView()
-                } else {
-
-                    hideSearchView()
-                }
-            }
-
             binding.addRenterFAB.id -> {
 
                 findNavController().navigate(R.id.action_homeFragment_to_addRenterFragment)
-            }
-        }
-    }
-
-    private fun showSearchView() {
-
-        isSearchViewVisible = !isSearchViewVisible
-
-        binding.renterSV.show()
-        binding.renterSV.animate().translationY(0f).alpha(1f).setDuration(350).start()
-
-        binding.searchET.requestFocus()
-
-        showKeyboard(requireActivity(), binding.searchET)
-    }
-
-    private fun hideSearchView() {
-
-        isSearchViewVisible = !isSearchViewVisible
-
-        binding.renterSV.animate().translationY(-50f).alpha(0f).setDuration(350).start()
-
-        lifecycleScope.launch {
-
-            closeKeyboard(requireActivity())
-
-            delay(360)
-
-            withContext(Dispatchers.Main) {
-
-                binding.renterSV.hide()
-                binding.searchET.setText("")
             }
         }
     }

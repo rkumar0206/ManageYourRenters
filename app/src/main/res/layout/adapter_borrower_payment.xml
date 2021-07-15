@@ -1,27 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
     android:layout_margin="6dp"
-    app:cardCornerRadius="5dp"
-    app:rippleColor="@color/rippleColor"
-    app:strokeColor="@color/colorGrey"
-    app:strokeWidth="0.5dp">
+    app:cardCornerRadius="5dp">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:cardCornerRadius="5dp"
+        app:rippleColor="@color/rippleColor"
+        app:strokeColor="@color/colorGrey"
+        app:strokeWidth="0.5dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <TextView
+                android:id="@+id/paidAmountTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:padding="4dp"
+                android:textColor="@color/color_green"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/dueAmountTV"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider39"
+                tools:text="Paid : 1000" />
+
+            <TextView
+                android:id="@+id/dueAmountTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:padding="4dp"
+                android:textColor="@color/color_Red"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/paidAmountTV"
+                app:layout_constraintTop_toBottomOf="@+id/divider39"
+                tools:text="Due : 1000" />
+
+            <TextView
+                android:id="@+id/borrowedAmountTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:padding="4dp"
+                android:textColor="@color/color_orange"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/borrowedPaymentDateTV"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Borrowed : 2000" />
+
+
+            <TextView
+                android:id="@+id/borrowedPaymentDateTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:padding="4dp"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="@+id/borrowedAmountTV"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/borrowedAmountTV"
+                tools:text="Borrowed On : 24-02-2020" />
+
+            <View
+                android:id="@+id/divider39"
+                android:layout_width="397dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="2dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/borrowedAmountTV" />
+
+            <View
+                android:id="@+id/divider40"
+                android:layout_width="397dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="2dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/paidAmountTV" />
+
+            <ImageButton
+                android:id="@+id/interestBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:backgroundTint="@color/color_white"
+                android:tooltipText="@string/interest"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/showDocumentBtn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider40"
+                app:layout_constraintVertical_bias="0.0"
+                app:srcCompat="@drawable/ic_interest"
+                tools:targetApi="o" />
+
+            <ImageButton
+                android:id="@+id/showDocumentBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/color_white"
+                android:tooltipText="show document"
+                app:layout_constraintBottom_toBottomOf="@+id/interestBtn"
+                app:layout_constraintEnd_toStartOf="@+id/messageBtn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/interestBtn"
+                app:layout_constraintTop_toTopOf="@+id/interestBtn"
+                app:srcCompat="@drawable/ic_document"
+                tools:targetApi="o" />
+
+            <ImageButton
+                android:id="@+id/messageBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/color_white"
+                android:tooltipText="show message"
+                app:layout_constraintBottom_toBottomOf="@+id/showDocumentBtn"
+                app:layout_constraintEnd_toStartOf="@+id/syncBtn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/showDocumentBtn"
+                app:layout_constraintTop_toTopOf="@+id/showDocumentBtn"
+                app:srcCompat="@drawable/ic_baseline_message_24"
+                tools:targetApi="o" />
+
+            <ImageButton
+                android:id="@+id/deleteBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/color_white"
+                android:tooltipText="delete"
+                app:layout_constraintBottom_toBottomOf="@+id/syncBtn"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/syncBtn"
+                app:layout_constraintTop_toTopOf="@+id/syncBtn"
+                app:srcCompat="@drawable/ic_baseline_delete_24"
+                tools:targetApi="o" />
+
+            <ImageButton
+                android:id="@+id/syncBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/color_white"
+                android:tooltipText="sync with cloud"
+                app:layout_constraintBottom_toBottomOf="@+id/messageBtn"
+                app:layout_constraintEnd_toStartOf="@+id/deleteBtn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/messageBtn"
+                app:layout_constraintTop_toTopOf="@+id/messageBtn"
+                app:srcCompat="@drawable/ic_baseline_sync_24_green"
+                tools:targetApi="o" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 
-</com.google.android.material.card.MaterialCardView>
+</androidx.cardview.widget.CardView>

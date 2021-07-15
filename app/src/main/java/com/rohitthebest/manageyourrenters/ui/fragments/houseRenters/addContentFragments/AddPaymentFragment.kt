@@ -188,7 +188,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             currentTimestamp = System.currentTimeMillis()
 
-            includeBinding.dateTV.text = "Bill Issue Date : ${
+            includeBinding.dateTV.text = "Payment Date : ${
                 WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                     currentTimestamp
                 )

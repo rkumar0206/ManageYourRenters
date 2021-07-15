@@ -47,6 +47,21 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/paymentAdapter_billPeriodTV" />
 
+        <TextView
+            android:id="@+id/paymentAdapter_issueDateTV2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:padding="4dp"
+            android:text="Issued On : 24-02-2020"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="@+id/paymentAdapter_billPeriodTV"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/paymentAdapter_billPeriodTV" />
+
         <View
             android:id="@+id/divider36"
             android:layout_width="match_parent"

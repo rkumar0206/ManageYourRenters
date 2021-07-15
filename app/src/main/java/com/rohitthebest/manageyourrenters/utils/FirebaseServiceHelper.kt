@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.ContextCompat
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.rohitthebest.manageyourrenters.others.Constants
@@ -11,6 +13,7 @@ import com.rohitthebest.manageyourrenters.services.DeleteAllDocumentsService
 import com.rohitthebest.manageyourrenters.services.DeleteService
 import com.rohitthebest.manageyourrenters.services.UpdateService
 import com.rohitthebest.manageyourrenters.services.UploadService
+import kotlinx.coroutines.tasks.await
 import kotlin.random.Random
 
 fun uploadDocumentToFireStore(
@@ -175,5 +178,29 @@ inline fun uploadFileToFirebaseStorage(
 
             failureListener(exception)
         }
+    }
+}
+
+suspend fun getDataFromFireStore(
+    collection: String,
+    uid: String,
+    failureListener: (Exception) -> Unit
+): QuerySnapshot? {
+
+    return try {
+
+        FirebaseFirestore.getInstance()
+            .collection(collection)
+            .whereEqualTo("uid", uid)
+            .get()
+            .addOnFailureListener {
+                failureListener(it)
+            }
+            .await()
+
+    } catch (e: java.lang.Exception) {
+
+        e.printStackTrace()
+        null
     }
 }

@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,6 +21,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoIntern
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 
 private const val TAG = "BorrowerHomeFragment"
 
@@ -65,8 +67,35 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
             borrowerAdapter.submitList(it)
 
+            initSearchViewMenu(it)
+
             showHideProgressBar(false)
         })
+    }
+
+    private fun initSearchViewMenu(borrowerList: List<Borrower>) {
+
+        val searchView =
+            binding.individualRenterToolbar.menu.findItem(R.id.menu_search_home).actionView as SearchView
+
+        searchView.searchText { newText ->
+
+            if (borrowerList.isEmpty()) {
+
+                binding.individualRentersRV.scrollToPosition(0)
+                borrowerAdapter.submitList(borrowerList)
+            } else {
+
+                val filteredList = borrowerList.filter { borrower ->
+
+                    borrower.name.toLowerCase(Locale.ROOT)
+                        .contains(newText.toString().trim().toLowerCase(Locale.ROOT))
+                }
+
+                borrowerAdapter.submitList(filteredList)
+            }
+
+        }
     }
 
     private fun setUpRecyclerView() {

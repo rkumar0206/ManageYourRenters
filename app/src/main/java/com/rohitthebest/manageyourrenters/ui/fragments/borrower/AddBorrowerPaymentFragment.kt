@@ -16,9 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.data.Interest
-import com.rohitthebest.manageyourrenters.data.InterestTimeSchedule
-import com.rohitthebest.manageyourrenters.data.InterestType
+import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.AddBorrowerPaymentLayoutBinding
@@ -53,6 +51,10 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private var receivedBorrower: Borrower? = null
     private var receivedBorrowerKey: String = ""
+    private var receivedBorrowerPayment: BorrowerPayment? = null
+    private var receivedBorrowerPaymentKey: String = ""
+    private var isMessageReceivedForEditing = false
+
     private lateinit var includeBinding: AddBorrowerPaymentLayoutBinding
     private lateinit var currencySymbols: List<String>
     private lateinit var interestTimeSchedules: List<String>
@@ -60,7 +62,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     private var selectedInterestTimeSchedule = InterestTimeSchedule.ANNUALLY
 
     private var selectedDate: Long = 0L
-    private var docType = "pdf"
+    private var docType: DocumentType = DocumentType.PDF
     private var interestType: InterestType = InterestType.SIMPLE_INTEREST
 
     private var pdfUri: Uri? = null
@@ -97,15 +99,85 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                     AddBorrowerPaymentFragmentArgs.fromBundle(it)
                 }
 
-                receivedBorrowerKey = args?.borrowerKeyMessage!!
+                val isBorrowerKey = args?.isBorrowerKey!!
 
-                getBorrower()
+                if (isBorrowerKey) {
+
+                    receivedBorrowerKey = args.borrowerKeyMessage!!
+                    getBorrower()
+                } else {
+
+                    isMessageReceivedForEditing = true
+                    receivedBorrowerPaymentKey = args.borrowerKeyMessage!!
+                    getBorrowerPayment()
+                }
 
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun getBorrowerPayment() {
+
+        borrowerPaymentViewModel.getBorrowerPaymentByKey(receivedBorrowerPaymentKey)
+            .observe(viewLifecycleOwner, {
+
+                receivedBorrowerKey = it.borrowerKey
+                receivedBorrowerPayment = it
+                getBorrower()
+                updateUI()
+            })
+    }
+
+    private fun updateUI() {
+
+        binding.addBorrowerPaymentToolBar.title = "Edit Payment"
+
+        receivedBorrowerPayment?.let { borrowerPayment ->
+
+            selectedDate = borrowerPayment.created
+            initUI()
+            includeBinding.borrowerPaymentET.editText?.setText(borrowerPayment.amountTakenOnRent.toString())
+
+            // if interest was added
+            if (borrowerPayment.isInterestAdded) {
+
+                showInterestCardView(true)
+                includeBinding.ratePercentET.setText(borrowerPayment.interest?.ratePercent.toString())
+                includeBinding.addInterestCB.isChecked = true
+                selectedInterestTimeSchedule = borrowerPayment.interest?.timeSchedule!!
+
+                when (selectedInterestTimeSchedule) {
+
+                    InterestTimeSchedule.ANNUALLY -> includeBinding.timeScheduleSpinner.setSelection(
+                        0
+                    )
+                    InterestTimeSchedule.MONTHLY -> includeBinding.timeScheduleSpinner.setSelection(
+                        1
+                    )
+                    InterestTimeSchedule.DAILY -> includeBinding.timeScheduleSpinner.setSelection(2)
+                }
+                interestType = borrowerPayment.interest?.type!!
+                if (interestType == InterestType.SIMPLE_INTEREST) {
+
+                    includeBinding.interestTypeRG.check(includeBinding.simpleIntRB.id)
+                } else {
+
+                    includeBinding.interestTypeRG.check(includeBinding.compundIntRB.id)
+                }
+            }
+
+            //if supporting document was added
+            if (borrowerPayment.isSupportingDocAdded) {
+
+                showAddSupportingDocCardView(true)
+
+            }
+
+        }
+
     }
 
     private fun getBorrower() {
@@ -242,9 +314,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
             // checking if the addSupportDocument enabled and the doc type is pdf or image
             if (includeBinding.addSupprtingDocCB.isChecked
-                && (docType == getString(R.string.pdf) || docType == getString(
-                    R.string.image
-                ))
+                && (docType == DocumentType.PDF || docType == DocumentType.IMAGE)
             ) {
 
                 // upload the pdf or the image to the firebase storage
@@ -279,7 +349,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         Log.d(TAG, "uploadDocToFirebaseStorage: ")
 
         try {
-            val fileName = if (docType == getString(R.string.pdf)) {
+            val fileName = if (docType == DocumentType.PDF) {
 
                 "${includeBinding.fileNameET.text.trim()}_${generateKey()}.pdf"
             } else {
@@ -302,7 +372,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             showFileUploadLinearLayout()
 
             uploadFileToFirebaseStorage(
-                if (docType == getString(R.string.pdf)) pdfUri!! else imageUri!!,
+                if (docType == DocumentType.PDF) pdfUri!! else imageUri!!,
                 fileRef,
                 { uploadTask ->
 
@@ -374,15 +444,12 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
             if (isSupportingDocAdded) {
 
-                supportingDocumentType = docType
-
-                supportingDocumentUrl = if (docType == getString(R.string.url)) {
-
-                    includeBinding.fileNameET.text.toString().trim()
-                } else {
-
-                    downloadUrl
-                }
+                supportingDocument = SupportingDocument(
+                    includeBinding.fileNameET.text.toString().trim(),
+                    if (docType == DocumentType.URL) includeBinding.fileNameET.text.toString()
+                        .trim() else downloadUrl,
+                    docType
+                )
             }
 
             isInterestAdded = includeBinding.addInterestCB.isChecked
@@ -433,26 +500,29 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         borrowerPaymentViewModel.getTotalDueOfTheBorrower(receivedBorrowerKey).observe(
             viewLifecycleOwner, {
 
-                receivedBorrower?.totalDueAmount = it
-                receivedBorrower?.modified = System.currentTimeMillis()
-                receivedBorrower?.isSynced = false
+                if (it != null) {
 
-                val map = HashMap<String, Any?>()
-                map["totalDueAmount"] = it
+                    receivedBorrower?.totalDueAmount = it
+                    receivedBorrower?.modified = System.currentTimeMillis()
+                    receivedBorrower?.isSynced = false
 
-                if (isInternetAvailable(requireContext())) {
+                    val map = HashMap<String, Any?>()
+                    map["totalDueAmount"] = it
 
-                    receivedBorrower?.isSynced = true
+                    if (isInternetAvailable(requireContext())) {
 
-                    updateDocumentOnFireStore(
-                        requireContext(),
-                        map = map,
-                        getString(R.string.borrowers),
-                        receivedBorrowerKey
-                    )
+                        receivedBorrower?.isSynced = true
+
+                        updateDocumentOnFireStore(
+                            requireContext(),
+                            map = map,
+                            getString(R.string.borrowers),
+                            receivedBorrowerKey
+                        )
+                    }
+
+                    borrowerViewModel.updateBorrower(receivedBorrower!!)
                 }
-
-                borrowerViewModel.updateBorrower(receivedBorrower!!)
             }
         )
 
@@ -497,7 +567,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 return false
             }
 
-            if (docType == getString(R.string.pdf) && pdfUri == null) {
+            if (docType == DocumentType.PDF && pdfUri == null) {
 
                 showToast(
                     requireContext(),
@@ -507,7 +577,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 return false
             }
 
-            if (docType == getString(R.string.image) && imageUri == null) {
+            if (docType == DocumentType.IMAGE && imageUri == null) {
 
                 showToast(
                     requireContext(),
@@ -549,7 +619,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
                 if (requireContext().checkIfPermissionsGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
-                    if (docType == getString(R.string.pdf)) {
+                    if (docType == DocumentType.PDF) {
 
                         chooseDocumentLauncher.launch("application/pdf")
                     } else {
@@ -565,7 +635,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
             includeBinding.removeFileBtn.id -> {
 
-                if (docType == getString(R.string.pdf)) {
+                if (docType == DocumentType.PDF) {
 
                     pdfUri = null
                 } else {
@@ -602,7 +672,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
             includeBinding.pdfRB.id -> {
 
-                docType = getString(R.string.pdf)
+                docType = DocumentType.PDF
                 includeBinding.fileNameET.hint = "Enter file name"
                 showFileUploadNoteTV(true)
 
@@ -625,7 +695,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             includeBinding.imageRB.id -> {
 
                 includeBinding.fileNameET.hint = "Enter image name"
-                docType = getString(R.string.image)
+                docType = DocumentType.IMAGE
                 showFileUploadNoteTV(true)
 
                 if (imageUri != null) {
@@ -646,7 +716,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             includeBinding.urlRB.id -> {
 
                 includeBinding.fileNameET.hint = "Enter url here"
-                docType = getString(R.string.url)
+                docType = DocumentType.URL
 
                 includeBinding.fileNameET.setText("")
 
@@ -726,7 +796,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         uri?.let {
 
-            if (docType == getString(R.string.pdf)) {
+            if (docType == DocumentType.PDF) {
 
                 //pdf uri
                 pdfUri = uri

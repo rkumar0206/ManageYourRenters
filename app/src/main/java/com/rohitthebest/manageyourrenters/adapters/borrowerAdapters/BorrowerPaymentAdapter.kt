@@ -101,7 +101,7 @@ class BorrowerPaymentAdapter :
                     }
                     binding.editBorrowerPaymentBtn.id -> {
 
-                        mListener!!.onEditBtnClick(getItem(absoluteAdapterPosition))
+                        mListener!!.onEditBtnClick(getItem(absoluteAdapterPosition).key)
                     }
                 }
             }
@@ -153,7 +153,7 @@ class BorrowerPaymentAdapter :
         fun onShowMessageBtnClick(message: String)
         fun onShowDocumentBtnClick(borrowerPayment: BorrowerPayment)
         fun onInterestBtnClick(borrowerPayment: BorrowerPayment)
-        fun onEditBtnClick(borrowerPayment: BorrowerPayment)
+        fun onEditBtnClick(borrowerPaymentKey: String)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

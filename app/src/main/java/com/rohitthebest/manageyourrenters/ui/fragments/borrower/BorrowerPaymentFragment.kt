@@ -56,7 +56,8 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                 val action =
                     BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
-                        receivedBorrowerKey
+                        receivedBorrowerKey,
+                        isBorrowerKey = true
                     )
                 findNavController().navigate(action)
             }
@@ -188,14 +189,32 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     override fun onShowDocumentBtnClick(borrowerPayment: BorrowerPayment) {
         //TODO("Not yet implemented")
+
+        if (!borrowerPayment.isSupportingDocAdded) {
+
+            showToast(requireContext(), "No document added!!!")
+        }
     }
 
     override fun onInterestBtnClick(borrowerPayment: BorrowerPayment) {
         //TODO("Not yet implemented")
+
+        if (!borrowerPayment.isInterestAdded) {
+
+            showToast(requireContext(), "No interest added!!!")
+        }
     }
 
-    override fun onEditBtnClick(borrowerPayment: BorrowerPayment) {
-        //TODO("Not yet implemented")
+    override fun onEditBtnClick(borrowerPaymentKey: String) {
+
+        // sending borrower payment key not the borrower key
+        val action =
+            BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
+                borrowerPaymentKey,
+                isBorrowerKey = false
+            )
+        findNavController().navigate(action)
+
     }
     //[END OF ADAPTER CLICK LISTENER]
 

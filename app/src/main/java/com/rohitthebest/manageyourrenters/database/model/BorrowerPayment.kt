@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.rohitthebest.manageyourrenters.data.Interest
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 
 @IgnoreExtraProperties
 @Entity(tableName = "borrower_payment_table")
@@ -18,8 +19,7 @@ data class BorrowerPayment(
     var dueLeftAmount: Double = 0.0,   // will be updated if the borrower does the partial payments
     var isDueCleared: Boolean = false,
     var isSupportingDocAdded: Boolean = false,
-    var supportingDocumentUrl: String? = null,
-    var supportingDocumentType: String? = null,  //select from pdf, image, and url
+    var supportingDocument: SupportingDocument? = null,
     var isInterestAdded: Boolean = false,
     var interest: Interest? = null,
     var key: String,
@@ -39,8 +39,7 @@ data class BorrowerPayment(
         0.0,
         false,
         false,
-        "",
-        "",
+        null,
         false,
         null,
         "",

@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.data.BillInfo
 import com.rohitthebest.manageyourrenters.data.ElectricityBillInfo
 import com.rohitthebest.manageyourrenters.data.Interest
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 
 class TypeConvertersForDatabase {
 
@@ -49,5 +50,17 @@ class TypeConvertersForDatabase {
     fun fromStringToInterest(str: String): Interest? {
 
         return Gson().fromJson(str, object : TypeToken<Interest?>() {}.type)
+    }
+
+    @TypeConverter
+    fun fromSupportingDocumentToString(supportingDocument: SupportingDocument?): String? {
+
+        return Gson().toJson(supportingDocument)
+    }
+
+    @TypeConverter
+    fun fromStringToSupportingDocument(str: String): SupportingDocument? {
+
+        return Gson().fromJson(str, object : TypeToken<SupportingDocument?>() {}.type)
     }
 }

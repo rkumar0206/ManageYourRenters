@@ -74,10 +74,20 @@ class BorrowerAdapter :
                     textView23.hide()
                     adapterRenterAddressTV.hide()
 
-                    adapterRoomNumTV.changeTextColor(
-                        binding.root.context,
-                        R.color.color_orange
-                    )
+                    if (b.totalDueAmount > 0) {
+
+                        adapterRoomNumTV.changeTextColor(
+                            binding.root.context,
+                            R.color.color_orange
+                        )
+                    } else {
+
+                        adapterRoomNumTV.changeTextColor(
+                            binding.root.context,
+                            R.color.color_green
+                        )
+                    }
+
 
                     // using room number textView for showing the due amount of the borrower
                     adapterRoomNumTV.text = "Total Due : ₹ ${b.totalDueAmount}"

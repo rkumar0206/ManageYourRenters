@@ -81,7 +81,10 @@ class BorrowerPaymentAdapter :
                     }
                     binding.syncBtn.id -> {
 
-                        mListener!!.onSyncBtnClick(getItem(absoluteAdapterPosition))
+                        mListener!!.onSyncBtnClick(
+                            getItem(absoluteAdapterPosition),
+                            absoluteAdapterPosition
+                        )
                     }
 
                     binding.showDocumentBtn.id -> {
@@ -146,7 +149,7 @@ class BorrowerPaymentAdapter :
 
         fun onItemClick(borrowerPayment: BorrowerPayment)
         fun onDeleteBtnClick(borrowerPayment: BorrowerPayment)
-        fun onSyncBtnClick(borrowerPayment: BorrowerPayment)
+        fun onSyncBtnClick(borrowerPayment: BorrowerPayment, position: Int)
         fun onShowMessageBtnClick(message: String)
         fun onShowDocumentBtnClick(borrowerPayment: BorrowerPayment)
         fun onInterestBtnClick(borrowerPayment: BorrowerPayment)

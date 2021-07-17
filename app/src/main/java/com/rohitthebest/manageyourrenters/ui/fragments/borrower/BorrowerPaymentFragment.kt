@@ -15,7 +15,12 @@ import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.fromBorrowerPaymentToString
 import com.rohitthebest.manageyourrenters.utils.isValid
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "BorrowerPaymentFragment"
@@ -124,6 +129,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     }
 
+    //[START OF ADAPTER CLICK LISTENER]
     override fun onItemClick(borrowerPayment: BorrowerPayment) {
         //todo  : open bottom sheet to add partial payment
     }
@@ -132,8 +138,32 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         //TODO("Not yet implemented")
     }
 
-    override fun onSyncBtnClick(borrowerPayment: BorrowerPayment) {
-        // TODO("Not yet implemented")
+    override fun onSyncBtnClick(borrowerPayment: BorrowerPayment, position: Int) {
+
+        if (borrowerPayment.isSynced) {
+
+            showToast(requireContext(), "Already synced")
+        } else {
+
+            if (isInternetAvailable(requireContext())) {
+
+                borrowerPayment.isSynced = true
+
+                uploadDocumentToFireStore(
+                    requireContext(),
+                    fromBorrowerPaymentToString(borrowerPayment),
+                    getString(R.string.borrowerPayments),
+                    borrowerPayment.key
+                )
+
+                borrowerPaymentViewModel.updateBorrowerPayment(borrowerPayment)
+                borrowerPaymentAdapter.notifyItemChanged(position)
+
+            } else {
+
+                showNoInternetMessage(requireContext())
+            }
+        }
     }
 
     override fun onShowMessageBtnClick(message: String) {
@@ -167,6 +197,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     override fun onEditBtnClick(borrowerPayment: BorrowerPayment) {
         //TODO("Not yet implemented")
     }
+    //[END OF ADAPTER CLICK LISTENER]
 
     override fun onDestroyView() {
         super.onDestroyView()

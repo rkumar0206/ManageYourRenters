@@ -206,13 +206,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     override fun onEditBtnClick(borrowerPaymentKey: String) {
 
-        // sending borrower payment key not the borrower key
-        val action =
-            BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
-                borrowerPaymentKey
-            )
-        findNavController().navigate(action)
-
+        //todo : not yet implemented
     }
     //[END OF ADAPTER CLICK LISTENER]
 

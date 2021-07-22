@@ -4,12 +4,10 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.rohitthebest.manageyourrenters.database.databases.BorrowerDatabase
-import com.rohitthebest.manageyourrenters.database.databases.BorrowerPaymentDatabase
-import com.rohitthebest.manageyourrenters.database.databases.PaymentDatabase
-import com.rohitthebest.manageyourrenters.database.databases.RenterDatabase
+import com.rohitthebest.manageyourrenters.database.databases.*
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_PAYMENT_DATABASE_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.PARTIAL_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.RENTER_DATABASE_NAME
 import dagger.Module
@@ -96,6 +94,23 @@ object Module {
     @Provides
     @Singleton
     fun provideBorrowerPaymentDao(db: BorrowerPaymentDatabase) = db.getBorrowerPaymentDao()
+
+
+    //============================== Partial Payment Database========================================
+
+    @Provides
+    @Singleton
+    fun providePartialPaymentDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(
+        context,
+        PartialPaymentDatabase::class.java,
+        PARTIAL_PAYMENT_DATABASE_NAME
+    ).build()
+
+    @Provides
+    @Singleton
+    fun providePartialPaymentDao(db: PartialPaymentDatabase) = db.getPartialPaymentDao()
 
 
 }

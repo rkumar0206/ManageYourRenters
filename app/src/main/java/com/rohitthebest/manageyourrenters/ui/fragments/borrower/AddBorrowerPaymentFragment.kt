@@ -51,9 +51,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private var receivedBorrower: Borrower? = null
     private var receivedBorrowerKey: String = ""
-    private var receivedBorrowerPayment: BorrowerPayment? = null
-    private var receivedBorrowerPaymentKey: String = ""
-    private var isMessageReceivedForEditing = false
 
     private lateinit var includeBinding: AddBorrowerPaymentLayoutBinding
     private lateinit var currencySymbols: List<String>
@@ -99,18 +96,8 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                     AddBorrowerPaymentFragmentArgs.fromBundle(it)
                 }
 
-                val isBorrowerKey = args?.isBorrowerKey!!
-
-                if (isBorrowerKey) {
-
-                    receivedBorrowerKey = args.borrowerKeyMessage!!
+                receivedBorrowerKey = args?.borrowerKeyMessage!!
                     getBorrower()
-                } else {
-
-                    isMessageReceivedForEditing = true
-                    receivedBorrowerPaymentKey = args.borrowerKeyMessage!!
-                    getBorrowerPayment()
-                }
 
             }
 
@@ -119,66 +106,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         }
     }
 
-    private fun getBorrowerPayment() {
-
-        borrowerPaymentViewModel.getBorrowerPaymentByKey(receivedBorrowerPaymentKey)
-            .observe(viewLifecycleOwner, {
-
-                receivedBorrowerKey = it.borrowerKey
-                receivedBorrowerPayment = it
-                getBorrower()
-                updateUI()
-            })
-    }
-
-    private fun updateUI() {
-
-        binding.addBorrowerPaymentToolBar.title = "Edit Payment"
-
-        receivedBorrowerPayment?.let { borrowerPayment ->
-
-            selectedDate = borrowerPayment.created
-            initUI()
-            includeBinding.borrowerPaymentET.editText?.setText(borrowerPayment.amountTakenOnRent.toString())
-
-            // if interest was added
-            if (borrowerPayment.isInterestAdded) {
-
-                showInterestCardView(true)
-                includeBinding.ratePercentET.setText(borrowerPayment.interest?.ratePercent.toString())
-                includeBinding.addInterestCB.isChecked = true
-                selectedInterestTimeSchedule = borrowerPayment.interest?.timeSchedule!!
-
-                when (selectedInterestTimeSchedule) {
-
-                    InterestTimeSchedule.ANNUALLY -> includeBinding.timeScheduleSpinner.setSelection(
-                        0
-                    )
-                    InterestTimeSchedule.MONTHLY -> includeBinding.timeScheduleSpinner.setSelection(
-                        1
-                    )
-                    InterestTimeSchedule.DAILY -> includeBinding.timeScheduleSpinner.setSelection(2)
-                }
-                interestType = borrowerPayment.interest?.type!!
-                if (interestType == InterestType.SIMPLE_INTEREST) {
-
-                    includeBinding.interestTypeRG.check(includeBinding.simpleIntRB.id)
-                } else {
-
-                    includeBinding.interestTypeRG.check(includeBinding.compundIntRB.id)
-                }
-            }
-
-            //if supporting document was added
-            if (borrowerPayment.isSupportingDocAdded) {
-
-                showAddSupportingDocCardView(true)
-
-            }
-
-        }
-
-    }
 
     private fun getBorrower() {
 
@@ -301,6 +228,69 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 checkFormAndInitDatabase()
                 true
             }
+    }
+
+    private fun isFormValid(): Boolean {
+
+        if (!includeBinding.borrowerPaymentET.editText?.isTextValid()!!) {
+
+            includeBinding.borrowerPaymentET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
+        if (includeBinding.borrowerPaymentET.editText?.text.toString().toDouble() <= 0) {
+
+            includeBinding.borrowerPaymentET.error = "Please enter amount greater than 0."
+            return false
+        }
+
+        if (includeBinding.addInterestCB.isChecked) {
+
+            if (!includeBinding.ratePercentET.isTextValid()) {
+
+                includeBinding.ratePercentET.requestFocus()
+                includeBinding.ratePercentET.error = EDIT_TEXT_EMPTY_MESSAGE
+                return false
+            }
+        }
+
+        if (includeBinding.addSupprtingDocCB.isChecked) {
+
+            if (!includeBinding.fileNameET.isTextValid()) {
+
+                includeBinding.fileNameET.requestFocus()
+                includeBinding.fileNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+                return false
+            }
+
+            if (docType == DocumentType.PDF && pdfUri == null) {
+
+                showToast(
+                    requireContext(),
+                    "Please add a pdf file as supporting document.",
+                    duration = Toast.LENGTH_LONG
+                )
+                return false
+            }
+
+            if (docType == DocumentType.IMAGE && imageUri == null) {
+
+                showToast(
+                    requireContext(),
+                    "Please add an image as supporting document.",
+                    duration = Toast.LENGTH_LONG
+                )
+                return false
+            }
+
+            if (docType == DocumentType.URL && !includeBinding.urlET.isTextValid()) {
+
+                includeBinding.urlET.error = EDIT_TEXT_EMPTY_MESSAGE
+                return false
+            }
+        }
+
+        return includeBinding.borrowerPaymentET.editText?.isTextValid()!!
     }
 
     private fun checkFormAndInitDatabase() {
@@ -446,7 +436,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
                 supportingDocument = SupportingDocument(
                     includeBinding.fileNameET.text.toString().trim(),
-                    if (docType == DocumentType.URL) includeBinding.fileNameET.text.toString()
+                    if (docType == DocumentType.URL) includeBinding.urlET.text.toString()
                         .trim() else downloadUrl,
                     docType
                 )
@@ -534,64 +524,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         }
     }
 
-    private fun isFormValid(): Boolean {
-
-        if (!includeBinding.borrowerPaymentET.editText?.isTextValid()!!) {
-
-            includeBinding.borrowerPaymentET.error = EDIT_TEXT_EMPTY_MESSAGE
-            return false
-        }
-
-        if (includeBinding.borrowerPaymentET.editText?.text.toString().toDouble() <= 0) {
-
-            includeBinding.borrowerPaymentET.error = "Please enter amount greater than 0."
-            return false
-        }
-
-        if (includeBinding.addInterestCB.isChecked) {
-
-            if (!includeBinding.ratePercentET.isTextValid()) {
-
-                includeBinding.ratePercentET.requestFocus()
-                includeBinding.ratePercentET.error = EDIT_TEXT_EMPTY_MESSAGE
-                return false
-            }
-        }
-
-        if (includeBinding.addSupprtingDocCB.isChecked) {
-
-            if (!includeBinding.fileNameET.isTextValid()) {
-
-                includeBinding.fileNameET.requestFocus()
-                includeBinding.fileNameET.error = EDIT_TEXT_EMPTY_MESSAGE
-                return false
-            }
-
-            if (docType == DocumentType.PDF && pdfUri == null) {
-
-                showToast(
-                    requireContext(),
-                    "Please add a pdf file as supporting document.",
-                    duration = Toast.LENGTH_LONG
-                )
-                return false
-            }
-
-            if (docType == DocumentType.IMAGE && imageUri == null) {
-
-                showToast(
-                    requireContext(),
-                    "Please add an image as supporting document.",
-                    duration = Toast.LENGTH_LONG
-                )
-                return false
-            }
-
-        }
-
-        return includeBinding.borrowerPaymentET.editText?.isTextValid()!!
-    }
-
     override fun onClick(v: View?) {
 
         if (v?.id == includeBinding.dateTV.id || v?.id == includeBinding.selectDateBtn.id) {
@@ -665,6 +597,8 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     }
 
+    private var recentUrl = ""
+
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
         hideKeyBoard(requireActivity())
 
@@ -675,6 +609,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 docType = DocumentType.PDF
                 includeBinding.fileNameET.hint = "Enter file name"
                 showFileUploadNoteTV(true)
+                showUrlEditText(false)
 
                 if (pdfUri != null) {
 
@@ -697,6 +632,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 includeBinding.fileNameET.hint = "Enter image name"
                 docType = DocumentType.IMAGE
                 showFileUploadNoteTV(true)
+                showUrlEditText(false)
 
                 if (imageUri != null) {
 
@@ -715,11 +651,12 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
             includeBinding.urlRB.id -> {
 
-                includeBinding.fileNameET.hint = "Enter url here"
+                includeBinding.fileNameET.hint = "Enter url name here"
                 docType = DocumentType.URL
 
-                includeBinding.fileNameET.setText("")
+                includeBinding.fileNameET.setText(recentUrl)
 
+                showUrlEditText(true)
                 showFileNameEditText(true)
                 showAddFileBtn(false)
                 showRemoveFileBtn(false)
@@ -852,6 +789,22 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             } else {
 
                 includeBinding.fileNameET.error = null
+
+                if (docType == DocumentType.URL) {
+
+                    recentUrl = s.toString()
+                }
+            }
+        }
+
+        includeBinding.urlET.onTextChangedListener { s ->
+
+            if (s?.trim()?.isEmpty()!!) {
+
+                includeBinding.urlET.error = EDIT_TEXT_EMPTY_MESSAGE
+            } else {
+
+                includeBinding.urlET.error = null
             }
         }
     }
@@ -874,6 +827,12 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     private fun showFileNameEditText(isVisible: Boolean) {
 
         includeBinding.fileNameET.isVisible = isVisible
+    }
+
+    private fun showUrlEditText(isVisible: Boolean) {
+
+        includeBinding.urlET.visibility = if (isVisible) View.VISIBLE else View.INVISIBLE
+        includeBinding.urlET.isEnabled = isVisible
     }
 
     private fun showRemoveFileBtn(isVisible: Boolean) {

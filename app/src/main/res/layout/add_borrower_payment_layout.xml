@@ -104,7 +104,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider4"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -261,7 +261,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:padding="3dp"
-                android:text="Time schedule"
+                android:text="@string/time_schedule"
                 android:textColor="@color/primaryTextColor"
                 app:layout_constraintBottom_toBottomOf="@+id/timeScheduleSpinner"
                 app:layout_constraintStart_toStartOf="parent"
@@ -283,14 +283,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
-                    android:text="Simple interest"
+                    android:text="@string/simple_interest"
                     android:textSize="12sp" />
 
                 <RadioButton
                     android:id="@+id/compundIntRB"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Compound interest"
+                    android:text="@string/compound_interest"
                     android:textSize="12sp" />
             </RadioGroup>
 
@@ -300,10 +300,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:ems="6"
-                android:hint="Rete percent"
+                android:hint="@string/rete_percent"
                 android:inputType="numberDecimal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/interestTypeRG"
+                android:importantForAutofill="no"
                 app:layout_constraintTop_toBottomOf="@+id/interestTypeRG" />
 
             <TextView
@@ -312,7 +313,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:padding="2dp"
-                android:text="%"
+                android:text="@string/percent_sign"
                 app:layout_constraintBottom_toBottomOf="@+id/ratePercentET"
                 app:layout_constraintStart_toEndOf="@+id/ratePercentET" />
 
@@ -336,6 +337,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/textView182"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textView182"
+                android:contentDescription="@string/imagebutton"
                 app:srcCompat="@drawable/ic_baseline_calculate_24" />
 
 
@@ -428,7 +430,7 @@
                     android:layout_marginEnd="10dp"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:text="pdf"
+                    android:text="@string/pdf"
                     android:textSize="14sp" />
 
                 <RadioButton
@@ -438,7 +440,7 @@
                     android:layout_marginEnd="10dp"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:text="image"
+                    android:text="@string/image"
                     android:textSize="14sp" />
 
                 <RadioButton
@@ -447,7 +449,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:text="url"
+                    android:text="@string/url"
                     android:textSize="14sp" />
             </RadioGroup>
 
@@ -458,28 +460,46 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="24dp"
-                android:hint="File name"
+                android:hint="@string/file_name"
                 android:inputType="textPersonName"
                 android:visibility="gone"
-                app:layout_constraintBottom_toTopOf="@+id/uploadingFileNoteTV"
                 app:layout_constraintEnd_toStartOf="@+id/removeFileBtn"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/docTypeRG"
-                tools:visibility="gone" />
+                android:importantForAutofill="no"
+                tools:visibility="visible" />
+
+            <EditText
+                android:id="@+id/urlET"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="8dp"
+                android:hint="@string/enter_url_here"
+                android:importantForAutofill="no"
+                android:inputType="textUri"
+                android:textColor="#2962FF"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fileNameET"
+                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/uploadingFileNoteTV"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:padding="3dp"
-                android:text="*For uploading file you need to have  active internet connection."
+                android:text="@string/for_uploading_file_you_need_to_have_active_internet_connection"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/textView5"
+                app:layout_constraintTop_toBottomOf="@+id/urlET"
                 tools:visibility="visible" />
 
             <ImageButton
@@ -493,6 +513,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/fileNameET"
                 app:srcCompat="@drawable/ic_baseline_delete_forever_24"
+                android:contentDescription="@string/imagebutton"
                 tools:visibility="gone" />
 
             <com.google.android.material.card.MaterialCardView
@@ -509,7 +530,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/docTypeRG"
                 app:strokeColor="@color/textColor1"
                 app:strokeWidth="0.5dp"
-                tools:visibility="visible">
+                tools:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -522,7 +543,7 @@
                         android:drawablePadding="10dp"
                         android:gravity="center_vertical"
                         android:padding="5dp"
-                        android:text="Add file"
+                        android:text="@string/add_file"
                         android:textColor="@color/primaryTextColor"
                         android:textSize="14sp"
                         app:drawableStartCompat="@drawable/ic_baseline_add_circle_outline_24" />
@@ -584,7 +605,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Add interest"
+        android:text="@string/add_interest"
         app:layout_constraintStart_toStartOf="@+id/cardView6"
         app:layout_constraintTop_toBottomOf="@+id/cardView6" />
 
@@ -594,7 +615,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="Add supporting document"
+        android:text="@string/add_supporting_document"
         app:layout_constraintStart_toEndOf="@+id/addInterestCB"
         app:layout_constraintTop_toBottomOf="@+id/cardView6" />
 

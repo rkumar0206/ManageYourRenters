@@ -66,8 +66,5 @@
             android:name="borrowerKeyMessage"
             app:argType="string"
             app:nullable="true" />
-        <argument
-            android:name="isBorrowerKey"
-            app:argType="boolean" />
     </fragment>
 </navigation>

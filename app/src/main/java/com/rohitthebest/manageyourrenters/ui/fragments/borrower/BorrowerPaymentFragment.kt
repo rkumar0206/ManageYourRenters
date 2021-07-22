@@ -56,8 +56,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                 val action =
                     BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
-                        receivedBorrowerKey,
-                        isBorrowerKey = true
+                        receivedBorrowerKey
                     )
                 findNavController().navigate(action)
             }
@@ -210,8 +209,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         // sending borrower payment key not the borrower key
         val action =
             BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
-                borrowerPaymentKey,
-                isBorrowerKey = false
+                borrowerPaymentKey
             )
         findNavController().navigate(action)
 

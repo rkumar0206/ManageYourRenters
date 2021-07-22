@@ -94,6 +94,18 @@
     <string name="sync_borrower_payments">syncing borrower payments…</string>
     <string name="sync_renters_payments">syncing renters payments…</string>
     <string name="sync_borrowers">syncing borrowers…</string>
+    <string name="time_schedule">Time schedule</string>
+    <string name="simple_interest">Simple interest</string>
+    <string name="compound_interest">Compound interest</string>
+    <string name="rete_percent">Rete percent</string>
+    <string name="percent_sign">%</string>
+    <string name="imagebutton">imagebutton</string>
+    <string name="file_name">File name</string>
+    <string name="enter_url_here">Enter url here</string>
+    <string name="for_uploading_file_you_need_to_have_active_internet_connection">*For uploading file you need to have active internet connection.</string>
+    <string name="add_file">Add file</string>
+    <string name="add_interest">Add interest</string>
+    <string name="add_supporting_document">Add supporting document</string>
 
 
     <string-array name="interest_time_schedule">

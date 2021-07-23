@@ -277,7 +277,9 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
             if (it.isNotEmpty()) {
 
-                // upload this list to the fire store
+                // upload this list to firestore
+
+
             }
         })
 

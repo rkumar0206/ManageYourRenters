@@ -33,18 +33,19 @@ class UploadService : Service() {
         val uploadData = intent?.getStringExtra(UPLOAD_DATA_KEY)
         val randomId = intent?.getIntExtra(RANDOM_ID_KEY, 1003)
 
-        val image = if (collection == getString(R.string.renters)) {
+        val image =
+            if (collection == getString(R.string.renters) || collection == getString(R.string.borrowers)) {
 
-            R.drawable.ic_baseline_person_add_24
-        } else {
-            R.drawable.ic_baseline_payment_24
-        }
+                R.drawable.ic_baseline_person_add_24
+            } else {
+                R.drawable.ic_baseline_payment_24
+            }
 
         val notification = NotificationCompat.Builder(
             this,
             Constants.NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(image)
-            .setContentTitle("Uploading changes to cloud.")
+            .setContentTitle("Uploading to cloud.")
             .build()
 
         startForeground(randomId!!, notification)

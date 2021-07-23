@@ -61,3 +61,14 @@ fun fromStringToBorrowerPayment(str: String): BorrowerPayment {
 
     return Gson().fromJson(str, object : TypeToken<BorrowerPayment>() {}.type)
 }
+
+fun fromModelListToString(list: List<Any>): String {
+
+    return gson.toJson(list)
+}
+
+fun fromStringToModelList(jsonString: String?): Any {
+
+    val type = object : TypeToken<Any>() {}.type
+    return gson.fromJson(jsonString, type)
+}

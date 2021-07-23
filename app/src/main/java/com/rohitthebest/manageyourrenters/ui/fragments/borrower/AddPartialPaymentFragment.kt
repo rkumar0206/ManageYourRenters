@@ -167,12 +167,16 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                 if (isChecked) {
 
-                    //todo : disable everything below this checkbox
+                    // disabling the ui below this checkbox
                     shouldEnableAddingPartialPayment(false)
+                    // todo : update the is due cleared variable of borrower payment
+                    //todo : show the delete payment button
                 } else {
-
-                    // todo : enable everything below this checkbox
+                    //enabling the ui below the checkbox
                     shouldEnableAddingPartialPayment(true)
+
+                    //todo : check weather the sum of partial payment is greater than or equal to the due amount and take appropriate action
+
                 }
             }
         }
@@ -192,6 +196,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         includeBinding.addPartialPaymentAmountET.isEnabled = isEnable
         includeBinding.addPartialPaymentAmountET.editText?.isEnabled = isEnable
         includeBinding.addPartialPaymentBtn.isEnabled = isEnable
+        includeBinding.addPartialPaymentRV.isEnabled = isEnable
 
         if (isEnable) {
 

@@ -26,4 +26,7 @@ class PartialPaymentRepository @Inject constructor(
 
     fun getPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey: String) =
         dao.getPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey)
+
+    fun getTheSumOfPartialPaymentsOfBorrowerPayment(borrowerPaymentKey: String) =
+        dao.getTheSumOfPartialPaymentsOfBorrowerPayment(borrowerPaymentKey)
 }

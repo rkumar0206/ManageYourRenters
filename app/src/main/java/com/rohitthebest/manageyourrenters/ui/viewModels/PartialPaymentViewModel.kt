@@ -38,4 +38,7 @@ class PartialPaymentViewModel @Inject constructor(
 
     fun getPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey: String) =
         repository.getPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey).asLiveData()
+
+    fun getTheSumOfPartialPaymentsOfBorrowerPayment(borrowerPaymentKey: String) =
+        repository.getTheSumOfPartialPaymentsOfBorrowerPayment(borrowerPaymentKey).asLiveData()
 }

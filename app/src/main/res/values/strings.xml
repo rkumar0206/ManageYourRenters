@@ -106,6 +106,10 @@
     <string name="add_file">Add file</string>
     <string name="add_interest">Add interest</string>
     <string name="add_supporting_document">Add supporting document</string>
+    <string name="mark_this_payment_as_done">Mark this payment as done</string>
+    <string name="add_partial_payment">Add partial payment</string>
+    <string name="enter_amount">Enter amount</string>
+    <string name="no_partial_payment_is_added">No partial payment is added</string>
 
 
     <string-array name="interest_time_schedule">

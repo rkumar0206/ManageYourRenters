@@ -13,8 +13,8 @@
             android:id="@+id/add_partial_fragment_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-            app:title="Add partial payment" />
+            app:navigationIcon="@drawable/ic_cancel"
+            app:title="Payments" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -30,5 +30,11 @@ interface PartialPaymentDao {
 
     @Query("SELECT SUM(amount) FROM partial_payment_table WHERE borrowerPaymentKey = :borrowerPaymentKey")
     fun getTheSumOfPartialPaymentsOfBorrowerPayment(borrowerPaymentKey: String): Flow<Double>
+
+    @Query("SELECT * FROM partial_payment_table WHERE borrowerPaymentKey = :borrowerPaymentKey AND isSynced = :isSynced")
+    fun getThePartialPaymentsByIsSyncedAndBorrowerPayment(
+        borrowerPaymentKey: String,
+        isSynced: Boolean
+    ): Flow<List<PartialPayment>>
 }
 

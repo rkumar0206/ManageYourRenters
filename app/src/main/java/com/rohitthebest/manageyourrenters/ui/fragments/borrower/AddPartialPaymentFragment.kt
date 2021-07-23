@@ -50,7 +50,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private lateinit var partialPaymentAdapter: PartialPaymentAdapter
     private var isPaymentMarkedAsDone = false
-    private lateinit var removedPartialPaymentKeyList: List<String>
+    private lateinit var removedPartialPaymentKeyList: ArrayList<String>
     private var dueLeftAmount = 0.0;
 
     override fun onCreateView(
@@ -135,6 +135,13 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
         dueLeftAmount += partialPayment.amount
 
+        // adding the keys of the partial payment (isSynced = true) which is going to removed so that
+        // it can also be removed from the cloud database
+        if (partialPayment.isSynced) {
+
+            removedPartialPaymentKeyList.add(partialPayment.key)
+        }
+
         partialPaymentViewModel.deletePartialPayment(partialPayment)
         hideKeyBoard(requireActivity())
     }
@@ -183,8 +190,6 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     override fun onClick(v: View?) {
 
-        hideKeyBoard(requireActivity())
-
         if (v?.id == includeBinding.addPartialPaymentDateBtn.id
             || v?.id == includeBinding.addPartialPaymentDateTV.id
         ) {
@@ -207,7 +212,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                 if (includeBinding.addPartialPaymentAmountET.editText?.isTextValid()!!) {
 
-                    initPartialPaymentAndAddToDataabase()
+                    initPartialPaymentAndAddToDatabase()
 
                 } else {
 
@@ -215,9 +220,11 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
                 }
             }
         }
+
+        hideKeyBoard(requireActivity())
     }
 
-    private fun initPartialPaymentAndAddToDataabase() {
+    private fun initPartialPaymentAndAddToDatabase() {
 
         val partialPayment = PartialPayment()
 

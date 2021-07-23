@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +10,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.PartialPaymentAdapter
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.database.model.PartialPayment
 import com.rohitthebest.manageyourrenters.databinding.AddPartialPaymentLayoutBinding
@@ -18,15 +21,20 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddPartialPaymentB
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PartialPaymentViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.isTextValid
 import com.rohitthebest.manageyourrenters.utils.setDateInTextView
 import dagger.hilt.android.AndroidEntryPoint
 
+private const val TAG = "AddPartialPaymentFragme"
+
 @AndroidEntryPoint
 class AddPartialPaymentFragment : BottomSheetDialogFragment(),
-    CompoundButton.OnCheckedChangeListener, View.OnClickListener {
+    CompoundButton.OnCheckedChangeListener, View.OnClickListener,
+    PartialPaymentAdapter.OnClickListener {
 
     private var _binding: FragmentAddPartialPaymentBinding? = null
     private val binding get() = _binding!!
@@ -40,9 +48,10 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private var selectedDate = 0L
 
+    private lateinit var partialPaymentAdapter: PartialPaymentAdapter
     private var isPaymentMarkedAsDone = false
-    private lateinit var addedPartialPaymentList: List<PartialPayment>
     private lateinit var removedPartialPaymentKeyList: List<String>
+    private var dueLeftAmount = 0.0;
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,7 +68,6 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
         initListeners()
 
-        addedPartialPaymentList = ArrayList()
         removedPartialPaymentKeyList = ArrayList()
 
         selectedDate = System.currentTimeMillis()
@@ -88,8 +96,8 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
             receivedBorrowerPaymentKey = args?.borrowerPaymentMessage!!
 
+            Log.d(TAG, "getMessage: $receivedBorrowerPaymentKey")
             getBorrowerPayment()
-            getBorrowerPartialPayments()
         }
     }
 
@@ -99,8 +107,36 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             .observe(viewLifecycleOwner, { borrowerPayment ->
 
                 receivedBorrowerPayment = borrowerPayment
+                dueLeftAmount = borrowerPayment.dueLeftAmount
+
+                Log.d(TAG, "getBorrowerPayment: Due left amount : $dueLeftAmount")
+                partialPaymentAdapter = PartialPaymentAdapter(borrowerPayment.currencySymbol)
+                setUpRecyclerView()
+
                 updateUI()
+                getBorrowerPartialPayments()
+                getTheTotalPartialPaymentSumAndHandleTheDue()
             })
+    }
+
+    private fun setUpRecyclerView() {
+
+        includeBinding.addPartialPaymentRV.apply {
+
+            setHasFixedSize(true)
+            adapter = partialPaymentAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+
+        partialPaymentAdapter.setOnClickListener(this)
+    }
+
+    override fun onDeleteBtnClick(partialPayment: PartialPayment, position: Int) {
+
+        dueLeftAmount += partialPayment.amount
+
+        partialPaymentViewModel.deletePartialPayment(partialPayment)
+        hideKeyBoard(requireActivity())
     }
 
     private fun getBorrowerPartialPayments() {
@@ -108,9 +144,10 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         partialPaymentViewModel.getPartialPaymentByBorrowerPaymentKey(receivedBorrowerPaymentKey)
             .observe(viewLifecycleOwner, { partialPaymentList ->
 
+                partialPaymentAdapter.submitList(partialPaymentList)
+
                 if (partialPaymentList.isNotEmpty()) {
 
-                    //todo : submit the list to the adapter
                     showNoPartialPaymentAddedTV(false)
                 } else {
 
@@ -146,6 +183,8 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     override fun onClick(v: View?) {
 
+        hideKeyBoard(requireActivity())
+
         if (v?.id == includeBinding.addPartialPaymentDateBtn.id
             || v?.id == includeBinding.addPartialPaymentDateTV.id
         ) {
@@ -168,12 +207,65 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                 if (includeBinding.addPartialPaymentAmountET.editText?.isTextValid()!!) {
 
-                    //todo : add the partial payment and clear the text
+                    initPartialPaymentAndAddToDataabase()
+
                 } else {
 
                     includeBinding.addPartialPaymentAmountET.error = EDIT_TEXT_EMPTY_MESSAGE
                 }
             }
+        }
+    }
+
+    private fun initPartialPaymentAndAddToDataabase() {
+
+        val partialPayment = PartialPayment()
+
+        partialPayment.apply {
+
+            created = selectedDate
+            borrowerId = receivedBorrowerPayment?.borrowerId!!
+            borrowerPaymentKey = receivedBorrowerPaymentKey
+            amount = includeBinding.addPartialPaymentAmountET.editText?.text.toString()
+                .toDouble()
+            uid = receivedBorrowerPayment?.uid!!
+            isSynced = false
+            key = generateKey("_${receivedBorrowerPayment?.uid}")
+        }
+
+        includeBinding.addPartialPaymentAmountET.editText?.setText("")
+
+        partialPaymentViewModel.insertPartialPayment(partialPayment)
+
+        dueLeftAmount -= partialPayment.amount
+
+    }
+
+    private fun getTheTotalPartialPaymentSumAndHandleTheDue() {
+
+        try {
+            partialPaymentViewModel.getTheSumOfPartialPaymentsOfBorrowerPayment(
+                receivedBorrowerPaymentKey
+            ).observe(viewLifecycleOwner, { totalPartialPayment ->
+
+                Log.d(
+                    TAG,
+                    "getTheTotalPartialPaymentSumAndHandleTheDue: Total Due : $totalPartialPayment"
+                )
+                Log.d(TAG, "getTheTotalPartialPaymentSumAndHandleTheDue: Due Left : $dueLeftAmount")
+
+                if (totalPartialPayment != null) {
+
+                    includeBinding.markAsDoneCB.isChecked =
+                        totalPartialPayment >= receivedBorrowerPayment?.dueLeftAmount!!
+                } else {
+
+                    includeBinding.markAsDoneCB.isChecked = false
+                }
+            })
+        } catch (e: NullPointerException) {
+
+            e.printStackTrace()
         }
     }
 
@@ -267,6 +359,5 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         super.onDestroyView()
         _binding = null
     }
-
 
 }

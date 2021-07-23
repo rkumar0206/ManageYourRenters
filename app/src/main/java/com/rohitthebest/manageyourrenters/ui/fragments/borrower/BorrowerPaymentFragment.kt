@@ -134,7 +134,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
         val action =
             BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddPartialPaymentFragment(
-                fromBorrowerPaymentToString(borrowerPayment)
+                borrowerPayment.key
             )
 
         findNavController().navigate(action)

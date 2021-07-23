@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_show_bill"
+        android:id="@+id/menu_save_btn"
         android:icon="@drawable/ic_baseline_save_24"
-        android:title="Show bill"
+        android:title="Save payment"
         app:showAsAction="always" />
 </menu>

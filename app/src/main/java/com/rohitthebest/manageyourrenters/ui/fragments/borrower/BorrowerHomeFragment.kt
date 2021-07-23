@@ -221,7 +221,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                     val paymentToDeleteFromFirestore =
                         keysAndIsSyncedList.filter { k -> k.isSynced }.map { k -> k.key }
 
-                    deleteAllDocumentsUsingKey(
+                    deleteAllDocumentsUsingKeyFromFirestore(
                         requireContext(),
                         getString(R.string.borrowerPayments),
                         convertStringListToJSON(paymentToDeleteFromFirestore)

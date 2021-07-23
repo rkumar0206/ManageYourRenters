@@ -107,7 +107,7 @@ fun deleteDocumentFromFireStore(
     ContextCompat.startForegroundService(context, foregroundService)
 }
 
-fun deleteAllDocumentsUsingKey(
+fun deleteAllDocumentsUsingKeyFromFirestore(
     context: Context,
     collection: String,
     keyList: String

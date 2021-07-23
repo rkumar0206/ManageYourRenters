@@ -221,7 +221,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         includeBinding.docTypeRG.setOnCheckedChangeListener(this)
         includeBinding.interestTypeRG.setOnCheckedChangeListener(this)
 
-        binding.addBorrowerPaymentToolBar.menu.findItem(R.id.menu_show_bill)
+        binding.addBorrowerPaymentToolBar.menu.findItem(R.id.menu_save_btn)
             .setOnMenuItemClickListener {
 
                 Log.d(TAG, "initListeners: Menu item clicked")

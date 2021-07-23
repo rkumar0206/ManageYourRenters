@@ -21,12 +21,11 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddPartialPaymentB
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PartialPaymentViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
-import com.rohitthebest.manageyourrenters.utils.changeTextColor
-import com.rohitthebest.manageyourrenters.utils.isTextValid
-import com.rohitthebest.manageyourrenters.utils.setDateInTextView
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "AddPartialPaymentFragme"
@@ -186,6 +185,111 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
             requireActivity().onBackPressed()
         }
+
+        binding.addPartialFragmentToolbar.menu.findItem(R.id.menu_save_btn)
+            .setOnMenuItemClickListener {
+
+                saveChangesToTheDatabase()
+                true
+            }
+    }
+
+    private fun saveChangesToTheDatabase() {
+
+        receivedBorrowerPayment?.let { borrowerPayment ->
+
+            val map = HashMap<String, Any?>()
+
+            if (includeBinding.markAsDoneCB.isChecked != borrowerPayment.isDueCleared) {
+
+                receivedBorrowerPayment!!.isDueCleared = includeBinding.markAsDoneCB.isChecked
+
+                map["isDueCleared"] = receivedBorrowerPayment!!.isDueCleared
+
+                if (includeBinding.markAsDoneCB.isChecked) {
+
+                    receivedBorrowerPayment!!.dueLeftAmount = 0.0
+                    map["dueLeftAmount"] = 0.0
+
+                    // checking if the borrower payment was already synced
+                } else {
+
+                    receivedBorrowerPayment!!.dueLeftAmount = dueLeftAmount
+                    map["dueLeftAmount"] = dueLeftAmount
+                }
+
+            } else {
+
+                if (dueLeftAmount != borrowerPayment.dueLeftAmount) {
+
+                    receivedBorrowerPayment!!.dueLeftAmount = dueLeftAmount
+                    map["dueLeftAmount"] = dueLeftAmount
+                }
+            }
+
+            if (receivedBorrowerPayment!!.isSynced) {
+
+                //update on firestore
+                if (isInternetAvailable(requireContext())) {
+
+                    updateDocumentOnFireStore(
+                        requireContext(),
+                        map,
+                        getString(R.string.borrowerPayments),
+                        receivedBorrowerPayment!!.key
+                    )
+
+                } else {
+
+                    receivedBorrowerPayment!!.isSynced = false
+                }
+
+                borrowerPaymentViewModel.updateBorrowerPayment(receivedBorrowerPayment!!)
+
+            } else {
+
+                //upload to firestore
+
+                if (isInternetAvailable(requireContext())) {
+
+                    receivedBorrowerPayment!!.isSynced = true
+
+                    uploadDocumentToFireStore(
+                        requireContext(),
+                        fromBorrowerPaymentToString(receivedBorrowerPayment!!),
+                        getString(R.string.borrowerPayments),
+                        borrowerPayment.key
+                    )
+                }
+
+                borrowerPaymentViewModel.updateBorrowerPayment(receivedBorrowerPayment!!)
+            }
+
+            savePartialPaymentsToFireStore()
+        }
+    }
+
+    private fun savePartialPaymentsToFireStore() {
+
+        partialPaymentViewModel.getThePartialPaymentsByIsSyncedAndBorrowerPayment(
+            receivedBorrowerPaymentKey, false
+        ).observe(viewLifecycleOwner, {
+
+            if (it.isNotEmpty()) {
+
+                // upload this list to the fire store
+            }
+        })
+
+        if (removedPartialPaymentKeyList.isNotEmpty()) {
+
+            deleteAllDocumentsUsingKeyFromFirestore(
+                requireContext(),
+                getString(R.string.partialPayments),
+                convertStringListToJSON(removedPartialPaymentKeyList)
+            )
+        }
+
     }
 
     override fun onClick(v: View?) {

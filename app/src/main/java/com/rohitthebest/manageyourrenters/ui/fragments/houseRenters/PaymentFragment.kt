@@ -737,7 +737,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         if (paymentKeyList.isNotEmpty()) {
 
-            deleteAllDocumentsUsingKey(
+            deleteAllDocumentsUsingKeyFromFirestore(
                 requireContext(),
                 getString(R.string.payments),
                 convertStringListToJSON(paymentKeyList)

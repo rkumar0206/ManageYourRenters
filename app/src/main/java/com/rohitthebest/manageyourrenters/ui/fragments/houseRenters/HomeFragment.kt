@@ -267,7 +267,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                         if (paymentToDeleteFromFirestore.isNotEmpty()) {
 
-                            deleteAllDocumentsUsingKey(
+                            deleteAllDocumentsUsingKeyFromFirestore(
                                 requireContext(),
                                 getString(R.string.payments),
                                 convertStringListToJSON(

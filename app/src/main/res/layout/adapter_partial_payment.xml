@@ -12,7 +12,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/textView25"
+            android:id="@+id/partialPaymentDateTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
@@ -27,7 +27,7 @@
             tools:text="02-06-2000" />
 
         <TextView
-            android:id="@+id/textView27"
+            android:id="@+id/partial_paymentTV"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -37,21 +37,22 @@
             android:maxLines="1"
             android:padding="5dp"
             android:textColor="@color/color_green"
-            app:layout_constraintBottom_toBottomOf="@+id/textView25"
-            app:layout_constraintEnd_toStartOf="@+id/imageButton"
-            app:layout_constraintStart_toEndOf="@+id/textView25"
-            app:layout_constraintTop_toTopOf="@+id/textView25"
+            app:layout_constraintBottom_toBottomOf="@+id/partialPaymentDateTV"
+            app:layout_constraintEnd_toStartOf="@+id/deletePartialPayment"
+            app:layout_constraintStart_toEndOf="@+id/partialPaymentDateTV"
+            app:layout_constraintTop_toTopOf="@+id/partialPaymentDateTV"
             tools:text="5000" />
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/deletePartialPayment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:backgroundTint="@color/color_white"
-            app:layout_constraintBottom_toBottomOf="@+id/textView25"
+            android:contentDescription="@string/imagebutton"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView25"
+            app:layout_constraintBottom_toBottomOf="@+id/partialPaymentDateTV"
+            app:layout_constraintTop_toTopOf="@+id/partialPaymentDateTV"
             app:srcCompat="@drawable/ic_baseline_delete_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

@@ -131,7 +131,13 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     //[START OF ADAPTER CLICK LISTENER]
     override fun onItemClick(borrowerPayment: BorrowerPayment) {
-        //todo  : open bottom sheet to add partial payment
+
+        val action =
+            BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddPartialPaymentFragment(
+                fromBorrowerPaymentToString(borrowerPayment)
+            )
+
+        findNavController().navigate(action)
     }
 
     override fun onDeleteBtnClick(borrowerPayment: BorrowerPayment) {

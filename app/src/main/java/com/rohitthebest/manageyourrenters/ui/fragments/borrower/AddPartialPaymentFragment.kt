@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -15,6 +16,7 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddPartialPaymentB
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PartialPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
+import com.rohitthebest.manageyourrenters.utils.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.setDateInTextView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -166,9 +168,11 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
                 if (isChecked) {
 
                     //todo : disable everything below this checkbox
+                    shouldEnableAddingPartialPayment(false)
                 } else {
 
                     // todo : enable everything below this checkbox
+                    shouldEnableAddingPartialPayment(true)
                 }
             }
         }
@@ -177,6 +181,52 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
     private fun showNoPartialPaymentAddedTV(isVisible: Boolean) {
 
         includeBinding.noPayemtAddedTV.isVisible = isVisible
+    }
+
+    private fun shouldEnableAddingPartialPayment(isEnable: Boolean) {
+
+        val colorGrey = ContextCompat.getColor(requireContext(), R.color.colorGrey)
+
+        includeBinding.addPartialPaymentDateBtn.isEnabled = isEnable
+        includeBinding.addPartialPaymentDateTV.isEnabled = isEnable
+        includeBinding.addPartialPaymentAmountET.isEnabled = isEnable
+        includeBinding.addPartialPaymentAmountET.editText?.isEnabled = isEnable
+        includeBinding.addPartialPaymentBtn.isEnabled = isEnable
+
+        if (isEnable) {
+
+            includeBinding.addPatialPaymentHeadingTV.changeTextColor(
+                requireContext(),
+                R.color.primaryTextColor
+            )
+            includeBinding.addPartialPaymentAmountET.editText?.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.primaryTextColor
+                )
+            )
+            includeBinding.addPartialPaymentBtn.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.purple_500
+                )
+            )
+            includeBinding.noPayemtAddedTV.changeTextColor(
+                requireContext(),
+                R.color.primaryTextColor
+            )
+        } else {
+
+            includeBinding.addPatialPaymentHeadingTV.changeTextColor(
+                requireContext(),
+                R.color.colorGrey
+            )
+            includeBinding.addPartialPaymentAmountET.editText?.setTextColor(colorGrey)
+            includeBinding.addPartialPaymentBtn.setTextColor(colorGrey)
+            includeBinding.noPayemtAddedTV.changeTextColor(requireContext(), R.color.colorGrey)
+
+            //todo : also change the color of recyclerview list items
+        }
     }
 
     override fun onDestroyView() {

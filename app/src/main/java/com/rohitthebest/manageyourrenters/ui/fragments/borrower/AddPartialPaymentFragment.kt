@@ -7,16 +7,20 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
+import com.rohitthebest.manageyourrenters.database.model.PartialPayment
 import com.rohitthebest.manageyourrenters.databinding.AddPartialPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPartialPaymentBinding
+import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PartialPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
+import com.rohitthebest.manageyourrenters.utils.isTextValid
 import com.rohitthebest.manageyourrenters.utils.setDateInTextView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,6 +40,10 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private var selectedDate = 0L
 
+    private var isPaymentMarkedAsDone = false
+    private lateinit var addedPartialPaymentList: List<PartialPayment>
+    private lateinit var removedPartialPaymentKeyList: List<String>
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,10 +59,14 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
         initListeners()
 
+        addedPartialPaymentList = ArrayList()
+        removedPartialPaymentKeyList = ArrayList()
+
         selectedDate = System.currentTimeMillis()
         initDate()
 
         getMessage()
+        textWatcher()
     }
 
     private fun initDate() {
@@ -114,6 +126,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             if (borrowerPayment.isDueCleared) {
 
                 includeBinding.markAsDoneCB.isChecked = true
+                isPaymentMarkedAsDone = true
             }
         }
     }
@@ -153,11 +166,16 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
             includeBinding.addPartialPaymentBtn.id -> {
 
-                // todo : add the partial payment
+                if (includeBinding.addPartialPaymentAmountET.editText?.isTextValid()!!) {
+
+                    //todo : add the partial payment and clear the text
+                } else {
+
+                    includeBinding.addPartialPaymentAmountET.error = EDIT_TEXT_EMPTY_MESSAGE
+                }
             }
         }
     }
-
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
 
@@ -178,6 +196,17 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
                     //todo : check weather the sum of partial payment is greater than or equal to the due amount and take appropriate action
 
                 }
+            }
+        }
+    }
+
+    private fun textWatcher() {
+
+        includeBinding.addPartialPaymentAmountET.editText?.addTextChangedListener { s ->
+
+            if (s?.isNotEmpty()!!) {
+
+                includeBinding.addPartialPaymentAmountET.error = null
             }
         }
     }

@@ -312,8 +312,6 @@ class Functions {
                 "datePicker"
             )
 
-            //builder.show(requireActivity().supportFragmentManager, "datePicker")
-
             builder.addOnPositiveButtonClickListener {
 
                 positiveListener(it)

@@ -14,11 +14,13 @@ import com.rohitthebest.manageyourrenters.databinding.AddPartialPaymentLayoutBin
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPartialPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PartialPaymentViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
+import com.rohitthebest.manageyourrenters.utils.setDateInTextView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class AddPartialPaymentFragment : BottomSheetDialogFragment(),
-    CompoundButton.OnCheckedChangeListener {
+    CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
     private var _binding: FragmentAddPartialPaymentBinding? = null
     private val binding get() = _binding!!
@@ -29,6 +31,8 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private var receivedBorrowerPayment: BorrowerPayment? = null
     private var receivedBorrowerPaymentKey: String = ""
+
+    private var selectedDate = 0L
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,7 +49,18 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
         initListeners()
 
+        selectedDate = System.currentTimeMillis()
+        initDate()
+
         getMessage()
+    }
+
+    private fun initDate() {
+
+        includeBinding.addPartialPaymentDateTV.setDateInTextView(
+            selectedDate,
+            "dd-MMMM-yyyy"
+        )
     }
 
     private fun getMessage() {
@@ -103,6 +118,9 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private fun initListeners() {
 
+        includeBinding.addPartialPaymentDateBtn.setOnClickListener(this)
+        includeBinding.addPartialPaymentBtn.setOnClickListener(this)
+        includeBinding.addPartialPaymentDateTV.setOnClickListener(this)
         includeBinding.markAsDoneCB.setOnCheckedChangeListener(this)
 
         binding.addPartialFragmentToolbar.setNavigationOnClickListener {
@@ -110,6 +128,34 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             requireActivity().onBackPressed()
         }
     }
+
+    override fun onClick(v: View?) {
+
+        if (v?.id == includeBinding.addPartialPaymentDateBtn.id
+            || v?.id == includeBinding.addPartialPaymentDateTV.id
+        ) {
+
+            showCalendarDialog(
+                selectedDate,
+                {
+                    requireActivity().supportFragmentManager
+                },
+                {
+                    selectedDate = it
+                    initDate()
+                }
+            )
+        }
+
+        when (v?.id) {
+
+            includeBinding.addPartialPaymentBtn.id -> {
+
+                // todo : add the partial payment
+            }
+        }
+    }
+
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
 
@@ -137,5 +183,6 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         super.onDestroyView()
         _binding = null
     }
+
 
 }

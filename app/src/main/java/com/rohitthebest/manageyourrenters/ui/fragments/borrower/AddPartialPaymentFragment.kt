@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,8 +11,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.PartialPaymentAdapter
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
@@ -20,13 +23,17 @@ import com.rohitthebest.manageyourrenters.databinding.AddPartialPaymentLayoutBin
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPartialPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PartialPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val TAG = "AddPartialPaymentFragme"
 
@@ -41,6 +48,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
     private val partialPaymentViewModel by viewModels<PartialPaymentViewModel>()
+    private val borrowerViewModel by viewModels<BorrowerViewModel>()
 
     private var receivedBorrowerPayment: BorrowerPayment? = null
     private var receivedBorrowerPaymentKey: String = ""
@@ -49,8 +57,13 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private lateinit var partialPaymentAdapter: PartialPaymentAdapter
     private var isPaymentMarkedAsDone = false
-    private lateinit var removedPartialPaymentKeyList: ArrayList<String>
-    private var dueLeftAmount = 0.0;
+
+    private lateinit var oldPartialPaymentList: List<PartialPayment>
+    private lateinit var addedPartialPaymentList: ArrayList<PartialPayment>
+    private lateinit var removedPartialPaymentList: ArrayList<PartialPayment>
+    private var dueLeftAmount = 0.0
+
+    private var isRefereshEnabled = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,7 +80,9 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
         initListeners()
 
-        removedPartialPaymentKeyList = ArrayList()
+        oldPartialPaymentList = emptyList()
+        addedPartialPaymentList = ArrayList()
+        removedPartialPaymentList = ArrayList()
 
         selectedDate = System.currentTimeMillis()
         initDate()
@@ -106,43 +121,12 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             .observe(viewLifecycleOwner, { borrowerPayment ->
 
                 receivedBorrowerPayment = borrowerPayment
-                dueLeftAmount = borrowerPayment.dueLeftAmount
-
-                Log.d(TAG, "getBorrowerPayment: Due left amount : $dueLeftAmount")
                 partialPaymentAdapter = PartialPaymentAdapter(borrowerPayment.currencySymbol)
                 setUpRecyclerView()
 
                 updateUI()
                 getBorrowerPartialPayments()
-                getTheTotalPartialPaymentSumAndHandleTheDue()
             })
-    }
-
-    private fun setUpRecyclerView() {
-
-        includeBinding.addPartialPaymentRV.apply {
-
-            setHasFixedSize(true)
-            adapter = partialPaymentAdapter
-            layoutManager = LinearLayoutManager(requireContext())
-        }
-
-        partialPaymentAdapter.setOnClickListener(this)
-    }
-
-    override fun onDeleteBtnClick(partialPayment: PartialPayment, position: Int) {
-
-        dueLeftAmount += partialPayment.amount
-
-        // adding the keys of the partial payment (isSynced = true) which is going to removed so that
-        // it can also be removed from the cloud database
-        if (partialPayment.isSynced) {
-
-            removedPartialPaymentKeyList.add(partialPayment.key)
-        }
-
-        partialPaymentViewModel.deletePartialPayment(partialPayment)
-        hideKeyBoard(requireActivity())
     }
 
     private fun getBorrowerPartialPayments() {
@@ -150,14 +134,20 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         partialPaymentViewModel.getPartialPaymentByBorrowerPaymentKey(receivedBorrowerPaymentKey)
             .observe(viewLifecycleOwner, { partialPaymentList ->
 
-                partialPaymentAdapter.submitList(partialPaymentList)
+                if (isRefereshEnabled) {
 
-                if (partialPaymentList.isNotEmpty()) {
+                    oldPartialPaymentList = partialPaymentList
 
-                    showNoPartialPaymentAddedTV(false)
-                } else {
+                    partialPaymentList.forEach {
 
-                    showNoPartialPaymentAddedTV(true)
+                        addedPartialPaymentList.add(it)
+                    }
+
+                    partialPaymentAdapter.submitList(addedPartialPaymentList)
+                    calculateDueAmount()
+                    handleTheDue()
+
+                    isRefereshEnabled = false
                 }
             })
     }
@@ -194,106 +184,6 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             }
     }
 
-    private fun saveChangesToTheDatabase() {
-
-        receivedBorrowerPayment?.let { borrowerPayment ->
-
-            val map = HashMap<String, Any?>()
-
-            if (includeBinding.markAsDoneCB.isChecked != borrowerPayment.isDueCleared) {
-
-                receivedBorrowerPayment!!.isDueCleared = includeBinding.markAsDoneCB.isChecked
-
-                map["isDueCleared"] = receivedBorrowerPayment!!.isDueCleared
-
-                if (includeBinding.markAsDoneCB.isChecked) {
-
-                    receivedBorrowerPayment!!.dueLeftAmount = 0.0
-                    map["dueLeftAmount"] = 0.0
-
-                    // checking if the borrower payment was already synced
-                } else {
-
-                    receivedBorrowerPayment!!.dueLeftAmount = dueLeftAmount
-                    map["dueLeftAmount"] = dueLeftAmount
-                }
-
-            } else {
-
-                if (dueLeftAmount != borrowerPayment.dueLeftAmount) {
-
-                    receivedBorrowerPayment!!.dueLeftAmount = dueLeftAmount
-                    map["dueLeftAmount"] = dueLeftAmount
-                }
-            }
-
-            if (receivedBorrowerPayment!!.isSynced) {
-
-                //update on firestore
-                if (isInternetAvailable(requireContext())) {
-
-                    updateDocumentOnFireStore(
-                        requireContext(),
-                        map,
-                        getString(R.string.borrowerPayments),
-                        receivedBorrowerPayment!!.key
-                    )
-
-                } else {
-
-                    receivedBorrowerPayment!!.isSynced = false
-                }
-
-                borrowerPaymentViewModel.updateBorrowerPayment(receivedBorrowerPayment!!)
-
-            } else {
-
-                //upload to firestore
-
-                if (isInternetAvailable(requireContext())) {
-
-                    receivedBorrowerPayment!!.isSynced = true
-
-                    uploadDocumentToFireStore(
-                        requireContext(),
-                        fromBorrowerPaymentToString(receivedBorrowerPayment!!),
-                        getString(R.string.borrowerPayments),
-                        borrowerPayment.key
-                    )
-                }
-
-                borrowerPaymentViewModel.updateBorrowerPayment(receivedBorrowerPayment!!)
-            }
-
-            savePartialPaymentsToFireStore()
-        }
-    }
-
-    private fun savePartialPaymentsToFireStore() {
-
-        partialPaymentViewModel.getThePartialPaymentsByIsSyncedAndBorrowerPayment(
-            receivedBorrowerPaymentKey, false
-        ).observe(viewLifecycleOwner, {
-
-            if (it.isNotEmpty()) {
-
-                // upload this list to firestore
-
-
-            }
-        })
-
-        if (removedPartialPaymentKeyList.isNotEmpty()) {
-
-            deleteAllDocumentsUsingKeyFromFirestore(
-                requireContext(),
-                getString(R.string.partialPayments),
-                convertStringListToJSON(removedPartialPaymentKeyList)
-            )
-        }
-
-    }
-
     override fun onClick(v: View?) {
 
         if (v?.id == includeBinding.addPartialPaymentDateBtn.id
@@ -318,7 +208,10 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                 if (includeBinding.addPartialPaymentAmountET.editText?.isTextValid()!!) {
 
-                    initPartialPaymentAndAddToDatabase()
+                    addToPartialPaymentList(
+                        includeBinding.addPartialPaymentAmountET.editText?.text.toString()
+                            .toDouble()
+                    )
 
                 } else {
 
@@ -330,7 +223,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         hideKeyBoard(requireActivity())
     }
 
-    private fun initPartialPaymentAndAddToDatabase() {
+    private fun addToPartialPaymentList(amount: Double) {
 
         val partialPayment = PartialPayment()
 
@@ -339,8 +232,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             created = selectedDate
             borrowerId = receivedBorrowerPayment?.borrowerId!!
             borrowerPaymentKey = receivedBorrowerPaymentKey
-            amount = includeBinding.addPartialPaymentAmountET.editText?.text.toString()
-                .toDouble()
+            this.amount = amount
             uid = receivedBorrowerPayment?.uid!!
             isSynced = false
             key = generateKey("_${receivedBorrowerPayment?.uid}")
@@ -348,39 +240,58 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
         includeBinding.addPartialPaymentAmountET.editText?.setText("")
 
-        partialPaymentViewModel.insertPartialPayment(partialPayment)
+        addedPartialPaymentList.add(0, partialPayment)
+        partialPaymentAdapter.notifyItemInserted(0)
 
-        dueLeftAmount -= partialPayment.amount
-
+        calculateDueAmount()
     }
 
-    private fun getTheTotalPartialPaymentSumAndHandleTheDue() {
+    private fun calculateDueAmount() {
 
-        try {
-            partialPaymentViewModel.getTheSumOfPartialPaymentsOfBorrowerPayment(
-                receivedBorrowerPaymentKey
-            ).observe(viewLifecycleOwner, { totalPartialPayment ->
+        val totalDue = receivedBorrowerPayment?.amountTakenOnRent!!
+        val totalAmountPaid = getTotalPaidAmountFromAllThePartialPayment()
 
-                Log.d(
-                    TAG,
-                    "getTheTotalPartialPaymentSumAndHandleTheDue: Total Due : $totalPartialPayment"
-                )
-                Log.d(TAG, "getTheTotalPartialPaymentSumAndHandleTheDue: Due Left : $dueLeftAmount")
+        dueLeftAmount = totalDue - totalAmountPaid
+        handleTheDue()
+    }
 
-                if (totalPartialPayment != null) {
+    private fun handleTheDue() {
 
-                    includeBinding.markAsDoneCB.isChecked =
-                        totalPartialPayment >= receivedBorrowerPayment?.dueLeftAmount!!
-                } else {
+        includeBinding.markAsDoneCB.isChecked = dueLeftAmount <= 0.0
 
-                    includeBinding.markAsDoneCB.isChecked = false
-                }
-            })
-        } catch (e: NullPointerException) {
+        updateDueAmountTV()
 
-            e.printStackTrace()
+        if (addedPartialPaymentList.isEmpty()) {
+
+            showNoPartialPaymentAddedTV(true)
+        } else {
+
+            showNoPartialPaymentAddedTV(false)
         }
     }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateDueAmountTV() {
+
+        includeBinding.dueLeftAmoutTV.text =
+            "${receivedBorrowerPayment?.currencySymbol} $dueLeftAmount"
+
+        if (dueLeftAmount <= 0.0) {
+
+            includeBinding.dueLeftAmoutTV.changeTextColor(
+                requireContext(),
+                R.color.color_green
+            )
+        } else {
+
+            includeBinding.dueLeftAmoutTV.changeTextColor(
+                requireContext(),
+                R.color.color_orange
+            )
+        }
+
+    }
+
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
 
@@ -392,17 +303,322 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                     // disabling the ui below this checkbox
                     shouldEnableAddingPartialPayment(false)
-                    // todo : update the is due cleared variable of borrower payment
+
+                    if (dueLeftAmount != 0.0 && dueLeftAmount > 0.0) {
+
+                        addToPartialPaymentList(dueLeftAmount)
+                    }
+
                     //todo : show the delete payment button
                 } else {
-                    //enabling the ui below the checkbox
-                    shouldEnableAddingPartialPayment(true)
 
-                    //todo : check weather the sum of partial payment is greater than or equal to the due amount and take appropriate action
+                    if (dueLeftAmount <= 0.0) {
 
+                        if (addedPartialPaymentList.isNotEmpty()) {
+
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setMessage("Are you sure you want to delete all the partial payments.")
+                                .setTitle("Delete all partial payments")
+                                .setPositiveButton("Yes") { dialog, _ ->
+
+                                    addedPartialPaymentList.forEach {
+
+                                        if (oldPartialPaymentList.contains(it)) {
+
+                                            removedPartialPaymentList.add(it)
+                                        }
+                                    }
+
+                                    addedPartialPaymentList.clear()
+                                    partialPaymentAdapter.notifyDataSetChanged()
+                                    calculateDueAmount()
+
+                                    shouldEnableAddingPartialPayment(true)
+                                    dialog.dismiss()
+                                }
+                                .setNegativeButton("No") { dialog, _ ->
+
+                                    includeBinding.markAsDoneCB.isChecked = true
+                                    dialog.dismiss()
+                                }
+                                .create()
+                                .show()
+
+                        }
+                    } else {
+
+                        shouldEnableAddingPartialPayment(true)
+                    }
                 }
             }
         }
+    }
+
+    private fun saveChangesToTheDatabase() {
+
+        if (removedPartialPaymentList.any { it.isSynced }
+            && !isInternetAvailable(requireContext())
+        ) {
+
+            showToast(
+                requireContext(),
+                "You need internet connection for saving the changes."
+            )
+            return
+        }
+
+        receivedBorrowerPayment?.let { borrowerPayment ->
+
+            calculateDueAmount()
+
+            val map = HashMap<String, Any?>()
+
+            if (includeBinding.markAsDoneCB.isChecked != borrowerPayment.isDueCleared) {
+
+                receivedBorrowerPayment!!.isDueCleared = includeBinding.markAsDoneCB.isChecked
+
+                map["dueCleared"] = receivedBorrowerPayment!!.isDueCleared
+
+                if (includeBinding.markAsDoneCB.isChecked) {
+
+                    receivedBorrowerPayment!!.dueLeftAmount = 0.0
+                    map["dueLeftAmount"] = 0.0
+
+                } else {
+
+                    receivedBorrowerPayment!!.dueLeftAmount = dueLeftAmount
+                    map["dueLeftAmount"] = dueLeftAmount
+                }
+
+            } else {
+
+                if (dueLeftAmount >= 0.0 && dueLeftAmount != borrowerPayment.dueLeftAmount) {
+
+                    Log.d(TAG, "saveChangesToTheDatabase: dueLeftAmount : $dueLeftAmount")
+
+                    receivedBorrowerPayment!!.dueLeftAmount = dueLeftAmount
+                    map["dueLeftAmount"] = dueLeftAmount
+                }
+            }
+
+            //borrower payment was already synced - need to be updated
+            if (receivedBorrowerPayment!!.isSynced) {
+
+                if (isInternetAvailable(requireContext())) {
+
+                    if (map.isNotEmpty()) {
+
+                        updateDocumentOnFireStore(
+                            requireContext(),
+                            map,
+                            getString(R.string.borrowerPayments),
+                            receivedBorrowerPayment!!.key
+                        )
+                    }
+
+                } else {
+
+                    if (map.isNotEmpty()) {
+
+                        receivedBorrowerPayment!!.isSynced = false
+                    }
+                }
+            } else {
+
+                //not synced - needs to be uploaded
+
+                if (isInternetAvailable(requireContext())) {
+
+                    receivedBorrowerPayment!!.isSynced = true
+
+                    Log.d(TAG, "saveChangesToTheDatabase: upload payment to firestore")
+
+                    uploadDocumentToFireStore(
+                        requireContext(),
+                        fromBorrowerPaymentToString(receivedBorrowerPayment!!),
+                        getString(R.string.borrowerPayments),
+                        borrowerPayment.key
+                    )
+                }
+
+            }
+
+            borrowerPaymentViewModel.updateBorrowerPayment(receivedBorrowerPayment!!)
+            savePartialPaymentsToFireStore()
+            getAndUpdateTotalDueAmountOfBorrower()
+
+        }
+    }
+
+    private fun getAndUpdateTotalDueAmountOfBorrower() {
+
+        Log.d(TAG, "getAndUpdateTotalDueAmountOfBorrower: ")
+
+        borrowerPaymentViewModel.getTotalDueOfTheBorrower(receivedBorrowerPayment?.borrowerKey!!)
+            .observe(viewLifecycleOwner, { totalDue ->
+
+                Log.d(TAG, "getAndUpdateTotalDueAmountOfBorrower: Total due : $totalDue")
+                if (totalDue == null) {
+
+                    updateBorrowerDueAmount(0.0)
+                } else {
+
+                    updateBorrowerDueAmount(totalDue)
+                }
+            })
+    }
+
+    var isBorrowerUpdateEnabled = true
+
+    private fun updateBorrowerDueAmount(totalDue: Double?) {
+
+        Log.d(TAG, "updateBorrowerDueAmount: ")
+
+        borrowerViewModel.getBorrowerByKey(receivedBorrowerPayment?.borrowerKey!!)
+            .observe(viewLifecycleOwner, { borrower ->
+
+                if (isBorrowerUpdateEnabled) {
+                    Log.d(TAG, "updateBorrowerDueAmount: ${borrower.name}")
+
+                    borrower.totalDueAmount = totalDue!!
+                    val map = HashMap<String, Any?>()
+                    map["totalDueAmount"] = totalDue
+
+                    //already synced - need to update
+                    if (borrower.isSynced) {
+
+                        if (isInternetAvailable(requireContext())) {
+
+                            updateDocumentOnFireStore(
+                                requireContext(),
+                                map,
+                                getString(R.string.borrowers),
+                                borrower.key
+                            )
+                        } else {
+
+                            borrower.isSynced = false
+                        }
+                    } else {
+
+                        // borrower not synced - need to be uploaded
+                        if (isInternetAvailable(requireContext())) {
+
+                            borrower.isSynced = true
+
+                            uploadDocumentToFireStore(
+                                requireContext(),
+                                fromBorrowerToString(borrower),
+                                getString(R.string.borrowers),
+                                borrower.key
+                            )
+                        }
+                    }
+
+                    borrowerViewModel.updateBorrower(borrower)
+
+                    isBorrowerUpdateEnabled = false
+                }
+            })
+    }
+
+    private fun savePartialPaymentsToFireStore() {
+
+        Log.d(TAG, "savePartialPaymentsToFireStore: ")
+
+        val listToBeAddedToTheDatabase =
+            (oldPartialPaymentList + addedPartialPaymentList).toSet().toList()
+
+        Log.d(TAG, "savePartialPaymentsToFireStore: $listToBeAddedToTheDatabase")
+
+        if (listToBeAddedToTheDatabase.isNotEmpty()) {
+
+            if (isInternetAvailable(requireContext())) {
+
+                val notSyncedList = listToBeAddedToTheDatabase.filter { !it.isSynced }
+
+                notSyncedList.forEach {
+
+                    it.isSynced = true
+                }
+
+                uploadListOfDataToFireStore(
+                    requireContext(),
+                    collection = getString(R.string.partialPayments),
+                    fromPartialPaymentListToString(notSyncedList)
+                )
+            }
+
+            partialPaymentViewModel.insertAllPartialPayment(listToBeAddedToTheDatabase)
+        }
+
+        if (removedPartialPaymentList.isNotEmpty()) {
+
+            val syncedList = removedPartialPaymentList.filter { it.isSynced }
+
+            if (syncedList.isNotEmpty()) {
+
+                // delete this list from the firestore
+                deleteAllDocumentsUsingKeyFromFirestore(
+                    requireContext(),
+                    getString(R.string.partialPayments),
+                    convertStringListToJSON(syncedList.map { it.key })
+                )
+            }
+
+            partialPaymentViewModel.deleteAllByProvideList(
+                removedPartialPaymentList.map { it.key }
+            )
+        }
+
+        lifecycleScope.launch {
+
+            delay(200)
+            requireActivity().onBackPressed()
+
+        }
+    }
+
+    private fun setUpRecyclerView() {
+
+        includeBinding.addPartialPaymentRV.apply {
+
+            setHasFixedSize(true)
+            adapter = partialPaymentAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+
+        partialPaymentAdapter.setOnClickListener(this)
+    }
+
+    override fun onDeleteBtnClick(partialPayment: PartialPayment, position: Int) {
+
+        // adding the keys of the partial payment (isSynced = true) which is going to removed so that
+        // it can also be removed from the cloud database
+        if (oldPartialPaymentList.contains(partialPayment)) {
+
+            removedPartialPaymentList.add(partialPayment)
+        }
+
+        addedPartialPaymentList.remove(partialPayment)
+        partialPaymentAdapter.notifyItemRemoved(position)
+
+        calculateDueAmount()
+
+        //partialPaymentViewModel.deletePartialPayment(partialPayment)
+        hideKeyBoard(requireActivity())
+    }
+
+    private fun getTotalPaidAmountFromAllThePartialPayment(): Double {
+
+        val totalPaid = addedPartialPaymentList.fold(0.0, { acc, partialPayment ->
+
+            acc + partialPayment.amount
+        })
+
+        Log.d(TAG, "checkTotalDueAmountAndHandleShowingAlertDialog: $totalPaid")
+
+        return totalPaid
     }
 
     private fun textWatcher() {

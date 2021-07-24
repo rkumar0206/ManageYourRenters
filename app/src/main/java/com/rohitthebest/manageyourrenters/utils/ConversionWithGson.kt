@@ -2,10 +2,7 @@ package com.rohitthebest.manageyourrenters.utils
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.rohitthebest.manageyourrenters.database.model.Borrower
-import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
-import com.rohitthebest.manageyourrenters.database.model.Payment
-import com.rohitthebest.manageyourrenters.database.model.Renter
+import com.rohitthebest.manageyourrenters.database.model.*
 
 private val gson = Gson()
 
@@ -62,13 +59,13 @@ fun fromStringToBorrowerPayment(str: String): BorrowerPayment {
     return Gson().fromJson(str, object : TypeToken<BorrowerPayment>() {}.type)
 }
 
-fun fromModelListToString(list: List<Any>): String {
+fun fromPartialPaymentListToString(list: List<PartialPayment>): String {
 
     return gson.toJson(list)
 }
 
-fun fromStringToModelList(jsonString: String?): Any {
+fun fromStringToPartialPaymentList(jsonString: String): List<PartialPayment> {
 
-    val type = object : TypeToken<Any>() {}.type
+    val type = object : TypeToken<List<PartialPayment>>() {}.type
     return gson.fromJson(jsonString, type)
 }

@@ -34,6 +34,12 @@ class PartialPaymentViewModel @Inject constructor(
         repository.deleteAllPartialPayments()
     }
 
+    fun deleteAllByProvideList(partialPaymentKeys: List<String>) =
+        viewModelScope.launch {
+
+            repository.deleteAllByProvideList(partialPaymentKeys)
+        }
+
     fun getAllPartialPayments() = repository.getAllPartialPayments().asLiveData()
 
     fun getPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey: String) =

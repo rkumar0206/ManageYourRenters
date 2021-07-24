@@ -9,10 +9,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.services.DeleteAllDocumentsService
-import com.rohitthebest.manageyourrenters.services.DeleteService
-import com.rohitthebest.manageyourrenters.services.UpdateService
-import com.rohitthebest.manageyourrenters.services.UploadService
+import com.rohitthebest.manageyourrenters.services.*
 import kotlinx.coroutines.tasks.await
 import kotlin.random.Random
 
@@ -105,6 +102,33 @@ fun deleteDocumentFromFireStore(
     )
 
     ContextCompat.startForegroundService(context, foregroundService)
+}
+
+fun uploadListOfDataToFireStore(
+    context: Context,
+    collection: String,
+    uploadData: String
+) {
+
+    val foregroundService = Intent(context, UploadDocumentListToFireStoreService::class.java)
+
+    foregroundService.putExtra(
+        Constants.COLLECTION_KEY,
+        collection
+    )
+
+    foregroundService.putExtra(
+        Constants.RANDOM_ID_KEY,
+        Random.nextInt(1000, 9999)
+    )
+
+    foregroundService.putExtra(
+        Constants.UPLOAD_DATA_KEY,
+        uploadData
+    )
+
+    ContextCompat.startForegroundService(context, foregroundService)
+
 }
 
 fun deleteAllDocumentsUsingKeyFromFirestore(

@@ -22,6 +22,9 @@ interface PartialPaymentDao {
     @Query("DELETE FROM partial_payment_table")
     suspend fun deleteAllPartialPayments()
 
+    @Query("DELETE FROM partial_payment_table WHERE `key` IN (:partialPaymentKeys)")
+    suspend fun deleteAllByProvideList(partialPaymentKeys: List<String>)
+
     @Query("SELECT * FROM partial_payment_table")
     fun getAllPartialPayments(): Flow<List<PartialPayment>>
 

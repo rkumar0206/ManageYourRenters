@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.changeTextColor
 
 class BorrowerPaymentAdapter :
     ListAdapter<BorrowerPayment, BorrowerPaymentAdapter.BorrowerPaymentViewHolder>(DiffUtilCallback()) {
@@ -45,6 +46,21 @@ class BorrowerPaymentAdapter :
                         "Paid : ${payment.currencySymbol} ${(payment.amountTakenOnRent - payment.dueLeftAmount)}"
 
                     dueAmountTV.text = "Due : ${payment.currencySymbol} ${payment.dueLeftAmount}"
+
+                    if (payment.dueLeftAmount <= 0.0) {
+
+                        dueAmountTV.changeTextColor(
+                            binding.root.context,
+                            R.color.color_green
+                        )
+                    } else {
+
+                        dueAmountTV.changeTextColor(
+                            binding.root.context,
+                            R.color.color_orange
+                        )
+
+                    }
 
                     borrowedPaymentDateTV.text =
                         "Borrowed on : " + WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(

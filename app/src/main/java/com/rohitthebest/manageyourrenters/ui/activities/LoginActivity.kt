@@ -204,7 +204,9 @@ class LoginActivity : AppCompatActivity() {
                         }
                     } else {
 
-                        lifecycleScope.launch {
+                        withContext(Dispatchers.Main) {
+
+                            renterViewModel.deleteRenterByIsSynced(getString(R.string.t))
 
                             showToast(
                                 this@LoginActivity,
@@ -237,6 +239,7 @@ class LoginActivity : AppCompatActivity() {
 
             renterPayments?.let {
 
+
                 if (renterPayments.size() != 0) {
 
                     withContext(Dispatchers.Main) {
@@ -251,7 +254,12 @@ class LoginActivity : AppCompatActivity() {
 
                 } else {
 
-                    syncBorrowers()
+                    withContext(Dispatchers.Main) {
+
+                        paymentViewModel.deleteAllPaymentsByIsSynced(getString(R.string.t))
+
+                        syncBorrowers()
+                    }
                 }
             }
         }
@@ -285,7 +293,11 @@ class LoginActivity : AppCompatActivity() {
                     }
                 } else {
 
-                    saveIsSyncedValueAndNavigateToHomeActivity()
+                    withContext(Dispatchers.Main) {
+
+                        borrowerViewModel.deleteBorrowerByIsSynced(true)
+                        saveIsSyncedValueAndNavigateToHomeActivity()
+                    }
                 }
             }
         }
@@ -311,8 +323,8 @@ class LoginActivity : AppCompatActivity() {
 
                     withContext(Dispatchers.Main) {
 
-
                         borrowerPaymentViewModel.deleteBorrowerPaymentsByIsSynced(true)
+
                         delay(100)
                         borrowerPaymentViewModel.insertBorrowerPayments(it.toObjects(BorrowerPayment::class.java))
 
@@ -320,7 +332,11 @@ class LoginActivity : AppCompatActivity() {
                     }
                 } else {
 
-                    saveIsSyncedValueAndNavigateToHomeActivity()
+                    withContext(Dispatchers.Main) {
+
+                        borrowerPaymentViewModel.deleteBorrowerPaymentsByIsSynced(true)
+                        saveIsSyncedValueAndNavigateToHomeActivity()
+                    }
                 }
             }
 

@@ -8,9 +8,8 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.WriteBatch
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.model.PartialPayment
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.utils.fromStringToModelList
+import com.rohitthebest.manageyourrenters.utils.fromStringToPartialPaymentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -52,16 +51,16 @@ class UploadDocumentListToFireStoreService : Service() {
 
             getString(R.string.partialPayments) -> {
 
-                val partialPaymentList = fromStringToModelList(uploadData) as List<PartialPayment>
+                Log.d(TAG, "onStartCommand: $uploadData")
 
-                Log.d(TAG, "onStartCommand: $partialPaymentList")
+                val partialPaymentList = fromStringToPartialPaymentList(uploadData!!)
 
                 if (partialPaymentList.isNotEmpty()) {
 
                     partialPaymentList.forEach { partialPayment ->
 
                         batch.set(
-                            db.collection(getString(R.string.partialPayments))
+                            db.collection(collection)
                                 .document(partialPayment.key),
                             partialPayment
                         )

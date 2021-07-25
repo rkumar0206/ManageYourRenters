@@ -249,7 +249,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                 else -> {
                     title = "Open ${document.documentName} url in browser"
-                    message = "Open ${document.documentName} in browser..."
+                    message = "Open ${document.documentUrl} in browser..."
                     positiveBtnText = "Open"
                 }
             }

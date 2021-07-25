@@ -25,6 +25,9 @@ interface PartialPaymentDao {
     @Query("DELETE FROM partial_payment_table WHERE `key` IN (:partialPaymentKeys)")
     suspend fun deleteAllByProvideList(partialPaymentKeys: List<String>)
 
+    @Query("DELETE FROM partial_payment_table WHERE borrowerPaymentKey= :borrowerPaymentKey")
+    suspend fun deleteAllPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey: String)
+
     @Query("SELECT * FROM partial_payment_table")
     fun getAllPartialPayments(): Flow<List<PartialPayment>>
 
@@ -39,5 +42,8 @@ interface PartialPaymentDao {
         borrowerPaymentKey: String,
         isSynced: Boolean
     ): Flow<List<PartialPayment>>
+
+    @Query("SELECT `key` FROM partial_payment_table WHERE borrowerPaymentKey= :borrowerPaymentKey and isSynced = 1")
+    suspend fun getKeysByBorrowerPaymentKey(borrowerPaymentKey: String): List<String>
 }
 

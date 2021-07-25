@@ -45,7 +45,7 @@ class UploadService : Service() {
             this,
             Constants.NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(image)
-            .setContentTitle("Uploading to cloud.")
+            .setContentTitle("Uploading to $collection.")
             .build()
 
         startForeground(randomId!!, notification)

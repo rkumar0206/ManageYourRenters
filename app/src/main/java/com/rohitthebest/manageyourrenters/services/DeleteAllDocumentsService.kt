@@ -31,7 +31,7 @@ class DeleteAllDocumentsService : Service() {
             this,
             Constants.NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(R.drawable.ic_baseline_delete_forever_24)
-            .setContentTitle("Deleting from cloud.")
+            .setContentTitle("Deleting all $collection from cloud.")
             .build()
 
         startForeground(randomId!!, notification)

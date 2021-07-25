@@ -20,6 +20,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoIntern
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.fromBorrowerPaymentToString
 import com.rohitthebest.manageyourrenters.utils.isValid
+import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
 import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -106,13 +107,13 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     private fun getBorrowerPayments() {
 
-
         borrowerPaymentViewModel.getPaymentsByBorrowerKey(receivedBorrowerKey)
             .observe(viewLifecycleOwner, { borrowerPayments ->
 
                 borrowerPaymentAdapter.submitList(borrowerPayments)
 
             })
+
     }
 
 
@@ -141,7 +142,39 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     }
 
     override fun onDeleteBtnClick(borrowerPayment: BorrowerPayment) {
-        //TODO("Not yet implemented")
+
+        showAlertDialogForDeletion(
+            requireContext(),
+            {
+
+                if (!borrowerPayment.isSynced) {
+
+                    borrowerPaymentViewModel.deleteBorrowerPayment(
+                        requireContext(),
+                        borrowerPayment
+                    )
+
+                } else {
+
+                    if (isInternetAvailable(requireContext())) {
+
+                        borrowerPaymentViewModel.deleteBorrowerPayment(
+                            requireContext(),
+                            borrowerPayment
+                        )
+
+                    } else {
+
+                        showNoInternetMessage(requireContext())
+                    }
+                }
+
+                it.dismiss()
+            },
+            {
+                it.dismiss()
+            }
+        )
     }
 
     override fun onSyncBtnClick(borrowerPayment: BorrowerPayment, position: Int) {

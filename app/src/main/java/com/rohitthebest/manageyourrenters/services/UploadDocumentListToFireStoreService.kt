@@ -23,7 +23,6 @@ class UploadDocumentListToFireStoreService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         val collection = intent?.getStringExtra(Constants.COLLECTION_KEY)
-        val key = intent?.getStringExtra(Constants.DOCUMENT_KEY)
         val uploadData = intent?.getStringExtra(Constants.UPLOAD_DATA_KEY)
         val randomId = intent?.getIntExtra(Constants.RANDOM_ID_KEY, 1003)
 
@@ -39,7 +38,7 @@ class UploadDocumentListToFireStoreService : Service() {
             this,
             Constants.NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(image)
-            .setContentTitle("Uploading list to the database...")
+            .setContentTitle("Uploading list to the $collection...")
             .build()
 
         startForeground(randomId!!, notification)

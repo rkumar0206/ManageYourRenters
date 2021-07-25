@@ -31,7 +31,7 @@ class DeleteService : Service() {
             this,
             NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(R.drawable.ic_baseline_delete_24)
-            .setContentTitle("Deleting from cloud.")
+            .setContentTitle("Deleting from $collection.")
             .build()
 
         startForeground(randomId!!, notification)

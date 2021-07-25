@@ -64,6 +64,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private var pdfUri: Uri? = null
     private var imageUri: Uri? = null
+    private var fileSize = 0L
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -105,7 +106,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             e.printStackTrace()
         }
     }
-
 
     private fun getBorrower() {
 
@@ -287,6 +287,23 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
                 includeBinding.urlET.error = EDIT_TEXT_EMPTY_MESSAGE
                 return false
+            }
+        }
+
+        if (includeBinding.addSupprtingDocCB.isChecked) {
+
+            if (docType != DocumentType.URL) {
+
+                if (fileSize / (1024 * 1024) > 3) {
+
+                    showToast(
+                        requireContext(),
+                        "Supporting document size should be less than or equal to 3MB",
+                        Toast.LENGTH_LONG
+                    )
+
+                    return false
+                }
             }
         }
 
@@ -616,7 +633,14 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                     showFileNameEditText(true)
                     showRemoveFileBtn(true)
                     showAddFileBtn(false)
-                    includeBinding.fileNameET.setText(pdfUri?.getFileName(requireActivity().contentResolver))
+
+                    val fileNameAndSize =
+                        pdfUri?.getFileNameAndSize(requireActivity().contentResolver)
+
+                    includeBinding.fileNameET
+                        .setText(fileNameAndSize?.first)
+
+                    fileSize = fileNameAndSize?.second!!
 
                 } else {
 
@@ -639,8 +663,14 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                     showFileNameEditText(true)
                     showRemoveFileBtn(true)
                     showAddFileBtn(false)
-                    includeBinding.fileNameET.setText(imageUri?.getFileName(requireActivity().contentResolver))
 
+                    val fileNameAndSize =
+                        imageUri?.getFileNameAndSize(requireActivity().contentResolver)
+
+                    includeBinding.fileNameET
+                        .setText(fileNameAndSize?.first)
+
+                    fileSize = fileNameAndSize?.second!!
                 } else {
 
                     showFileNameEditText(false)
@@ -743,12 +773,19 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 imageUri = uri
             }
 
-            val fileName = it.getFileName(requireActivity().contentResolver)
+            val fileNameAndSize = it.getFileNameAndSize(requireActivity().contentResolver)
 
-            if (fileName.isValid()) {
+            if (fileNameAndSize != null) {
 
-                includeBinding.fileNameET.setText(fileName)
+                includeBinding.fileNameET.setText(fileNameAndSize.first)
+                fileSize = fileNameAndSize.second
             }
+
+            Log.d(
+                TAG,
+                "FileNameAndSize: ${fileNameAndSize?.first} " +
+                        "and size : ${fileNameAndSize?.second?.div(1024 * 1024)}"
+            )
 
             showAddFileBtn(false)
             showFileNameEditText(true)

@@ -140,7 +140,7 @@ inline fun View.showSnackbarWithActionAndDismissListener(
         .show()
 }
 
-fun Uri.getFileName(contentResolver: ContentResolver): String {
+fun Uri.getFileNameAndSize(contentResolver: ContentResolver): Pair<String, Long>? {
 
     contentResolver
         .query(
@@ -148,13 +148,17 @@ fun Uri.getFileName(contentResolver: ContentResolver): String {
         )?.use { cursor ->
 
             val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            //val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+            val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
 
             cursor.moveToFirst()
-            return cursor.getString(nameIndex)
+
+            val fileName = cursor.getString(nameIndex)
+            val size = cursor.getLong(sizeIndex)
+
+            return Pair(fileName, size)
         }
 
-    return ""
+    return null
 }
 
 inline fun SearchView.searchText(

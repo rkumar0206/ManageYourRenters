@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.repositories.PartialPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
 import com.rohitthebest.manageyourrenters.utils.deleteAllDocumentsUsingKeyFromFirestore
+import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,12 +49,20 @@ class BorrowerPaymentViewModel @Inject constructor(
 
             if (Functions.isInternetAvailable(context)) {
 
-                deleteAllDocumentsUsingKeyFromFirestore(
+                deleteDocumentFromFireStore(
                     context,
-                    context.getString(R.string.partialPayments),
-                    convertStringListToJSON(partialPaymentKeys)
+                    context.getString(R.string.borrowerPayments),
+                    borrowerPayment.key
                 )
 
+                if (partialPaymentKeys.isNotEmpty()) {
+
+                    deleteAllDocumentsUsingKeyFromFirestore(
+                        context,
+                        context.getString(R.string.partialPayments),
+                        convertStringListToJSON(partialPaymentKeys)
+                    )
+                }
             }
 
             partialPaymentRepository.deleteAllPartialPaymentByBorrowerPaymentKey(borrowerPayment.key)
@@ -85,6 +94,4 @@ class BorrowerPaymentViewModel @Inject constructor(
     fun getBorrowerPaymentByKey(paymentKey: String) =
         repository.getBorrowerPaymentByKey(paymentKey).asLiveData()
 
-    fun getPaymentKeysByBorrowerKey(borrowerKey: String) =
-        repository.getPaymentKeysByBorrowerKey(borrowerKey).asLiveData()
 }

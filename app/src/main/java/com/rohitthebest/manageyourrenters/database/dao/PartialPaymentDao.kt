@@ -28,6 +28,9 @@ interface PartialPaymentDao {
     @Query("DELETE FROM partial_payment_table WHERE borrowerPaymentKey= :borrowerPaymentKey")
     suspend fun deleteAllPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey: String)
 
+    @Query("DELETE FROM partial_payment_table WHERE borrowerId= :borrowerId")
+    suspend fun deleteAllPartialPaymentByBorrowerId(borrowerId: String)
+
     @Query("SELECT * FROM partial_payment_table")
     fun getAllPartialPayments(): Flow<List<PartialPayment>>
 
@@ -43,7 +46,13 @@ interface PartialPaymentDao {
         isSynced: Boolean
     ): Flow<List<PartialPayment>>
 
+    // it will give the list of keys of a particular borrower payment
+    // making it suspend because it will only be used in viewModel and not in fragments or activities
     @Query("SELECT `key` FROM partial_payment_table WHERE borrowerPaymentKey= :borrowerPaymentKey and isSynced = 1")
     suspend fun getKeysByBorrowerPaymentKey(borrowerPaymentKey: String): List<String>
+
+    // will give the list of keys of a particular borrower
+    @Query("SELECT `key` FROM partial_payment_table WHERE borrowerId =:borrowerId AND isSynced = 1")
+    suspend fun getKeysByBorrowerId(borrowerId: String): List<String>
 }
 

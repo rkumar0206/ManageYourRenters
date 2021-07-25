@@ -158,12 +158,18 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
                 if (!borrower?.isSynced!!) {
 
-                    deleteBorrower(borrower)
+                    borrowerViewModel.deleteBorrower(
+                        requireContext(),
+                        borrower
+                    )
                 } else {
 
                     if (isInternetAvailable(requireContext())) {
 
-                        deleteBorrower(borrower)
+                        borrowerViewModel.deleteBorrower(
+                            requireContext(),
+                            borrower
+                        )
                     } else {
                         showNoInternetMessage(requireContext())
                     }
@@ -177,60 +183,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                 it.dismiss()
             }
         )
-    }
-
-    private fun deleteBorrower(borrower: Borrower) {
-
-        borrowerViewModel.deleteBorrower(borrower)
-
-        var isUndoClicked = false
-
-        binding.root.showSnackbarWithActionAndDismissListener(
-            text = "Borrower deleted",
-            actionText = "Undo",
-            action = {
-
-                isUndoClicked = true
-
-                borrowerViewModel.insertBorrower(borrower)
-                Functions.showToast(requireContext(), "Borrower restored...")
-            },
-            dismissListener = {
-
-                if (!isUndoClicked && borrower.isSynced) {
-
-                    deleteDocumentFromFireStore(
-                        context = requireContext(),
-                        collection = getString(R.string.borrowers),
-                        documentKey = borrower.key
-                    )
-                }
-
-                deleteAllPaymentsOfThisBorrower(borrower)
-            }
-        )
-    }
-
-    private fun deleteAllPaymentsOfThisBorrower(borrower: Borrower) {
-
-        borrowerPaymentViewModel.getPaymentKeysByBorrowerKey(borrower.key)
-            .observe(viewLifecycleOwner, { keysAndIsSyncedList ->
-
-                if (keysAndIsSyncedList.isNotEmpty()) {
-
-                    val paymentToDeleteFromFirestore =
-                        keysAndIsSyncedList.filter { k -> k.isSynced }.map { k -> k.key }
-
-                    deleteAllDocumentsUsingKeyFromFirestore(
-                        requireContext(),
-                        getString(R.string.borrowerPayments),
-                        convertStringListToJSON(paymentToDeleteFromFirestore)
-                    )
-
-                    borrowerPaymentViewModel.deleteAllBorrowerPaymentsByBorrowerKey(borrowerKey = borrower.key)
-                }
-            })
-
     }
 
     override fun onEditClicked(borrowerKey: String) {

@@ -188,7 +188,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addInterestCB"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -301,10 +301,10 @@
                 android:layout_marginTop="8dp"
                 android:ems="6"
                 android:hint="@string/rete_percent"
+                android:importantForAutofill="no"
                 android:inputType="numberDecimal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/interestTypeRG"
-                android:importantForAutofill="no"
                 app:layout_constraintTop_toBottomOf="@+id/interestTypeRG" />
 
             <TextView
@@ -328,16 +328,27 @@
                 app:layout_constraintStart_toStartOf="@+id/ratePercentET"
                 app:layout_constraintTop_toBottomOf="@+id/ratePercentET" />
 
+            <Spinner
+                android:id="@+id/timeScheduleSpinner2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/textView10"
+                app:layout_constraintStart_toStartOf="@+id/ratePercentET"
+                app:layout_constraintTop_toBottomOf="@+id/ratePercentET" />
+
             <ImageButton
                 android:id="@+id/calculateInterestBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_marginEnd="5dp"
                 android:backgroundTint="@color/color_white"
+                android:contentDescription="@string/imagebutton"
                 app:layout_constraintBottom_toBottomOf="@+id/textView182"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textView182"
-                android:contentDescription="@string/imagebutton"
                 app:srcCompat="@drawable/ic_baseline_calculate_24" />
 
 

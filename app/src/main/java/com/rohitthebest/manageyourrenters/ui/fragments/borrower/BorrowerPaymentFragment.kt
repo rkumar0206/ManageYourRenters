@@ -282,11 +282,13 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     }
 
     override fun onInterestBtnClick(borrowerPayment: BorrowerPayment) {
-        //TODO("Not yet implemented")
 
         if (!borrowerPayment.isInterestAdded) {
 
             showToast(requireContext(), "No interest added!!!")
+        } else {
+
+            //TODO("Not yet implemented")
         }
     }
 

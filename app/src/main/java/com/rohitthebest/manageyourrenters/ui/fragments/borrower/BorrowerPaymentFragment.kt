@@ -10,18 +10,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.BorrowerPaymentAdapter
+import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.openLinkInBrowser
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.fromBorrowerPaymentToString
-import com.rohitthebest.manageyourrenters.utils.isValid
-import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
-import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "BorrowerPaymentFragment"
@@ -226,11 +225,59 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     }
 
     override fun onShowDocumentBtnClick(borrowerPayment: BorrowerPayment) {
-        //TODO("Not yet implemented")
 
         if (!borrowerPayment.isSupportingDocAdded) {
 
             showToast(requireContext(), "No document added!!!")
+        } else {
+
+            val document = borrowerPayment.supportingDocument!!
+
+            var title = "Download ${document.documentName}"
+            var message = ""
+            var positiveBtnText = "Download"
+
+            when (document.documentType) {
+
+                DocumentType.PDF -> {
+                    message = "Download this pdf..."
+                }
+
+                DocumentType.IMAGE -> {
+                    message = "Download this image"
+                }
+
+                else -> {
+                    title = "Open ${document.documentName} url in browser"
+                    message = "Open ${document.documentName} in browser..."
+                    positiveBtnText = "Open"
+                }
+            }
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(positiveBtnText) { dialog, _ ->
+
+                    if (document.documentType != DocumentType.URL) {
+
+                        downloadFileFromUrl(
+                            requireActivity(),
+                            document.documentUrl,
+                            document.documentName
+                        )
+                    } else {
+
+                        openLinkInBrowser(requireContext(), document.documentUrl)
+                    }
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+
+                    dialog.dismiss()
+                }
+                .create()
+                .show()
         }
     }
 

@@ -108,7 +108,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
         renterTypeList.add(
             RenterTypes(
                 id = 3,
-                renterType = getString(R.string.manage_money),
+                renterType = getString(R.string.track_money),
                 image = R.drawable.ic_baseline_attach_money_24
             )
         )

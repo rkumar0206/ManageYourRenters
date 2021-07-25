@@ -75,7 +75,7 @@
     <string name="due">due</string>
     <string name="paid_in_advance">Paid in advance </string>
     <string name="borrowers">Borrowers</string>
-    <string name="manage_money">Manage money</string>
+    <string name="track_money">Track money</string>
     <string name="mobileNumberErrorMessage">Please enter a valid mobile number!!</string>
     <string name="add_borrower">Add borrower</string>
     <string name="borrowerPayments">Borrower_Payments</string>
@@ -112,6 +112,7 @@
     <string name="enter_amount">Enter amount</string>
     <string name="no_partial_payment_is_added">No partial payments are added</string>
     <string name="partialPayments">Partial_Payments</string>
+    <string name="downloading_file">downloading file…</string>
 
 
     <string-array name="interest_time_schedule">

@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -323,6 +324,42 @@ class Functions {
             return ContextCompat.checkSelfPermission(
                 this, permission
             ) == PackageManager.PERMISSION_GRANTED
+        }
+
+
+        private fun checkUrl(url: String): String {
+
+            var urll = ""
+            try {
+                if (url.startsWith("https://") || url.startsWith("http://")) {
+                    urll = url
+                } else if (url.trim().isNotEmpty()) {
+                    urll = "https://www.google.com/search?q=$url"
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            return urll
+        }
+
+        fun openLinkInBrowser(context: Context, url: String?) {
+
+            if (isInternetAvailable(context)) {
+                url?.let {
+
+                    try {
+                        Log.d(TAG, "Loading Url in default browser.")
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(checkUrl(it)))
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        showToast(context, e.message.toString())
+                        e.printStackTrace()
+                    }
+                }
+            } else {
+                showNoInternetMessage(context)
+            }
         }
 
     }

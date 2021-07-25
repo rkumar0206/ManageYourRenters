@@ -289,6 +289,14 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         } else {
 
             //TODO("Not yet implemented")
+
+            showInterestBottomSheet(
+                requireContext(),
+                borrowerPayment.interest!!,
+                borrowerPayment.amountTakenOnRent,
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
+            )
         }
     }
 

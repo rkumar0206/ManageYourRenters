@@ -103,7 +103,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider4"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -187,7 +187,7 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/periodTypeRG"
-                tools:visibility="visible" />
+                tools:visibility="gone" />
 
             <Spinner
                 android:id="@+id/selectYearSpinner"
@@ -197,7 +197,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/monthSelectSpinner"
-                app:layout_constraintTop_toTopOf="@+id/monthSelectSpinner" />
+                app:layout_constraintTop_toTopOf="@+id/monthSelectSpinner"
+                tools:visibility="gone" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/byDateCL"
@@ -214,39 +215,28 @@
                 app:layout_constraintTop_toBottomOf="@+id/periodTypeRG"
                 app:layout_constraintVertical_bias="0.0"
                 tools:alpha="1"
-                tools:visibility="gone">
+                tools:visibility="visible">
 
                 <View
                     android:id="@+id/divider17"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:background="?android:attr/listDivider"
-                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintEnd_toStartOf="@+id/divider33"
                     app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guideline2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintGuide_percent="0.41"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/divider8"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/textView7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:padding="4dp"
                     android:text="@string/from"
                     android:textColor="@color/textColor1"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline2"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintStart_toEndOf="@+id/divider8"
                     app:layout_constraintTop_toBottomOf="@+id/divider17" />
 
                 <TextView
@@ -256,64 +246,33 @@
                     android:padding="4dp"
                     android:text="@string/till"
                     android:textColor="@color/textColor1"
-                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
-                    app:layout_constraintStart_toStartOf="@+id/guideline2"
-                    app:layout_constraintTop_toBottomOf="@+id/divider17" />
+                    app:layout_constraintEnd_toStartOf="@+id/divider33"
+                    app:layout_constraintStart_toEndOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintTop_toTopOf="@+id/textView7" />
 
                 <View
                     android:id="@+id/divider7"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="4dp"
                     android:background="?android:attr/listDivider"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline2"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/divider33"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/divider8"
                     app:layout_constraintTop_toBottomOf="@+id/textView7" />
-
-                <View
-                    android:id="@+id/divider8"
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="2dp"
-                    android:background="?android:attr/listDivider"
-                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
-                    app:layout_constraintStart_toStartOf="@+id/guideline2"
-                    app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
                 <TextView
                     android:id="@+id/fromDateTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="7dp"
                     android:padding="4dp"
                     android:text="@string/nul"
                     android:textSize="15sp"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline2"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/divider7" />
-
-                <TextView
-                    android:id="@+id/tillDateTV"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:padding="4dp"
-                    android:text="@string/nul"
-                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/dateRangePickerBtn"
                     app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
-                    app:layout_constraintStart_toStartOf="@+id/guideline2"
-                    app:layout_constraintTop_toBottomOf="@+id/divider8" />
-
-                <ImageButton
-                    android:id="@+id/dateRangePickerBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="2dp"
-                    android:backgroundTint="@color/imageBtnBackgroundColor"
-                    app:layout_constraintBottom_toBottomOf="@+id/tillDateTV"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/tillDateTV"
-                    app:srcCompat="@drawable/ic_baseline_date_range_24" />
+                    app:layout_constraintStart_toEndOf="@+id/divider8"
+                    app:layout_constraintTop_toTopOf="@+id/dateRangePickerBtn" />
 
                 <View
                     android:id="@+id/divider9"
@@ -321,15 +280,55 @@
                     android:layout_height="0dp"
                     android:background="?android:attr/listDivider"
                     app:layout_constraintBottom_toTopOf="@+id/divider16"
-                    app:layout_constraintEnd_toStartOf="@+id/textView8"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/textView7"
-                    app:layout_constraintTop_toTopOf="@+id/textView7" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:id="@+id/divider8"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toTopOf="@+id/divider16"
+                    app:layout_constraintStart_toEndOf="@+id/textView7"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tillDateTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:padding="4dp"
+                    android:text="@string/nul"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintEnd_toStartOf="@+id/divider33"
+                    app:layout_constraintStart_toEndOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintTop_toTopOf="@+id/dateRangePickerBtn" />
+
+                <ImageButton
+                    android:id="@+id/dateRangePickerBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="2dp"
+                    android:backgroundTint="@color/color_white"
+                    android:contentDescription="@string/imagebutton"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider7"
+                    app:srcCompat="@drawable/ic_baseline_date_range_24" />
 
                 <TextView
                     android:id="@+id/byDateErrorMessageTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="4dp"
                     android:layout_marginBottom="2dp"
                     android:ellipsize="end"
                     android:maxLines="1"
@@ -342,28 +341,28 @@
                     app:layout_constraintEnd_toStartOf="@+id/tillDateTV"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/fromDateTV"
-                    app:layout_constraintTop_toBottomOf="@+id/divider16"
+                    app:layout_constraintTop_toBottomOf="@id/divider16"
                     tools:visibility="visible" />
 
                 <View
                     android:id="@+id/divider16"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:layout_marginTop="2dp"
                     android:layout_marginBottom="8dp"
                     android:background="?android:attr/listDivider"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/fromDateTV" />
+                    app:layout_constraintEnd_toStartOf="@+id/divider33"
+                    app:layout_constraintStart_toEndOf="@+id/divider8"
+                    app:layout_constraintTop_toBottomOf="@+id/dateRangePickerBtn" />
 
                 <View
                     android:id="@+id/divider33"
                     android:layout_width="1dp"
                     android:layout_height="0dp"
+                    android:layout_marginEnd="8dp"
                     android:background="?android:attr/listDivider"
                     app:layout_constraintBottom_toBottomOf="@+id/divider9"
-                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -527,6 +526,7 @@
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="@+id/textView14"
                 app:layout_constraintStart_toStartOf="@+id/textView14"
+                android:importantForAutofill="no"
                 app:layout_constraintTop_toBottomOf="@+id/divider12" />
 
             <View
@@ -601,6 +601,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/previousReadingET"
                 app:layout_constraintEnd_toEndOf="@+id/textView15"
                 app:layout_constraintStart_toStartOf="@+id/textView15"
+                android:importantForAutofill="no"
                 app:layout_constraintTop_toTopOf="@+id/previousReadingET" />
 
             <EditText
@@ -617,6 +618,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/currentReadingET"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/divider14"
+                android:importantForAutofill="no"
                 app:layout_constraintTop_toTopOf="@+id/currentReadingET" />
 
             <View
@@ -652,6 +654,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/textView13"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textView13"
+                android:contentDescription="@string/imagebutton"
                 app:srcCompat="@drawable/ic_baseline_calculate_24" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -801,6 +804,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/textView19"
                 app:layout_constraintStart_toStartOf="parent"
+                android:importantForAutofill="no"
                 app:layout_constraintTop_toBottomOf="@+id/divider23" />
 
             <View
@@ -827,6 +831,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/extraFieldNameET"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/divider24"
+                android:importantForAutofill="no"
                 app:layout_constraintTop_toTopOf="@+id/extraFieldNameET" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
@@ -853,7 +858,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:padding="4dp"
-                android:text="Amount Paid"
+                android:text="@string/amount_paid"
                 android:textColor="@color/textColor1"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -901,7 +906,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
-                    android:hint="Amout paid "
+                    android:hint="@string/amount_paid"
                     android:inputType="numberDecimal"
                     android:textColor="@color/color_green" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -939,6 +944,7 @@
                 android:inputType="textMultiLine"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                android:importantForAutofill="no"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -1003,7 +1009,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:padding="4dp"
-        android:text="Dues of last payments : +50"
+        tools:text="Dues of last payments : +50"
         android:textSize="17sp"
         app:layout_constraintEnd_toEndOf="@+id/cardView5"
         app:layout_constraintHorizontal_bias="0.5"

@@ -167,7 +167,7 @@
         android:layout_marginTop="4dp"
         android:padding="4dp"
         android:text="@string/from"
-        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintEnd_toStartOf="@+id/intTimeIB"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider46" />
 
@@ -178,7 +178,7 @@
         android:padding="4dp"
         android:text="@string/till"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toEndOf="@+id/intTimeIB"
         app:layout_constraintTop_toTopOf="@+id/textView38" />
 
     <View
@@ -186,20 +186,11 @@
         android:layout_width="1dp"
         android:layout_height="0dp"
         android:background="?android:attr/listDivider"
-        app:layout_constraintBottom_toBottomOf="@id/divider47"
-        app:layout_constraintEnd_toStartOf="@+id/guideline3"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toBottomOf="@+id/divider46" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/divider48"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintGuide_begin="206dp"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider46" />
 
     <ImageButton
         android:id="@+id/intTimeIB"
@@ -208,8 +199,9 @@
         android:layout_marginTop="16dp"
         android:backgroundTint="@color/color_white"
         android:contentDescription="@string/imagebutton"
-        app:layout_constraintEnd_toStartOf="@+id/guideline3"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider47"
         app:srcCompat="@drawable/ic_baseline_date_range_24" />
 

@@ -1,7 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.model.Payment
 import com.rohitthebest.manageyourrenters.repositories.PaymentRepository
@@ -11,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PaymentViewModel @Inject constructor(
-    val repository: PaymentRepository
+    private val repository: PaymentRepository
 ) : ViewModel() {
 
     fun insertPayment(payment: Payment) = viewModelScope.launch {
@@ -54,6 +53,4 @@ class PaymentViewModel @Inject constructor(
 
     fun getSumOfDueOrAdvance(renterKey: String) = repository.getSumOfDueOrAdvance(renterKey)
 
-    fun getPaymentKeysByRenterKey(renterKey: String) =
-        repository.getPaymentKeysByRenterKey(renterKey).asLiveData()
 }

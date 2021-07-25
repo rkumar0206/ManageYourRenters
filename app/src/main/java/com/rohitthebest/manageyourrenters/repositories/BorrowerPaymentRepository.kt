@@ -28,8 +28,6 @@ class BorrowerPaymentRepository @Inject constructor(
     suspend fun deleteBorrowerPaymentsByIsSynced(isSynced: Boolean) =
         dao.deleteBorrowerPaymentsByIsSynced(isSynced)
 
-    fun getAllBorrowerPayments() = dao.getAllBorrowerPayments()
-
     fun getPaymentsByBorrowerKey(borrowerKey: String) = dao.getPaymentsByBorrowerKey(borrowerKey)
 
     fun getTotalDueOfTheBorrower(borrowerKey: String) = dao.getTotalDueOfTheBorrower(borrowerKey)

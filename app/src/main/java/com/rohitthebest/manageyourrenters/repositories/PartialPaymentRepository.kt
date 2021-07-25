@@ -14,9 +14,6 @@ class PartialPaymentRepository @Inject constructor(
     suspend fun insertAllPartialPayment(partialPayments: List<PartialPayment>) =
         dao.insertAllPartialPayment(partialPayments)
 
-    suspend fun updatePartialPayment(partialPayment: PartialPayment) =
-        dao.updatePartialPayment(partialPayment)
-
     suspend fun deletePartialPayment(partialPayment: PartialPayment) =
         dao.deletePartialPayment(partialPayment)
 
@@ -38,14 +35,6 @@ class PartialPaymentRepository @Inject constructor(
 
     fun getPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey: String) =
         dao.getPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey)
-
-    fun getTheSumOfPartialPaymentsOfBorrowerPayment(borrowerPaymentKey: String) =
-        dao.getTheSumOfPartialPaymentsOfBorrowerPayment(borrowerPaymentKey)
-
-    fun getThePartialPaymentsByIsSyncedAndBorrowerPayment(
-        borrowerPaymentKey: String,
-        isSynced: Boolean
-    ) = dao.getThePartialPaymentsByIsSyncedAndBorrowerPayment(borrowerPaymentKey, isSynced)
 
     suspend fun getKeysByBorrowerPaymentKey(borrowerPaymentKey: String) =
         dao.getKeysByBorrowerPaymentKey(borrowerPaymentKey)

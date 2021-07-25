@@ -40,8 +40,6 @@ class BorrowerPaymentViewModel @Inject constructor(
     fun deleteBorrowerPayment(context: Context, borrowerPayment: BorrowerPayment) =
         viewModelScope.launch {
 
-            repository.deleteBorrowerPayment(borrowerPayment)
-
             val partialPaymentKeys =
                 partialPaymentRepository.getKeysByBorrowerPaymentKey(borrowerPayment.key)
 
@@ -65,6 +63,7 @@ class BorrowerPaymentViewModel @Inject constructor(
                 }
             }
 
+            repository.deleteBorrowerPayment(borrowerPayment)
             partialPaymentRepository.deleteAllPartialPaymentByBorrowerPaymentKey(borrowerPayment.key)
         }
 
@@ -81,9 +80,6 @@ class BorrowerPaymentViewModel @Inject constructor(
 
         repository.deleteBorrowerPaymentsByIsSynced(isSynced)
     }
-
-
-    fun getAllBorrowerPayments() = repository.getAllBorrowerPayments().asLiveData()
 
     fun getPaymentsByBorrowerKey(borrowerKey: String) =
         repository.getPaymentsByBorrowerKey(borrowerKey).asLiveData()

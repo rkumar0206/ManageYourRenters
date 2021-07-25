@@ -86,6 +86,8 @@ class BorrowerViewModel @Inject constructor(
     fun deleteAllBorrower() = viewModelScope.launch {
 
         borrowerRepository.deleteAllBorrower()
+        borrowerPaymentRepository.deleteAllBorrowerPayments()
+        partialPaymentRepository.deleteAllPartialPayments()
     }
 
     fun deleteBorrowerByIsSynced(isSynced: Boolean) = viewModelScope.launch {
@@ -97,8 +99,5 @@ class BorrowerViewModel @Inject constructor(
 
     fun getBorrowerByKey(borrowerKey: String) =
         borrowerRepository.getBorrowerByKey(borrowerKey).asLiveData()
-
-    fun getBorrowerByIsSynced(isSynced: Boolean) =
-        borrowerRepository.getBorrowerByIsSynced(isSynced).asLiveData()
 
 }

@@ -30,5 +30,6 @@ class PaymentRepository @Inject constructor(
 
     fun getSumOfDueOrAdvance(renterKey: String) = dao.getSumOfDueOrAdvance(renterKey)
 
-    fun getPaymentKeysByRenterKey(renterKey: String) = dao.getPaymentKeysByRenterKey(renterKey)
+    suspend fun getPaymentKeysByRenterKey(renterKey: String) =
+        dao.getPaymentKeysByRenterKey(renterKey)
 }

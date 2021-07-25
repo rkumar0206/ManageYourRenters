@@ -27,8 +27,7 @@ import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
 import com.rohitthebest.manageyourrenters.data.RenterTypes
 import com.rohitthebest.manageyourrenters.databinding.ActivityHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
-import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.*
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,7 +45,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
     private lateinit var mAuth: FirebaseAuth
 
     private val renterViewModel: RenterViewModel by viewModels()
-    private val paymentViewModel: PaymentViewModel by viewModels()
+    private val borrowerViewModel: BorrowerViewModel by viewModels()
 
     private lateinit var renterTypeList: ArrayList<RenterTypes>
     private lateinit var renterTypeAdapter: RenterTypeAdapter
@@ -287,7 +286,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
 
         try {
             renterViewModel.deleteAllRenter()
-            paymentViewModel.deleteAllPayments()
+            borrowerViewModel.deleteAllBorrower()
             changeIsSyncedValue()
 
         } catch (e: Exception) {

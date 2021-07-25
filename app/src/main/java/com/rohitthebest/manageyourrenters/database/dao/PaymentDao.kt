@@ -3,12 +3,7 @@ package com.rohitthebest.manageyourrenters.database.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.rohitthebest.manageyourrenters.database.model.Payment
-import kotlinx.coroutines.flow.Flow
 
-data class KeyAndIsSynced(
-    @ColumnInfo(name = "key") val key: String,
-    @ColumnInfo(name = "isSynced") val isSynced: String
-)
 
 @Dao
 interface PaymentDao {
@@ -43,6 +38,6 @@ interface PaymentDao {
     @Query("SELECT SUM(amountPaid - totalRent) FROM payment_table WHERE renterKey =:renterKey")
     fun getSumOfDueOrAdvance(renterKey: String): LiveData<Double>
 
-    @Query("SELECT `key`, isSynced FROM payment_table WHERE renterKey = :renterKey")
-    fun getPaymentKeysByRenterKey(renterKey: String): Flow<List<KeyAndIsSynced>>
+    @Query("SELECT `key` FROM payment_table WHERE renterKey = :renterKey AND isSynced = 1")
+    suspend fun getPaymentKeysByRenterKey(renterKey: String): List<String>
 }

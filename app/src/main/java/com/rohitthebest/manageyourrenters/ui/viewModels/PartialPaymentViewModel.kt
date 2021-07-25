@@ -22,10 +22,6 @@ class PartialPaymentViewModel @Inject constructor(
         repository.insertAllPartialPayment(partialPayments)
     }
 
-    fun updatePartialPayment(partialPayment: PartialPayment) = viewModelScope.launch {
-        repository.updatePartialPayment(partialPayment)
-    }
-
     fun deletePartialPayment(partialPayment: PartialPayment) = viewModelScope.launch {
         repository.deletePartialPayment(partialPayment)
     }
@@ -50,12 +46,4 @@ class PartialPaymentViewModel @Inject constructor(
     fun getPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey: String) =
         repository.getPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey).asLiveData()
 
-    fun getTheSumOfPartialPaymentsOfBorrowerPayment(borrowerPaymentKey: String) =
-        repository.getTheSumOfPartialPaymentsOfBorrowerPayment(borrowerPaymentKey).asLiveData()
-
-    fun getThePartialPaymentsByIsSyncedAndBorrowerPayment(
-        borrowerPaymentKey: String,
-        isSynced: Boolean
-    ) = repository.getThePartialPaymentsByIsSyncedAndBorrowerPayment(borrowerPaymentKey, isSynced)
-        .asLiveData()
 }

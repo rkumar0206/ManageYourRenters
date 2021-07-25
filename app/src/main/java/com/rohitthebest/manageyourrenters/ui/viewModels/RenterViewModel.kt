@@ -1,16 +1,24 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Renter
+import com.rohitthebest.manageyourrenters.repositories.PaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
+import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
+import com.rohitthebest.manageyourrenters.utils.deleteAllDocumentsUsingKeyFromFirestore
+import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class RenterViewModel @Inject constructor(
-    val repo: RenterRepository
+    private val repo: RenterRepository,
+    private val paymentRepository: PaymentRepository
 ) : ViewModel() {
 
     fun insertRenter(renter: Renter) = viewModelScope.launch {
@@ -23,14 +31,36 @@ class RenterViewModel @Inject constructor(
         repo.insertRenters(renters)
     }
 
-    fun deleteRenter(renter: Renter) = viewModelScope.launch {
+    fun deleteRenter(context: Context, renter: Renter) = viewModelScope.launch {
+
+        val paymentKeys = paymentRepository.getPaymentKeysByRenterKey(renter.key!!)
+
+        if (Functions.isInternetAvailable(context)) {
+
+            deleteDocumentFromFireStore(
+                context,
+                context.getString(R.string.renters),
+                renter.key!!
+            )
+
+            if (paymentKeys.isNotEmpty()) {
+
+                deleteAllDocumentsUsingKeyFromFirestore(
+                    context,
+                    context.getString(R.string.payments),
+                    convertStringListToJSON(paymentKeys)
+                )
+            }
+        }
 
         repo.deleteRenter(renter)
+        paymentRepository.deleteAllPaymentsOfRenter(renterKey = renter.key!!)
     }
 
     fun deleteAllRenter() = viewModelScope.launch {
 
         repo.deleteAllRenter()
+        paymentRepository.deleteAllPayments()
     }
 
     fun deleteRenterByIsSynced(isSynced: String) = viewModelScope.launch {

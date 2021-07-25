@@ -1,7 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +18,6 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowRentersAdapter
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
-import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
@@ -39,7 +37,6 @@ private const val TAG = "HomeFragment"
 class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClickListener {
 
     private val renterViewModel: RenterViewModel by viewModels()
-    private val paymentViewModel: PaymentViewModel by viewModels()
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -201,12 +198,12 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                 if (renter.isSynced == getString(R.string.f)) {
 
-                    deleteRenter(renter)
+                    renterViewModel.deleteRenter(requireContext(), renter)
                 } else {
 
                     if (isInternetAvailable(requireContext())) {
 
-                        deleteRenter(renter)
+                        renterViewModel.deleteRenter(requireContext(), renter)
                     } else {
                         showNoInternetMessage(requireContext())
                     }
@@ -219,66 +216,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                 it.dismiss()
             }
         )
-    }
-
-    private fun deleteRenter(renter: Renter) {
-
-        renterViewModel.deleteRenter(renter)
-        var isUndoClicked = false
-
-        binding.homeCoordinatorL.showSnackbarWithActionAndDismissListener(
-            text = "Renter deleted",
-            actionText = "Undo",
-            action = {
-
-                isUndoClicked = true
-
-                renterViewModel.insertRenter(renter)
-                showToast(requireContext(), "Renter restored...")
-            },
-            dismissListener = {
-                if (!isUndoClicked && renter.isSynced == getString(R.string.t)) {
-
-                    deleteDocumentFromFireStore(
-                        context = requireContext(),
-                        collection = getString(R.string.renters),
-                        documentKey = renter.key!!
-                    )
-                }
-
-                deleteAllPaymentsOfThisRenter(renter)
-            }
-        )
-    }
-
-    private fun deleteAllPaymentsOfThisRenter(renter: Renter) {
-
-        paymentViewModel.getPaymentKeysByRenterKey(renterKey = renter.key!!)
-            .observe(viewLifecycleOwner,
-                { keysAndIsSyncedList ->
-
-                    if (keysAndIsSyncedList.isNotEmpty()) {
-
-                        Log.d(TAG, "deleteAllPaymentsOfThisRenter: $keysAndIsSyncedList")
-
-                        val paymentToDeleteFromFirestore =
-                            keysAndIsSyncedList.filter { k -> k.isSynced == getString(R.string.t) }
-                                .map { k -> k.key }
-
-                        if (paymentToDeleteFromFirestore.isNotEmpty()) {
-
-                            deleteAllDocumentsUsingKeyFromFirestore(
-                                requireContext(),
-                                getString(R.string.payments),
-                                convertStringListToJSON(
-                                    paymentToDeleteFromFirestore
-                                )
-                            )
-                        }
-
-                        paymentViewModel.deleteAllPaymentsOfRenter(renter.key!!)
-                    }
-                })
     }
 
     override fun onEditClicked(renter: Renter) {

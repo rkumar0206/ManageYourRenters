@@ -13,9 +13,6 @@ interface PartialPaymentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllPartialPayment(partialPayments: List<PartialPayment>)
 
-    @Update
-    suspend fun updatePartialPayment(partialPayment: PartialPayment)
-
     @Delete
     suspend fun deletePartialPayment(partialPayment: PartialPayment)
 
@@ -39,15 +36,6 @@ interface PartialPaymentDao {
 
     @Query("SELECT * FROM partial_payment_table WHERE borrowerPaymentKey = :borrowerPaymentKey ORDER BY created DESC")
     fun getPartialPaymentByBorrowerPaymentKey(borrowerPaymentKey: String): Flow<List<PartialPayment>>
-
-    @Query("SELECT SUM(amount) FROM partial_payment_table WHERE borrowerPaymentKey = :borrowerPaymentKey")
-    fun getTheSumOfPartialPaymentsOfBorrowerPayment(borrowerPaymentKey: String): Flow<Double>
-
-    @Query("SELECT * FROM partial_payment_table WHERE borrowerPaymentKey = :borrowerPaymentKey AND isSynced = :isSynced")
-    fun getThePartialPaymentsByIsSyncedAndBorrowerPayment(
-        borrowerPaymentKey: String,
-        isSynced: Boolean
-    ): Flow<List<PartialPayment>>
 
     // it will give the list of keys of a particular borrower payment
     // making it suspend because it will only be used in viewModel and not in fragments or activities

@@ -21,6 +21,7 @@ object Constants {
     const val UPLOAD_DATA_KEY = "UPLOAD_TAG_sdhaasdfhkjvhkjvhjkvhbjkvb"
     const val RANDOM_ID_KEY = "RANDOM_ID_KEY_sdjhdsdvjkbvbavbhbvhjbhjbvdb"
     const val KEY_LIST_KEY = "KEY_LIST_KEY_fdhvjkhjkvkjvkbvk"
+    const val DELETE_FILE_FROM_FIREBASE_KEY = "DELETE_FILE_FROM_FIREBASE_KEY_sjvvbibisbvbaib"
 
     const val IS_SYNCED_SHARED_PREF_NAME = "IS_SYNCED_SHARED_PREF_NAME_fdkdnf"
     const val IS_SYNCED_SHARED_PREF_KEY = "IS_SYNCED_SHARED_PREF_KEY_fkjdvkjdbdnf"

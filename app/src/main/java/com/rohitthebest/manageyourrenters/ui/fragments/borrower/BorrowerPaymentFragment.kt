@@ -234,7 +234,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
             val document = borrowerPayment.supportingDocument!!
 
             var title = "Download ${document.documentName}"
-            var message = ""
+            val message: String
             var positiveBtnText = "Download"
 
             when (document.documentType) {

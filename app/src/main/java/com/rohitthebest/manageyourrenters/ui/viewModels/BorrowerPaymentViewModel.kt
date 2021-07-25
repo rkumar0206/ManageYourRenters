@@ -6,13 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.PartialPaymentRepository
-import com.rohitthebest.manageyourrenters.utils.Functions
-import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
-import com.rohitthebest.manageyourrenters.utils.deleteAllDocumentsUsingKeyFromFirestore
-import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
+import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -52,6 +50,17 @@ class BorrowerPaymentViewModel @Inject constructor(
                     context.getString(R.string.borrowerPayments),
                     borrowerPayment.key
                 )
+
+                if (borrowerPayment.isSupportingDocAdded) {
+
+                    if (borrowerPayment.supportingDocument?.documentType != DocumentType.URL) {
+
+                        deleteFileFromFirebaseStorage(
+                            context,
+                            borrowerPayment.supportingDocument?.documentUrl!!
+                        )
+                    }
+                }
 
                 if (partialPaymentKeys.isNotEmpty()) {
 

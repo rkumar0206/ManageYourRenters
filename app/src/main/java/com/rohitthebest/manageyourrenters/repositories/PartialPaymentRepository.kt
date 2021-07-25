@@ -22,6 +22,9 @@ class PartialPaymentRepository @Inject constructor(
 
     suspend fun deleteAllPartialPayments() = dao.deleteAllPartialPayments()
 
+    suspend fun deletePartialPaymentsByIsSynced(isSynced: Boolean) =
+        dao.deletePartialPaymentsByIsSynced(isSynced)
+
     suspend fun deleteAllByProvideList(partialPaymentKeys: List<String>) =
         dao.deleteAllByProvideList(partialPaymentKeys)
 

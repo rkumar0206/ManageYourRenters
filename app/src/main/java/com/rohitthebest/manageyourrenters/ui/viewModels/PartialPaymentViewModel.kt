@@ -34,6 +34,11 @@ class PartialPaymentViewModel @Inject constructor(
         repository.deleteAllPartialPayments()
     }
 
+    fun deletePartialPaymentsByIsSynced(isSynced: Boolean) = viewModelScope.launch {
+
+        repository.deletePartialPaymentsByIsSynced(isSynced)
+    }
+
     fun deleteAllByProvideList(partialPaymentKeys: List<String>) =
         viewModelScope.launch {
 

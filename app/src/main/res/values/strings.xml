@@ -92,6 +92,7 @@
     <string name="url">url</string>
     <string name="please_wait_while_file_is_uploading">Please wait while file is uploading…</string>
     <string name="sync_borrower_payments">syncing borrower payments…</string>
+    <string name="sync_partial_payments">syncing partial payments…</string>
     <string name="sync_renters_payments">syncing renters payments…</string>
     <string name="sync_borrowers">syncing borrowers…</string>
     <string name="time_schedule">Time schedule</string>

@@ -16,16 +16,10 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.model.Borrower
-import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
-import com.rohitthebest.manageyourrenters.database.model.Payment
-import com.rohitthebest.manageyourrenters.database.model.Renter
+import com.rohitthebest.manageyourrenters.database.model.*
 import com.rohitthebest.manageyourrenters.databinding.ActivityLoginBinding
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
-import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
-import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
-import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.*
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
@@ -43,6 +37,7 @@ class LoginActivity : AppCompatActivity() {
     private val paymentViewModel by viewModels<PaymentViewModel>()
     private val borrowerViewModel by viewModels<BorrowerViewModel>()
     private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
+    private val partialPaymentViewModel by viewModels<PartialPaymentViewModel>()
 
     private lateinit var mAuth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -296,6 +291,8 @@ class LoginActivity : AppCompatActivity() {
                     withContext(Dispatchers.Main) {
 
                         borrowerViewModel.deleteBorrowerByIsSynced(true)
+                        borrowerPaymentViewModel.deleteBorrowerPaymentsByIsSynced(true)
+                        partialPaymentViewModel.deletePartialPaymentsByIsSynced(true)
                         saveIsSyncedValueAndNavigateToHomeActivity()
                     }
                 }
@@ -328,18 +325,57 @@ class LoginActivity : AppCompatActivity() {
                         delay(100)
                         borrowerPaymentViewModel.insertBorrowerPayments(it.toObjects(BorrowerPayment::class.java))
 
-                        saveIsSyncedValueAndNavigateToHomeActivity()
+                        syncBorrowersPartialPayments()
                     }
                 } else {
 
                     withContext(Dispatchers.Main) {
 
                         borrowerPaymentViewModel.deleteBorrowerPaymentsByIsSynced(true)
+                        partialPaymentViewModel.deletePartialPaymentsByIsSynced(true)
                         saveIsSyncedValueAndNavigateToHomeActivity()
                     }
                 }
             }
 
+        }
+    }
+
+    private suspend fun syncBorrowersPartialPayments() {
+
+        binding.showSyncingInfoTV.text = getString(R.string.sync_partial_payments)
+
+        withContext(Dispatchers.IO) {
+
+            val partialPayments = getDataFromFireStore(
+                getString(R.string.partialPayments),
+                getUid()!!
+            ) {
+                showToast(this@LoginActivity, "Something went wrong.")
+                saveIsSyncedValueAndNavigateToHomeActivity()
+            }
+
+            partialPayments?.let {
+
+                if (partialPayments.size() != 0) {
+
+                    withContext(Dispatchers.Main) {
+
+                        partialPaymentViewModel.deletePartialPaymentsByIsSynced(true)
+                        delay(100)
+                        partialPaymentViewModel.insertAllPartialPayment(it.toObjects(PartialPayment::class.java))
+
+                        saveIsSyncedValueAndNavigateToHomeActivity()
+                    }
+                } else {
+
+                    withContext(Dispatchers.Main) {
+
+                        partialPaymentViewModel.deletePartialPaymentsByIsSynced(true)
+                        saveIsSyncedValueAndNavigateToHomeActivity()
+                    }
+                }
+            }
         }
     }
 

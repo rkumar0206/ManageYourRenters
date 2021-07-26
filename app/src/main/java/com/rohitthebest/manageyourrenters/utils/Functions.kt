@@ -319,6 +319,35 @@ class Functions {
             }
         }
 
+        inline fun showDateRangePickerDialog(
+            startDate: Long,
+            endDate: Long,
+            crossinline fragmentManager: () -> FragmentManager,
+            crossinline positiveListener: (androidx.core.util.Pair<Long, Long>) -> Unit
+        ) {
+
+            val builder = MaterialDatePicker.Builder.dateRangePicker()
+                .setSelection(androidx.core.util.Pair(startDate, endDate))
+                .setTitleText("Select date range")
+                .build()
+
+            builder.show(
+                fragmentManager(),
+                "date_range_picker"
+            )
+
+            builder.addOnPositiveButtonClickListener {
+
+                positiveListener(it)
+            }
+        }
+
+        fun calculateNumberOfDays(startDate: Long, endDate: Long): Int {
+
+            return ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt()
+
+        }
+
         fun Context.checkIfPermissionsGranted(permission: String): Boolean {
 
             return ContextCompat.checkSelfPermission(

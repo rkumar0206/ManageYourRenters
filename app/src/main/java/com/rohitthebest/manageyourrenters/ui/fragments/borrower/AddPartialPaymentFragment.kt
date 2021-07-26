@@ -173,7 +173,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
         binding.addPartialFragmentToolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+           dismiss()
         }
 
         binding.addPartialFragmentToolbar.menu.findItem(R.id.menu_save_btn)

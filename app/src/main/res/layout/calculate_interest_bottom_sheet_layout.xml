@@ -5,38 +5,15 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView27"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:padding="5dp"
-        android:text="@string/calculate_interest"
-        android:textColor="@color/primaryTextColor"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/divider45"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="2dp"
-        android:background="?android:attr/listDivider"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView27" />
-
-    <TextView
         android:id="@+id/textView28"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:padding="5dp"
         android:text="@string/type"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/intTypeRG"
-        app:layout_constraintStart_toStartOf="@+id/textView27"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/intTypeRG" />
 
     <TextView
@@ -47,7 +24,7 @@
         android:text="@string/rate"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/intRateET"
-        app:layout_constraintStart_toStartOf="@+id/textView27"
+        app:layout_constraintStart_toStartOf="@+id/textView28"
         app:layout_constraintTop_toTopOf="@+id/intRateET" />
 
     <TextView
@@ -58,24 +35,24 @@
         android:text="@string/principal"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/intPrincipalET"
-        app:layout_constraintStart_toStartOf="@+id/textView27"
+        app:layout_constraintStart_toStartOf="@+id/textView35"
         app:layout_constraintTop_toTopOf="@+id/intPrincipalET" />
 
     <RadioGroup
         android:id="@+id/intTypeRG"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView49"
-        app:layout_constraintTop_toBottomOf="@+id/divider45">
+        app:layout_constraintTop_toTopOf="parent">
 
         <RadioButton
             android:id="@+id/intSimpleInterestRB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:text="@string/simple_interest" />
 
@@ -83,7 +60,7 @@
             android:id="@+id/intCompoundInterestRB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:text="@string/compound_interest" />
     </RadioGroup>
@@ -132,7 +109,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="16dp"
-        android:background="?android:attr/listDivider"
+        android:background="@color/divider_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -143,7 +120,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="4dp"
-        android:background="?android:attr/listDivider"
+        android:background="@color/divider_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -154,7 +131,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="16dp"
-        android:background="?android:attr/listDivider"
+        android:background="@color/divider_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -185,7 +162,7 @@
         android:id="@+id/divider49"
         android:layout_width="1dp"
         android:layout_height="0dp"
-        android:background="?android:attr/listDivider"
+        android:background="@color/divider_color"
         app:layout_constraintBottom_toTopOf="@+id/divider48"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -306,5 +283,17 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView13" />
+
+    <View
+        android:id="@+id/divider45"
+        android:layout_width="409dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/intCalculateBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

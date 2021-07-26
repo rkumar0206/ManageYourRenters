@@ -288,15 +288,12 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
             showToast(requireContext(), "No interest added!!!")
         } else {
 
-            //TODO("Not yet implemented")
+            val action =
+                BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToCalculateInterestBottomSheetFragment(
+                    borrowerPayment.key
+                )
 
-            showInterestBottomSheet(
-                requireContext(),
-                borrowerPayment.interest!!,
-                borrowerPayment.amountTakenOnRent,
-                System.currentTimeMillis(),
-                System.currentTimeMillis()
-            )
+            findNavController().navigate(action)
         }
     }
 

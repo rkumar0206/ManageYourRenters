@@ -24,5 +24,6 @@
     <color name="primaryTextColor">#212121</color>
     <color name="secondaryTextColor">#4D4C4C</color>
     <color name="color_white">#FFFFFF</color>
+    <color name="divider_color">#79A0A0A0</color>
 
 </resources>

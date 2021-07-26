@@ -58,8 +58,10 @@
             app:popExitAnim="@anim/fade_out" />
         <action
             android:id="@+id/action_borrowerPaymentFragment_to_addPartialPaymentFragment"
-            app:destination="@id/addPartialPaymentFragment"
-            />
+            app:destination="@id/addPartialPaymentFragment" />
+        <action
+            android:id="@+id/action_borrowerPaymentFragment_to_calculateInterestBottomSheetFragment"
+            app:destination="@id/calculateInterestBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/addBorrowerPaymentFragment"
@@ -78,6 +80,16 @@
         tools:layout="@layout/fragment_add_partial_payment">
         <argument
             android:name="borrower_payment_message"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
+    <dialog
+        android:id="@+id/calculateInterestBottomSheetFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.borrower.CalculateInterestBottomSheetFragment"
+        android:label="CalculateInterestBottomSheetFragment"
+        tools:layout="@layout/fragment_calculate_interest">
+        <argument
+            android:name="paymentKey"
             app:argType="string"
             app:nullable="true" />
     </dialog>

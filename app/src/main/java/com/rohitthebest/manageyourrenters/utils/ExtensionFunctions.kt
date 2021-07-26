@@ -6,7 +6,10 @@ import android.content.DialogInterface
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.text.Editable
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.TextWatcher
+import android.text.style.StrikethroughSpan
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -177,4 +180,20 @@ inline fun SearchView.searchText(
         }
 
     })
+}
+
+
+fun TextView.strikeThrough() {
+
+    val spannableStringBuilder = SpannableStringBuilder(this.text.toString())
+    val strikeThroughSpan = StrikethroughSpan()
+
+    spannableStringBuilder.setSpan(
+        strikeThroughSpan,
+        0,
+        this.text.toString().length,
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+    )
+
+    this.text = spannableStringBuilder
 }

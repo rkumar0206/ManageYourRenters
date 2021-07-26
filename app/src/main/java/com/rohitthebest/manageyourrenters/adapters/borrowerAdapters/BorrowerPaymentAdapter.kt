@@ -13,6 +13,7 @@ import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
+import com.rohitthebest.manageyourrenters.utils.strikeThrough
 
 class BorrowerPaymentAdapter :
     ListAdapter<BorrowerPayment, BorrowerPaymentAdapter.BorrowerPaymentViewHolder>(DiffUtilCallback()) {
@@ -75,6 +76,11 @@ class BorrowerPaymentAdapter :
 
                         binding.adapterBorrowerPaymentMCV.strokeColor =
                             ContextCompat.getColor(binding.root.context, R.color.color_green)
+
+                        binding.borrowedAmountTV.strikeThrough()
+                        binding.paidAmountTV.strikeThrough()
+                        binding.dueAmountTV.strikeThrough()
+
                     }
                 }
             }

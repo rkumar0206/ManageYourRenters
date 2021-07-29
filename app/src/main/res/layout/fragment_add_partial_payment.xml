@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:navigationIcon="@drawable/ic_cancel"
-            app:menu="@menu/add_payment_menu"
+            app:menu="@menu/save_menu"
             app:title="Payments" />
 
     </com.google.android.material.appbar.AppBarLayout>

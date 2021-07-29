@@ -33,11 +33,12 @@ class EmiFragment : Fragment(R.layout.fragment_emi) {
             findNavController().navigate(R.id.action_emiFragment_to_addEditEMIFragment)
         }
 
-        binding.emiFragmentToolbar.menu.findItem(R.id.menu_search_home).setOnMenuItemClickListener {
+        binding.emiFragmentToolbar.menu.findItem(R.id.menu_search_home)
+            .setOnMenuItemClickListener {
 
-            //todo : add search functionality in this fragment
-            true
-        }
+                //todo : add search functionality in this fragment
+                true
+            }
 
     }
 

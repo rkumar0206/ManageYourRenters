@@ -123,6 +123,20 @@
     <string name="others">Others</string>
     <string name="no_borrowers_message">Press add button below if you have given money someone..</string>
     <string name="addemicategoryfab">addEmiCategoryfab</string>
+    <string name="name">Name</string>
+    <string name="emi_name">EMI name</string>
+    <string name="enter_a_name_for_the_emi_for_example_car_emi_bike_emi_etc">* enter a name for the EMI. For example : car emi, bike emi, etc.</string>
+    <string name="time">Time</string>
+    <string name="start_date_of_the_emi">Start date of the EMI</string>
+    <string name="total_number_of_months">Total number of months</string>
+    <string name="months_completed">Months completed</string>
+    <string name="total_months_for_which_emi_is_taken">Total months for which EMI is taken</string>
+    <string name="number_of_months_completed_till_now">Number of months completed till now</string>
+    <string name="amount_per_month">Amount per month</string>
+    <string name="amount_paid_till_now">Amount paid till now</string>
+    <string name="amount_to_paid_per_month">Amount to paid per month</string>
+    <string name="total_emi_amount_total_months_amount_per_month">Total EMI amount (total months * amount per month)</string>
+    <string name="amount_paid_till_now">Amount paid till now</string>
 
 
     <string-array name="interest_time_schedule">

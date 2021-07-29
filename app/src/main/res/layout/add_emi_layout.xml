@@ -135,11 +135,13 @@
 
             <TextView
                 android:id="@+id/emiStartDateTV"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:padding="5dp"
                 android:text="@string/_02_06_2000"
                 app:layout_constraintBottom_toBottomOf="@+id/emiStartDateCalendarBtn"
+                app:layout_constraintEnd_toStartOf="@+id/emiStartDateCalendarBtn"
                 app:layout_constraintStart_toStartOf="@+id/textView41"
                 app:layout_constraintTop_toTopOf="@+id/emiStartDateCalendarBtn" />
 

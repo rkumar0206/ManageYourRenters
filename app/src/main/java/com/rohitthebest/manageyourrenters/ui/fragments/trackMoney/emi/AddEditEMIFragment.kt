@@ -9,9 +9,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.AddEmiLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEmiBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
-import com.rohitthebest.manageyourrenters.utils.isTextValid
-import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
-import com.rohitthebest.manageyourrenters.utils.setCurrencySymbol
+import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -28,6 +26,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
     private lateinit var includeBinding: AddEmiLayoutBinding
     private lateinit var currencySymbolList: List<String>
     private var selectedCurrencySymbol = ""
+    private var selectedEMIStartDate: Long = 0L
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -36,6 +35,11 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
         includeBinding = binding.includeLayout
 
         currencySymbolList = resources.getStringArray(R.array.currency_symbol).asList()
+
+        selectedEMIStartDate = System.currentTimeMillis()
+        includeBinding.emiStartDateTV.setDateInTextView(
+            selectedEMIStartDate
+        )
 
         initListeners()
         textWatcher()
@@ -63,7 +67,18 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         if (v?.id == includeBinding.emiStartDateTV.id || v?.id == includeBinding.emiStartDateCalendarBtn.id) {
 
-            // todo : open the calendar
+            Functions.showCalendarDialog(
+                selectedEMIStartDate,
+                {
+                    requireActivity().supportFragmentManager
+                },
+                {
+                    selectedEMIStartDate = it
+                    includeBinding.emiStartDateTV.setDateInTextView(
+                        selectedEMIStartDate
+                    )
+                }
+            )
         }
 
     }

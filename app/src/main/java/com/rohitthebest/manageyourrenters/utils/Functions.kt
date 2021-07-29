@@ -293,18 +293,22 @@ class Functions {
         inline fun showCalendarDialog(
             selectedDate: Long,
             crossinline show: () -> FragmentManager,
-            crossinline positiveListener: (time: Long) -> Unit
+            crossinline positiveListener: (time: Long) -> Unit,
+            isUpcomingDatesValid: Boolean = false
         ) {
 
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select a date")
                 .setSelection(selectedDate)
 
-            val constrainBuilder = CalendarConstraints.Builder()
-                .setValidator(DateValidatorPointBackward.now())
-                .build()
+            if (!isUpcomingDatesValid) {
 
-            datePicker.setCalendarConstraints(constrainBuilder)
+                val constrainBuilder = CalendarConstraints.Builder()
+                    .setValidator(DateValidatorPointBackward.now())
+                    .build()
+
+                datePicker.setCalendarConstraints(constrainBuilder)
+            }
 
             val builder = datePicker.build()
 

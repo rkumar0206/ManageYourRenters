@@ -15,6 +15,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ManageYourRenters">
+        <activity
+            android:name=".ui.activities.TrackMoneyActivity"
+            android:exported="true" />
         <activity android:name=".ui.activities.BorrowerActivity" />
         <activity android:name=".ui.activities.LoginActivity" />
         <activity android:name=".ui.activities.HouseRentersActivity" />

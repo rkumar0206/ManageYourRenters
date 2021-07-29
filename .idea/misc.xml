@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/activity_borrower.xml" value="0.2257405515832482" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/activity_track_money.xml" value="0.23020833333333332" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

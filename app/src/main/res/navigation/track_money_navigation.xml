@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/track_money_navigation">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/track_money_navigation"
+    app:startDestination="@id/trackMoneyHomeFragment">
 
+    <fragment
+        android:id="@+id/trackMoneyHomeFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.TrackMoneyHomeFragment"
+        android:label="TrackMoneyHomeFragment"
+        tools:layout="@layout/fragment_track_money_home" />
 </navigation>

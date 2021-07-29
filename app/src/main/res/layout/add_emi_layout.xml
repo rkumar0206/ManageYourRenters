@@ -70,6 +70,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
                     android:hint="@string/emi_name"
+                    android:inputType="textPersonName|textAutoCorrect|textAutoComplete|textCapCharacters"
                     android:maxLength="25" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -161,7 +162,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="8dp"
                 android:text="@string/start_date_of_the_emi"
-                android:textColor="@color/dark_blue"
+                android:textColor="#1976D2"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider51" />
@@ -173,7 +174,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:text="@string/total_number_of_months"
-                android:textColor="@color/dark_blue"
+                android:textColor="#1976D2"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider52" />
@@ -185,7 +186,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="8dp"
                 android:text="@string/months_completed"
-                android:textColor="@color/dark_blue"
+                android:textColor="#1976D2"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/totalEmiMonthsET" />
@@ -207,6 +208,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:hint="@string/total_months_for_which_emi_is_taken"
+                android:hintTextColor="#78909C"
                 android:inputType="number"
                 android:maxLength="4"
                 android:minHeight="48dp"
@@ -226,6 +228,7 @@
                 android:maxLength="4"
                 android:maxLines="1"
                 android:minHeight="48dp"
+                android:text="@string/__0"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/totalEmiMonthsET"
                 app:layout_constraintStart_toStartOf="@+id/textView45"
@@ -254,12 +257,13 @@
                 android:id="@+id/emiAmountPerMonthET"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:hint="@string/amount_per_month"
-                android:inputType="number"
+                android:hintTextColor="#78909C"
+                android:inputType="numberDecimal"
                 android:maxLength="10"
                 android:minHeight="48dp"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/moneySymbolSpinner"
                 app:layout_constraintStart_toStartOf="@+id/textView56"
                 app:layout_constraintTop_toBottomOf="@+id/textView56"
                 tools:ignore="Autofill" />
@@ -271,9 +275,10 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="5dp"
                 android:hint="@string/amount_paid_till_now"
-                android:inputType="number"
+                android:inputType="numberDecimal"
                 android:maxLength="10"
                 android:minHeight="48dp"
+                android:text="@string/__0"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/textView56"
@@ -287,7 +292,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="8dp"
                 android:text="@string/amount_to_paid_per_month"
-                android:textColor="@color/dark_blue"
+                android:textColor="#1976D2"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider53" />
@@ -299,7 +304,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="8dp"
                 android:text="@string/total_emi_amount_total_months_amount_per_month"
-                android:textColor="@color/dark_blue"
+                android:textColor="#1976D2"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/emiAmountPerMonthET" />
@@ -311,7 +316,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="8dp"
                 android:text="@string/amount_paid_till_now"
-                android:textColor="@color/dark_blue"
+                android:textColor="#1976D2"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/totalEMIAmountTV" />
@@ -352,6 +357,16 @@
                 app:layout_constraintStart_toStartOf="@+id/textView58"
                 app:layout_constraintTop_toBottomOf="@+id/textView58"
                 tools:text="84 * 9000" />
+
+            <Spinner
+                android:id="@+id/moneySymbolSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/emiAmountPerMonthET"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/emiAmountPerMonthET" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 

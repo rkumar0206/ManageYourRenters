@@ -22,5 +22,19 @@
         android:id="@+id/emiFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi.EmiFragment"
         android:label="EmiFragment"
-        tools:layout="@layout/fragment_emi" />
+        tools:layout="@layout/fragment_emi">
+        <action
+            android:id="@+id/action_emiFragment_to_addEditEMIFragment"
+            app:destination="@id/addEditEMIFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/addEditEMIFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi.AddEditEMIFragment"
+        android:label="AddEditEMIFragment"
+        tools:layout="@layout/fragment_add_emi" />
 </navigation>

@@ -11,10 +11,13 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddEmiBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.utils.isTextValid
 import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
+import com.rohitthebest.manageyourrenters.utils.setCurrencySymbol
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+private const val TAG = "AddEditEMIFragment"
 
 @AndroidEntryPoint
 class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickListener {
@@ -23,16 +26,21 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
     private val binding get() = _binding!!
 
     private lateinit var includeBinding: AddEmiLayoutBinding
+    private lateinit var currencySymbolList: List<String>
+    private var selectedCurrencySymbol = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAddEmiBinding.bind(view)
 
         includeBinding = binding.includeLayout
+
+        currencySymbolList = resources.getStringArray(R.array.currency_symbol).asList()
+
         initListeners()
         textWatcher()
+        setUpCurrencySymbolSpinner()
     }
-
 
     private fun initListeners() {
 
@@ -59,6 +67,18 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
         }
 
     }
+
+    private fun setUpCurrencySymbolSpinner() {
+
+        includeBinding.moneySymbolSpinner.setCurrencySymbol(
+            requireContext()
+        ) { position ->
+
+            selectedCurrencySymbol = currencySymbolList[position]
+            calculateTotalEmiAmount()
+        }
+    }
+
 
     private fun textWatcher() {
 
@@ -168,7 +188,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
                 val totalEMIAmount = totalMonths * amountPerMonth
 
                 includeBinding.totalEMIAmountTV.text = String.format(
-                    "$totalMonths * $amountPerMonth = %.3f", totalEMIAmount
+                    "$totalMonths * $amountPerMonth = $selectedCurrencySymbol %.3f", totalEMIAmount
                 )
 
             }

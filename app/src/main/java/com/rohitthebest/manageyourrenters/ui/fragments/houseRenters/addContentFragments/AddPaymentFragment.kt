@@ -417,37 +417,14 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun setUpCurrencySymbolList() {
 
-        includeBinding.moneySymbolSpinner.let { spinner ->
+        includeBinding.moneySymbolSpinner.setCurrencySymbol(
 
-            spinner.adapter = ArrayAdapter(
-                requireContext(),
-                R.layout.support_simple_spinner_dropdown_item,
-                currencyList
-            )
+            requireContext(),
+        ) { position ->
 
-            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                    spinner.setSelection(0)
-                    currencySymbol = currencyList[0]
-                }
-
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-
-                    spinner.setSelection(position)
-                    currencySymbol = currencyList[position]
-                    calculateTotalBill()
-                    //showToast(requireContext(), "${currencyList!![position]} is selected..")
-                }
-            }
+            currencySymbol = currencyList[position]
+            calculateTotalBill()
         }
-
     }
 
     private fun initListeners() {

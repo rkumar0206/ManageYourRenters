@@ -11,8 +11,7 @@ import android.text.Spanned
 import android.text.TextWatcher
 import android.text.style.StrikethroughSpan
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -196,4 +195,43 @@ fun TextView.strikeThrough() {
     )
 
     this.text = spannableStringBuilder
+}
+
+
+inline fun Spinner.setCurrencySymbol(
+    context: Context,
+    crossinline position: (Int) -> Unit
+) {
+
+    val currencySymbolList = resources.getStringArray(R.array.currency_symbol)
+
+    this.apply {
+
+        adapter = ArrayAdapter(
+            context,
+            R.layout.support_simple_spinner_dropdown_item,
+            currencySymbolList
+        )
+
+        onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                setSelection(0)
+                position(0)
+            }
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+
+                setSelection(position)
+                position(position)
+            }
+        }
+
+    }
 }

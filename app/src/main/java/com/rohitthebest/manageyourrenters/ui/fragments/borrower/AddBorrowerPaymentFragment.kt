@@ -172,35 +172,12 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private fun setUpCurrencySymbolSpinner() {
 
-        includeBinding.moneySymbolSpinner.apply {
+        includeBinding.moneySymbolSpinner.setCurrencySymbol(
+            requireContext()
+        ) { position ->
 
-            adapter = ArrayAdapter(
-                requireContext(),
-                R.layout.support_simple_spinner_dropdown_item,
-                currencySymbols
-            )
-
-            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                    setSelection(0)
-                    selectedCurrencySymbol = currencySymbols[0]
-                }
-
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-
-                    setSelection(position)
-                    selectedCurrencySymbol = currencySymbols[position]
-                }
-            }
+            selectedCurrencySymbol = currencySymbols[position]
         }
-
     }
 
     private fun initListeners() {

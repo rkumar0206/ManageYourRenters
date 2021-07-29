@@ -205,9 +205,9 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                                 )
                         }
 
-                        payment.bill?.billMonth?.toLowerCase(Locale.ROOT)?.contains(
+                        payment.bill?.billMonth?.lowercase(Locale.ROOT)?.contains(
 
-                            s.toString().trim().toLowerCase(Locale.ROOT)
+                            s.toString().trim().lowercase(Locale.ROOT)
                         )!! ||
                                 from?.contains(s.toString().trim())!!
                                 ||

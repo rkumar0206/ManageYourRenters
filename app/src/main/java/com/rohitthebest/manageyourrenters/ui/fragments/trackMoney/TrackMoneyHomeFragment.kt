@@ -3,7 +3,10 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
+import com.rohitthebest.manageyourrenters.data.RenterTypes
 import com.rohitthebest.manageyourrenters.databinding.FragmentTrackMoneyHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -13,9 +16,62 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home) {
     private var _binding: FragmentTrackMoneyHomeBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var trackMoneyTypeList: ArrayList<RenterTypes>
+    private lateinit var trackMoneyTypeAdapter: RenterTypeAdapter
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentTrackMoneyHomeBinding.bind(view)
+
+        populateTrackMoneyTypeList()
+        trackMoneyTypeAdapter = RenterTypeAdapter()
+        setUpRecyclerView()
+        trackMoneyTypeAdapter.submitList(trackMoneyTypeList)
+
+
+        binding.trackMoneyHomeToolbar.setNavigationOnClickListener {
+
+            requireActivity().onBackPressed()
+        }
+    }
+
+    private fun populateTrackMoneyTypeList() {
+
+        trackMoneyTypeList = ArrayList()
+
+        trackMoneyTypeList.add(
+            RenterTypes(
+                id = 1,
+                renterType = getString(R.string.emi),
+                image = R.drawable.ic_emi
+            )
+        )
+
+        trackMoneyTypeList.add(
+            RenterTypes(
+                id = 2,
+                renterType = getString(R.string.loan),
+                image = R.drawable.ic_loan
+            )
+        )
+
+        trackMoneyTypeList.add(
+            RenterTypes(
+                id = 3,
+                renterType = getString(R.string.others),
+                image = R.drawable.ic_other_track_money
+            )
+        )
+    }
+
+    private fun setUpRecyclerView() {
+
+        binding.trackMoneyHomeRV.apply {
+
+            setHasFixedSize(true)
+            adapter = trackMoneyTypeAdapter
+            layoutManager = GridLayoutManager(requireContext(), 2)
+        }
     }
 
     override fun onDestroyView() {

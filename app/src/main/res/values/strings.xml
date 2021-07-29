@@ -118,6 +118,10 @@
     <string name="principal">Principal</string>
     <string name="interest_">Interest :</string>
     <string name="calculate">Calculate</string>
+    <string name="emi">EMI</string>
+    <string name="loan">Loan</string>
+    <string name="others">Others</string>
+    <string name="no_borrowers_message">Press add button below if you have given money someone..</string>
 
 
     <string-array name="interest_time_schedule">

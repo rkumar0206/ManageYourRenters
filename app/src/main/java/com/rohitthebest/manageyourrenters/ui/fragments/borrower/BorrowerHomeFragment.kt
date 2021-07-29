@@ -13,7 +13,6 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.BorrowerAdapter
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerHomeBinding
-import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -33,7 +32,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
     private val binding get() = _binding!!
 
     private val borrowerViewModel by viewModels<BorrowerViewModel>()
-    private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
     private lateinit var borrowerAdapter: BorrowerAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,6 +63,14 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
         borrowerViewModel.getAllBorrower().observe(viewLifecycleOwner, {
 
+            if (it.isEmpty()) {
+
+                showNoBorrowersAddedTV(true)
+            } else {
+
+                showNoBorrowersAddedTV(false)
+            }
+
             borrowerAdapter.submitList(it)
 
             initSearchViewMenu(it)
@@ -88,8 +94,8 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
                 val filteredList = borrowerList.filter { borrower ->
 
-                    borrower.name.toLowerCase(Locale.ROOT)
-                        .contains(newText.toString().trim().toLowerCase(Locale.ROOT))
+                    borrower.name.lowercase(Locale.ROOT)
+                        .contains(newText.toString().trim().lowercase(Locale.ROOT))
                 }
 
                 borrowerAdapter.submitList(filteredList)
@@ -198,6 +204,12 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
         binding.individualRentersRV.isVisible = !isVisible
         binding.progressBar.isVisible = isVisible
+    }
+
+    private fun showNoBorrowersAddedTV(isVisible: Boolean) {
+
+        binding.noBorrowersAddedMessageTV.isVisible = isVisible
+        binding.noBorrowersAddedMessageTV.isVisible = !isVisible
     }
 
     override fun onDestroyView() {

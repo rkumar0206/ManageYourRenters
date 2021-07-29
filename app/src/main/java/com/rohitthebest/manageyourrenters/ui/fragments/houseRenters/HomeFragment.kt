@@ -120,12 +120,12 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                 val filteredList = it?.filter { renter ->
 
-                    renter.name.toLowerCase(Locale.ROOT).contains(
-                        s.toString().trim().toLowerCase(Locale.ROOT)
+                    renter.name.lowercase(Locale.ROOT).contains(
+                        s.toString().trim().lowercase(Locale.ROOT)
                     )
                             ||
-                            renter.roomNumber.toLowerCase(Locale.ROOT).contains(
-                                s.toString().trim().toLowerCase(Locale.ROOT)
+                            renter.roomNumber.lowercase(Locale.ROOT).contains(
+                                s.toString().trim().lowercase(Locale.ROOT)
                             )
                 }
 

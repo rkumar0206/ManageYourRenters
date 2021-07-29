@@ -93,7 +93,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
             RenterTypes(
                 id = 1,
                 renterType = getString(R.string.house_renters),
-                image = R.drawable.ic_baseline_house_24
+                image = R.drawable.ic_house_renters
             )
         )
 
@@ -101,7 +101,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
             RenterTypes(
                 id = 2,
                 renterType = getString(R.string.borrowers),
-                image = R.drawable.ic_baseline_person_24
+                image = R.drawable.ic_borrower
             )
         )
 
@@ -109,7 +109,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
             RenterTypes(
                 id = 3,
                 renterType = getString(R.string.track_money),
-                image = R.drawable.ic_baseline_attach_money_24
+                image = R.drawable.ic_track_money
             )
         )
     }
@@ -145,7 +145,8 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
 
             else -> {
 
-                showToast(this, renterType.toString())
+                val intent = Intent(this, TrackMoneyActivity::class.java)
+                startActivity(intent)
             }
 
         }
@@ -257,7 +258,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
                         .build()
                     val googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-                    googleSignInClient?.signOut()?.addOnCompleteListener {
+                    googleSignInClient.signOut().addOnCompleteListener {
                         Log.i(TAG, "Google signOut Successful")
 
                         try {

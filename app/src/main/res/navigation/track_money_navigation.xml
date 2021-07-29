@@ -9,5 +9,18 @@
         android:id="@+id/trackMoneyHomeFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.TrackMoneyHomeFragment"
         android:label="TrackMoneyHomeFragment"
-        tools:layout="@layout/fragment_track_money_home" />
+        tools:layout="@layout/fragment_track_money_home">
+        <action
+            android:id="@+id/action_trackMoneyHomeFragment_to_emiFragment"
+            app:destination="@id/emiFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/emiFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi.EmiFragment"
+        android:label="EmiFragment"
+        tools:layout="@layout/fragment_emi" />
 </navigation>

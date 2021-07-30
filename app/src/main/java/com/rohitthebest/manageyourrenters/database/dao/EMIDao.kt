@@ -22,7 +22,7 @@ interface EMIDao {
     @Query("DELETE FROM emi_table")
     suspend fun deleteAllEMIs()
 
-    @Query("SELECT * FROM emi_table")
+    @Query("SELECT * FROM emi_table ORDER BY modified DESC")
     fun getAllEMIs(): Flow<List<EMI>>
 
     @Query("SELECT * FROM emi_table WHERE `key` = :emiKey")

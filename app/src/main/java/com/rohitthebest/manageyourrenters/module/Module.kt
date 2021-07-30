@@ -7,6 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.rohitthebest.manageyourrenters.database.databases.*
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_PAYMENT_DATABASE_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.EMI_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.PARTIAL_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.RENTER_DATABASE_NAME
@@ -112,5 +113,20 @@ object Module {
     @Singleton
     fun providePartialPaymentDao(db: PartialPaymentDatabase) = db.getPartialPaymentDao()
 
+    //============================== EMI Database========================================
+
+    @Provides
+    @Singleton
+    fun provideEMIDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(
+        context,
+        EMIDatabase::class.java,
+        EMI_DATABASE_NAME
+    ).build()
+
+    @Provides
+    @Singleton
+    fun provideEMIDao(db: EMIDatabase) = db.getEmiDao()
 
 }

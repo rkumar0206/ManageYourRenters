@@ -52,6 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
+        android:minHeight="48dp"
         app:layout_constraintBottom_toBottomOf="@+id/borrowerNameTV"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/borrowerNameTV" />
@@ -77,6 +78,7 @@
         android:layout_marginTop="8dp"
         android:backgroundTint="@color/color_white"
         android:contentDescription="@string/select_date_button"
+        android:minHeight="48dp"
         android:src="@drawable/ic_baseline_calendar_today_24"
         app:layout_constraintBottom_toBottomOf="@+id/dateTV"
         app:layout_constraintEnd_toEndOf="@+id/moneySymbolSpinner"
@@ -188,7 +190,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addInterestCB"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -303,6 +305,7 @@
                 android:hint="@string/rete_percent"
                 android:importantForAutofill="no"
                 android:inputType="numberDecimal"
+                android:minHeight="48dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/interestTypeRG"
                 app:layout_constraintTop_toBottomOf="@+id/interestTypeRG" />
@@ -323,6 +326,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
+                android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/textView10"
                 app:layout_constraintStart_toStartOf="@+id/ratePercentET"
@@ -334,6 +338,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
+                android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/textView10"
                 app:layout_constraintStart_toStartOf="@+id/ratePercentET"
@@ -472,12 +477,13 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="8dp"
                 android:hint="@string/file_name"
+                android:importantForAutofill="no"
                 android:inputType="textPersonName"
+                android:minHeight="48dp"
                 android:visibility="gone"
                 app:layout_constraintEnd_toStartOf="@+id/removeFileBtn"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/docTypeRG"
-                android:importantForAutofill="no"
                 tools:visibility="visible" />
 
             <EditText
@@ -490,6 +496,7 @@
                 android:hint="@string/enter_url_here"
                 android:importantForAutofill="no"
                 android:inputType="textUri"
+                android:minHeight="48dp"
                 android:textColor="#2962FF"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -568,6 +575,7 @@
 
     </androidx.cardview.widget.CardView>
 
+    <include layout="@layout/supporting_document_layout" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/materialCardView2"

@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.AddEmiLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEmiBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -22,6 +24,8 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
     private var _binding: FragmentAddEmiBinding? = null
     private val binding get() = _binding!!
+
+    private val emiViewModel by viewModels<EMIViewModel>()
 
     private lateinit var includeBinding: AddEmiLayoutBinding
     private lateinit var currencySymbolList: List<String>
@@ -58,10 +62,14 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         binding.addEmiToolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
 
-            //todo : save the EMI
+            if (isFormValid()) {
+
+                // todo : save to emi database
+            }
             true
         }
     }
+
 
     override fun onClick(v: View?) {
 
@@ -82,6 +90,40 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
         }
 
     }
+
+    private fun isFormValid(): Boolean {
+
+        if (!includeBinding.emiNameET.editText?.isTextValid()!!) {
+
+            includeBinding.emiNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
+        if (!includeBinding.totalEmiMonthsET.isTextValid()) {
+
+            includeBinding.emiNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
+        if (!includeBinding.numberOfMonthsCompltedET.isTextValid()) {
+
+            includeBinding.numberOfMonthsCompltedET.setText("0")
+        }
+
+        if (!isTotalMonthAndMonthCompletedETValid()) {
+
+            includeBinding.totalEmiMonthsET.error =
+                "It should be greater than or equal to the completed month."
+
+            includeBinding.numberOfMonthsCompltedET.error =
+                "It should be less than or equal to total months."
+
+            return false
+        }
+
+        return true
+    }
+
 
     private fun setUpCurrencySymbolSpinner() {
 

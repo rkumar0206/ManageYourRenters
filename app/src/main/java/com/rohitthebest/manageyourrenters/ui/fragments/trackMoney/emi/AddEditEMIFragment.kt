@@ -94,7 +94,6 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
         }
     }
 
-
     private fun textWatcher() {
 
         includeBinding.emiNameET.editText?.onTextChangedListener { s ->
@@ -138,7 +137,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
             if (s?.isEmpty()!!) {
 
-                includeBinding.numberOfMonthsCompltedET.setText("0")
+                includeBinding.numberOfMonthsCompltedET.error = EDIT_TEXT_EMPTY_MESSAGE
             } else {
 
                 if (includeBinding.totalEmiMonthsET.isTextValid()) {
@@ -223,7 +222,6 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         return true
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

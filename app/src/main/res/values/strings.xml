@@ -136,6 +136,7 @@
     <string name="total_emi_amount_total_months_amount_per_month">Total EMI amount (total months * amount per month)</string>
     <string name="amount_paid_till_now">Amount paid till now</string>
     <string name="__0">0</string>
+    <string name="contract_deals">Contracts / Deals</string>
 
 
     <string-array name="interest_time_schedule">

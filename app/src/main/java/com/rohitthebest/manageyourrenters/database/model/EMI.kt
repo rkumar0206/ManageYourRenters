@@ -6,11 +6,12 @@ import com.google.firebase.firestore.IgnoreExtraProperties
 
 
 @IgnoreExtraProperties
-@Entity(tableName = "emit_table")
+@Entity(tableName = "emi_table")
 data class EMI(
     @PrimaryKey(autoGenerate = true) var id: Int? = null,
     var created: Long,
     var modified: Long,
+    var key: String,
     var emiName: String,
     var startDate: Long,
     var totalMonths: Int,
@@ -25,6 +26,7 @@ data class EMI(
         null,
         System.currentTimeMillis(),
         System.currentTimeMillis(),
+        "",
         "",
         System.currentTimeMillis(),
         0,

@@ -2,14 +2,17 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.AddEmiLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEmiBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,6 +51,23 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
         initListeners()
         textWatcher()
         setUpCurrencySymbolSpinner()
+        observeForSupportingDocumentBottomSheetDismissListener()
+    }
+
+    private fun observeForSupportingDocumentBottomSheetDismissListener() {
+
+        findNavController()
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.getLiveData<Boolean>(SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY)
+            ?.observe(viewLifecycleOwner, {
+
+                if (it) {
+
+                    //todo : call back pressed
+                    Log.d(TAG, "observeForSupportingDocumentBottomSheetDismissListener: $it")
+                }
+            })
     }
 
     private fun initListeners() {
@@ -62,10 +82,17 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         binding.addEmiToolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
 
-            if (isFormValid()) {
+            val action =
+                AddEditEMIFragmentDirections.actionAddEditEMIFragmentToAddSupportingDocumentBottomSheetFragment(
+                    "key", "tag"
+                )
 
-                // todo : save to emi database
-            }
+            findNavController().navigate(action)
+
+//            if (isFormValid()) {
+//
+//                // todo : save to emi database
+//            }
             true
         }
     }

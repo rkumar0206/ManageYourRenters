@@ -26,4 +26,6 @@ object Constants {
 
     const val IS_SYNCED_SHARED_PREF_NAME = "IS_SYNCED_SHARED_PREF_NAME_fdkdnf"
     const val IS_SYNCED_SHARED_PREF_KEY = "IS_SYNCED_SHARED_PREF_KEY_fkjdvkjdbdnf"
+
+    const val SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY = "dcsnckjkscn"
 }

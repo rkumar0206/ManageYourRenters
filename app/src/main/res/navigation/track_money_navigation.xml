@@ -36,5 +36,23 @@
         android:id="@+id/addEditEMIFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi.AddEditEMIFragment"
         android:label="AddEditEMIFragment"
-        tools:layout="@layout/fragment_add_emi" />
+        tools:layout="@layout/fragment_add_emi">
+        <action
+            android:id="@+id/action_addEditEMIFragment_to_addSupportingDocumentBottomSheetFragment"
+            app:destination="@id/addSupportingDocumentBottomSheetFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/addSupportingDocumentBottomSheetFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBottomSheetFragment"
+        android:label="AddSupportingDocumentBottomSheetFragment"
+        tools:layout="@layout/add_supporting_document_layout">
+        <argument
+            android:name="key"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="tag"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
 </navigation>

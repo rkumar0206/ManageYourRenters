@@ -575,7 +575,6 @@
 
     </androidx.cardview.widget.CardView>
 
-    <include layout="@layout/supporting_document_layout" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/materialCardView2"

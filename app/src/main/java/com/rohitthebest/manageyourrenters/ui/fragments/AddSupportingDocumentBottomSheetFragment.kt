@@ -18,19 +18,18 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.AddSupportingDocumentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddSupportingDocumentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY
+import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.getFileNameAndSize
-import com.rohitthebest.manageyourrenters.utils.isTextValid
-import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
-import com.rohitthebest.manageyourrenters.utils.showSnackbarWithActionAndDismissListener
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "AddSupportingDocumentBo"
@@ -42,6 +41,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
     private var _binding: FragmentAddSupportingDocumentBinding? = null
     private val binding get() = _binding!!
 
+    private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
     private val emiViewModel by viewModels<EMIViewModel>()
 
     private lateinit var includeBinding: AddSupportingDocumentLayoutBinding
@@ -49,6 +49,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
     private var receivedCollectionTag = ""
     private var receivedDocumentKey = ""
     private lateinit var receivedEMI: EMI
+    private lateinit var receivedBorrowerPayment: BorrowerPayment
 
     private var docType: DocumentType = DocumentType.PDF
     private var pdfUri: Uri? = null
@@ -88,22 +89,34 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
             receivedCollectionTag = args?.tag!!
             receivedDocumentKey = args.key!!
 
-            when (receivedCollectionTag) {
+            getDocument()
 
-                getString(R.string.emis) -> {
-
-                    getEMI()
-                }
-            }
         }
     }
 
-    private fun getEMI() {
+    private fun getDocument() {
 
-        emiViewModel.getEMIByKey(receivedDocumentKey).observe(viewLifecycleOwner, { emi ->
+        when (receivedCollectionTag) {
 
-            receivedEMI = emi
-        })
+            getString(R.string.emis) -> {
+
+                emiViewModel.getEMIByKey(receivedDocumentKey).observe(viewLifecycleOwner, { emi ->
+
+                    receivedEMI = emi
+                })
+
+            }
+
+            getString(R.string.borrowerPayments) -> {
+
+                borrowerPaymentViewModel.getBorrowerPaymentByKey(receivedDocumentKey)
+                    .observe(viewLifecycleOwner, { borrowerPayment ->
+
+                        receivedBorrowerPayment = borrowerPayment
+                    })
+            }
+        }
+
     }
 
     private fun initListeners() {
@@ -119,6 +132,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
                 if (isFormValid()) {
 
                     //todo : save
+                    initDocument()
                 }
                 true
             }
@@ -162,6 +176,115 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
         }
     }
 
+    private fun initDocument() {
+
+        when (receivedCollectionTag) {
+
+            getString(R.string.emi) -> {
+
+                receivedEMI.isSupportingDocumentAdded = true
+                receivedEMI.supportingDocument.apply {
+
+                    documentName = includeBinding.fileNameET.text.toString().trim()
+                    documentType = docType
+
+                    documentUrl = if (documentType == DocumentType.URL) {
+
+                        includeBinding.urlET.text.toString().trim()
+                    } else {
+                        ""
+                    }
+                }
+
+                insertDocumentToDatabase(receivedEMI)
+            }
+
+            getString(R.string.borrowerPayments) -> {
+
+                receivedBorrowerPayment.isSupportingDocAdded = true
+                receivedEMI.supportingDocument.apply {
+
+                    documentName = includeBinding.fileNameET.text.toString().trim()
+                    documentType = docType
+
+                    documentUrl = if (documentType == DocumentType.URL) {
+
+                        includeBinding.urlET.text.toString().trim()
+                    } else {
+                        ""
+                    }
+                }
+
+                insertDocumentToDatabase(receivedBorrowerPayment)
+            }
+        }
+    }
+
+    private fun insertDocumentToDatabase(document: Any) {
+
+        when (receivedCollectionTag) {
+
+            getString(R.string.emi) -> {
+
+                val emi = document as EMI
+                if (emi.supportingDocument.documentType == DocumentType.URL) {
+
+                    // if docType is URL then no need of storage, directly update and insert
+                    // in firestore database
+                    emiViewModel.updateEMI(emi)
+
+                    uploadDocumentToFireStore(
+                        requireContext(), fromEMIToString(emi), receivedCollectionTag, emi.key
+                    )
+                } else {
+                    // if docType is pdf or image then we need to upload it to the firebase storage
+                    // and we need call the service where the updating and insertion of data
+                    // will be done
+                    uploadFileToStorage(fromEMIToString(emi))
+                }
+            }
+
+            getString(R.string.borrowerPayments) -> {
+
+                val borrowerPayment = document as BorrowerPayment
+
+                if (docType == DocumentType.URL) {
+
+                    borrowerPaymentViewModel.updateBorrowerPayment(borrowerPayment)
+
+                    uploadDocumentToFireStore(
+                        requireContext(), fromBorrowerPaymentToString(borrowerPayment),
+                        receivedCollectionTag, borrowerPayment.key
+                    )
+                } else {
+
+                    uploadFileToStorage(fromBorrowerPaymentToString(borrowerPayment))
+                }
+
+            }
+        }
+    }
+
+    private fun uploadFileToStorage(uploadData: String) {
+
+        val fileNameForUploadingToStorage = if (docType == DocumentType.PDF) {
+
+            "${includeBinding.fileNameET.text.trim()}_${Functions.generateKey()}.pdf"
+        } else {
+
+            "${includeBinding.fileNameET.text.trim()}_${Functions.generateKey()}.jpg"
+        }
+
+        uploadFileToFirebaseStorage(
+            requireContext(),
+            Pair(
+                if (docType == DocumentType.PDF) pdfUri!! else imageUri!!,
+                fileNameForUploadingToStorage
+            ),
+            Pair(uploadData, receivedCollectionTag)
+        )
+    }
+
     private fun isFormValid(): Boolean {
 
         if (docType == DocumentType.PDF && pdfUri == null) {
@@ -194,6 +317,13 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
             includeBinding.fileNameET.requestFocus()
             includeBinding.fileNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
+        if (includeBinding.fileNameET.text.toString().trim().contains("/")) {
+
+            includeBinding.fileNameET.requestFocus()
+            includeBinding.fileNameET.error = "file name should not contain any '/'"
             return false
         }
 

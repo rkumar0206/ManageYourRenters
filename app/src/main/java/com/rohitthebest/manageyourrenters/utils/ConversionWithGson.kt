@@ -69,3 +69,13 @@ fun fromStringToPartialPaymentList(jsonString: String): List<PartialPayment> {
     val type = object : TypeToken<List<PartialPayment>>() {}.type
     return gson.fromJson(jsonString, type)
 }
+
+fun fromEMIToString(emi: EMI): String {
+
+    return Gson().toJson(emi)
+}
+
+fun fromStringToEMI(str: String): EMI {
+
+    return Gson().fromJson(str, object : TypeToken<EMI>() {}.type)
+}

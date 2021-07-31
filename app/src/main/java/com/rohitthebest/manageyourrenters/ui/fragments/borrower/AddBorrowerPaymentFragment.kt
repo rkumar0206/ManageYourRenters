@@ -199,7 +199,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             .setOnMenuItemClickListener {
 
                 Log.d(TAG, "initListeners: Menu item clicked")
-                checkFormAndInitDatabase()
+                checkFormAndInitDocument()
                 true
             }
     }
@@ -264,7 +264,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         }
     }
 
-    private fun checkFormAndInitDatabase() {
+    private fun checkFormAndInitDocument() {
 
         Log.d(TAG, "checkFormAndInitDatabase: ")
 

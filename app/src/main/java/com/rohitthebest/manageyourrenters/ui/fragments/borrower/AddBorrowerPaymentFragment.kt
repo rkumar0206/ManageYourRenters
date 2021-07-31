@@ -576,7 +576,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     }
 
-    private var recentUrl = ""
+    private var recentUrlName = ""
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
         hideKeyBoard(requireActivity())
@@ -646,7 +646,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 includeBinding.fileNameET.hint = "Enter url name here"
                 docType = DocumentType.URL
 
-                includeBinding.fileNameET.setText(recentUrl)
+                includeBinding.fileNameET.setText(recentUrlName)
 
                 showUrlEditText(true)
                 showFileNameEditText(true)
@@ -791,7 +791,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
                 if (docType == DocumentType.URL) {
 
-                    recentUrl = s.toString()
+                    recentUrlName = s.toString()
                 }
             }
         }

@@ -36,6 +36,6 @@ class EMIViewModel @Inject constructor(
 
     fun getAllEMIs() = repository.getAllEMIs().asLiveData()
 
-    fun getEMIByKey(emiKey: String) = repository.getEMIByKey(emiKey)
+    fun getEMIByKey(emiKey: String) = repository.getEMIByKey(emiKey).asLiveData()
 
 }

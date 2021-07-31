@@ -137,6 +137,7 @@
     <string name="amount_paid_till_now">Amount paid till now</string>
     <string name="__0">0</string>
     <string name="contract_deals">Contracts / Deals</string>
+    <string name="emis">EMIs</string>
 
 
     <string-array name="interest_time_schedule">

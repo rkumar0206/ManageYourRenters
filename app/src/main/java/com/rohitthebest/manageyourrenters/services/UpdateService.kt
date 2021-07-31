@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.others.Constants
@@ -13,10 +12,10 @@ import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPDATE_DOCUMENT_MAP_KEY
+import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class UpdateService : Service() {
 
@@ -59,26 +58,6 @@ class UpdateService : Service() {
 
         return START_NOT_STICKY
     }
-
-    private suspend fun updateDocumentOnFireStore(
-        docRef: DocumentReference,
-        map: java.util.HashMap<String, Any?>
-    ): Boolean {
-
-        return try {
-
-            Log.i(TAG, "updateDocumentOnFireStore")
-
-            docRef.update(map)
-                .await()
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-
-    }
-
 
     override fun onBind(intent: Intent?): IBinder? {
 

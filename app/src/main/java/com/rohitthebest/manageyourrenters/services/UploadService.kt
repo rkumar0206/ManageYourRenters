@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.others.Constants
@@ -15,14 +14,10 @@ import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
-import com.rohitthebest.manageyourrenters.utils.convertJSONtoPayment
-import com.rohitthebest.manageyourrenters.utils.convertJSONtoRenter
-import com.rohitthebest.manageyourrenters.utils.fromStringToBorrower
-import com.rohitthebest.manageyourrenters.utils.fromStringToBorrowerPayment
+import com.rohitthebest.manageyourrenters.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class UploadService : Service() {
 
@@ -125,22 +120,6 @@ class UploadService : Service() {
 
 
         return START_NOT_STICKY
-    }
-
-    private suspend fun insertToFireStore(docRef: DocumentReference, data: Any): Boolean {
-
-        return try {
-
-            Log.i(TAG, "insertToFireStore")
-
-            docRef.set(data)
-                .await()
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-
     }
 
 

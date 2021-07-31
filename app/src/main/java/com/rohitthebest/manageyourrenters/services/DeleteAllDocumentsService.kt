@@ -6,16 +6,15 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.WriteBatch
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.KEY_LIST_KEY
 import com.rohitthebest.manageyourrenters.utils.convertJSONToStringList
+import com.rohitthebest.manageyourrenters.utils.deleteFilesFromFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class DeleteAllDocumentsService : Service() {
 
@@ -59,7 +58,7 @@ class DeleteAllDocumentsService : Service() {
 
                 delay(250)
 
-                if (deleteFiles(batch)) {
+                if (deleteFilesFromFirestore(batch)) {
 
                     Log.d(TAG, "onStartCommand: Deleted All Files")
                     stopSelf()
@@ -68,20 +67,6 @@ class DeleteAllDocumentsService : Service() {
         }
 
         return START_REDELIVER_INTENT
-    }
-
-    private suspend fun deleteFiles(batch: WriteBatch): Boolean {
-
-        return try {
-            batch.commit()
-                .await()
-
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-
     }
 
     override fun onBind(intent: Intent?): IBinder? {

@@ -6,13 +6,12 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.utils.deleteFileFromFirebaseStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class DeleteFileFromFirebaseStorageService : Service() {
 
@@ -48,19 +47,6 @@ class DeleteFileFromFirebaseStorageService : Service() {
 
         }
         return START_NOT_STICKY
-    }
-
-
-    private suspend fun deleteFileFromFirebaseStorage(mStorageRef: StorageReference?): Boolean {
-
-        return try {
-            mStorageRef?.delete()?.await()
-
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
     }
 
 

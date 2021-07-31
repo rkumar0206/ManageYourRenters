@@ -5,17 +5,16 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.NOTIFICATION_CHANNEL_ID
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
+import com.rohitthebest.manageyourrenters.utils.deleteFromFireStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class DeleteService : Service() {
 
@@ -50,19 +49,6 @@ class DeleteService : Service() {
         }
 
         return START_NOT_STICKY
-    }
-
-    private suspend fun deleteFromFireStore(docRef: DocumentReference): Boolean {
-
-        return try {
-
-            docRef.delete().await()
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-
     }
 
     override fun onBind(p0: Intent?): IBinder? {

@@ -6,15 +6,14 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.WriteBatch
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.utils.fromStringToPartialPaymentList
+import com.rohitthebest.manageyourrenters.utils.uploadFilesOnFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 private const val TAG = "UploadDocumentListToFir"
 
@@ -69,7 +68,7 @@ class UploadDocumentListToFireStoreService : Service() {
 
                         delay(150)
 
-                        if (uploadList(batch)) {
+                        if (uploadFilesOnFirestore(batch)) {
 
                             Log.d(TAG, "onStartCommand: Upload successfull")
                             stopSelf()
@@ -86,20 +85,6 @@ class UploadDocumentListToFireStoreService : Service() {
         }
 
         return START_NOT_STICKY
-    }
-
-    private suspend fun uploadList(batch: WriteBatch): Boolean {
-
-        return try {
-
-            batch.commit().await()
-
-            true
-        } catch (e: Exception) {
-
-            e.printStackTrace()
-            false
-        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {

@@ -1,7 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -13,8 +12,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.UploadTask
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.database.model.Borrower
@@ -207,317 +204,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             }
     }
 
-    private fun isFormValid(): Boolean {
-
-        if (!includeBinding.borrowerPaymentET.editText?.isTextValid()!!) {
-
-            includeBinding.borrowerPaymentET.error = EDIT_TEXT_EMPTY_MESSAGE
-            return false
-        }
-
-        if (includeBinding.borrowerPaymentET.editText?.text.toString().toDouble() <= 0) {
-
-            includeBinding.borrowerPaymentET.error = "Please enter amount greater than 0."
-            return false
-        }
-
-        if (includeBinding.addInterestCB.isChecked) {
-
-            if (!includeBinding.ratePercentET.isTextValid()) {
-
-                includeBinding.ratePercentET.requestFocus()
-                includeBinding.ratePercentET.error = EDIT_TEXT_EMPTY_MESSAGE
-                return false
-            }
-        }
-
-        if (includeBinding.addSupprtingDocCB.isChecked) {
-
-            if (!includeBinding.fileNameET.isTextValid()) {
-
-                includeBinding.fileNameET.requestFocus()
-                includeBinding.fileNameET.error = EDIT_TEXT_EMPTY_MESSAGE
-                return false
-            }
-
-            if (docType == DocumentType.PDF && pdfUri == null) {
-
-                showToast(
-                    requireContext(),
-                    "Please add a pdf file as supporting document.",
-                    duration = Toast.LENGTH_LONG
-                )
-                return false
-            }
-
-            if (docType == DocumentType.IMAGE && imageUri == null) {
-
-                showToast(
-                    requireContext(),
-                    "Please add an image as supporting document.",
-                    duration = Toast.LENGTH_LONG
-                )
-                return false
-            }
-
-            if (docType == DocumentType.URL && !includeBinding.urlET.isTextValid()) {
-
-                includeBinding.urlET.error = EDIT_TEXT_EMPTY_MESSAGE
-                return false
-            }
-        }
-
-        if (includeBinding.addSupprtingDocCB.isChecked) {
-
-            if (docType != DocumentType.URL) {
-
-                if (fileSize / (1024 * 1024) > 3) {
-
-                    showToast(
-                        requireContext(),
-                        "Supporting document size should be less than or equal to 3MB",
-                        Toast.LENGTH_LONG
-                    )
-
-                    return false
-                }
-            }
-        }
-
-        return includeBinding.borrowerPaymentET.editText?.isTextValid()!!
-    }
-
-    private fun checkFormAndInitDatabase() {
-
-        Log.d(TAG, "checkFormAndInitDatabase: ")
-
-        // checking if the form is valid and saving to database
-        if (isFormValid()) {
-
-            Log.d(TAG, "checkFormAndInitDatabase: isFormValid")
-
-            // checking if the addSupportDocument enabled and the doc type is pdf or image
-            if (includeBinding.addSupprtingDocCB.isChecked
-                && (docType == DocumentType.PDF || docType == DocumentType.IMAGE)
-            ) {
-
-                // upload the pdf or the image to the firebase storage
-
-                if (isInternetAvailable(requireContext())) {
-
-                    uploadDocToFirebaseStorage()
-                } else {
-
-                    showToast(
-                        requireContext(),
-                        "Internet connection required to upload the $docType.",
-                        Toast.LENGTH_LONG
-                    )
-                }
-
-            } else {
-
-                // insert the data to the database
-
-                initBorrowerPayment("")
-            }
-
-        }
-    }
-
-    private var mUploadTask: UploadTask? = null
-
-    @SuppressLint("SetTextI18n")
-    private fun uploadDocToFirebaseStorage() {
-
-        Log.d(TAG, "uploadDocToFirebaseStorage: ")
-
-        try {
-            val fileName = if (docType == DocumentType.PDF) {
-
-                "${includeBinding.fileNameET.text.trim()}_${generateKey()}.pdf"
-            } else {
-
-                "${includeBinding.fileNameET.text.trim()}_${generateKey()}.jpg"
-            }
-
-            if (fileName.contains("/")) {
-
-                includeBinding.fileNameET.requestFocus()
-                includeBinding.fileNameET.error = "file name should not contain any '/'"
-                return
-            }
-
-            val storageRef = FirebaseStorage.getInstance()
-                .getReference("${getUid()}/BorrowerPaymentDoc/$docType")
-
-            val fileRef = storageRef.child(fileName)
-
-            showFileUploadLinearLayout()
-
-            uploadFileToFirebaseStorage(
-                if (docType == DocumentType.PDF) pdfUri!! else imageUri!!,
-                fileRef,
-                { uploadTask ->
-
-                    Log.d(TAG, "uploadDocToFirebaseStorage: Initialized upload task")
-                    mUploadTask = uploadTask
-                },
-                { task ->
-                    // progress
-
-                    try {
-                        // catching nullPointerException because when
-                        // the upload is interrupted in between by the user when he presses
-                        // back button then binding will become null
-
-                        val progress = (100 * task.bytesTransferred) / task.totalByteCount
-
-                        binding.progressTV.text = "${progress.toInt()}%"
-                        binding.progressBar.progress = progress.toInt()
-
-                    } catch (e: NullPointerException) {
-                        e.printStackTrace()
-                    }
-                },
-                { downloadUrl ->
-                    // complete
-                    Log.d(TAG, "uploadDocToFirebaseStorage: Download url : $downloadUrl")
-
-                    initBorrowerPayment(downloadUrl)
-                },
-                {
-                    // success
-                    Log.d(TAG, "uploadDocToFirebaseStorage: file uploading success")
-                },
-                {
-                    // failure
-                    Log.d(
-                        TAG,
-                        "uploadDocToFirebaseStorage: file uploading failure with exception $it"
-                    )
-                    showToast(requireContext(), "Something went wrong. Please try again...")
-                },
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-    }
-
-    private fun initBorrowerPayment(downloadUrl: String) {
-
-        Log.d(TAG, "initBorrowerPayment: ")
-
-        val borrowerPayment = BorrowerPayment()
-
-        borrowerPayment.modified = System.currentTimeMillis()
-        borrowerPayment.isSynced = false
-        borrowerPayment.currencySymbol = selectedCurrencySymbol
-
-        borrowerPayment.apply {
-
-            created = selectedDate
-            borrowerId = receivedBorrower?.borrowerId!!
-            borrowerKey = receivedBorrowerKey
-            amountTakenOnRent =
-                includeBinding.borrowerPaymentET.editText?.text.toString().toDouble()
-            dueLeftAmount = amountTakenOnRent
-            isDueCleared = false
-            isSupportingDocAdded = includeBinding.addSupprtingDocCB.isChecked
-
-            if (isSupportingDocAdded) {
-
-                supportingDocument = SupportingDocument(
-                    includeBinding.fileNameET.text.toString().trim(),
-                    if (docType == DocumentType.URL) includeBinding.urlET.text.toString()
-                        .trim() else downloadUrl,
-                    docType
-                )
-            }
-
-            isInterestAdded = includeBinding.addInterestCB.isChecked
-
-            if (isInterestAdded) {
-
-                interest = Interest(
-                    interestType,
-                    includeBinding.ratePercentET.text.toString().toDouble(),
-                    selectedInterestTimeSchedule
-                )
-            }
-
-            uid = getUid()!!
-
-            key = generateKey("_${uid}")
-
-            messageOrNote = includeBinding.addNoteET.text.toString()
-        }
-
-        if (isInternetAvailable(requireContext())) {
-
-            borrowerPayment.isSynced = true
-
-            uploadDocumentToFireStore(
-                requireContext(),
-                fromBorrowerPaymentToString(borrowerPayment),
-                getString(R.string.borrowerPayments),
-                borrowerPayment.key
-            )
-
-            insertToDatabase(borrowerPayment)
-        } else {
-
-            borrowerPayment.isSynced = false
-            insertToDatabase(borrowerPayment)
-        }
-    }
-
-    private fun insertToDatabase(borrowerPayment: BorrowerPayment) {
-
-        Log.d(TAG, "insertToDatabase: ")
-
-        borrowerPaymentViewModel.insertBorrowerPayment(
-            borrowerPayment
-        )
-
-        borrowerPaymentViewModel.getTotalDueOfTheBorrower(receivedBorrowerKey).observe(
-            viewLifecycleOwner, {
-
-                if (it != null) {
-
-                    receivedBorrower?.totalDueAmount = it
-                    receivedBorrower?.modified = System.currentTimeMillis()
-                    receivedBorrower?.isSynced = false
-
-                    val map = HashMap<String, Any?>()
-                    map["totalDueAmount"] = it
-
-                    if (isInternetAvailable(requireContext())) {
-
-                        receivedBorrower?.isSynced = true
-
-                        updateDocumentOnFireStore(
-                            requireContext(),
-                            map = map,
-                            getString(R.string.borrowers),
-                            receivedBorrowerKey
-                        )
-                    }
-
-                    borrowerViewModel.updateBorrower(receivedBorrower!!)
-                }
-            }
-        )
-
-        lifecycleScope.launch {
-
-            delay(150)
-
-            requireActivity().onBackPressed()
-        }
-    }
-
     override fun onClick(v: View?) {
 
         if (v?.id == includeBinding.dateTV.id || v?.id == includeBinding.selectDateBtn.id) {
@@ -575,6 +261,305 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 showFileNameEditText(false)
                 showAddFileBtn(true)
             }
+        }
+    }
+
+    private fun checkFormAndInitDatabase() {
+
+        Log.d(TAG, "checkFormAndInitDatabase: ")
+
+        // checking if the form is valid and saving to database
+        if (isFormValid()) {
+
+            Log.d(TAG, "checkFormAndInitDatabase: isFormValid")
+
+            // checking if the addSupportDocument enabled and the doc type is pdf or image
+            if (includeBinding.addSupprtingDocCB.isChecked
+                && (docType == DocumentType.PDF || docType == DocumentType.IMAGE)
+            ) {
+
+                // upload the pdf or the image to the firebase storage
+
+                if (isInternetAvailable(requireContext())) {
+
+                    //uploadDocToFirebaseStorage()
+
+                    val fileNameForUploadingToStorage = if (docType == DocumentType.PDF) {
+
+                        "${includeBinding.fileNameET.text.trim()}_${generateKey()}.pdf"
+                    } else {
+
+                        "${includeBinding.fileNameET.text.trim()}_${generateKey()}.jpg"
+                    }
+
+                    if (fileNameForUploadingToStorage.contains("/")) {
+
+                        includeBinding.fileNameET.requestFocus()
+                        includeBinding.fileNameET.error = "file name should not contain any '/'"
+                        return
+                    }
+
+                    initBorrowerPayment(fileNameForUploadingToStorage)
+
+                } else {
+
+                    showToast(
+                        requireContext(),
+                        "Internet connection is required to upload the $docType.",
+                        Toast.LENGTH_LONG
+                    )
+
+                    return
+                }
+
+            } else {
+
+                // insert the data to the database
+
+                initBorrowerPayment("")
+            }
+
+        }
+    }
+
+    private fun isFormValid(): Boolean {
+
+        if (!includeBinding.borrowerPaymentET.editText?.isTextValid()!!) {
+
+            includeBinding.borrowerPaymentET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
+        if (includeBinding.borrowerPaymentET.editText?.text.toString().toDouble() <= 0) {
+
+            includeBinding.borrowerPaymentET.error = "Please enter amount greater than 0."
+            return false
+        }
+
+        if (includeBinding.addInterestCB.isChecked) {
+
+            if (!includeBinding.ratePercentET.isTextValid()) {
+
+                includeBinding.ratePercentET.requestFocus()
+                includeBinding.ratePercentET.error = EDIT_TEXT_EMPTY_MESSAGE
+                return false
+            }
+        }
+
+        if (includeBinding.addSupprtingDocCB.isChecked) {
+
+            if (docType == DocumentType.PDF && pdfUri == null) {
+
+                showToast(
+                    requireContext(),
+                    "Please add a pdf file as supporting document.",
+                    duration = Toast.LENGTH_LONG
+                )
+                return false
+            }
+
+            if (docType == DocumentType.IMAGE && imageUri == null) {
+
+                showToast(
+                    requireContext(),
+                    "Please add an image as supporting document.",
+                    duration = Toast.LENGTH_LONG
+                )
+                return false
+            }
+
+            if (!includeBinding.fileNameET.isTextValid()) {
+
+                includeBinding.fileNameET.requestFocus()
+                includeBinding.fileNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+                return false
+            }
+
+            if (docType == DocumentType.URL && !includeBinding.urlET.isTextValid()) {
+
+                includeBinding.urlET.error = EDIT_TEXT_EMPTY_MESSAGE
+                return false
+            }
+        }
+
+        if (includeBinding.addSupprtingDocCB.isChecked) {
+
+            if (docType != DocumentType.URL) {
+
+                if (fileSize / (1024 * 1024) > 3) {
+
+                    showToast(
+                        requireContext(),
+                        "Supporting document size should be less than or equal to 3MB",
+                        Toast.LENGTH_LONG
+                    )
+
+                    return false
+                }
+            }
+        }
+
+        return includeBinding.borrowerPaymentET.editText?.isTextValid()!!
+    }
+
+    private fun initBorrowerPayment(fileNameForUploadingToStorage: String) {
+
+        Log.d(TAG, "initBorrowerPayment: ")
+
+        val borrowerPayment = BorrowerPayment()
+
+        borrowerPayment.modified = System.currentTimeMillis()
+        borrowerPayment.isSynced = false
+        borrowerPayment.currencySymbol = selectedCurrencySymbol
+
+        borrowerPayment.apply {
+
+            created = selectedDate
+            borrowerId = receivedBorrower?.borrowerId!!
+            borrowerKey = receivedBorrowerKey
+            amountTakenOnRent =
+                includeBinding.borrowerPaymentET.editText?.text.toString().toDouble()
+            dueLeftAmount = amountTakenOnRent
+            isDueCleared = false
+            isSupportingDocAdded = includeBinding.addSupprtingDocCB.isChecked
+
+            if (isSupportingDocAdded) {
+
+                supportingDocument = SupportingDocument(
+                    includeBinding.fileNameET.text.toString().trim(),
+                    if (docType == DocumentType.URL) includeBinding.urlET.text.toString()
+                        .trim() else "",
+                    docType
+                )
+            }
+
+            isInterestAdded = includeBinding.addInterestCB.isChecked
+
+            if (isInterestAdded) {
+
+                interest = Interest(
+                    interestType,
+                    includeBinding.ratePercentET.text.toString().toDouble(),
+                    selectedInterestTimeSchedule
+                )
+            }
+
+            uid = getUid()!!
+
+            key = generateKey("_${uid}")
+
+            messageOrNote = includeBinding.addNoteET.text.toString()
+        }
+
+        if (isInternetAvailable(requireContext())) {
+
+            borrowerPayment.isSynced = true
+
+/*
+            uploadDocumentToFireStore(
+                requireContext(),
+                fromBorrowerPaymentToString(borrowerPayment),
+                getString(R.string.borrowerPayments),
+                borrowerPayment.key
+            )
+*/
+
+            insertToDatabase(borrowerPayment, fileNameForUploadingToStorage)
+        } else {
+
+            borrowerPayment.isSynced = false
+            insertToDatabase(borrowerPayment, fileNameForUploadingToStorage)
+        }
+    }
+
+    private fun insertToDatabase(
+        borrowerPayment: BorrowerPayment,
+        fileNameForUploadingToStorage: String
+    ) {
+
+        Log.d(TAG, "insertToDatabase: ")
+
+        borrowerPaymentViewModel.insertBorrowerPayment(
+            borrowerPayment
+        )
+
+        if (borrowerPayment.isSupportingDocAdded) {
+
+            if (borrowerPayment.supportingDocument?.documentType != DocumentType.URL) {
+
+                val fileUri =
+                    if (borrowerPayment.supportingDocument?.documentType == DocumentType.PDF) pdfUri!! else imageUri!!
+
+                // uploading the pdf or image to the firebase storage as well as the borrower payment to firestore
+                // using the service
+                uploadFileToFirebaseStorage(
+                    context = requireContext(),
+                    fileInfo = Pair(fileUri, fileNameForUploadingToStorage),
+                    uploadDataInfo = Pair(
+                        fromBorrowerPaymentToString(borrowerPayment), // borrower payment as string
+                        getString(R.string.borrowerPayments) // collection
+                    )
+                )
+            } else {
+
+                if (borrowerPayment.isSynced) {
+
+                    uploadDocumentToFireStore(
+                        requireContext(),
+                        fromBorrowerPaymentToString(borrowerPayment),
+                        getString(R.string.borrowerPayments),
+                        borrowerPayment.key
+                    )
+
+                }
+            }
+        } else {
+
+            if (borrowerPayment.isSynced) {
+
+                uploadDocumentToFireStore(
+                    requireContext(),
+                    fromBorrowerPaymentToString(borrowerPayment),
+                    getString(R.string.borrowerPayments),
+                    borrowerPayment.key
+                )
+            }
+        }
+
+        borrowerPaymentViewModel.getTotalDueOfTheBorrower(receivedBorrowerKey).observe(
+            viewLifecycleOwner, {
+
+                if (it != null) {
+
+                    receivedBorrower?.totalDueAmount = it
+                    receivedBorrower?.modified = System.currentTimeMillis()
+                    receivedBorrower?.isSynced = false
+
+                    val map = HashMap<String, Any?>()
+                    map["totalDueAmount"] = it
+
+                    if (isInternetAvailable(requireContext())) {
+
+                        receivedBorrower?.isSynced = true
+
+                        updateDocumentOnFireStore(
+                            requireContext(),
+                            map = map,
+                            getString(R.string.borrowers),
+                            receivedBorrowerKey
+                        )
+                    }
+
+                    borrowerViewModel.updateBorrower(receivedBorrower!!)
+                }
+            }
+        )
+
+        lifecycleScope.launch {
+
+            delay(150)
+
+            requireActivity().onBackPressed()
         }
     }
 
@@ -859,46 +844,10 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         includeBinding.uploadingFileNoteTV.isVisible = isVisible
     }
 
-    private fun showFileUploadLinearLayout() {
-
-        binding.fileUploadingLL.isVisible = true
-        binding.addBorrowerPaymentAppBar.isVisible = false
-        hideKeyBoard(requireActivity())
-
-        //disabling views
-        includeBinding.calculateInterestBtn.isEnabled = false
-        includeBinding.addSupprtingDocCB.isEnabled = false
-        includeBinding.addInterestCB.isEnabled = false
-        includeBinding.dateTV.isEnabled = false
-        includeBinding.selectDateBtn.isEnabled = false
-        includeBinding.fileNameET.isEnabled = false
-        includeBinding.ratePercentET.isEnabled = false
-        includeBinding.addNoteET.isEnabled = false
-        includeBinding.timeScheduleSpinner.isEnabled = false
-        includeBinding.moneySymbolSpinner.isEnabled = false
-        includeBinding.borrowerPaymentET.isEnabled = false
-        includeBinding.interestTypeRG.isEnabled = false
-        includeBinding.compundIntRB.isEnabled = false
-        includeBinding.simpleIntRB.isEnabled = false
-        includeBinding.imageRB.isEnabled = false
-        includeBinding.pdfRB.isEnabled = false
-        includeBinding.urlRB.isEnabled = false
-        includeBinding.addFileMCV.isEnabled = false
-        includeBinding.removeFileBtn.isEnabled = false
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
 
-
-        if (mUploadTask != null && (mUploadTask?.isInProgress!! || !mUploadTask?.isComplete!!)) {
-
-            mUploadTask!!.pause()
-            mUploadTask!!.cancel()
-        }
-
         hideKeyBoard(requireActivity())
-
 
         _binding = null
     }

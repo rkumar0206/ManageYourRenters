@@ -82,12 +82,13 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         binding.addEmiToolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
 
-            val action =
-                AddEditEMIFragmentDirections.actionAddEditEMIFragmentToAddSupportingDocumentBottomSheetFragment(
-                    "key", "tag"
-                )
+//            val action =
+//                AddEditEMIFragmentDirections.actionAddEditEMIFragmentToAddSupportingDocumentBottomSheetFragment(
+//                    "key", "tag"
+//                )
+//
+//            findNavController().navigate(action)
 
-            findNavController().navigate(action)
 
 //            if (isFormValid()) {
 //

@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.services
 
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -13,6 +14,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
+import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
 import com.rohitthebest.manageyourrenters.utils.convertJSONtoPayment
 import com.rohitthebest.manageyourrenters.utils.convertJSONtoRenter
 import com.rohitthebest.manageyourrenters.utils.fromStringToBorrower
@@ -41,10 +43,16 @@ class UploadService : Service() {
                 R.drawable.ic_baseline_payment_24
             }
 
+        val pendingIntent: PendingIntent =
+            Intent(this, HomeActivity::class.java).let { notificationIntent ->
+                PendingIntent.getActivity(this, 0, notificationIntent, 0)
+            }
+
         val notification = NotificationCompat.Builder(
             this,
             Constants.NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(image)
+            .setContentIntent(pendingIntent)
             .setContentTitle("Uploading to $collection.")
             .build()
 

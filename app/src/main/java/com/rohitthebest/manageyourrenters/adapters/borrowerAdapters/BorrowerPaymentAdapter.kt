@@ -48,6 +48,14 @@ class BorrowerPaymentAdapter :
 
                     dueAmountTV.text = "Due : ${payment.currencySymbol} ${payment.dueLeftAmount}"
 
+                    if (payment.isSynced) {
+
+                        syncBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                    } else {
+
+                        syncBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                    }
+
                     if (payment.dueLeftAmount <= 0.0) {
 
                         dueAmountTV.changeTextColor(

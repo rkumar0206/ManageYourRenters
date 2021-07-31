@@ -35,6 +35,7 @@
         <service android:name=".services.DeleteAllDocumentsService" />
         <service android:name=".services.UploadDocumentListToFireStoreService" />
         <service android:name=".services.DeleteFileFromFirebaseStorageService" />
+        <service android:name=".services.UploadFileToFirebaseStorageService" />
 
         <meta-data
             android:name="io.sentry.dsn"

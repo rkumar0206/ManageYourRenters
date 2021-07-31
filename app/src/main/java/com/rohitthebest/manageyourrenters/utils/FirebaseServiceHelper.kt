@@ -6,10 +6,12 @@ import android.net.Uri
 import androidx.core.content.ContextCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DELETE_FILE_FROM_FIREBASE_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.FILE_NAME_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.FILE_URI_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
 import com.rohitthebest.manageyourrenters.services.*
 import kotlinx.coroutines.tasks.await
 import kotlin.random.Random
@@ -141,7 +143,7 @@ fun deleteAllDocumentsUsingKeyFromFirestore(
     val foregroundService = Intent(context, DeleteAllDocumentsService::class.java)
 
     foregroundService.putExtra(
-        Constants.COLLECTION_KEY,
+        COLLECTION_KEY,
         collection
     )
 
@@ -174,51 +176,20 @@ fun deleteFileFromFirebaseStorage(context: Context, documentUrl: String) {
 }
 
 
-inline fun uploadFileToFirebaseStorage(
-    documentUri: Uri,
-    fileReference: StorageReference,  // should be complete reference like mStorageRef.child(fileName)
-    crossinline uploadTask: (UploadTask) -> Unit,
-    crossinline progressListener: (UploadTask.TaskSnapshot) -> Unit,
-    crossinline completeListener: (String) -> Unit,  // sending download url
-    crossinline successListener: (Uri) -> Unit,
-    crossinline failureListener: (Exception) -> Unit
+fun uploadFileToFirebaseStorage(
+    context: Context,
+    fileInfo: Pair<Uri, String>,  // pass fileUri and fileName
+    uploadDataInfo: Pair<String, String>, // pass upload data and collection
 ) {
 
-    fileReference.putFile(documentUri).let { mUploadTask ->
+    val foregroundServiceIntent = Intent(context, UploadFileToFirebaseStorageService::class.java)
 
-        uploadTask(mUploadTask)
+    foregroundServiceIntent.putExtra(FILE_URI_KEY, fileInfo.first.toString())
+    foregroundServiceIntent.putExtra(FILE_NAME_KEY, fileInfo.second)
+    foregroundServiceIntent.putExtra(UPLOAD_DATA_KEY, uploadDataInfo.first)
+    foregroundServiceIntent.putExtra(COLLECTION_KEY, uploadDataInfo.second)
 
-        mUploadTask.addOnProgressListener { taskSnapshot -> // UploadTask.TaskSnapshot
-
-            progressListener(taskSnapshot)
-        }.continueWithTask { task -> // Task<UploadTask.TaskSnapshot!>
-
-            if (!task.isSuccessful) {
-                task.exception?.let { exception ->
-                    throw exception
-                }
-            }
-            fileReference.downloadUrl
-        }.addOnCompleteListener { task -> // Task<Uri!>
-
-            if (task.isSuccessful) {
-
-                completeListener(task.result.toString())  // download url
-            } else {
-
-                task.exception?.let { exception ->
-                    throw exception
-                }
-            }
-
-        }.addOnSuccessListener { uri -> // Uri
-
-            successListener(uri)
-        }.addOnFailureListener { exception ->
-
-            failureListener(exception)
-        }
-    }
+    ContextCompat.startForegroundService(context, foregroundServiceIntent)
 }
 
 suspend fun getDataFromFireStore(

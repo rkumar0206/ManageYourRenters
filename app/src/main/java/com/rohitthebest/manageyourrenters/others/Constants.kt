@@ -24,7 +24,7 @@ object Constants {
     const val KEY_LIST_KEY = "KEY_LIST_KEY_fdhvjkhjkvkjvkbvk"
     const val DELETE_FILE_FROM_FIREBASE_KEY = "DELETE_FILE_FROM_FIREBASE_KEY_sjvvbibisbvbaib"
     const val FILE_URI_KEY = "sdjcjncjsbcjhbcu"
-    const val TAG_FOR_DATABASE = "tagdcbcnkascbabua"
+    const val COLLECTION_TAG_KEY = "tagdcbcnkascbabua"
     const val FILE_NAME_KEY = "FILE_cnsjcbhsbchsb"
 
     const val IS_SYNCED_SHARED_PREF_NAME = "IS_SYNCED_SHARED_PREF_NAME_fdkdnf"

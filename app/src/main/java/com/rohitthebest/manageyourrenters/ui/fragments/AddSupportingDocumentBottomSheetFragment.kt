@@ -14,7 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
@@ -22,8 +21,9 @@ import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.AddSupportingDocumentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddSupportingDocumentBinding
+import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_TAG_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
-import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -35,7 +35,7 @@ import dagger.hilt.android.AndroidEntryPoint
 private const val TAG = "AddSupportingDocumentBo"
 
 @AndroidEntryPoint
-class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
+class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
     RadioGroup.OnCheckedChangeListener {
 
     private var _binding: FragmentAddSupportingDocumentBinding? = null
@@ -47,7 +47,6 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
     private lateinit var includeBinding: AddSupportingDocumentLayoutBinding
 
     private var receivedCollectionTag = ""
-    private var receivedDocumentKey = ""
     private lateinit var receivedEMI: EMI
     private lateinit var receivedBorrowerPayment: BorrowerPayment
 
@@ -55,6 +54,8 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
     private var pdfUri: Uri? = null
     private var imageUri: Uri? = null
     private var fileSize = 0L
+
+    private var mListener: OnBottomSheetDismissListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,40 +82,41 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
         if (!arguments?.isEmpty!!) {
 
-            val args = arguments?.let {
 
-                AddSupportingDocumentBottomSheetFragmentArgs.fromBundle(it)
+            arguments?.let { bundle ->
+
+                receivedCollectionTag = bundle.getString(COLLECTION_TAG_KEY, "")
+                getDocument(bundle.getString(DOCUMENT_KEY, ""))
+
+                Log.d(TAG, "getMessage: $receivedCollectionTag")
             }
-
-            receivedCollectionTag = args?.tag!!
-            receivedDocumentKey = args.key!!
-
-            getDocument()
 
         }
     }
 
-    private fun getDocument() {
+    private fun getDocument(documentString: String) {
 
-        when (receivedCollectionTag) {
+        Log.d(TAG, "getMessage: $documentString")
 
-            getString(R.string.emis) -> {
+        if (documentString != "") {
 
-                emiViewModel.getEMIByKey(receivedDocumentKey).observe(viewLifecycleOwner, { emi ->
+            when (receivedCollectionTag) {
 
-                    receivedEMI = emi
-                })
+                getString(R.string.emis) -> {
 
+                    receivedEMI = fromStringToEMI(documentString)
+                }
+
+                getString(R.string.borrowerPayments) -> {
+
+                    receivedBorrowerPayment = fromStringToBorrowerPayment(documentString)
+                }
             }
 
-            getString(R.string.borrowerPayments) -> {
+        } else {
 
-                borrowerPaymentViewModel.getBorrowerPaymentByKey(receivedDocumentKey)
-                    .observe(viewLifecycleOwner, { borrowerPayment ->
-
-                        receivedBorrowerPayment = borrowerPayment
-                    })
-            }
+            showToast(requireContext(), "Something went wrong!!!")
+            dismiss()
         }
 
     }
@@ -232,7 +234,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
                     // if docType is URL then no need of storage, directly update and insert
                     // in firestore database
                     emiViewModel.updateEMI(emi)
-
+                    emi.isSynced = true
                     uploadDocumentToFireStore(
                         requireContext(), fromEMIToString(emi), receivedCollectionTag, emi.key
                     )
@@ -252,6 +254,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
                     borrowerPaymentViewModel.updateBorrowerPayment(borrowerPayment)
 
+                    borrowerPayment.isSynced = true
                     uploadDocumentToFireStore(
                         requireContext(), fromBorrowerPaymentToString(borrowerPayment),
                         receivedCollectionTag, borrowerPayment.key
@@ -563,16 +566,31 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
 
-        Log.d(TAG, "onDismiss: Supprting document bottom sheet dismissed")
-        notifyTheFragment()
+        Log.d(TAG, "onDismiss: Supporting document bottom sheet dismissed")
+
+        if (mListener != null) {
+
+            mListener!!.onBottomSheetDismissed(false)
+        }
     }
 
-    private fun notifyTheFragment() {
+    interface OnBottomSheetDismissListener {
 
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(
-            SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY,
-            true
-        )
+        fun onBottomSheetDismissed(isDocumentAdded: Boolean)
+    }
+
+    fun setOnBottomSheetDismissListener(listener: OnBottomSheetDismissListener) {
+
+        mListener = listener
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(bundle: Bundle): AddSupportingDocumentBottomSheetFragment {
+            val fragment = AddSupportingDocumentBottomSheetFragment()
+            fragment.arguments = bundle
+            return fragment
+        }
     }
 
     override fun onDestroyView() {

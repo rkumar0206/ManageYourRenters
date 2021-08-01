@@ -165,6 +165,7 @@ class UploadFileToFirebaseStorageService : Service() {
                         getString(R.string.borrowerPayments) -> {
 
                             val borrowerPayment = document as BorrowerPayment
+                            borrowerPayment.isSynced = true
                             borrowerPayment.supportingDocument?.documentUrl = downloadUrl
                             docKey = borrowerPayment.key
                             borrowerPaymentRepository.updateBorrowerPayment(borrowerPayment)
@@ -177,6 +178,7 @@ class UploadFileToFirebaseStorageService : Service() {
                             val emi = document as EMI
                             emi.supportingDocument.documentUrl = downloadUrl
                             docKey = emi.key
+                            emi.isSynced = true
                             emiRepository.updateEMI(emi)
 
                             uploadDocument = emi

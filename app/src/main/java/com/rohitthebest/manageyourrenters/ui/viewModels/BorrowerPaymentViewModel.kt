@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
 import com.rohitthebest.manageyourrenters.repositories.PartialPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -42,21 +43,37 @@ class BorrowerPaymentViewModel @Inject constructor(
 
                         borrower.totalDueAmount = value
                         borrower.modified = System.currentTimeMillis()
-                        borrower.isSynced = false
 
-                        val map = HashMap<String, Any?>()
-                        map["totalDueAmount"] = value
+                        if (isInternetAvailable(context)) {
 
-                        if (Functions.isInternetAvailable(context)) {
+                            if (borrower.isSynced) {
 
-                            borrower.isSynced = true
+                                // if the borrower document was already synced previously then update the document
+                                // or else upload the entire document to the fireStore
 
-                            updateDocumentOnFireStore(
-                                context,
-                                map = map,
-                                context.getString(R.string.borrowers),
-                                borrowerPayment.borrowerKey
-                            )
+                                val map = HashMap<String, Any?>()
+                                map["totalDueAmount"] = value
+
+                                updateDocumentOnFireStore(
+                                    context,
+                                    map = map,
+                                    context.getString(R.string.borrowers),
+                                    borrower.key
+                                )
+                            } else {
+
+                                borrower.isSynced = true
+
+                                uploadDocumentToFireStore(
+                                    context,
+                                    fromBorrowerToString(borrower),
+                                    context.getString(R.string.borrowers),
+                                    borrower.key
+                                )
+                            }
+                        } else {
+
+                            borrower.isSynced = false
                         }
 
                         borrowerRepository.update(borrower)
@@ -82,7 +99,7 @@ class BorrowerPaymentViewModel @Inject constructor(
 
             Log.d(TAG, "deleteBorrowerPayment: Partial payment keys : $partialPaymentKeys")
 
-            if (Functions.isInternetAvailable(context)) {
+            if (isInternetAvailable(context)) {
 
                 deleteDocumentFromFireStore(
                     context,

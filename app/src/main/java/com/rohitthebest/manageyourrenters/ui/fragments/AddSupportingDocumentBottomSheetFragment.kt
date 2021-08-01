@@ -17,6 +17,7 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.AddSupportingDocumentLayoutBinding
@@ -29,6 +30,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -56,6 +58,8 @@ class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
     private var fileSize = 0L
 
     private var mListener: OnBottomSheetDismissListener? = null
+
+    private var isDocumentAdded = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -133,7 +137,6 @@ class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
 
                 if (isFormValid()) {
 
-                    //todo : save
                     initDocument()
                 }
                 true
@@ -185,18 +188,17 @@ class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
             getString(R.string.emi) -> {
 
                 receivedEMI.isSupportingDocumentAdded = true
-                receivedEMI.supportingDocument.apply {
 
-                    documentName = includeBinding.fileNameET.text.toString().trim()
-                    documentType = docType
-
-                    documentUrl = if (documentType == DocumentType.URL) {
+                receivedEMI.supportingDocument = SupportingDocument(
+                    includeBinding.fileNameET.text.toString().trim(),
+                    if (docType == DocumentType.URL) {
 
                         includeBinding.urlET.text.toString().trim()
                     } else {
                         ""
-                    }
-                }
+                    },
+                    docType
+                )
 
                 insertDocumentToDatabase(receivedEMI)
             }
@@ -204,18 +206,17 @@ class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
             getString(R.string.borrowerPayments) -> {
 
                 receivedBorrowerPayment.isSupportingDocAdded = true
-                receivedEMI.supportingDocument.apply {
 
-                    documentName = includeBinding.fileNameET.text.toString().trim()
-                    documentType = docType
-
-                    documentUrl = if (documentType == DocumentType.URL) {
+                receivedBorrowerPayment.supportingDocument = SupportingDocument(
+                    includeBinding.fileNameET.text.toString().trim(),
+                    if (docType == DocumentType.URL) {
 
                         includeBinding.urlET.text.toString().trim()
                     } else {
                         ""
-                    }
-                }
+                    },
+                    docType
+                )
 
                 insertDocumentToDatabase(receivedBorrowerPayment)
             }
@@ -233,11 +234,22 @@ class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
 
                     // if docType is URL then no need of storage, directly update and insert
                     // in firestore database
-                    emiViewModel.updateEMI(emi)
-                    emi.isSynced = true
-                    uploadDocumentToFireStore(
-                        requireContext(), fromEMIToString(emi), receivedCollectionTag, emi.key
-                    )
+                    if (isInternetAvailable(requireContext())) {
+
+                        emi.isSynced = true
+                        uploadDocumentToFireStore(
+                            requireContext(), fromEMIToString(emi), receivedCollectionTag, emi.key
+                        )
+                    } else {
+
+                        emi.isSynced = false
+                    }
+
+                    isDocumentAdded = true
+                    emiViewModel.insertEMI(emi)
+
+                    dismiss()
+
                 } else {
                     // if docType is pdf or image then we need to upload it to the firebase storage
                     // and we need call the service where the updating and insertion of data
@@ -252,13 +264,25 @@ class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
 
                 if (docType == DocumentType.URL) {
 
-                    borrowerPaymentViewModel.updateBorrowerPayment(borrowerPayment)
+                    if (isInternetAvailable(requireContext())) {
 
-                    borrowerPayment.isSynced = true
-                    uploadDocumentToFireStore(
-                        requireContext(), fromBorrowerPaymentToString(borrowerPayment),
-                        receivedCollectionTag, borrowerPayment.key
+                        borrowerPayment.isSynced = true
+                        uploadDocumentToFireStore(
+                            requireContext(), fromBorrowerPaymentToString(borrowerPayment),
+                            receivedCollectionTag, borrowerPayment.key
+                        )
+                    } else {
+
+                        borrowerPayment.isSynced = false
+                    }
+
+                    isDocumentAdded = true
+                    borrowerPaymentViewModel.insertBorrowerPayment(
+                        requireContext(),
+                        borrowerPayment
                     )
+
+                    dismiss()
                 } else {
 
                     uploadFileToStorage(fromBorrowerPaymentToString(borrowerPayment))
@@ -270,22 +294,36 @@ class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
 
     private fun uploadFileToStorage(uploadData: String) {
 
-        val fileNameForUploadingToStorage = if (docType == DocumentType.PDF) {
+        if (isInternetAvailable(requireContext())) {
+            val fileNameForUploadingToStorage = if (docType == DocumentType.PDF) {
 
-            "${includeBinding.fileNameET.text.trim()}_${Functions.generateKey()}.pdf"
+                "${includeBinding.fileNameET.text.trim()}_${Functions.generateKey()}.pdf"
+            } else {
+
+                "${includeBinding.fileNameET.text.trim()}_${Functions.generateKey()}.jpg"
+            }
+
+            uploadFileToFirebaseStorage(
+                requireContext(),
+                Pair(
+                    if (docType == DocumentType.PDF) pdfUri!! else imageUri!!,
+                    fileNameForUploadingToStorage
+                ),
+                Pair(uploadData, receivedCollectionTag)
+            )
+
+            isDocumentAdded = true
+
+            dismiss()
+
         } else {
 
-            "${includeBinding.fileNameET.text.trim()}_${Functions.generateKey()}.jpg"
+            showToast(
+                requireContext(),
+                "Internet connection is needed for uploading the supporting the document",
+                Toast.LENGTH_LONG
+            )
         }
-
-        uploadFileToFirebaseStorage(
-            requireContext(),
-            Pair(
-                if (docType == DocumentType.PDF) pdfUri!! else imageUri!!,
-                fileNameForUploadingToStorage
-            ),
-            Pair(uploadData, receivedCollectionTag)
-        )
     }
 
     private fun isFormValid(): Boolean {
@@ -570,7 +608,7 @@ class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
 
         if (mListener != null) {
 
-            mListener!!.onBottomSheetDismissed(false)
+            mListener!!.onBottomSheetDismissed(isDocumentAdded)
         }
     }
 

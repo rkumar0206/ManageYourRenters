@@ -20,15 +20,15 @@ import com.rohitthebest.manageyourrenters.others.Constants.FILE_NAME_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.FILE_URI_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
 import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
+import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
 import com.rohitthebest.manageyourrenters.repositories.EMIRepository
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
-import com.rohitthebest.manageyourrenters.utils.Functions
-import com.rohitthebest.manageyourrenters.utils.fromStringToBorrowerPayment
-import com.rohitthebest.manageyourrenters.utils.insertToFireStore
-import com.rohitthebest.manageyourrenters.utils.uploadFileUriOnFirebaseStorage
+import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.random.Random
@@ -47,6 +47,9 @@ class UploadFileToFirebaseStorageService : Service() {
 
     @Inject
     lateinit var emiRepository: EMIRepository
+
+    @Inject
+    lateinit var borrowerRepository: BorrowerRepository
 
     private var receivedCollection = ""
     private lateinit var notificationBuilder: NotificationCompat.Builder
@@ -87,6 +90,8 @@ class UploadFileToFirebaseStorageService : Service() {
         CoroutineScope(Dispatchers.IO).launch {
 
             val uri = Uri.parse(fileUri)
+            var referenceString = ""
+            val document: Any
 
             when (receivedCollection) {
 
@@ -94,27 +99,39 @@ class UploadFileToFirebaseStorageService : Service() {
 
                     val borrowerPayment = fromStringToBorrowerPayment(uploadData!!)
 
-                    val storageRef = FirebaseStorage.getInstance()
-                        .getReference("${Functions.getUid()}/BorrowerPaymentDoc/${borrowerPayment.supportingDocument?.documentType}")
+                    referenceString =
+                        "${Functions.getUid()}/BorrowerPaymentDoc/${borrowerPayment.supportingDocument?.documentType}"
 
-                    val fileRef = storageRef.child(fileName!!)
-
-                    uploadFileToFirebaseStorage(
-                        uri,
-                        fileRef,
-                        borrowerPayment
-                    )
+                    document = borrowerPayment
                 }
+
+                getString(R.string.emi) -> {
+
+                    val emi = fromStringToEMI(uploadData!!)
+
+                    referenceString =
+                        "${Functions.getUid()}/EMIDoc/${emi.supportingDocument.documentType}"
+
+                    document = emi
+                }
+
+                else -> document = Any()
             }
+
+            val storageRef = FirebaseStorage.getInstance()
+                .getReference(referenceString)
+
+            val fileRef = storageRef.child(fileName!!)
+
+            uploadFileToFirebaseStorage(
+                uri,
+                fileRef,
+                document
+            )
 
         }
 
         return START_NOT_STICKY
-    }
-
-    override fun onBind(intent: Intent?): IBinder? {
-
-        return null
     }
 
     private suspend inline fun uploadFileToFirebaseStorage(
@@ -129,6 +146,8 @@ class UploadFileToFirebaseStorageService : Service() {
             {},
             { task ->
 
+                // updating progress here
+
                 try {
 
                     NotificationManagerCompat.from(applicationContext).apply {
@@ -136,6 +155,7 @@ class UploadFileToFirebaseStorageService : Service() {
                         PROGRESS_CURRENT =
                             ((100 * task.bytesTransferred) / task.totalByteCount).toInt()
 
+                        notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
                         notificationBuilder.setProgress(
                             PROGRESS_MAX,
                             PROGRESS_CURRENT,
@@ -155,10 +175,9 @@ class UploadFileToFirebaseStorageService : Service() {
             },
             { downloadUrl ->
 
-                CoroutineScope(Dispatchers.IO).launch {
+                // inserting downloadUrl to the database document
 
-                    var docKey = ""
-                    val uploadDocument: Any
+                CoroutineScope(Dispatchers.IO).launch {
 
                     when (receivedCollection) {
 
@@ -167,53 +186,108 @@ class UploadFileToFirebaseStorageService : Service() {
                             val borrowerPayment = document as BorrowerPayment
                             borrowerPayment.isSynced = true
                             borrowerPayment.supportingDocument?.documentUrl = downloadUrl
-                            docKey = borrowerPayment.key
-                            borrowerPaymentRepository.updateBorrowerPayment(borrowerPayment)
 
-                            uploadDocument = borrowerPayment
+                            borrowerPaymentRepository.insertBorrowerPayment(borrowerPayment)
+                            insertDocument(borrowerPayment, borrowerPayment.key)
+                            updateBorrowerDueAmount(borrowerPayment)
                         }
 
                         getString(R.string.emi) -> {
 
                             val emi = document as EMI
                             emi.supportingDocument.documentUrl = downloadUrl
-                            docKey = emi.key
                             emi.isSynced = true
-                            emiRepository.updateEMI(emi)
 
-                            uploadDocument = emi
+                            emiRepository.insertEMI(emi)
+                            insertDocument(emi, emi.key)
                         }
-
-                        else -> uploadDocument = document
                     }
-
-                    val docRef = FirebaseFirestore.getInstance()
-                        .collection(receivedCollection)
-                        .document(docKey)
-
-                    if (insertToFireStore(docRef, uploadDocument)) {
-
-                        NotificationManagerCompat.from(applicationContext).apply {
-
-                            notificationBuilder
-                                .setContentText("Upload complete")
-                                .setProgress(0, 0, false)
-
-                            notify(notificationId, notificationBuilder.build())
-                        }
-
-                        stopSelf()
-                    }
-
                 }
-
             },
             {
 
+                Log.d(TAG, "uploadFileToFirebaseStorage: Successful file upload")
             },
             {
 
+                Log.d(TAG, "uploadFileToFirebaseStorage: Something went wrong...")
+                Log.d(TAG, "uploadFileToFirebaseStorage: Exception : ${it.message}")
+
+                showToast(applicationContext, "File could not upload successfully. Try again...")
+                stopSelf()
             }
         )
     }
+
+    private suspend fun insertDocument(uploadDocument: Any, docKey: String) {
+
+        val docRef = FirebaseFirestore.getInstance()
+            .collection(receivedCollection)
+            .document(docKey)
+
+        Log.d(TAG, "uploadFileToFirebaseStorage: docRef : $docRef")
+
+        if (insertToFireStore(docRef, uploadDocument)) {
+
+            NotificationManagerCompat.from(applicationContext).apply {
+
+                notificationBuilder
+                    .setContentText("Upload complete")
+                    .setProgress(0, 0, false)
+
+                notify(notificationId, notificationBuilder.build())
+            }
+
+            stopSelf()
+        }
+
+    }
+
+    private suspend fun updateBorrowerDueAmount(borrowerPayment: BorrowerPayment) {
+
+        borrowerRepository.getBorrowerByKey(borrowerPayment.borrowerKey).collect { borrower ->
+
+            borrowerPaymentRepository.getTotalDueOfTheBorrower(borrowerPayment.borrowerKey)
+                .collect { value ->
+
+                    borrower.totalDueAmount = value
+                    borrower.modified = System.currentTimeMillis()
+
+                    val map = HashMap<String, Any?>()
+                    map["totalDueAmount"] = value
+
+                    val docRef = FirebaseFirestore.getInstance()
+                        .collection(applicationContext.getString(R.string.borrowers))
+                        .document(borrower.key)
+
+                    if (borrower.isSynced) {
+
+                        // if the document was synced previously update the document else insert
+                        // it to the firestore
+                        updateDocumentOnFireStore(
+                            docRef,
+                            map
+                        )
+
+                    } else {
+
+                        borrower.isSynced = true
+
+                        insertToFireStore(
+                            docRef,
+                            borrower
+                        )
+                    }
+
+                    borrowerRepository.update(borrower)
+                }
+        }
+
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+
+        return null
+    }
+
 }

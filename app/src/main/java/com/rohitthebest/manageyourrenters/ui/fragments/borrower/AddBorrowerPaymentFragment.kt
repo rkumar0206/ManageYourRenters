@@ -317,7 +317,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             .setPositiveButton("No") { dialog, _ ->
 
                 insertToDatabase(borrowerPayment)
-                // upload file to firestore
+                dialog.dismiss()
             }
             .setNegativeButton("Yes") { dialog, _ ->
 
@@ -336,14 +336,13 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                         ).apply {
                             show(it, "AddSupportingTag")
                         }.setOnBottomSheetDismissListener(this)
-
                     }
 
                 } else {
 
                     showToast(
                         requireContext(),
-                        "Internet connection is required for uploading supporting document.",
+                        "Internet connection is needed for uploading supporting document.",
                         Toast.LENGTH_LONG
                     )
                 }
@@ -357,12 +356,32 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     override fun onBottomSheetDismissed(isDocumentAdded: Boolean) {
 
         Log.d(TAG, "onBottomSheetDismissed: $isDocumentAdded")
+
+        if (isDocumentAdded) {
+
+            requireActivity().onBackPressed()
+        }
     }
 
 
     private fun insertToDatabase(borrowerPayment: BorrowerPayment) {
 
         Log.d(TAG, "insertToDatabase: ")
+
+        if (isInternetAvailable(requireContext())) {
+
+            borrowerPayment.isSynced = true
+
+            uploadDocumentToFireStore(
+                requireContext(),
+                fromBorrowerPaymentToString(borrowerPayment),
+                getString(R.string.borrowerPayments),
+                borrowerPayment.key
+            )
+        } else {
+
+            borrowerPayment.isSynced = false
+        }
 
         borrowerPaymentViewModel.insertBorrowerPayment(
             requireContext(), borrowerPayment

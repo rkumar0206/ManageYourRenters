@@ -16,10 +16,11 @@ data class EMI(
     var startDate: Long,
     var totalMonths: Int,
     var monthsCompleted: Int,
+    var currencySymbol: String = "₹",
     var amountPaidPerMonth: Double,
     var amountPaid: Double,
-    var isSupportingDocumentAdded: Boolean,
-    var supportingDocument: SupportingDocument,
+    var isSupportingDocumentAdded: Boolean = false,
+    var supportingDocument: SupportingDocument?,
     var isSynced: Boolean,
     var uid: String
 ) {
@@ -33,10 +34,11 @@ data class EMI(
         System.currentTimeMillis(),
         0,
         0,
+        "₹",
         0.0,
         0.0,
         false,
-        SupportingDocument(),
+        null,
         false,
         ""
     )

@@ -105,12 +105,12 @@ class UploadFileToFirebaseStorageService : Service() {
                     document = borrowerPayment
                 }
 
-                getString(R.string.emi) -> {
+                getString(R.string.emis) -> {
 
                     val emi = fromStringToEMI(uploadData!!)
 
                     referenceString =
-                        "${Functions.getUid()}/EMIDoc/${emi.supportingDocument.documentType}"
+                        "${Functions.getUid()}/EMIDoc/${emi.supportingDocument?.documentType}"
 
                     document = emi
                 }
@@ -192,10 +192,10 @@ class UploadFileToFirebaseStorageService : Service() {
                             updateBorrowerDueAmount(borrowerPayment)
                         }
 
-                        getString(R.string.emi) -> {
+                        getString(R.string.emis) -> {
 
                             val emi = document as EMI
-                            emi.supportingDocument.documentUrl = downloadUrl
+                            emi.supportingDocument?.documentUrl = downloadUrl
                             emi.isSynced = true
 
                             emiRepository.insertEMI(emi)

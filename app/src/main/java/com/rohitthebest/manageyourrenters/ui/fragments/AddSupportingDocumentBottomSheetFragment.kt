@@ -37,7 +37,7 @@ import dagger.hilt.android.AndroidEntryPoint
 private const val TAG = "AddSupportingDocumentBo"
 
 @AndroidEntryPoint
-class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
+class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
     RadioGroup.OnCheckedChangeListener {
 
     private var _binding: FragmentAddSupportingDocumentBinding? = null
@@ -185,7 +185,7 @@ class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
 
         when (receivedCollectionTag) {
 
-            getString(R.string.emi) -> {
+            getString(R.string.emis) -> {
 
                 receivedEMI.isSupportingDocumentAdded = true
 
@@ -227,10 +227,10 @@ class AddSupportingDocumentBottomSheetFragment() : BottomSheetDialogFragment(),
 
         when (receivedCollectionTag) {
 
-            getString(R.string.emi) -> {
+            getString(R.string.emis) -> {
 
                 val emi = document as EMI
-                if (emi.supportingDocument.documentType == DocumentType.URL) {
+                if (docType == DocumentType.URL) {
 
                     // if docType is URL then no need of storage, directly update and insert
                     // in firestore database

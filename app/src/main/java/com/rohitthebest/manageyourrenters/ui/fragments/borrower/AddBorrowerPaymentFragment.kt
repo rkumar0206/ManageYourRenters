@@ -308,22 +308,31 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             messageOrNote = includeBinding.addNoteET.text.toString()
         }
 
-        // todo : send the whole document and not only key to the supporting document bottom sheet
-        // todo : as insertion of document to the database will be done there
+        showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(borrowerPayment)
+    }
 
+    private fun showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(borrowerPayment: BorrowerPayment) {
+
+        // showing dialog if the user wants to upload any supporting document
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Add supporting document")
             .setMessage("Do you want to add any supporting document?")
             .setPositiveButton("No") { dialog, _ ->
 
+                // if user selects no, then simply insert the borrower payment to the cloud as well
+                // as local database
                 insertToDatabase(borrowerPayment)
                 dialog.dismiss()
             }
             .setNegativeButton("Yes") { dialog, _ ->
 
-                if (isInternetAvailable(requireContext())) {
+                // opening  bottomSheet for adding supporting document
+                // and also sending this borrower payment instance and the collection name
+                // as a bundle to the bottomSheet arguments
+                // if the user adds a supporting document then insertion of borrower payment
+                // to the database will be done there only
 
-                    // todo : open supporting document bottom sheet
+                if (isInternetAvailable(requireContext())) {
 
                     requireActivity().supportFragmentManager.let {
 
@@ -334,7 +343,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                         AddSupportingDocumentBottomSheetFragment.newInstance(
                             bundle
                         ).apply {
-                            show(it, "AddSupportingTag")
+                            show(it, "AddSupportingDocTag")
                         }.setOnBottomSheetDismissListener(this)
                     }
 
@@ -368,6 +377,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         Log.d(TAG, "insertToDatabase: ")
 
+        borrowerPayment.isSupportingDocAdded = false
         if (isInternetAvailable(requireContext())) {
 
             borrowerPayment.isSynced = true

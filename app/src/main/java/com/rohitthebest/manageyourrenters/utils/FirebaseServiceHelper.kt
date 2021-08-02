@@ -26,7 +26,7 @@ fun uploadDocumentToFireStore(
     val foregroundService = Intent(context, UploadService::class.java)
 
     foregroundService.putExtra(
-        Constants.COLLECTION_KEY,
+        COLLECTION_KEY,
         collection
     )
 
@@ -36,7 +36,7 @@ fun uploadDocumentToFireStore(
     )
 
     foregroundService.putExtra(
-        Constants.UPLOAD_DATA_KEY,
+        UPLOAD_DATA_KEY,
         uploadData
     )
 
@@ -58,7 +58,7 @@ fun updateDocumentOnFireStore(
     val foregroundService = Intent(context, UpdateService::class.java)
 
     foregroundService.putExtra(
-        Constants.COLLECTION_KEY,
+        COLLECTION_KEY,
         collectionKey
     )
 
@@ -116,7 +116,7 @@ fun uploadListOfDataToFireStore(
     val foregroundService = Intent(context, UploadDocumentListToFireStoreService::class.java)
 
     foregroundService.putExtra(
-        Constants.COLLECTION_KEY,
+        COLLECTION_KEY,
         collection
     )
 
@@ -126,7 +126,7 @@ fun uploadListOfDataToFireStore(
     )
 
     foregroundService.putExtra(
-        Constants.UPLOAD_DATA_KEY,
+        UPLOAD_DATA_KEY,
         uploadData
     )
 

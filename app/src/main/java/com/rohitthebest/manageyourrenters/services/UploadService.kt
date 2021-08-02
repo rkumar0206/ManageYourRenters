@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.services
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
@@ -19,10 +20,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+private const val TAG = "UploadService"
+
 class UploadService : Service() {
 
-    private val TAG = "UploadService"
-
+    @SuppressLint("UnspecifiedImmutableFlag")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         val collection = intent?.getStringExtra(COLLECTION_KEY)
@@ -30,13 +32,7 @@ class UploadService : Service() {
         val uploadData = intent?.getStringExtra(UPLOAD_DATA_KEY)
         val randomId = intent?.getIntExtra(RANDOM_ID_KEY, 1003)
 
-        val image =
-            if (collection == getString(R.string.renters) || collection == getString(R.string.borrowers)) {
-
-                R.drawable.ic_baseline_person_add_24
-            } else {
-                R.drawable.ic_baseline_payment_24
-            }
+        val image = R.drawable.ic_house_renters
 
         val pendingIntent: PendingIntent =
             Intent(this, HomeActivity::class.java).let { notificationIntent ->
@@ -107,7 +103,18 @@ class UploadService : Service() {
                         )
                         stopSelf()
                     }
+                }
 
+                getString(R.string.emis) -> {
+
+                    if (insertToFireStore(docRef, fromStringToEMI(uploadData!!))) {
+
+                        Log.d(
+                            TAG,
+                            "onStartCommand: Uploaded emi to collection $collection with key $key"
+                        )
+                        stopSelf()
+                    }
                 }
 
                 else -> {

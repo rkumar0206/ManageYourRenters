@@ -209,7 +209,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
     private fun showNoBorrowersAddedTV(isVisible: Boolean) {
 
         binding.noBorrowersAddedMessageTV.isVisible = isVisible
-        binding.noBorrowersAddedMessageTV.isVisible = !isVisible
+        binding.individualRentersRV.isVisible = !isVisible
     }
 
     override fun onDestroyView() {

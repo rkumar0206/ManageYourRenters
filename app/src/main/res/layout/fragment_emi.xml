@@ -26,6 +26,25 @@
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:id="@+id/no_emi_added_messageTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="5dp"
+        android:text="@string/no_EMI_added_message"
+        android:textSize="16sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addEmiCategoryFAB"
         android:layout_width="wrap_content"

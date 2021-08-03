@@ -3,14 +3,19 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.emiAdapters.EMIAdapter
+import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
+import com.rohitthebest.manageyourrenters.utils.searchText
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -18,18 +23,22 @@ import kotlinx.coroutines.launch
 private const val TAG = "EmiFragment"
 
 @AndroidEntryPoint
-class EmiFragment : Fragment(R.layout.fragment_emi) {
+class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener {
 
     private var _binding: FragmentEmiBinding? = null
     private val binding get() = _binding!!
 
     private val emiViewModel by viewModels<EMIViewModel>()
 
+    private lateinit var emiAdapter: EMIAdapter
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentEmiBinding.bind(view)
 
         initListeners()
+
+        emiAdapter = EMIAdapter()
 
         setProgressBarVisibility(true)
 
@@ -46,8 +55,21 @@ class EmiFragment : Fragment(R.layout.fragment_emi) {
 
         binding.emiRV.apply {
 
-            //todo : do set up
+            adapter = emiAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
         }
+
+        emiAdapter.setOnClickListener(this)
+    }
+
+    override fun onItemClick(emi: EMI) {
+
+        TODO("Not yet implemented")
+    }
+
+    override fun onMenuBtnClicked(emi: EMI, position: Int) {
+        TODO("Not yet implemented")
     }
 
     private fun getEMIs() {
@@ -64,9 +86,38 @@ class EmiFragment : Fragment(R.layout.fragment_emi) {
                 setNoEMIAddedMessageTVVisibility(false)
             }
 
-            //todo : adapter.submitList()
+            emiAdapter.submitList(emiList)
 
+            setUpSearchView(emiList)
+
+            setProgressBarVisibility(false)
         })
+    }
+
+    private fun setUpSearchView(emiList: List<EMI>?) {
+
+        val searchView =
+            binding.emiFragmentToolbar.menu.findItem(R.id.menu_search_home).actionView as SearchView
+
+        searchView.searchText { s ->
+
+            if (s?.trim()?.isEmpty()!!) {
+
+                binding.emiRV.scrollToPosition(0)
+                emiAdapter.submitList(emiList)
+            } else {
+
+                val filteredList = emiList?.filter { emi ->
+
+                    emi.emiName.lowercase().contains(s.lowercase().trim())
+                }
+
+                emiAdapter.submitList(filteredList)
+
+            }
+
+        }
+
     }
 
     private fun initListeners() {
@@ -80,14 +131,6 @@ class EmiFragment : Fragment(R.layout.fragment_emi) {
 
             findNavController().navigate(R.id.action_emiFragment_to_addEditEMIFragment)
         }
-
-        binding.emiFragmentToolbar.menu.findItem(R.id.menu_search_home)
-            .setOnMenuItemClickListener {
-
-                //todo : add search functionality in this fragment
-                true
-            }
-
     }
 
     private fun setProgressBarVisibility(isVisible: Boolean) {

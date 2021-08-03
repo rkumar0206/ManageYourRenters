@@ -26,6 +26,17 @@ class EMIAdapter : ListAdapter<EMI, EMIAdapter.EMIViewHolder>(DiffUtilCallback()
                     mListener!!.onItemClick(getItem(absoluteAdapterPosition))
                 }
             }
+
+            binding.emiItemMenuBtn.setOnClickListener {
+
+                if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
+
+                    mListener!!.onMenuBtnClicked(
+                        getItem(absoluteAdapterPosition),
+                        absoluteAdapterPosition
+                    )
+                }
+            }
         }
 
         @SuppressLint("SetTextI18n")
@@ -76,6 +87,7 @@ class EMIAdapter : ListAdapter<EMI, EMIAdapter.EMIViewHolder>(DiffUtilCallback()
     interface OnClickListener {
 
         fun onItemClick(emi: EMI)
+        fun onMenuBtnClicked(emi: EMI, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

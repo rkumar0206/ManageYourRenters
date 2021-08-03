@@ -23,15 +23,17 @@
 
             <TextView
                 android:id="@+id/emiNameTV"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginEnd="8dp"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:padding="5dp"
                 android:textColor="@color/primaryTextColor"
                 android:textSize="18sp"
+                app:layout_constraintEnd_toStartOf="@+id/emiAddedOnTV"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="TEST EMI 1" />
@@ -71,13 +73,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:padding="3dp"
                 android:textColor="@color/primaryTextColor"
                 android:textSize="15sp"
                 app:layout_constraintBottom_toBottomOf="@+id/textView64"
-                app:layout_constraintEnd_toEndOf="@+id/emiAddedOnTV"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/textView64"
                 app:layout_constraintTop_toTopOf="@+id/textView64"
                 tools:text="54 / 05" />
@@ -86,15 +89,17 @@
                 android:id="@+id/emiAmountLeftTV"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
+                android:layout_marginBottom="3dp"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:padding="3dp"
                 android:textColor="@color/primaryTextColor"
                 android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/monthsCompletedTV"
-                app:layout_constraintStart_toEndOf="@+id/textView68"
+                app:layout_constraintStart_toEndOf="@+id/textView64"
+                app:layout_constraintStart_toStartOf="@+id/monthsCompletedTV"
                 app:layout_constraintTop_toBottomOf="@+id/textView64"
                 tools:text="50000.344 / 10000" />
 
@@ -102,12 +107,11 @@
                 android:id="@+id/emiAddedOnTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
                 android:ellipsize="end"
                 android:padding="3dp"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/emiNameTV"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/emiItemMenuBtn"
                 app:layout_constraintTop_toTopOf="@+id/emiNameTV"
                 tools:text="Added on : 02-06-2000" />
 
@@ -122,18 +126,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/emiNameTV" />
 
-            <View
-                android:id="@+id/divider57"
-                android:layout_width="400dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="1dp"
-                android:background="?android:attr/listDivider"
-                app:layout_constraintBottom_toBottomOf="parent"
+            <ImageButton
+                android:id="@+id/emiItemMenuBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/color_white"
+                android:contentDescription="@string/imagebutton"
+                android:minHeight="48dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/emiAmountLeftTV" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_baseline_more_vert_24" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>

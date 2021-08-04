@@ -32,10 +32,20 @@ class Functions {
         private val mAuth = Firebase.auth
 
         private const val TAG = "Functions"
-        fun showToast(context: Context, message: String, duration: Int = Toast.LENGTH_SHORT) {
+        fun showToast(context: Context, message: Any?, duration: Int = Toast.LENGTH_SHORT) {
             try {
-                Log.d(TAG, message)
-                Toast.makeText(context, message, duration).show()
+                Log.d(TAG, message.toString())
+                Toast.makeText(context, message.toString(), duration).show()
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        @JvmName("showToast1")
+        fun Context.showToast(message: Any?, duration: Int = Toast.LENGTH_SHORT) {
+            try {
+                Log.d(TAG, message.toString())
+                Toast.makeText(this, message.toString(), duration).show()
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
             }

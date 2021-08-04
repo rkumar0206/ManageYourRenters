@@ -33,16 +33,19 @@ class EMIMenuItems : BottomSheetDialogFragment() {
         binding.editEmiMenu.setOnClickListener {
 
             mListener?.onEditMenuClick()
+            dismiss()
         }
 
         binding.deleteEmiMenu.setOnClickListener {
 
             mListener?.onDeleteMenuClick()
+            dismiss()
         }
 
         binding.supportingDocumentMenu.setOnClickListener {
 
             mListener?.onSupportingDocumentMenuClick()
+            dismiss()
         }
     }
 
@@ -61,7 +64,7 @@ class EMIMenuItems : BottomSheetDialogFragment() {
     companion object {
 
         @JvmStatic
-        fun newInstance(bundle: Bundle): EMIMenuItems {
+        fun newInstance(bundle: Bundle?): EMIMenuItems {
 
             val fragment = EMIMenuItems()
             fragment.arguments = bundle

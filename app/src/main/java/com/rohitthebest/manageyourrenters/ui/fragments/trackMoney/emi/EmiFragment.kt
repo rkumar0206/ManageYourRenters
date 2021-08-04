@@ -15,6 +15,7 @@ import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.emiAdapter
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.searchText
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -23,7 +24,8 @@ import kotlinx.coroutines.launch
 private const val TAG = "EmiFragment"
 
 @AndroidEntryPoint
-class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener {
+class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
+    EMIMenuItems.OnItemClickListener {
 
     private var _binding: FragmentEmiBinding? = null
     private val binding get() = _binding!!
@@ -68,11 +70,40 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener 
         //TODO("Not yet implemented")
     }
 
+    private lateinit var emiForMenuItems: EMI
+
     override fun onMenuBtnClicked(emi: EMI, position: Int) {
-        //TODO("Not yet implemented")
+
+        emiForMenuItems = emi
+
+        requireActivity().supportFragmentManager.let {
+
+            EMIMenuItems.newInstance(
+                null
+            ).apply {
+                show(it, "emi_menu_bottomsheet_tag")
+            }.setOnClickListener(this)
+        }
     }
 
     override fun onSyncBtnClicked(emi: EMI, position: Int) {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onEditMenuClick() {
+
+        if (this::emiForMenuItems.isInitialized) {
+
+            requireContext().showToast(emiForMenuItems.emiName)
+            //TODO("Not yet implemented")
+        }
+    }
+
+    override fun onDeleteMenuClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onSupportingDocumentMenuClick() {
         //TODO("Not yet implemented")
     }
 
@@ -153,4 +184,5 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener 
         super.onDestroyView()
         _binding = null
     }
+
 }

@@ -139,6 +139,8 @@
     <string name="contract_deals">Contracts / Deals</string>
     <string name="emis">EMIs</string>
     <string name="no_EMI_added_message">Click the add (+) button below to add an EMI</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 
 
     <string-array name="interest_time_schedule">

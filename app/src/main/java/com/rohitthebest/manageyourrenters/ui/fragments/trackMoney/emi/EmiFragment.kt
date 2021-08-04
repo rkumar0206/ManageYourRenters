@@ -65,11 +65,15 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener 
 
     override fun onItemClick(emi: EMI) {
 
-        TODO("Not yet implemented")
+        //TODO("Not yet implemented")
     }
 
     override fun onMenuBtnClicked(emi: EMI, position: Int) {
-        TODO("Not yet implemented")
+        //TODO("Not yet implemented")
+    }
+
+    override fun onSyncBtnClicked(emi: EMI, position: Int) {
+        //TODO("Not yet implemented")
     }
 
     private fun getEMIs() {

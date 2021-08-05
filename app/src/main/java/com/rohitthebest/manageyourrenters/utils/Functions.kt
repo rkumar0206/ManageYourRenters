@@ -389,7 +389,7 @@ class Functions {
             return urll
         }
 
-        fun openLinkInBrowser(context: Context, url: String?) {
+        private fun openLinkInBrowser(context: Context, url: String?) {
 
             if (isInternetAvailable(context)) {
                 url?.let {
@@ -414,23 +414,26 @@ class Functions {
         ) {
 
 
-            var title = "Download ${supportingDoc.documentName}"
+            val title: String
             val message: String
             var positiveBtnText = "Download"
 
             when (supportingDoc.documentType) {
 
                 DocumentType.PDF -> {
-                    message = "Download this pdf..."
+                    title = "Download PDF"
+                    message = "PDF name : ${supportingDoc.documentName}"
                 }
 
                 DocumentType.IMAGE -> {
-                    message = "Download this image"
+                    title = "Download Image"
+                    message = "Image name : ${supportingDoc.documentName}"
                 }
 
                 else -> {
-                    title = "Open ${supportingDoc.documentName} url in browser"
-                    message = "Open ${supportingDoc.documentUrl} in browser..."
+                    title = "Open url in browser"
+                    message = "Description : ${supportingDoc.documentName}" +
+                            "\nUrl :  ${supportingDoc.documentUrl} in browser..."
                     positiveBtnText = "Open"
                 }
             }

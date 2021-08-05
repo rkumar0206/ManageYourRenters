@@ -9,7 +9,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.EmiMenuBottomsheetLayoutBinding
 
-class EMIMenuItems : BottomSheetDialogFragment() {
+class EMIMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
 
     private var _binding: EmiMenuBottomsheetLayoutBinding? = null
     private val binding get() = _binding!!
@@ -30,30 +30,64 @@ class EMIMenuItems : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         _binding = EmiMenuBottomsheetLayoutBinding.bind(view)
 
-        binding.editEmiMenu.setOnClickListener {
-
-            mListener?.onEditMenuClick()
-            dismiss()
-        }
-
-        binding.deleteEmiMenu.setOnClickListener {
-
-            mListener?.onDeleteMenuClick()
-            dismiss()
-        }
-
-        binding.supportingDocumentMenu.setOnClickListener {
-
-            mListener?.onSupportingDocumentMenuClick()
-            dismiss()
-        }
+        intiListeners()
     }
+
+    private fun intiListeners() {
+
+        binding.editEmiMenu.setOnClickListener(this)
+        binding.deleteEmiMenu.setOnClickListener(this)
+        binding.viewOrDownloadSupportingDocumentMenu.setOnClickListener(this)
+        binding.replaceSupportingDocumentMenu.setOnClickListener(this)
+        binding.deleteSupportingDocumentMenu.setOnClickListener(this)
+    }
+
+    override fun onClick(v: View?) {
+
+        when (v?.id) {
+
+            binding.editEmiMenu.id -> {
+
+                mListener?.onEditMenuClick()
+                dismiss()
+            }
+
+            binding.deleteEmiMenu.id -> {
+
+                mListener?.onDeleteMenuClick()
+                dismiss()
+            }
+
+            binding.viewOrDownloadSupportingDocumentMenu.id -> {
+
+                mListener?.onViewSupportingDocumentMenuClick()
+                dismiss()
+            }
+
+            binding.replaceSupportingDocumentMenu.id -> {
+
+                mListener?.onReplaceSupportingDocumentClick()
+                dismiss()
+            }
+
+            binding.deleteSupportingDocumentMenu.id -> {
+
+                mListener?.onDeleteSupportingDocumentClick()
+                dismiss()
+            }
+
+        }
+
+    }
+
 
     interface OnItemClickListener {
 
         fun onEditMenuClick()
         fun onDeleteMenuClick()
-        fun onSupportingDocumentMenuClick()
+        fun onViewSupportingDocumentMenuClick()
+        fun onReplaceSupportingDocumentClick()
+        fun onDeleteSupportingDocumentClick()
     }
 
     fun setOnClickListener(listener: OnItemClickListener) {
@@ -76,4 +110,5 @@ class EMIMenuItems : BottomSheetDialogFragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }

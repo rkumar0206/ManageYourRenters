@@ -14,7 +14,9 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.rohitthebest.manageyourrenters.R
 
@@ -46,6 +48,28 @@ fun View.invisible() {
     } catch (e: Exception) {
         e.printStackTrace()
     }
+}
+
+fun RecyclerView.changeVisibilityOfFABOnScrolled(fab: FloatingActionButton) {
+
+    this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            try {
+                if (dy > 0 && fab.visibility == View.VISIBLE) {
+
+                    fab.hide()
+                } else if (dy < 0 && fab.visibility != View.VISIBLE) {
+
+                    fab.show()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    })
 }
 
 fun TextView.changeTextColor(context: Context, color: Int) {

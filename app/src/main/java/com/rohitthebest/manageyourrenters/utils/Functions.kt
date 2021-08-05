@@ -16,8 +16,11 @@ import androidx.fragment.app.FragmentManager
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -403,6 +406,60 @@ class Functions {
             } else {
                 showNoInternetMessage(context)
             }
+        }
+
+        fun onViewOrDownloadSupportingDocument(
+            activity: Activity,
+            supportingDoc: SupportingDocument
+        ) {
+
+
+            var title = "Download ${supportingDoc.documentName}"
+            val message: String
+            var positiveBtnText = "Download"
+
+            when (supportingDoc.documentType) {
+
+                DocumentType.PDF -> {
+                    message = "Download this pdf..."
+                }
+
+                DocumentType.IMAGE -> {
+                    message = "Download this image"
+                }
+
+                else -> {
+                    title = "Open ${supportingDoc.documentName} url in browser"
+                    message = "Open ${supportingDoc.documentUrl} in browser..."
+                    positiveBtnText = "Open"
+                }
+            }
+
+            MaterialAlertDialogBuilder(activity)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(positiveBtnText) { dialog, _ ->
+
+                    if (supportingDoc.documentType != DocumentType.URL) {
+
+                        downloadFileFromUrl(
+                            activity,
+                            supportingDoc.documentUrl,
+                            supportingDoc.documentName
+                        )
+                    } else {
+
+                        openLinkInBrowser(activity, supportingDoc.documentUrl)
+                    }
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+
+                    dialog.dismiss()
+                }
+                .create()
+                .show()
+
         }
 
     }

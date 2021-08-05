@@ -83,7 +83,7 @@
     <string name="borrowed_amount">Borrowed Amount</string>
     <string name="add_a_note_optional_n_n_n_n_n_n_n">Add a note.... (Optional) \n\n\n\n\n\n\n</string>
     <string name="select_date_button">select_date_button</string>
-    <string name="supporting_document">Supporting document</string>
+    <string name="supporting_document">View supporting document</string>
     <string name="interest">Interest</string>
     <string name="type">Type</string>
     <string name="edit_borrower">Edit Borrower</string>
@@ -141,6 +141,9 @@
     <string name="no_EMI_added_message">Click the add (+) button below to add an EMI</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="delete_supporting_document">Delete supporting document</string>
+    <string name="replace_supporting_document">Replace supporting document</string>
+    <string name="no_supporting_doc_added">No supporting document added!!!</string>
 
 
     <string-array name="interest_time_schedule">

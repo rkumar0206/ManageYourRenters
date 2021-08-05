@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -253,25 +252,10 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     private fun initListeners() {
 
         binding.addRenterFAB.setOnClickListener(this)
-        binding.rentersRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                try {
-                    if (dy > 0 && binding.addRenterFAB.visibility == View.VISIBLE) {
-
-                        binding.addRenterFAB.hide()
-                    } else if (dy < 0 && binding.addRenterFAB.visibility != View.VISIBLE) {
-
-                        binding.addRenterFAB.show()
-
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        })
+        binding.rentersRV.changeVisibilityOfFABOnScrolled(
+            binding.addRenterFAB
+        )
 
         binding.houseRentersHomeToolBar.setNavigationOnClickListener {
 

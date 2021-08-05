@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
@@ -648,25 +647,9 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         binding.deleteAllPaymentsBtn.setOnClickListener(this)
         binding.paymentBackBtn.setOnClickListener(this)
 
-        binding.paymentRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                try {
-                    if (dy > 0 && binding.addPyamentFAB.visibility == View.VISIBLE) {
-
-                        binding.addPyamentFAB.hide()
-                    } else if (dy < 0 && binding.addPyamentFAB.visibility != View.VISIBLE) {
-
-                        binding.addPyamentFAB.show()
-
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        })
+        binding.paymentRV.changeVisibilityOfFABOnScrolled(
+            binding.addPyamentFAB
+        )
     }
 
     override fun onClick(v: View?) {

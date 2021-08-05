@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.AdapterEmiBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
@@ -66,6 +67,14 @@ class EMIAdapter : ListAdapter<EMI, EMIAdapter.EMIViewHolder>(DiffUtilCallback()
                     emiAmountLeftTV.text =
                         "${e.amountPaidPerMonth * e.totalMonths} / ${e.amountPaid}"
                     monthsCompletedTV.text = "${e.totalMonths} / ${e.monthsCompleted}"
+
+                    if (e.isSynced) {
+
+                        emiSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                    } else {
+
+                        emiSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                    }
                 }
             }
         }

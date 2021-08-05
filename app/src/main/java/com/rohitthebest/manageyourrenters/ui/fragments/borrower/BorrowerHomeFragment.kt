@@ -57,6 +57,10 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
             delay(300)
             getAllBorrowers()
         }
+
+        binding.individualRentersRV.changeVisibilityOfFABOnScrolled(
+            binding.addIndividualRenterFAB
+        )
     }
 
     private fun getAllBorrowers() {

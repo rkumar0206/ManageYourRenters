@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.BorrowerPaymentAdapter
-import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
@@ -18,7 +17,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.openLinkInBrowser
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.onViewOrDownloadSupportingDocument
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -67,6 +66,10 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         borrowerPaymentAdapter = BorrowerPaymentAdapter()
 
         setUpRecyclerView()
+
+        binding.borrowerPaymentRV.changeVisibilityOfFABOnScrolled(
+            binding.addPaymentFAB
+        )
     }
 
 
@@ -228,56 +231,16 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
         if (!borrowerPayment.isSupportingDocAdded) {
 
-            showToast(requireContext(), "No document added!!!")
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
         } else {
 
-            val document = borrowerPayment.supportingDocument!!
+            borrowerPayment.supportingDocument?.let { supportingDoc ->
 
-            var title = "Download ${document.documentName}"
-            val message: String
-            var positiveBtnText = "Download"
-
-            when (document.documentType) {
-
-                DocumentType.PDF -> {
-                    message = "Download this pdf..."
-                }
-
-                DocumentType.IMAGE -> {
-                    message = "Download this image"
-                }
-
-                else -> {
-                    title = "Open ${document.documentName} url in browser"
-                    message = "Open ${document.documentUrl} in browser..."
-                    positiveBtnText = "Open"
-                }
+                onViewOrDownloadSupportingDocument(
+                    requireActivity(),
+                    supportingDoc
+                )
             }
-
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton(positiveBtnText) { dialog, _ ->
-
-                    if (document.documentType != DocumentType.URL) {
-
-                        downloadFileFromUrl(
-                            requireActivity(),
-                            document.documentUrl,
-                            document.documentName
-                        )
-                    } else {
-
-                        openLinkInBrowser(requireContext(), document.documentUrl)
-                    }
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-
-                    dialog.dismiss()
-                }
-                .create()
-                .show()
         }
     }
 

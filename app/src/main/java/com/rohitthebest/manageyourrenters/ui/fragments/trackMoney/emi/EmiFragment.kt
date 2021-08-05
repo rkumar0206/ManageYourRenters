@@ -16,8 +16,10 @@ import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.onViewOrDownloadSupportingDocument
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
 import com.rohitthebest.manageyourrenters.utils.fromEMIToString
 import com.rohitthebest.manageyourrenters.utils.searchText
 import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
@@ -109,6 +111,8 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
                 )
 
                 emiViewModel.updateEMI(emi)
+
+                emiAdapter.notifyItemChanged(position)
             } else {
 
                 showNoInternetMessage(requireContext())
@@ -130,7 +134,32 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
         //TODO("Not yet implemented")
     }
 
-    override fun onSupportingDocumentMenuClick() {
+    override fun onViewSupportingDocumentMenuClick() {
+
+        if (this::emiForMenuItems.isInitialized) {
+
+            if (!emiForMenuItems.isSupportingDocumentAdded) {
+
+                requireContext().showToast(getString(R.string.no_supporting_doc_added))
+            } else {
+
+                emiForMenuItems.supportingDocument?.let { supportingDoc ->
+
+                    onViewOrDownloadSupportingDocument(
+                        requireActivity(),
+                        supportingDoc
+                    )
+                }
+            }
+        }
+
+    }
+
+    override fun onReplaceSupportingDocumentClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDeleteSupportingDocumentClick() {
         //TODO("Not yet implemented")
     }
 
@@ -193,6 +222,10 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
             findNavController().navigate(R.id.action_emiFragment_to_addEditEMIFragment)
         }
+
+        binding.emiRV.changeVisibilityOfFABOnScrolled(
+            binding.addEmiCategoryFAB
+        )
     }
 
     private fun setProgressBarVisibility(isVisible: Boolean) {

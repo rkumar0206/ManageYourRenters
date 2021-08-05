@@ -63,7 +63,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/supporting_document_menu"
+        android:id="@+id/view_or_download_supporting_document_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:rippleColor="@color/rippleColor">
@@ -99,6 +99,90 @@
                 android:gravity="center_vertical"
                 android:padding="10dp"
                 android:text="@string/supporting_document"
+                android:textSize="18sp" />
+        </RelativeLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/replace_supporting_document_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:rippleColor="@color/rippleColor">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <ImageView
+                android:id="@+id/imageView123"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/image"
+                android:padding="10dp"
+                app:srcCompat="@drawable/ic_replace_or_change" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/imageView123"
+                android:layout_alignBottom="@+id/imageView123"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@+id/imageView123"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:text="@string/replace_supporting_document"
+                android:textSize="18sp" />
+        </RelativeLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/delete_supporting_document_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:rippleColor="@color/rippleColor">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <ImageView
+                android:id="@+id/imageView155"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/image"
+                android:padding="10dp"
+                app:srcCompat="@drawable/ic_baseline_delete_forever_24" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/imageView155"
+                android:layout_alignBottom="@+id/imageView155"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@+id/imageView155"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:text="@string/delete_supporting_document"
                 android:textSize="18sp" />
         </RelativeLayout>
 

@@ -15,8 +15,12 @@ import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.emiAdapter
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.fromEMIToString
 import com.rohitthebest.manageyourrenters.utils.searchText
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -87,7 +91,30 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
     }
 
     override fun onSyncBtnClicked(emi: EMI, position: Int) {
-        //TODO("Not yet implemented")
+
+        if (emi.isSynced) {
+
+            requireContext().showToast("Already synced")
+        } else {
+
+            if (isInternetAvailable(requireContext())) {
+
+                emi.isSynced = true
+
+                uploadDocumentToFireStore(
+                    requireContext(),
+                    fromEMIToString(emi),
+                    getString(R.string.emis),
+                    emi.key
+                )
+
+                emiViewModel.updateEMI(emi)
+            } else {
+
+                showNoInternetMessage(requireContext())
+            }
+        }
+
     }
 
     override fun onEditMenuClick() {

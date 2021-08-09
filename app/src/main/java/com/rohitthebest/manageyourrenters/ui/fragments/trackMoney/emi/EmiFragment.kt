@@ -10,19 +10,18 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.emiAdapters.EMIAdapter
+import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.onViewOrDownloadSupportingDocument
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
-import com.rohitthebest.manageyourrenters.utils.fromEMIToString
-import com.rohitthebest.manageyourrenters.utils.searchText
-import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -160,7 +159,59 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
     }
 
     override fun onDeleteSupportingDocumentClick() {
-        //TODO("Not yet implemented")
+
+        if (this::emiForMenuItems.isInitialized) {
+
+            if (emiForMenuItems.isSupportingDocumentAdded) {
+
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Are you sure?")
+                    .setMessage("After deleting you cannot retrieve it again.")
+                    .setPositiveButton("Yes") { dialog, _ ->
+
+                        if (emiForMenuItems.supportingDocument?.documentType != DocumentType.URL) {
+
+                            deleteFileFromFirebaseStorage(
+                                requireContext(),
+                                emiForMenuItems.supportingDocument?.documentUrl!!
+                            )
+
+                        }
+
+                        emiForMenuItems.isSupportingDocumentAdded = false
+                        emiForMenuItems.supportingDocument = null
+
+                        val map = HashMap<String, Any?>()
+                        map["supportingDocumentAdded"] = false
+                        map["supportingDocument"] = null
+
+                        updateDocumentOnFireStore(
+                            requireContext(),
+                            map,
+                            getString(R.string.emis),
+                            emiForMenuItems.key
+                        )
+
+                        emiViewModel.updateEMI(emiForMenuItems)
+
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("Cancel") { dialog, _ ->
+
+                        dialog.dismiss()
+                    }
+                    .create()
+                    .show()
+
+            } else {
+
+                requireContext().showToast(
+                    "No supporting document added!!!"
+                )
+            }
+        }
+
+
     }
 
     private fun getEMIs() {

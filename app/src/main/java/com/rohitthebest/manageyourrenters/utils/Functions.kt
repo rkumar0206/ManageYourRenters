@@ -1,8 +1,6 @@
 package com.rohitthebest.manageyourrenters.utils
 
 import android.app.Activity
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -64,7 +62,7 @@ class Functions {
             showToast(context, NO_INTERNET_MESSAGE)
         }
 
-        fun shareAsText(message: String?, subject: String?, context: Context) {
+        /*fun shareAsText(message: String?, subject: String?, context: Context) {
 
             val intent = Intent(Intent.ACTION_SEND)
             intent.type = "text/plain"
@@ -83,7 +81,7 @@ class Functions {
 
             clipboardManager.setPrimaryClip(clipData)
 
-        }
+        }*/
 
         fun hideKeyBoard(activity: Activity) {
 
@@ -375,34 +373,35 @@ class Functions {
 
         private fun checkUrl(url: String): String {
 
-            var urll = ""
-            try {
+            return try {
                 if (url.startsWith("https://") || url.startsWith("http://")) {
-                    urll = url
+                    url
                 } else if (url.trim().isNotEmpty()) {
-                    urll = "https://www.google.com/search?q=$url"
+                    "https://www.google.com/search?q=$url"
+                } else {
+                    ""
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                ""
             }
-
-            return urll
         }
 
-        private fun openLinkInBrowser(context: Context, url: String?) {
+        private fun openLinkInBrowser(context: Context, url: String) {
 
             if (isInternetAvailable(context)) {
-                url?.let {
 
-                    try {
-                        Log.d(TAG, "Loading Url in default browser.")
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(checkUrl(it)))
-                        context.startActivity(intent)
-                    } catch (e: Exception) {
-                        showToast(context, e.message.toString())
-                        e.printStackTrace()
-                    }
+                Log.d(TAG, "Loading Url in default browser.")
+
+                if (url.isValid()) {
+
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(checkUrl(url)))
+                    context.startActivity(intent)
+                } else {
+
+                    Toast.makeText(context, "Invalid url!!!", Toast.LENGTH_SHORT).show()
                 }
+
             } else {
                 showNoInternetMessage(context)
             }

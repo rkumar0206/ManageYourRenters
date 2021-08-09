@@ -25,6 +25,7 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddSupportingDocum
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_TAG_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.others.Constants.IS_DOCUMENT_FOR_EDITING_KEY
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -61,6 +62,9 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
     private var isDocumentAdded = false
 
+    private var isDocumentReceivedForEditing = false
+    private var docUrlForDeletingFromCloudStorage = ""
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -89,6 +93,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
             arguments?.let { bundle ->
 
+                isDocumentReceivedForEditing = bundle.getBoolean(IS_DOCUMENT_FOR_EDITING_KEY)
                 receivedCollectionTag = bundle.getString(COLLECTION_TAG_KEY, "")
                 getDocument(bundle.getString(DOCUMENT_KEY, ""))
 
@@ -109,11 +114,40 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
                 getString(R.string.emis) -> {
 
                     receivedEMI = fromStringToEMI(documentString)
+
+                    // checking if the supporting document was added previously and
+                    // if it was of type PDF or Image,
+                    // if true, then storing the document url to the variable for deleting it
+                    // from the cloud storage
+
+                    if (isDocumentReceivedForEditing) {
+
+                        if (receivedEMI.isSupportingDocumentAdded) {
+
+                            if (receivedEMI.supportingDocument?.documentType != DocumentType.URL) {
+
+                                docUrlForDeletingFromCloudStorage =
+                                    receivedEMI.supportingDocument?.documentUrl!!
+                            }
+                        }
+                    }
                 }
 
                 getString(R.string.borrowerPayments) -> {
 
                     receivedBorrowerPayment = fromStringToBorrowerPayment(documentString)
+
+                    if (isDocumentReceivedForEditing) {
+
+                        if (receivedBorrowerPayment.isSupportingDocAdded) {
+
+                            if (receivedBorrowerPayment.supportingDocument?.documentType != DocumentType.URL) {
+
+                                docUrlForDeletingFromCloudStorage =
+                                    receivedBorrowerPayment.supportingDocument?.documentUrl!!
+                            }
+                        }
+                    }
                 }
             }
 
@@ -129,7 +163,8 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
         binding.addSupportingDocToolbar.setNavigationOnClickListener {
 
-            //todo : close
+            isDocumentAdded = false
+            dismiss()
         }
 
         binding.addSupportingDocToolbar.menu.findItem(R.id.menu_save_btn)
@@ -201,6 +236,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
                 )
 
                 insertDocumentToDatabase(receivedEMI)
+
             }
 
             getString(R.string.borrowerPayments) -> {
@@ -246,7 +282,14 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
                     }
 
                     isDocumentAdded = true
-                    emiViewModel.insertEMI(emi)
+
+                    if (!isDocumentReceivedForEditing) {
+
+                        emiViewModel.insertEMI(emi)
+                    } else {
+
+                        emiViewModel.updateEMI(emi)
+                    }
 
                     dismiss()
 
@@ -277,11 +320,19 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
                     }
 
                     isDocumentAdded = true
-                    borrowerPaymentViewModel.insertBorrowerPayment(
-                        requireContext(),
-                        borrowerPayment
-                    )
 
+                    if (!isDocumentReceivedForEditing) {
+
+                        borrowerPaymentViewModel.insertBorrowerPayment(
+                            requireContext(),
+                            borrowerPayment
+                        )
+                    } else {
+
+                        borrowerPaymentViewModel.updateBorrowerPayment(
+                            borrowerPayment
+                        )
+                    }
                     dismiss()
                 } else {
 
@@ -295,6 +346,15 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
     private fun uploadFileToStorage(uploadData: String) {
 
         if (isInternetAvailable(requireContext())) {
+
+            if (docUrlForDeletingFromCloudStorage != "") {
+
+                deleteFileFromFirebaseStorage(
+                    requireContext(),
+                    docUrlForDeletingFromCloudStorage
+                )
+            }
+
             val fileNameForUploadingToStorage = if (docType == DocumentType.PDF) {
 
                 "${includeBinding.fileNameET.text.trim()}_${Functions.generateKey()}.pdf"

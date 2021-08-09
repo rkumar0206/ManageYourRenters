@@ -26,6 +26,7 @@ object Constants {
     const val FILE_URI_KEY = "sdjcjncjsbcjhbcu"
     const val COLLECTION_TAG_KEY = "tagdcbcnkascbabua"
     const val FILE_NAME_KEY = "FILE_cnsjcbhsbchsb"
+    const val IS_DOCUMENT_FOR_EDITING_KEY = "isDocumentForEditing"
 
     const val IS_SYNCED_SHARED_PREF_NAME = "IS_SYNCED_SHARED_PREF_NAME_fdkdnf"
     const val IS_SYNCED_SHARED_PREF_KEY = "IS_SYNCED_SHARED_PREF_KEY_fkjdvkjdbdnf"

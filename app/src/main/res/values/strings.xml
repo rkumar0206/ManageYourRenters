@@ -142,7 +142,7 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="delete_supporting_document">Delete supporting document</string>
-    <string name="replace_supporting_document">Replace supporting document</string>
+    <string name="replace_supporting_document">Add / Replace supporting document</string>
     <string name="no_supporting_doc_added">No supporting document added!!!</string>
 
 

@@ -132,6 +132,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
                         val bundle = Bundle()
                         bundle.putString(Constants.COLLECTION_TAG_KEY, getString(R.string.emis))
                         bundle.putString(Constants.DOCUMENT_KEY, fromEMIToString(emi))
+                        bundle.putBoolean(Constants.IS_DOCUMENT_FOR_EDITING_KEY, false)
 
                         AddSupportingDocumentBottomSheetFragment.newInstance(
                             bundle

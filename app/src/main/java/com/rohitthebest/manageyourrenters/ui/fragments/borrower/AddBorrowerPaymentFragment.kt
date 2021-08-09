@@ -22,6 +22,7 @@ import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_TAG_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.others.Constants.IS_DOCUMENT_FOR_EDITING_KEY
 import com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBottomSheetFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
@@ -339,6 +340,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                         val bundle = Bundle()
                         bundle.putString(COLLECTION_TAG_KEY, getString(R.string.borrowerPayments))
                         bundle.putString(DOCUMENT_KEY, fromBorrowerPaymentToString(borrowerPayment))
+                        bundle.putBoolean(IS_DOCUMENT_FOR_EDITING_KEY, false)
 
                         AddSupportingDocumentBottomSheetFragment.newInstance(
                             bundle

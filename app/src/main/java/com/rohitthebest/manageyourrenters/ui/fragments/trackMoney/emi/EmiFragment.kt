@@ -137,7 +137,39 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
     }
 
     override fun onDeleteMenuClick() {
-        //TODO("Not yet implemented")
+
+        if (this::emiForMenuItems.isInitialized) {
+
+            showAlertDialogForDeletion(
+                requireContext(),
+                {
+
+                    if (!emiForMenuItems.isSynced) {
+
+                        //todo : modify the delete method for deleting the emi payments of this emi
+                        emiViewModel.deleteEMI(
+                            emiForMenuItems
+                        )
+                    } else {
+
+                        if (isInternetAvailable(requireContext())) {
+
+                            emiViewModel.deleteEMI(
+                                emiForMenuItems
+                            )
+                        } else {
+
+                            showNoInternetMessage(requireContext())
+                        }
+                    }
+                },
+                { dialog ->
+
+                    dialog.dismiss()
+                }
+            )
+        }
+
     }
 
     override fun onViewSupportingDocumentMenuClick() {

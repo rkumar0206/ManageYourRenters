@@ -21,6 +21,7 @@ import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -42,6 +43,11 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
     private var selectedCurrencySymbol = ""
     private var selectedEMIStartDate: Long = 0L
 
+    //editing vars
+    private var isMessageReceivedForEditing = false
+    private var receivedEmiKey = ""
+    private lateinit var receivedEmi: EMI
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAddEmiBinding.bind(view)
@@ -58,8 +64,63 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
         initListeners()
         textWatcher()
         setUpCurrencySymbolSpinner()
+
+        lifecycleScope.launch {
+
+            delay(150)
+            getMessage()
+        }
+
     }
 
+    private fun getMessage() {
+
+        if (!arguments?.isEmpty!!) {
+
+            val args = arguments?.let {
+
+                AddEditEMIFragmentArgs.fromBundle(it)
+            }
+
+            receivedEmiKey = args?.emiKey!!
+            isMessageReceivedForEditing = true
+            getEmi()
+        }
+    }
+
+    private fun getEmi() {
+
+        emiViewModel.getEMIByKey(receivedEmiKey).observe(viewLifecycleOwner, {
+
+            receivedEmi = it
+
+            updateUI()
+        })
+    }
+
+    private fun updateUI() {
+
+        if (this::receivedEmi.isInitialized) {
+
+            includeBinding.apply {
+
+                emiNameET.editText?.setText(receivedEmi.emiName)
+                emiStartDateTV.setDateInTextView(
+                    receivedEmi.startDate
+                )
+                selectedEMIStartDate = receivedEmi.startDate
+
+                selectedCurrencySymbol = receivedEmi.currencySymbol
+                moneySymbolSpinner.setSelection(currencySymbolList.indexOf(receivedEmi.currencySymbol))
+
+                totalEmiMonthsET.setText(receivedEmi.totalMonths.toString())
+                numberOfMonthsCompltedET.setText(receivedEmi.monthsCompleted.toString())
+                emiAmountPerMonthET.setText(receivedEmi.amountPaidPerMonth.toString())
+                calculateTotalEmiAmount()
+                emiAmountPaidET.setText(receivedEmi.amountPaid.toString())
+            }
+        }
+    }
 
     private fun initListeners() {
 
@@ -83,14 +144,21 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
     private fun initEMI() {
 
-        val emi = EMI()
+        var emi = EMI()
+
+        if (isMessageReceivedForEditing) {
+
+            emi = receivedEmi
+        }
 
         emi.modified = System.currentTimeMillis()
         emi.isSynced = false
 
         emi.apply {
 
-            created = System.currentTimeMillis()
+            created =
+                if (!isMessageReceivedForEditing) System.currentTimeMillis() else receivedEmi.created
+
             emiName = includeBinding.emiNameET.editText?.text.toString().trim()
             startDate = selectedEMIStartDate
             totalMonths = includeBinding.totalEmiMonthsET.text.toString().toInt()
@@ -99,11 +167,17 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
             amountPaid = includeBinding.emiAmountPaidET.text.toString().toDouble()
             currencySymbol = selectedCurrencySymbol
             uid = getUid()!!
-            key = generateKey("_${uid}")
+
+            key = if (!isMessageReceivedForEditing) generateKey("_${uid}") else receivedEmi.key
         }
 
-        showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(emi)
+        if (!isMessageReceivedForEditing) {
 
+            showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(emi)
+        } else {
+
+            insertToDatabase(emi)
+        }
     }
 
     private fun showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(emi: EMI) {
@@ -169,10 +243,23 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         Log.d(TAG, "insertToDatabase: ")
 
-        emi.isSupportingDocumentAdded = false
-        if (isInternetAvailable(requireContext())) {
+        emi.isSynced = isInternetAvailable(requireContext())
 
-            emi.isSynced = true
+        if (!isMessageReceivedForEditing) {
+
+            emi.isSupportingDocumentAdded = false
+
+            emiViewModel.insertEMI(emi)
+            Log.d(TAG, "insertToDatabase: EMI inserted")
+        } else {
+
+            emiViewModel.updateEMI(emi)
+            requireContext().showToast(
+                "EMI details updated"
+            )
+        }
+
+        if (emi.isSynced) {
 
             uploadDocumentToFireStore(
                 requireContext(),
@@ -180,13 +267,8 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
                 getString(R.string.emis),
                 emi.key
             )
-        } else {
-
-            emi.isSynced = false
         }
 
-        emiViewModel.insertEMI(emi)
-        Log.d(TAG, "insertToDatabase: EMI inserted")
 
         requireActivity().onBackPressed()
     }
@@ -256,7 +338,6 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         return true
     }
-
 
     private fun setUpCurrencySymbolSpinner() {
 

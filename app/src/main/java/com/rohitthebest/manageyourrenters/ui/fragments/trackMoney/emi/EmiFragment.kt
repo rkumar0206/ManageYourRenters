@@ -128,8 +128,11 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
         if (this::emiForMenuItems.isInitialized) {
 
-            requireContext().showToast(emiForMenuItems.emiName)
-            //TODO("Not yet implemented")
+            val action = EmiFragmentDirections.actionEmiFragmentToAddEditEMIFragment(
+                emiForMenuItems.key
+            )
+
+            findNavController().navigate(action)
         }
     }
 
@@ -179,7 +182,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
     //          |
     //          |
     override fun onBottomSheetDismissed(isDocumentAdded: Boolean) {
-        //TODO("Not yet implemented")
+        //("Not yet implemented")
     }
 
     override fun onDeleteSupportingDocumentClick() {

@@ -36,5 +36,10 @@
         android:id="@+id/addEditEMIFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi.AddEditEMIFragment"
         android:label="AddEditEMIFragment"
-        tools:layout="@layout/fragment_add_emi" />
+        tools:layout="@layout/fragment_add_emi">
+        <argument
+            android:name="emiKey"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 </navigation>

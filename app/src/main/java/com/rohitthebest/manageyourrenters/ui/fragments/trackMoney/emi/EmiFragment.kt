@@ -33,8 +33,7 @@ private const val TAG = "EmiFragment"
 
 @AndroidEntryPoint
 class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
-    EMIMenuItems.OnItemClickListener,
-    AddSupportingDocumentBottomSheetFragment.OnBottomSheetDismissListener {
+    EMIMenuItems.OnItemClickListener {
 
     private var _binding: FragmentEmiBinding? = null
     private val binding get() = _binding!!
@@ -206,15 +205,9 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
                 bundle
             ).apply {
                 show(it, "AddSupportingDocTag")
-            }.setOnBottomSheetDismissListener(this)
+            }
         }
 
-    }//_________
-
-    //          |
-    //          |
-    override fun onBottomSheetDismissed(isDocumentAdded: Boolean) {
-        //("Not yet implemented")
     }
 
     override fun onDeleteSupportingDocumentClick() {

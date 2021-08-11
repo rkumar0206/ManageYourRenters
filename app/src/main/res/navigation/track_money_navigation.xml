@@ -31,6 +31,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_emiFragment_to_EMIPaymentFragment"
+            app:destination="@id/EMIPaymentFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/addEditEMIFragment"
@@ -42,4 +49,9 @@
             app:argType="string"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/EMIPaymentFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi.EMIPaymentFragment"
+        android:label="EMIPaymentFragment"
+        tools:layout="@layout/fragment_emi_payment" />
 </navigation>

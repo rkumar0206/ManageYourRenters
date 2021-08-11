@@ -54,6 +54,6 @@
         android:contentDescription="@string/addemicategoryfab"
         android:src="@drawable/ic_baseline_add_24"
         android:tooltipText="Add EMI category"
-        tools:ignore="UnusedAttribute" />
+        tools:targetApi="o" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

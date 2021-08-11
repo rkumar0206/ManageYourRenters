@@ -144,6 +144,8 @@
     <string name="delete_supporting_document">Delete supporting document</string>
     <string name="replace_supporting_document">Add / Replace supporting document</string>
     <string name="no_supporting_doc_added">No supporting document added!!!</string>
+    <string name="no_payments_made_for_this_emi">No payments made for this EMI. Click the (+) button for adding payments</string>
+    <string name="add_emi_payment">Add EMI payment</string>
 
 
     <string-array name="interest_time_schedule">

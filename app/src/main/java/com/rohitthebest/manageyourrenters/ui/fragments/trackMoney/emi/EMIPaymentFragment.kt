@@ -31,7 +31,10 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
         shouldShowProgressBar(true)
 
         getMessage()
+
+        initListeners()
     }
+
 
     private fun getMessage() {
 
@@ -44,6 +47,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
 
             receivedEMIKey = args?.emiKeyMessage!!
 
+            getEMIPayments()
             getEMI()
 
         }
@@ -54,14 +58,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
         emiViewModel.getEMIByKey(receivedEMIKey).observe(viewLifecycleOwner, { emi ->
 
             receivedEMI = emi
-            updateEmiUI()
-            getEMIPayments()
         })
-    }
-
-    private fun updateEmiUI() {
-
-        //todo : update the emi ui
     }
 
     private fun getEMIPayments() {
@@ -81,6 +78,22 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
             shouldShowProgressBar(false)
         })
     }
+
+    private fun initListeners() {
+
+        binding.emiPaymentToolbar.setNavigationOnClickListener {
+
+            requireActivity().onBackPressed()
+        }
+
+        binding.emiPaymentToolbar.menu.findItem(R.id.menu_show_emi_details)
+            .setOnMenuItemClickListener {
+
+                // todo : show bottom sheet showing emi details
+                true
+            }
+    }
+
 
     private fun shouldShowProgressBar(isVisible: Boolean) {
 

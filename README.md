@@ -50,3 +50,18 @@ After adding the borrower payment, you can mark it finish by either marking it a
 
 ---
 ### Track your money
+
+This category again contains some more catgeories :
+
+-[EMI](emi)
+-[Loan](loan)
+-[Contracts/Deals](contracts-deals)
+-[Others](others)
+
+### EMI
+
+### Loan
+
+### Contracts / Deals
+
+### Others

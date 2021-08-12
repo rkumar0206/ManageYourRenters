@@ -58,5 +58,18 @@
             android:name="emiKeyMessage"
             app:argType="string"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_EMIPaymentFragment_to_emiDetailsBottomSheetFragment"
+            app:destination="@id/emiDetailsBottomSheetFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/emiDetailsBottomSheetFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi.EmiDetailsBottomSheetFragment"
+        android:label="EmiDetailsBottomSheetFragment"
+        tools:layout="@layout/fragment_emi_details_bottomsheet">
+        <argument
+            android:name="emiKeyMessage"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
 </navigation>

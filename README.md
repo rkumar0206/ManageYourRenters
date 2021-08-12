@@ -27,7 +27,7 @@ After adding a renter, you can track his payments.
 
 For adding the payment of a renter you just need to:
 
-**_select the renter_** -> **_click on add payment button_** -> **_fill the details_** -> **_and the Payment is added_**
+**_select the renter_** -> **_click on add payment button_** -> **_fill the details_** -> **_click the save button_**
 
 I have provided every possible fields in the payment which you can fill and keep track of.
 

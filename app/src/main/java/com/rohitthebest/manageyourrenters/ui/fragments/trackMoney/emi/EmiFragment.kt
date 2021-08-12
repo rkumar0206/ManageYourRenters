@@ -75,7 +75,9 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
     override fun onItemClick(emi: EMI) {
 
-        //TODO("Not yet implemented")
+        val action = EmiFragmentDirections.actionEmiFragmentToEMIPaymentFragment(emi.key)
+
+        findNavController().navigate(action)
     }
 
     private lateinit var emiForMenuItems: EMI

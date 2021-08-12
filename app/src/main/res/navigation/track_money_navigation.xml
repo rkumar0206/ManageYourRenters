@@ -53,5 +53,10 @@
         android:id="@+id/EMIPaymentFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi.EMIPaymentFragment"
         android:label="EMIPaymentFragment"
-        tools:layout="@layout/fragment_emi_payment" />
+        tools:layout="@layout/fragment_emi_payment">
+        <argument
+            android:name="emiKeyMessage"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 </navigation>

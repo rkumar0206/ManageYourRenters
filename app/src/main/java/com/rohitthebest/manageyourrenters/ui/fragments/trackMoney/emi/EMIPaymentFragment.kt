@@ -7,10 +7,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
-import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,10 +18,8 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
     private val binding get() = _binding!!
 
     private val emiPaymentViewModel by viewModels<EMIPaymentViewModel>()
-    private val emiViewModel by viewModels<EMIViewModel>()
 
     private var receivedEMIKey = ""
-    private lateinit var receivedEMI: EMI
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

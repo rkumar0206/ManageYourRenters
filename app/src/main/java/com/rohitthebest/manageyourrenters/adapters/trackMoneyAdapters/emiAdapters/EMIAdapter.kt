@@ -64,9 +64,11 @@ class EMIAdapter : ListAdapter<EMI, EMIAdapter.EMIViewHolder>(DiffUtilCallback()
                             e.created
                         )
                     }"
-                    emiAmountLeftTV.text =
-                        "${e.amountPaidPerMonth * e.totalMonths} / ${e.amountPaid}"
-                    monthsCompletedTV.text = "${e.totalMonths} / ${e.monthsCompleted}"
+
+                    emiAmountPaidTV.text =
+                        "${e.currencySymbol} ${e.amountPaid} / ${e.currencySymbol} ${e.amountPaidPerMonth * e.totalMonths}"
+
+                    monthsCompletedTV.text = "${e.monthsCompleted} / ${e.totalMonths}"
 
                     if (e.isSynced) {
 

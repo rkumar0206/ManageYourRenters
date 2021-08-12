@@ -132,7 +132,7 @@
     <string name="total_months_for_which_emi_is_taken">Total months for which EMI is taken</string>
     <string name="number_of_months_completed_till_now">Number of months completed till now</string>
     <string name="amount_per_month">Amount per month</string>
-    <string name="amount_to_paid_per_month">Amount to paid per month</string>
+    <string name="amount_to_paid_per_month">Amount to be paid per month</string>
     <string name="total_emi_amount_total_months_amount_per_month">Total EMI amount (total months * amount per month)</string>
     <string name="amount_paid_till_now_optional">Amount paid till now (Optional)</string>
     <string name="amount_paid_till_now">Amount paid till now</string>
@@ -148,6 +148,8 @@
     <string name="no_payments_made_for_this_emi">No payments made for this EMI. Click the (+) button for adding payments</string>
     <string name="add_emi_payment">Add EMI payment</string>
     <string name="show_emi_details">Show EMI details</string>
+    <string name="months_completed_">Months completed :</string>
+    <string name="amount_paid_">Amount Paid:</string>
 
 
     <string-array name="interest_time_schedule">

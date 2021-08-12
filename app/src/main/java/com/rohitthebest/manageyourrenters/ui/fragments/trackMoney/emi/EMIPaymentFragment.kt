@@ -49,17 +49,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
             receivedEMIKey = args?.emiKeyMessage!!
 
             getEMIPayments()
-            getEMI()
-
         }
-    }
-
-    private fun getEMI() {
-
-        emiViewModel.getEMIByKey(receivedEMIKey).observe(viewLifecycleOwner, { emi ->
-
-            receivedEMI = emi
-        })
     }
 
     private fun getEMIPayments() {

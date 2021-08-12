@@ -54,7 +54,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
         lifecycleScope.launch {
 
-            delay(200)
+            delay(400)
             getEMIs()
         }
 

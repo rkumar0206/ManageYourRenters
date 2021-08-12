@@ -5,6 +5,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiPaymentBinding
@@ -73,7 +74,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
                 shouldShowNoEMIPaymentAddedTV(false)
             }
 
-            // adapter.submit list
+            //todo : adapter.submit list
 
             shouldShowProgressBar(false)
         })
@@ -89,7 +90,12 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
         binding.emiPaymentToolbar.menu.findItem(R.id.menu_show_emi_details)
             .setOnMenuItemClickListener {
 
-                // todo : show bottom sheet showing emi details
+                val action =
+                    EMIPaymentFragmentDirections.actionEMIPaymentFragmentToEmiDetailsBottomSheetFragment(
+                        receivedEMIKey
+                    )
+                findNavController().navigate(action)
+
                 true
             }
     }

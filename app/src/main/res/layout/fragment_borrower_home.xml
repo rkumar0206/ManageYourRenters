@@ -27,6 +27,13 @@
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addIndividualRenterFAB"
         android:layout_width="wrap_content"
@@ -35,12 +42,6 @@
         android:layout_margin="16dp"
         android:contentDescription="@string/add_borrower"
         android:src="@drawable/ic_baseline_add_24" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
 
     <TextView
         android:id="@+id/no_borrowers_added_messageTV"

@@ -54,7 +54,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
         lifecycleScope.launch {
 
-            delay(300)
+            delay(400)
             getAllBorrowers()
         }
 

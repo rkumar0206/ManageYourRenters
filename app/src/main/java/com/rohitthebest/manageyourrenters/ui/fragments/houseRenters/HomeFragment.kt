@@ -69,7 +69,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         lifecycleScope.launch {
 
-            delay(350)
+            delay(400)
 
             withContext(Dispatchers.Main) {
 

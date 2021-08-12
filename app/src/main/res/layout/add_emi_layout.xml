@@ -316,7 +316,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="8dp"
-                android:text="@string/amount_paid_till_now"
+                android:text="@string/amount_paid_till_now_optional"
                 android:textColor="#1976D2"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"

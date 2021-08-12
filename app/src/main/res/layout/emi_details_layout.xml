@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView60"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/start_date_of_the_emi"
+        android:textColor="#1976D2"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emi_name_TV" />
+
+    <TextView
+        android:id="@+id/textView66"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="months completed / total months"
+        android:textColor="#1976D2"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/startEmiDateTV" />
+
+    <TextView
+        android:id="@+id/textView69"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/amount_to_paid_per_month"
+        android:textColor="#1976D2"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/monthsCompletedByTotalMonthsTV" />
+
+    <TextView
+        android:id="@+id/textView71"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/total_emi_amount_total_months_amount_per_month"
+        android:textColor="#1976D2"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emiAmountPaidPerMonthTV" />
+
+    <TextView
+        android:id="@+id/textView73"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/amount_paid_till_now"
+        android:textColor="#1976D2"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/totalEmiAmountTV" />
+
+    <TextView
+        android:id="@+id/textView41"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/emi_name"
+        android:textColor="#1976D2"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/emi_name_TV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="4dp"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/textView41"
+        app:layout_constraintTop_toBottomOf="@+id/textView41"
+        tools:text="Car emi" />
+
+    <TextView
+        android:id="@+id/startEmiDateTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="4dp"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/textView60"
+        app:layout_constraintTop_toBottomOf="@+id/textView60"
+        tools:text="@string/_02_06_2000" />
+
+    <TextView
+        android:id="@+id/monthsCompletedByTotalMonthsTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="4dp"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/textView66"
+        app:layout_constraintTop_toBottomOf="@+id/textView66"
+        tools:text="50 / 84" />
+
+    <TextView
+        android:id="@+id/emiAmountPaidPerMonthTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="4dp"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/textView66"
+        app:layout_constraintTop_toBottomOf="@+id/textView69"
+        tools:text="5000" />
+
+    <TextView
+        android:id="@+id/totalEmiAmountTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="4dp"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/textView71"
+        app:layout_constraintTop_toBottomOf="@+id/textView71"
+        tools:text="5 * 2000 = 10000" />
+
+    <TextView
+        android:id="@+id/emiAmountPaidTillNowTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="4dp"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/textView73"
+        app:layout_constraintTop_toBottomOf="@+id/textView73"
+        tools:text="5000" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

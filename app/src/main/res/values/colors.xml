@@ -26,4 +26,6 @@
     <color name="color_white">#FFFFFF</color>
     <color name="divider_color">#79A0A0A0</color>
 
+    <color name="blue_text_color">#1976D2</color>
+
 </resources>

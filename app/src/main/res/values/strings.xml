@@ -150,6 +150,12 @@
     <string name="show_emi_details">Show EMI details</string>
     <string name="months_completed_">Months completed :</string>
     <string name="amount_paid_">Amount Paid:</string>
+    <string name="paid_on">Paid on</string>
+    <string name="till_month">Till month</string>
+    <string name="for_the_month_s">For the month(s)</string>
+    <string name="current_status">Current status :</string>
+    <string name="from_month">From month</string>
+    <string name="total_amount_paid">Total amount paid</string>
 
 
     <string-array name="interest_time_schedule">

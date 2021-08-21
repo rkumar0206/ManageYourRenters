@@ -87,7 +87,11 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
 
         binding.addEmiPaymentFAB.setOnClickListener {
 
-            findNavController().navigate(R.id.action_EMIPaymentFragment_to_addEmiPaymentFragment)
+            val action =
+                EMIPaymentFragmentDirections.actionEMIPaymentFragmentToAddEmiPaymentFragment(
+                    receivedEMIKey
+                )
+            findNavController().navigate(action)
         }
     }
 

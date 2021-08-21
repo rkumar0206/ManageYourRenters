@@ -83,8 +83,6 @@ class BorrowerPaymentViewModel @Inject constructor(
 
     fun insertBorrowerPayments(borrowerPayments: List<BorrowerPayment>) = viewModelScope.launch {
         borrowerPaymentRepository.insertAllBorrowerPayment(borrowerPayments)
-
-
     }
 
     fun updateBorrowerPayment(borrowerPayment: BorrowerPayment) = viewModelScope.launch {
@@ -131,6 +129,7 @@ class BorrowerPaymentViewModel @Inject constructor(
             borrowerPaymentRepository.deleteBorrowerPayment(borrowerPayment)
             partialPaymentRepository.deleteAllPartialPaymentByBorrowerPaymentKey(borrowerPayment.key)
         }
+
 
     fun deleteAllBorrowerPayments() = viewModelScope.launch {
         borrowerPaymentRepository.deleteAllBorrowerPayments()

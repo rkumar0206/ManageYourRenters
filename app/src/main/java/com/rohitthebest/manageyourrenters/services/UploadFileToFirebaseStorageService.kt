@@ -245,42 +245,52 @@ class UploadFileToFirebaseStorageService : Service() {
 
     private suspend fun updateBorrowerDueAmount(borrowerPayment: BorrowerPayment) {
 
-        borrowerRepository.getBorrowerByKey(borrowerPayment.borrowerKey).collect { borrower ->
+        CoroutineScope(Dispatchers.IO).launch {
 
-            borrowerPaymentRepository.getTotalDueOfTheBorrower(borrowerPayment.borrowerKey)
-                .collect { value ->
+            try {
+                borrowerRepository.getBorrowerByKey(borrowerPayment.borrowerKey)
+                    .collect { borrower ->
 
-                    borrower.totalDueAmount = value
-                    borrower.modified = System.currentTimeMillis()
+                        borrowerPaymentRepository.getTotalDueOfTheBorrower(borrowerPayment.borrowerKey)
+                            .collect { value ->
 
-                    val map = HashMap<String, Any?>()
-                    map["totalDueAmount"] = value
+                                borrower.totalDueAmount = value
+                                borrower.modified = System.currentTimeMillis()
 
-                    val docRef = FirebaseFirestore.getInstance()
-                        .collection(applicationContext.getString(R.string.borrowers))
-                        .document(borrower.key)
+                                val map = HashMap<String, Any?>()
+                                map["totalDueAmount"] = value
 
-                    if (borrower.isSynced) {
+                                val docRef = FirebaseFirestore.getInstance()
+                                    .collection(applicationContext.getString(R.string.borrowers))
+                                    .document(borrower.key)
 
-                        // if the document was synced previously update the document else insert
-                        // it to the firestore
-                        updateDocumentOnFireStore(
-                            docRef,
-                            map
-                        )
+                                if (borrower.isSynced) {
 
-                    } else {
+                                    // if the document was synced previously update the document else insert
+                                    // it to the firestore
+                                    updateDocumentOnFireStore(
+                                        docRef,
+                                        map
+                                    )
 
-                        borrower.isSynced = true
+                                } else {
 
-                        insertToFireStore(
-                            docRef,
-                            borrower
-                        )
+                                    borrower.isSynced = true
+
+                                    insertToFireStore(
+                                        docRef,
+                                        borrower
+                                    )
+                                }
+
+                                borrowerRepository.update(borrower)
+                            }
+
+                        return@collect
                     }
-
-                    borrowerRepository.update(borrower)
-                }
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
+            }
         }
 
     }

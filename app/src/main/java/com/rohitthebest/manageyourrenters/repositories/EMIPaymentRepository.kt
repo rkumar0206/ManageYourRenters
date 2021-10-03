@@ -33,4 +33,6 @@ class EMIPaymentRepository @Inject constructor(
     fun getEMIPaymentByKey(emiPaymentKey: String) = dao.getEMIPaymentByKey(emiPaymentKey)
 
     fun getEmiPaymentsKeysByEMIKey(emiKey: String) = dao.getEmiPaymentsKeysByEMIKey(emiKey)
+
+    fun getTotalAmountPaidOfAnEMI(emiKey: String) = dao.getTotalAmountPaidOfAnEMI(emiKey)
 }

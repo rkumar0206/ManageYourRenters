@@ -14,6 +14,7 @@ import com.google.firebase.storage.StorageReference
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.database.model.EMI
+import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.FILE_NAME_KEY
@@ -215,6 +216,18 @@ class UploadFileToFirebaseStorageService : Service() {
                             emiRepository.insertEMI(emi)
                             insertDocument(emi, emi.key)
                         }
+
+                        getString(R.string.emiPayments) -> {
+
+                            val emiPayment = document as EMIPayment
+
+                            emiPayment.supportingDocument?.documentUrl = downloadUrl
+                            emiPayment.isSynced = true
+
+                            emiPaymentRepository.insertEMIPayment(emiPayment)
+                            insertDocument(emiPayment, emiPayment.key)
+                            updateEMIForAmountPaidAndTotalMonthsCompleted(emiPayment)
+                        }
                     }
                 }
             },
@@ -232,6 +245,7 @@ class UploadFileToFirebaseStorageService : Service() {
             }
         )
     }
+
 
     private suspend fun insertDocument(uploadDocument: Any, docKey: String) {
 
@@ -255,6 +269,64 @@ class UploadFileToFirebaseStorageService : Service() {
             stopSelf()
         }
 
+    }
+
+    private fun updateEMIForAmountPaidAndTotalMonthsCompleted(emiPayment: EMIPayment) {
+
+        // todo : update emi amount paid and total months completed
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            try {
+
+                emiRepository.getEMIByKey(emiPayment.emiKey)
+                    .collect { emi ->
+
+                        emiPaymentRepository.getTotalAmountPaidOfAnEMI(emi.key)
+                            .collect { value ->
+
+                                emi.amountPaid = value
+                                emi.monthsCompleted = emiPayment.tillMonth
+                                emi.modified = System.currentTimeMillis()
+
+                                val map = HashMap<String, Any?>()
+                                map["amountPaid"] = value
+                                map["monthsCompleted"] = emiPayment.tillMonth
+                                map["modified"] = System.currentTimeMillis()
+
+                                val docRef = FirebaseFirestore.getInstance()
+                                    .collection(getString(R.string.emis))
+                                    .document(emi.key)
+
+
+                                if (emi.isSynced) {
+
+                                    updateDocumentOnFireStore(
+                                        docRef,
+                                        map
+                                    )
+                                } else {
+
+                                    emi.isSynced = true
+
+                                    insertToFireStore(
+                                        docRef,
+                                        emi
+                                    )
+                                }
+
+                                emiRepository.updateEMI(emi)
+
+                            }
+
+                        return@collect
+                    }
+
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
+            }
+
+        }
     }
 
     private suspend fun updateBorrowerDueAmount(borrowerPayment: BorrowerPayment) {

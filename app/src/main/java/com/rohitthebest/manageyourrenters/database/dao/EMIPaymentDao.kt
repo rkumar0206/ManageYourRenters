@@ -41,4 +41,8 @@ interface EMIPaymentDao {
     // this will return the keys of emi payments of a particular EMI
     @Query("SELECT (`key`) FROM emi_payment_table WHERE emiKey =:emiKey")
     fun getEmiPaymentsKeysByEMIKey(emiKey: String): List<String>
+
+    // get total emi amount paid
+    @Query("SELECT SUM(amountPaid) as total FROM emi_payment_table WHERE emiKey =:emiKey")
+    fun getTotalAmountPaidOfAnEMI(emiKey: String): Flow<Double>
 }

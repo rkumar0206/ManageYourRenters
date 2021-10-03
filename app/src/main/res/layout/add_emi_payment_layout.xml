@@ -232,7 +232,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="1dp"
                 android:layout_marginTop="3dp"
-                android:text="@string/total_amount_paid"
+                android:text="@string/amount_paying"
                 android:textColor="#1976D2"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="parent"

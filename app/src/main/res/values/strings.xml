@@ -155,7 +155,7 @@
     <string name="for_the_month_s">For the month(s)</string>
     <string name="current_status">Current status :</string>
     <string name="from_month">From month</string>
-    <string name="total_amount_paid">Total amount paid</string>
+    <string name="amount_paying">Amount Paying</string>
     <string name="emiPayments">EMI_Payments</string>
 
 

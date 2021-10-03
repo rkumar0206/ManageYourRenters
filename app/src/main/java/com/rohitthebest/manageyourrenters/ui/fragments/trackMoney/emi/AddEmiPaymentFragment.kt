@@ -347,7 +347,20 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
                 includeBinding.emiPaymentAmountPaidET.error = EDIT_TEXT_EMPTY_MESSAGE
             } else {
 
-                includeBinding.emiPaymentAmountPaidET.error = null
+                val totalEMIAmountLeft =
+                    (receivedEMI.amountPaidPerMonth * receivedEMI.totalMonths) - receivedEMI.amountPaid
+
+                val amount = includeBinding.emiPaymentAmountPaidET.editText?.text.toString().trim()
+                    .toDouble()
+
+                if (amount > totalEMIAmountLeft) {
+
+                    includeBinding.emiPaymentAmountPaidET.error =
+                        "Should be less than or equal to ${receivedEMI.currencySymbol} $totalEMIAmountLeft"
+                } else {
+
+                    includeBinding.emiPaymentAmountPaidET.error = null
+                }
             }
         }
 

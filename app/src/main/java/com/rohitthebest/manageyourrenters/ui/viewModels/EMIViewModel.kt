@@ -28,7 +28,7 @@ class EMIViewModel @Inject constructor(
 
     fun deleteEMI(emi: EMI) = viewModelScope.launch {
 
-        //todo : modify the delete method for deleting the emi payments of this emi
+        //todo : modify the delete method for deleting the emi payments of this emi and the supporting documents
         repository.deleteEMI(emi)
     }
 

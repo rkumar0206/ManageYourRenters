@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -14,8 +15,11 @@ class EMIPaymentViewModel @Inject constructor(
     private val repository: EMIPaymentRepository
 ) : ViewModel() {
 
-    fun insertEMIPayment(emiPayment: EMIPayment) = viewModelScope.launch {
+    fun insertEMIPayment(context: Context, emiPayment: EMIPayment) = viewModelScope.launch {
         repository.insertEMIPayment(emiPayment)
+
+        // todo : update the total month completed and amount paid of EMI
+
     }
 
     fun insertAllEMIPayment(emiPayments: List<EMIPayment>) = viewModelScope.launch {

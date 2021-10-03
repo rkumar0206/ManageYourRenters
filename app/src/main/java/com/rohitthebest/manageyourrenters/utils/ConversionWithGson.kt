@@ -79,3 +79,14 @@ fun fromStringToEMI(str: String): EMI {
 
     return Gson().fromJson(str, object : TypeToken<EMI>() {}.type)
 }
+
+fun fromEMIPaymentToString(emiPayment: EMIPayment): String {
+
+    return Gson().toJson(emiPayment)
+}
+
+fun fromStringToEMIPayment(str: String): EMIPayment {
+
+    return Gson().fromJson(str, object : TypeToken<EMIPayment>() {}.type)
+}
+

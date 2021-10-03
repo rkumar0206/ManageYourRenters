@@ -21,6 +21,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.FILE_URI_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
 import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
+import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.EMIRepository
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
 import com.rohitthebest.manageyourrenters.utils.*
@@ -50,6 +51,9 @@ class UploadFileToFirebaseStorageService : Service() {
 
     @Inject
     lateinit var borrowerRepository: BorrowerRepository
+
+    @Inject
+    lateinit var emiPaymentRepository: EMIPaymentRepository
 
     private var receivedCollection = ""
     private lateinit var notificationBuilder: NotificationCompat.Builder
@@ -90,7 +94,7 @@ class UploadFileToFirebaseStorageService : Service() {
         CoroutineScope(Dispatchers.IO).launch {
 
             val uri = Uri.parse(fileUri)
-            var referenceString = ""
+            var referenceString = ""   // location of the document in the storage
             val document: Any
 
             when (receivedCollection) {
@@ -113,6 +117,16 @@ class UploadFileToFirebaseStorageService : Service() {
                         "${Functions.getUid()}/EMIDoc/${emi.supportingDocument?.documentType}"
 
                     document = emi
+                }
+
+                getString(R.string.emiPayments) -> {
+
+                    val emiPayment = fromStringToEMIPayment(uploadData!!)
+
+                    referenceString =
+                        "${Functions.getUid()}/EMIPaymentDoc/${emiPayment.supportingDocument?.documentType}"
+
+                    document = emiPayment
                 }
 
                 else -> document = Any()

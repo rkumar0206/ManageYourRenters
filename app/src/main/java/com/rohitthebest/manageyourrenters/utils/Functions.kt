@@ -89,6 +89,7 @@ class Functions {
 
                 CoroutineScope(Dispatchers.Main).launch {
 
+                    Log.i(TAG, "Function: hideKeyboard")
                     closeKeyboard(activity)
                 }
 
@@ -99,12 +100,15 @@ class Functions {
         }
 
         suspend fun closeKeyboard(activity: Activity) {
+
             try {
                 withContext(Dispatchers.IO) {
 
                     val view = activity.currentFocus
 
                     if (view != null) {
+
+                        Log.i(TAG, "Function: closeKeyboard")
 
                         val inputMethodManager =
                             activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

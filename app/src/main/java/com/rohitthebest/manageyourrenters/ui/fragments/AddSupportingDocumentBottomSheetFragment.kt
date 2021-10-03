@@ -20,6 +20,7 @@ import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.database.model.EMI
+import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.databinding.AddSupportingDocumentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddSupportingDocumentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_TAG_KEY
@@ -27,6 +28,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.others.Constants.IS_DOCUMENT_FOR_EDITING_KEY
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
@@ -46,12 +48,14 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
     private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
     private val emiViewModel by viewModels<EMIViewModel>()
+    private val emiPaymentViewModel by viewModels<EMIPaymentViewModel>()
 
     private lateinit var includeBinding: AddSupportingDocumentLayoutBinding
 
     private var receivedCollectionTag = ""
     private lateinit var receivedEMI: EMI
     private lateinit var receivedBorrowerPayment: BorrowerPayment
+    private lateinit var receivedEMIPayment: EMIPayment
 
     private var docType: DocumentType = DocumentType.PDF
     private var pdfUri: Uri? = null
@@ -149,6 +153,26 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
                         }
                     }
                 }
+
+                getString(R.string.emiPayments) -> {
+
+                    receivedEMIPayment = fromStringToEMIPayment(documentString)
+
+                    if (isDocumentReceivedForEditing) {
+
+                        if (receivedEMIPayment.isSupportingDocumentAdded) {
+
+                            if (receivedBorrowerPayment.supportingDocument?.documentType != DocumentType.URL) {
+
+                                docUrlForDeletingFromCloudStorage =
+                                    receivedEMIPayment.supportingDocument?.documentUrl!!
+                            }
+
+                        }
+                    }
+
+                }
+
             }
 
         } else {
@@ -256,6 +280,23 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
                 insertDocumentToDatabase(receivedBorrowerPayment)
             }
+
+            getString(R.string.emiPayments) -> {
+
+                receivedEMIPayment.isSupportingDocumentAdded = true
+
+                receivedEMIPayment.supportingDocument = SupportingDocument(
+                    documentName = includeBinding.fileNameET.text.toString().trim(),
+                    documentUrl = if (docType == DocumentType.URL) {
+                        includeBinding.urlET.text.toString().trim()
+                    } else {
+                        ""
+                    },
+                    docType
+                )
+
+                insertDocumentToDatabase(receivedEMIPayment)
+            }
         }
     }
 
@@ -266,81 +307,139 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
             getString(R.string.emis) -> {
 
                 val emi = document as EMI
-                if (docType == DocumentType.URL) {
 
-                    // if docType is URL then no need of storage, directly update and insert
-                    // in firestore database
-                    if (isInternetAvailable(requireContext())) {
-
-                        emi.isSynced = true
-                        uploadDocumentToFireStore(
-                            requireContext(), fromEMIToString(emi), receivedCollectionTag, emi.key
-                        )
-                    } else {
-
-                        emi.isSynced = false
-                    }
-
-                    isDocumentAdded = true
-
-                    if (!isDocumentReceivedForEditing) {
-
-                        emiViewModel.insertEMI(emi)
-                    } else {
-
-                        emiViewModel.updateEMI(emi)
-                    }
-
-                    dismiss()
-
-                } else {
-                    // if docType is pdf or image then we need to upload it to the firebase storage
-                    // and we need call the service where the updating and insertion of data
-                    // will be done
-                    uploadFileToStorage(fromEMIToString(emi))
-                }
+                handleEMI(emi)
             }
 
             getString(R.string.borrowerPayments) -> {
 
                 val borrowerPayment = document as BorrowerPayment
 
-                if (docType == DocumentType.URL) {
-
-                    if (isInternetAvailable(requireContext())) {
-
-                        borrowerPayment.isSynced = true
-                        uploadDocumentToFireStore(
-                            requireContext(), fromBorrowerPaymentToString(borrowerPayment),
-                            receivedCollectionTag, borrowerPayment.key
-                        )
-                    } else {
-
-                        borrowerPayment.isSynced = false
-                    }
-
-                    isDocumentAdded = true
-
-                    if (!isDocumentReceivedForEditing) {
-
-                        borrowerPaymentViewModel.insertBorrowerPayment(
-                            requireContext(),
-                            borrowerPayment
-                        )
-                    } else {
-
-                        borrowerPaymentViewModel.updateBorrowerPayment(
-                            borrowerPayment
-                        )
-                    }
-                    dismiss()
-                } else {
-
-                    uploadFileToStorage(fromBorrowerPaymentToString(borrowerPayment))
-                }
+                handleBorrowerPayment(borrowerPayment)
 
             }
+
+            getString(R.string.emiPayments) -> {
+
+                val emiPayment = document as EMIPayment
+
+                handleEMIPayment(emiPayment)
+            }
         }
+    }
+
+    private fun handleEMIPayment(emiPayment: EMIPayment) {
+
+        if (docType == DocumentType.URL) {
+
+            if (isInternetAvailable(requireContext())) {
+
+                emiPayment.isSynced = true
+                uploadDocumentToFireStore(
+                    requireContext(), fromEMIPaymentToString(emiPayment),
+                    receivedCollectionTag, emiPayment.key
+                )
+            } else {
+
+                emiPayment.isSynced = false
+            }
+
+            isDocumentAdded = true
+
+            if (!isDocumentReceivedForEditing) {
+
+                emiPaymentViewModel.insertEMIPayment(
+                    requireContext(),
+                    emiPayment
+                )
+            } else {
+
+                emiPaymentViewModel.updateEMIPayment(
+                    emiPayment
+                )
+            }
+            dismiss()
+        } else {
+
+            uploadFileToStorage(fromEMIPaymentToString(emiPayment))
+        }
+
+    }
+
+    private fun handleBorrowerPayment(borrowerPayment: BorrowerPayment) {
+
+        if (docType == DocumentType.URL) {
+
+            if (isInternetAvailable(requireContext())) {
+
+                borrowerPayment.isSynced = true
+                uploadDocumentToFireStore(
+                    requireContext(), fromBorrowerPaymentToString(borrowerPayment),
+                    receivedCollectionTag, borrowerPayment.key
+                )
+            } else {
+
+                borrowerPayment.isSynced = false
+            }
+
+            isDocumentAdded = true
+
+            if (!isDocumentReceivedForEditing) {
+
+                borrowerPaymentViewModel.insertBorrowerPayment(
+                    requireContext(),
+                    borrowerPayment
+                )
+            } else {
+
+                borrowerPaymentViewModel.updateBorrowerPayment(
+                    borrowerPayment
+                )
+            }
+            dismiss()
+        } else {
+
+            uploadFileToStorage(fromBorrowerPaymentToString(borrowerPayment))
+        }
+
+    }
+
+    private fun handleEMI(emi: EMI) {
+
+        if (docType == DocumentType.URL) {
+
+            // if docType is URL then no need of storage, directly update and insert
+            // in firestore database
+            if (isInternetAvailable(requireContext())) {
+
+                emi.isSynced = true
+                uploadDocumentToFireStore(
+                    requireContext(), fromEMIToString(emi), receivedCollectionTag, emi.key
+                )
+            } else {
+
+                emi.isSynced = false
+            }
+
+            isDocumentAdded = true
+
+            if (!isDocumentReceivedForEditing) {
+
+                emiViewModel.insertEMI(emi)
+            } else {
+
+                emiViewModel.updateEMI(emi)
+            }
+
+            dismiss()
+
+        } else {
+            // if docType is pdf or image then we need to upload it to the firebase storage
+            // and we need call the service where the updating and insertion of data
+            // will be done
+            uploadFileToStorage(fromEMIToString(emi))
+        }
+
     }
 
     private fun uploadFileToStorage(uploadData: String) {

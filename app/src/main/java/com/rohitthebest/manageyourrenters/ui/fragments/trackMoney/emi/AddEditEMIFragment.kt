@@ -201,7 +201,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
                 // be done there only
                 if (isInternetAvailable(requireContext())) {
 
-                    requireActivity().supportFragmentManager.let {
+                    requireActivity().supportFragmentManager.let { fragmentManager ->
 
                         val bundle = Bundle()
                         bundle.putString(Constants.COLLECTION_TAG_KEY, getString(R.string.emis))
@@ -211,13 +211,13 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
                         AddSupportingDocumentBottomSheetFragment.newInstance(
                             bundle
                         ).apply {
-                            show(it, "AddSupportingDocTag")
+                            show(fragmentManager, "AddSupportingDocTag")
                         }.setOnBottomSheetDismissListener(this)
                     }
 
                 } else {
 
-                    Functions.showToast(
+                    showToast(
                         requireContext(),
                         "Internet connection is needed for uploading supporting document.",
                         Toast.LENGTH_LONG

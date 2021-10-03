@@ -156,6 +156,7 @@
     <string name="current_status">Current status :</string>
     <string name="from_month">From month</string>
     <string name="total_amount_paid">Total amount paid</string>
+    <string name="emiPayments">EMI_Payments</string>
 
 
     <string-array name="interest_time_schedule">

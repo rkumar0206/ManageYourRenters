@@ -117,6 +117,18 @@ class UploadService : Service() {
                     }
                 }
 
+                getString(R.string.emiPayments) -> {
+
+                    if (insertToFireStore(docRef, fromStringToEMIPayment(uploadData!!))) {
+
+                        Log.d(
+                            TAG,
+                            "onStartCommand: Uploaded emi_payment to collection $collection with key $key"
+                        )
+                        stopSelf()
+                    }
+                }
+
                 else -> {
 
                     stopSelf()

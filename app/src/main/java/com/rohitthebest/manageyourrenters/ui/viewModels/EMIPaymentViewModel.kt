@@ -4,56 +4,103 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
+import com.rohitthebest.manageyourrenters.repositories.EMIRepository
+import com.rohitthebest.manageyourrenters.utils.fromEMIToString
+import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class EMIPaymentViewModel @Inject constructor(
-    private val repository: EMIPaymentRepository
+    private val emiPaymentRepository: EMIPaymentRepository,
+    private val emiRepository: EMIRepository
 ) : ViewModel() {
 
     fun insertEMIPayment(context: Context, emiPayment: EMIPayment) = viewModelScope.launch {
-        repository.insertEMIPayment(emiPayment)
+        emiPaymentRepository.insertEMIPayment(emiPayment)
 
-        // todo : update the total month completed and amount paid of EMI
+        emiRepository.getEMIByKey(emiPayment.emiKey)
+            .collect { emi ->
+
+                emiPaymentRepository.getTotalAmountPaidOfAnEMI(emi.key)
+                    .collect { value ->
+
+                        emi.amountPaid = value
+                        emi.monthsCompleted = emiPayment.tillMonth
+                        emi.modified = System.currentTimeMillis()
+
+                        val map = HashMap<String, Any?>()
+                        map["amountPaid"] = value
+                        map["monthsCompleted"] = emiPayment.tillMonth
+                        map["modified"] = System.currentTimeMillis()
+
+
+                        if (emi.isSynced) {
+
+                            updateDocumentOnFireStore(
+                                context,
+                                map,
+                                context.getString(R.string.emis),
+                                emi.key
+                            )
+                        } else {
+
+                            emi.isSynced = true
+
+                            uploadDocumentToFireStore(
+                                context,
+                                fromEMIToString(emi),
+                                context.getString(R.string.emis),
+                                emi.key
+                            )
+                        }
+
+                        emiRepository.updateEMI(emi)
+                    }
+
+                return@collect
+            }
 
     }
 
     fun insertAllEMIPayment(emiPayments: List<EMIPayment>) = viewModelScope.launch {
-        repository.insertAllEMIPayment(emiPayments)
+        emiPaymentRepository.insertAllEMIPayment(emiPayments)
     }
 
     fun updateEMIPayment(emiPayment: EMIPayment) = viewModelScope.launch {
-        repository.updateEMIPayment(emiPayment)
+        emiPaymentRepository.updateEMIPayment(emiPayment)
     }
 
     fun deleteEMIPayment(emiPayment: EMIPayment) = viewModelScope.launch {
-        repository.deleteEMIPayment(emiPayment)
+        emiPaymentRepository.deleteEMIPayment(emiPayment)
     }
 
     fun deleteAllEMIPayments() = viewModelScope.launch {
-        repository.deleteAllEMIPayments()
+        emiPaymentRepository.deleteAllEMIPayments()
     }
 
     fun deletePaymentsByEMIKey(emiKey: String) = viewModelScope.launch {
 
-        repository.deletePaymentsByEMIKey(emiKey)
+        emiPaymentRepository.deletePaymentsByEMIKey(emiKey)
     }
 
     fun deleteEMIPaymentsByIsSynced(isSynced: Boolean) = viewModelScope.launch {
 
-        repository.deleteEMIPaymentsByIsSynced(isSynced)
+        emiPaymentRepository.deleteEMIPaymentsByIsSynced(isSynced)
     }
 
-    fun getAllEMIPayments() = repository.getAllEMIPayments().asLiveData()
+    fun getAllEMIPayments() = emiPaymentRepository.getAllEMIPayments().asLiveData()
 
     fun getAllEMIPaymentsByEMIKey(emiKey: String) =
-        repository.getAllEMIPaymentsByEMIKey(emiKey).asLiveData()
+        emiPaymentRepository.getAllEMIPaymentsByEMIKey(emiKey).asLiveData()
 
     fun getEMIPaymentByKey(emiPaymentKey: String) =
-        repository.getEMIPaymentByKey(emiPaymentKey).asLiveData()
+        emiPaymentRepository.getEMIPaymentByKey(emiPaymentKey).asLiveData()
 
 }

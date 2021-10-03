@@ -18,13 +18,10 @@ import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSA
 import com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBottomSheetFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
-import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
-import com.rohitthebest.manageyourrenters.utils.fromEMIPaymentToString
-import com.rohitthebest.manageyourrenters.utils.isTextValid
-import com.rohitthebest.manageyourrenters.utils.setDateInTextView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -252,7 +249,24 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
 
 
     private fun insertToDatabase(emiPayment: EMIPayment) {
-        //TODO("Not yet implemented")
+
+        emiPayment.isSynced = Functions.isInternetAvailable(requireContext())
+
+        emiPayment.isSupportingDocumentAdded = false
+
+        emiPaymentViewModel.insertEMIPayment(requireContext(), emiPayment)
+
+        if (emiPayment.isSynced) {
+
+            uploadDocumentToFireStore(
+                requireContext(),
+                fromEMIPaymentToString(emiPayment),
+                getString(R.string.emiPayments),
+                emiPayment.key
+            )
+        }
+
+        requireActivity().onBackPressed()
     }
 
     private fun isFormValid(): Boolean {

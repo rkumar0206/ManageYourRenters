@@ -37,3 +37,22 @@ Afer adding payment once, the next time you add payment, everything is prefilled
 ### Borrowers
 
 In this category you can keep track of the borrowers (the person to whom you have lend some money.)
+
+* First you need to add the borrower details
+  * name (required)
+  * mobile number (required)
+  * any other document (optional)
+* After adding the borrower it will be added to the borrower list and you click on the borrower details and add their payments
+* For adding a borrower payment
+  * click on the borrower details - a new fragment opens
+  * click on the add button
+  * fill the details
+    * Date when the money has been borrowed
+    * Borrowed amount
+    * Interest (if any)
+    * Supporting document (If any)
+  * After filling the payment details it will be added to the borrower payments list
+  * Now you can mark the payment as cleared or you can add partial payments (if the user gives you money in parts)
+
+---
+

@@ -9,7 +9,7 @@ This app helps you to keep track of your renters. It makes your life easier by:
 This app include several categories like : 
 - [House Renters](#house-renters)
 - [Borrowers](#borrowers)
-- Track your money
+- [Track money](#track-money)
 
 ---
 ### House Renters
@@ -55,4 +55,10 @@ In this category you can keep track of the borrowers (the person to whom you hav
   * Now you can mark the payment as cleared or you can add partial payments (if the user gives you money in parts)
 
 ---
-
+## Track Money
+ 
+ In this category you can track your money based on other sub categories like :
+ * EMI
+ * Loan
+ * Contracts / Deals
+ * Others

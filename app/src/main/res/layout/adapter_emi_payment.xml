@@ -46,14 +46,14 @@
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/emi_month_paid_TV"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/emi_month_paid_TV"
+                app:layout_constraintTop_toBottomOf="@+id/emiPaymentMenuBtn"
                 tools:text="Paid on : 03-10-2021" />
 
             <View
                 android:id="@+id/divider63"
                 android:layout_width="397dp"
                 android:layout_height="1dp"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="8dp"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -85,6 +85,15 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/emiAmountPaymentTV" />
+
+            <ImageButton
+                android:id="@+id/emiPaymentMenuBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/color_white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/emi_month_paid_TV"
+                app:srcCompat="@drawable/ic_baseline_more_vert_24" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

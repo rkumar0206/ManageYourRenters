@@ -181,8 +181,6 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
         }
 
         showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(emiPayment)
-
-        //todo : complete this
     }
 
     private fun showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(emiPayment: EMIPayment) {

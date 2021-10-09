@@ -17,7 +17,7 @@
     <string name="document_number">Document number</string>
     <string name="address">Address</string>
     <string name="payments">Payments</string>
-    <string name="menubtn">menuBtn</string>
+    <string name="menubtn">Menu Button</string>
     <string name="addpaymentfab">addPaymentFAB</string>
     <string name="renter_name">Renter name</string>
     <string name="nul">null</string>
@@ -134,7 +134,6 @@
     <string name="amount_per_month">Amount per month</string>
     <string name="amount_to_paid_per_month">Amount to be paid per month</string>
     <string name="total_emi_amount_total_months_amount_per_month">Total EMI amount (total months * amount per month)</string>
-    <string name="amount_paid_till_now_optional">Amount paid till now (Optional)</string>
     <string name="amount_paid_till_now">Amount paid till now</string>
     <string name="__0">0</string>
     <string name="contract_deals">Contracts / Deals</string>
@@ -147,7 +146,7 @@
     <string name="no_supporting_doc_added">No supporting document added!!!</string>
     <string name="no_payments_made_for_this_emi">No payments made for this EMI. Click the (+) button for adding payments</string>
     <string name="add_emi_payment">Add EMI payment</string>
-    <string name="show_emi_details">Show EMI details</string>
+    <string name="show_emi_details">Details</string>
     <string name="months_completed_">Months completed :</string>
     <string name="amount_paid_">Amount Paid:</string>
     <string name="paid_on">Paid on</string>

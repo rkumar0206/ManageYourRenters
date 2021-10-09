@@ -5,11 +5,18 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.emiAdapters.EMIPaymentAdapter
+import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
@@ -18,19 +25,28 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
     private val binding get() = _binding!!
 
     private val emiPaymentViewModel by viewModels<EMIPaymentViewModel>()
+    private val emiViewModel by viewModels<EMIViewModel>()
 
     private var receivedEMIKey = ""
+    private lateinit var receivedEMI: EMI
+
+    private lateinit var emiPaymentAdapter: EMIPaymentAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentEmiPaymentBinding.bind(view)
+
+        emiPaymentAdapter = EMIPaymentAdapter()
 
         shouldShowProgressBar(true)
 
         getMessage()
 
         initListeners()
+
+        setUpRecyclerView()
     }
+
 
 
     private fun getMessage() {
@@ -44,8 +60,22 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
 
             receivedEMIKey = args?.emiKeyMessage!!
 
-            getEMIPayments()
+            lifecycleScope.launch {
+
+                delay(300)
+                getEMI()
+            }
         }
+    }
+
+    private fun getEMI() {
+
+        emiViewModel.getEMIByKey(receivedEMIKey).observe(viewLifecycleOwner, { emi ->
+
+            receivedEMI = emi
+
+            getEMIPayments()
+        })
     }
 
     private fun getEMIPayments() {
@@ -60,11 +90,30 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
                 shouldShowNoEMIPaymentAddedTV(false)
             }
 
-            //todo : adapter.submit list
+            if (this::receivedEMI.isInitialized) {
+
+                val totalEMI = receivedEMI.totalMonths * receivedEMI.amountPaidPerMonth
+                val leftEMIAmount = totalEMI - receivedEMI.amountPaid
+                binding.emiPaymentToolbar.subtitle =
+                    "Due: ${receivedEMI.currencySymbol} $leftEMIAmount"
+            }
+
+            emiPaymentAdapter.submitList(it)
 
             shouldShowProgressBar(false)
         })
     }
+
+    private fun setUpRecyclerView() {
+
+        binding.emiPaymentsRV.apply {
+
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = emiPaymentAdapter
+        }
+    }
+
 
     private fun initListeners() {
 

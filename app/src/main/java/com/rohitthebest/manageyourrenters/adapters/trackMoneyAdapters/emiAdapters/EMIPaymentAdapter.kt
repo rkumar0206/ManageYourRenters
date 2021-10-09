@@ -42,7 +42,7 @@ class EMIPaymentAdapter :
                         "For month : ${payment.fromMonth}"
                     } else {
 
-                        "From month : ${payment.fromMonth}\nTill month : ${payment.tillMonth}"
+                        "From month : ${payment.fromMonth}\nTill month :    ${payment.tillMonth}"
                     }
 
                     emiMonthPaidTV.text = monthTVText

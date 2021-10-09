@@ -117,7 +117,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
                 numberOfMonthsCompltedET.setText(receivedEmi.monthsCompleted.toString())
                 emiAmountPerMonthET.setText(receivedEmi.amountPaidPerMonth.toString())
                 calculateTotalEmiAmount()
-                emiAmountPaidET.setText(receivedEmi.amountPaid.toString())
+                amountPaidTillNowForEMITV.text = receivedEmi.amountPaid.toString()
             }
         }
     }
@@ -164,7 +164,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
             totalMonths = includeBinding.totalEmiMonthsET.text.toString().toInt()
             monthsCompleted = includeBinding.numberOfMonthsCompltedET.text.toString().toInt()
             amountPaidPerMonth = includeBinding.emiAmountPerMonthET.text.toString().toDouble()
-            amountPaid = includeBinding.emiAmountPaidET.text.toString().toDouble()
+            amountPaid = calculateAmountPaidTillNow()
             currencySymbol = selectedCurrencySymbol
             uid = getUid()!!
 
@@ -323,19 +323,6 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
             return false
         }
 
-        if (!includeBinding.emiAmountPaidET.isTextValid()) {
-
-            includeBinding.emiAmountPaidET.setText("0.0")
-            includeBinding.emiAmountPaidET.clearFocus()
-        } else {
-
-            if (includeBinding.emiAmountPaidET.error != null) {
-
-                includeBinding.emiAmountPaidET.requestFocus()
-                return false
-            }
-        }
-
         return true
     }
 
@@ -423,16 +410,16 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
             }
         }
 
-        includeBinding.emiAmountPaidET.onTextChangedListener { s ->
+        includeBinding.numberOfMonthsCompltedET.onTextChangedListener { s ->
 
-            if (!s?.isEmpty()!!) {
+            if (s?.isNotEmpty()!!) {
 
                 calculateTotalEmiAmount()
             }
         }
     }
 
-    var calculateTotalEMIJob: Job? = null
+    private var calculateTotalEMIJob: Job? = null
 
     @SuppressLint("SetTextI18n")
     private fun calculateTotalEmiAmount() {
@@ -469,22 +456,29 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
                     "$totalMonths * $amountPerMonth = $selectedCurrencySymbol %.3f", totalEMIAmount
                 )
 
-                if (includeBinding.emiAmountPaidET.isTextValid()) {
-
-                    if (totalEMIAmount >= includeBinding.emiAmountPaidET.text.toString()
-                            .toDouble()
-                    ) {
-
-                        includeBinding.emiAmountPaidET.error = null
-                    } else {
-
-                        includeBinding.emiAmountPaidET.error =
-                            "It must be less than or equal to total EMI amount."
-                    }
-                }
+                includeBinding.amountPaidTillNowForEMITV.text =
+                    "$selectedCurrencySymbol ${calculateAmountPaidTillNow()}"
 
             }
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun calculateAmountPaidTillNow(): Double {
+
+        var amountPaidTillNow = 0.0
+
+        if (includeBinding.numberOfMonthsCompltedET.isTextValid()
+            && includeBinding.totalEmiMonthsET.isTextValid()
+            && includeBinding.emiAmountPerMonthET.isTextValid()
+        ) {
+
+            amountPaidTillNow = includeBinding.numberOfMonthsCompltedET.text.toString()
+                .toInt() * includeBinding.emiAmountPerMonthET.text.toString()
+                .toDouble()
+        }
+
+        return amountPaidTillNow
     }
 
     private fun isTotalMonthAndMonthCompletedETValid(): Boolean {

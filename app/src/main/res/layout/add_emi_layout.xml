@@ -103,7 +103,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView14"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -269,17 +269,15 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView56"
                 tools:ignore="Autofill" />
 
-            <EditText
-                android:id="@+id/emiAmountPaidET"
+            <TextView
+                android:id="@+id/amountPaidTillNowForEMITV"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="5dp"
-                android:hint="@string/__0"
-                android:inputType="numberDecimal"
-                android:maxLength="10"
-                android:minHeight="48dp"
-                android:text="@string/__0"
+                android:padding="5dp"
+                tools:text="@string/__0"
+
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/textView56"
@@ -316,7 +314,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="8dp"
-                android:text="@string/amount_paid_till_now_optional"
+                android:text="@string/amount_paid_till_now"
                 android:textColor="#1976D2"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.emiAdapters.EMIPaymentAdapter
 import com.rohitthebest.manageyourrenters.database.model.EMI
+import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
@@ -18,8 +19,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private const val TAG = "EMIPaymentFragment"
+
 @AndroidEntryPoint
-class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
+class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
+    EMIPaymentAdapter.OnClickListener, EMIMenuItems.OnItemClickListener {
 
     private var _binding: FragmentEmiPaymentBinding? = null
     private val binding get() = _binding!!
@@ -112,8 +116,53 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = emiPaymentAdapter
         }
+
+        emiPaymentAdapter.setOnClickListener(this)
     }
 
+    private lateinit var emiPaymentForMenus: EMIPayment
+
+    override fun onMenuBtnClicked(emiPayment: EMIPayment, position: Int) {
+
+        emiPaymentForMenus = emiPayment
+
+        requireActivity().supportFragmentManager.let { fm ->
+
+            EMIMenuItems.newInstance(
+                null
+            ).apply {
+
+                show(fm, TAG)
+            }.setOnClickListener(this)
+        }
+
+    }
+
+    override fun onSyncBtnClicked(emiPayment: EMIPayment, position: Int) {
+        //TODO("Not yet implemented")
+    }
+
+    //[START OF MENUS]
+    override fun onEditMenuClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDeleteMenuClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onViewSupportingDocumentMenuClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onReplaceSupportingDocumentClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDeleteSupportingDocumentClick() {
+        //TODO("Not yet implemented")
+    }
+    //[END OF MENUS]
 
     private fun initListeners() {
 
@@ -160,4 +209,5 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment) {
         super.onDestroyView()
         _binding = null
     }
+
 }

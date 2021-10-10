@@ -125,6 +125,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
     }
 
+    //[START OF MENUS]
     override fun onEditMenuClick() {
 
         if (this::emiForMenuItems.isInitialized) {
@@ -268,6 +269,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
 
     }
+    //[END OF MENUS]
 
     private fun getEMIs() {
 

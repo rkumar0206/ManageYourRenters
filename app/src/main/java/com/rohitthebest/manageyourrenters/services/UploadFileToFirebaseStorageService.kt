@@ -273,8 +273,6 @@ class UploadFileToFirebaseStorageService : Service() {
 
     private fun updateEMIForAmountPaidAndTotalMonthsCompleted(emiPayment: EMIPayment) {
 
-        // todo : update emi amount paid and total months completed
-
         CoroutineScope(Dispatchers.IO).launch {
 
             try {

@@ -147,8 +147,8 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
                     if (!emiForMenuItems.isSynced) {
 
-                        //todo : modify the delete method for deleting the emi payments of this emi
                         emiViewModel.deleteEMI(
+                            requireContext(),
                             emiForMenuItems
                         )
                     } else {
@@ -156,6 +156,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
                         if (isInternetAvailable(requireContext())) {
 
                             emiViewModel.deleteEMI(
+                                requireContext(),
                                 emiForMenuItems
                             )
                         } else {

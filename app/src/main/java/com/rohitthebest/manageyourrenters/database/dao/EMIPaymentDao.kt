@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.database.dao
 
 import androidx.room.*
+import com.rohitthebest.manageyourrenters.data.KeyAndSupportingDoc
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import kotlinx.coroutines.flow.Flow
 
@@ -39,8 +40,8 @@ interface EMIPaymentDao {
 
     // will be declared only in emi payment repository
     // this will return the keys of emi payments of a particular EMI
-    @Query("SELECT (`key`) FROM emi_payment_table WHERE emiKey =:emiKey")
-    fun getEmiPaymentsKeysByEMIKey(emiKey: String): List<String>
+    @Query("SELECT (`key`), supportingDocument FROM emi_payment_table WHERE emiKey =:emiKey")
+    suspend fun getEmiPaymentsKeysAndSupportingDocsByEMIKey(emiKey: String): List<KeyAndSupportingDoc>
 
     // get total emi amount paid
     @Query("SELECT SUM(amountPaid) as total FROM emi_payment_table WHERE emiKey =:emiKey")

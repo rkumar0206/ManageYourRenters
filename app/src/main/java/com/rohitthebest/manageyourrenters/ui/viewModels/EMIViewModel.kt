@@ -1,43 +1,116 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.database.model.EMI
+import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.EMIRepository
+import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
+import com.rohitthebest.manageyourrenters.utils.deleteAllDocumentsUsingKeyFromFirestore
+import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
+import com.rohitthebest.manageyourrenters.utils.deleteFileFromFirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val TAG = "EMIViewModel"
+
 @HiltViewModel
 class EMIViewModel @Inject constructor(
-    private val repository: EMIRepository
+    private val emiRepository: EMIRepository,
+    private val emiPaymentRepository: EMIPaymentRepository
 ) : ViewModel() {
 
     fun insertEMI(emi: EMI) = viewModelScope.launch {
-        repository.insertEMI(emi)
+        emiRepository.insertEMI(emi)
     }
 
     fun insertAllEMI(emis: List<EMI>) = viewModelScope.launch {
-        repository.insertAllEMI(emis)
+        emiRepository.insertAllEMI(emis)
     }
 
     fun updateEMI(emi: EMI) = viewModelScope.launch {
-        repository.updateEMI(emi)
+        emiRepository.updateEMI(emi)
     }
 
-    fun deleteEMI(emi: EMI) = viewModelScope.launch {
+    fun deleteEMI(context: Context, emi: EMI) = viewModelScope.launch {
 
-        //todo : modify the delete method for deleting the emi payments of this emi and the supporting documents
-        repository.deleteEMI(emi)
+        // get all the supporting documents and keys of payments for this emi
+        val keysAndSupportingDocs =
+            emiPaymentRepository.getEmiPaymentsKeysAndSupportingDocsByEMIKey(
+                emi.key
+            )
+
+        Log.d(TAG, "deleteEMI: $keysAndSupportingDocs")
+
+        if (keysAndSupportingDocs.isNotEmpty()) {
+
+            // extract the keys and supporting doc urls from the list
+            val keys: ArrayList<String> = ArrayList()
+            val supportingDocs: ArrayList<SupportingDocument?> = ArrayList()
+
+            keysAndSupportingDocs.forEach { keyAndSupportingDoc ->
+
+                keys.add(keyAndSupportingDoc.key)
+                supportingDocs.add(keyAndSupportingDoc.supportingDocument)
+            }
+
+            Log.d(TAG, "deleteEMI: Keys : $keys")
+            Log.d(TAG, "deleteEMI: Supporting doc : $supportingDocs")
+
+            // delete the supporting document from the firebase storage
+            if (supportingDocs.isNotEmpty()) {
+
+                supportingDocs.forEach { supportingDoc ->
+
+                    if (supportingDoc != null && supportingDoc.documentType != DocumentType.URL) {
+
+                        deleteFileFromFirebaseStorage(context, supportingDoc.documentUrl)
+                    }
+                }
+            }
+
+            // delete all emi payments from firestore
+            deleteAllDocumentsUsingKeyFromFirestore(
+                context,
+                context.getString(R.string.emiPayments),
+                convertStringListToJSON(keys)
+            )
+
+        }
+
+        // delete supporting document of the emi
+        if (emi.isSupportingDocumentAdded) {
+
+            if (emi.supportingDocument != null && emi.supportingDocument?.documentType != DocumentType.URL)
+
+                deleteFileFromFirebaseStorage(context, emi.supportingDocument?.documentUrl!!)
+        }
+
+        // delete the emi from the firestore
+        deleteDocumentFromFireStore(
+            context,
+            context.getString(R.string.emis),
+            emi.key
+        )
+
+        // delete from local database
+        emiPaymentRepository.deletePaymentsByEMIKey(emi.key)
+        emiRepository.deleteEMI(emi)
     }
 
     fun deleteAllEMIs() = viewModelScope.launch {
-        repository.deleteAllEMIs()
+        emiRepository.deleteAllEMIs()
     }
 
-    fun getAllEMIs() = repository.getAllEMIs().asLiveData()
+    fun getAllEMIs() = emiRepository.getAllEMIs().asLiveData()
 
-    fun getEMIByKey(emiKey: String) = repository.getEMIByKey(emiKey).asLiveData()
+    fun getEMIByKey(emiKey: String) = emiRepository.getEMIByKey(emiKey).asLiveData()
 
 }

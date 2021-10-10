@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
@@ -22,8 +23,26 @@ class EMIPaymentAdapter :
 
             binding.emiPaymentMenuBtn.setOnClickListener {
 
-                //todo : show the menu bottom sheet
+                if (checkForNullability(absoluteAdapterPosition)) {
+
+                    mListener!!.onMenuBtnClicked(
+                        getItem(absoluteAdapterPosition),
+                        absoluteAdapterPosition
+                    )
+                }
             }
+
+            binding.emiPaymentSyncedIV.setOnClickListener {
+
+                if (checkForNullability(absoluteAdapterPosition)) {
+
+                    mListener!!.onSyncBtnClicked(
+                        getItem(absoluteAdapterPosition),
+                        absoluteAdapterPosition
+                    )
+                }
+            }
+
         }
 
         @SuppressLint("SetTextI18n")
@@ -50,8 +69,22 @@ class EMIPaymentAdapter :
                     emiPaidOnTV.text = "Paid On : ${
                         WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(payment.created)
                     }"
+
+                    if (payment.isSynced) {
+
+                        emiPaymentSyncedIV.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                    } else {
+
+                        emiPaymentSyncedIV.setImageResource(R.drawable.ic_baseline_sync_24)
+                    }
                 }
             }
+        }
+
+        private fun checkForNullability(position: Int): Boolean {
+
+            return position != RecyclerView.NO_POSITION &&
+                    mListener != null
         }
     }
 
@@ -82,7 +115,8 @@ class EMIPaymentAdapter :
 
     interface OnClickListener {
 
-        fun onItemClick(emiPayment: EMIPayment)
+        fun onMenuBtnClicked(emiPayment: EMIPayment, position: Int)
+        fun onSyncBtnClicked(emiPayment: EMIPayment, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

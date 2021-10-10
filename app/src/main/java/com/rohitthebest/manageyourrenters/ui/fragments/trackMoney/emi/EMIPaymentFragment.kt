@@ -15,6 +15,11 @@ import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.fromEMIPaymentToString
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -139,7 +144,34 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
     }
 
     override fun onSyncBtnClicked(emiPayment: EMIPayment, position: Int) {
-        //TODO("Not yet implemented")
+
+        if (emiPayment.isSynced) {
+
+            showToast(
+                requireContext(),
+                "Already synced!!"
+            )
+        } else {
+
+            if (isInternetAvailable(requireContext())) {
+
+                emiPayment.isSynced = true
+
+                uploadDocumentToFireStore(
+                    requireContext(),
+                    fromEMIPaymentToString(emiPayment),
+                    getString(R.string.emiPayments),
+                    emiPayment.key
+                )
+
+                emiPaymentViewModel.updateEMIPayment(emiPayment)
+
+                emiPaymentAdapter.notifyItemChanged(position)
+            } else {
+
+                showNoInternetMessage(requireContext())
+            }
+        }
     }
 
     //[START OF MENUS]

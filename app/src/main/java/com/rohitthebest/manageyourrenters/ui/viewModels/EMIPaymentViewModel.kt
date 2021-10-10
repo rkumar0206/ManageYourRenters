@@ -8,6 +8,8 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.EMIRepository
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.fromEMIToString
 import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
 import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
@@ -35,30 +37,37 @@ class EMIPaymentViewModel @Inject constructor(
                         emi.monthsCompleted = emiPayment.tillMonth
                         emi.modified = System.currentTimeMillis()
 
-                        val map = HashMap<String, Any?>()
-                        map["amountPaid"] = value
-                        map["monthsCompleted"] = emiPayment.tillMonth
-                        map["modified"] = System.currentTimeMillis()
+                        if (isInternetAvailable(context)) {
 
+                            val map = HashMap<String, Any?>()
+                            map["amountPaid"] = value
+                            map["monthsCompleted"] = emiPayment.tillMonth
+                            map["modified"] = System.currentTimeMillis()
 
-                        if (emi.isSynced) {
+                            if (emi.isSynced) {
 
-                            updateDocumentOnFireStore(
-                                context,
-                                map,
-                                context.getString(R.string.emis),
-                                emi.key
-                            )
+                                updateDocumentOnFireStore(
+                                    context,
+                                    map,
+                                    context.getString(R.string.emis),
+                                    emi.key
+                                )
+                            } else {
+
+                                emi.isSynced = true
+
+                                uploadDocumentToFireStore(
+                                    context,
+                                    fromEMIToString(emi),
+                                    context.getString(R.string.emis),
+                                    emi.key
+                                )
+                            }
+
                         } else {
 
-                            emi.isSynced = true
-
-                            uploadDocumentToFireStore(
-                                context,
-                                fromEMIToString(emi),
-                                context.getString(R.string.emis),
-                                emi.key
-                            )
+                            emi.isSynced = false
+                            showNoInternetMessage(context)
                         }
 
                         emiRepository.updateEMI(emi)

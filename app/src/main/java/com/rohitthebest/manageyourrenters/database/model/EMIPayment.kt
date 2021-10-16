@@ -18,7 +18,8 @@ data class EMIPayment(
     var isSupportingDocumentAdded: Boolean = false,
     var supportingDocument: SupportingDocument?,
     var isSynced: Boolean,
-    var uid: String
+    var uid: String,
+    var message: String = ""
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null
@@ -34,6 +35,7 @@ data class EMIPayment(
         false,
         null,
         false,
+        "",
         ""
     )
 }

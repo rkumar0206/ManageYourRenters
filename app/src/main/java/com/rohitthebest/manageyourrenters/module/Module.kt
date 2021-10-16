@@ -132,6 +132,14 @@ object Module {
 
     //============================== EMI Payment Database========================================
 
+    private val migrationEMIPayment = object : Migration(1, 2) {
+
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+            database.execSQL("ALTER TABLE 'emi_payment_table' ADD COLUMN 'message' VARCHAR NOT NULL DEFAULT ''")
+        }
+    }
+
     @Provides
     @Singleton
     fun provideEMIPaymentDatabase(
@@ -140,7 +148,9 @@ object Module {
         context,
         EMIPaymentDatabase::class.java,
         EMI_PAYMENT_DATABASE_NAME
-    ).build()
+    )
+        .addMigrations(migrationEMIPayment)
+        .build()
 
     @Provides
     @Singleton

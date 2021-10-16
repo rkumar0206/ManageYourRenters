@@ -9,7 +9,7 @@ import com.rohitthebest.manageyourrenters.database.typeConverters.TypeConverters
 
 @Database(
     entities = [EMIPayment::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(TypeConvertersForDatabase::class)

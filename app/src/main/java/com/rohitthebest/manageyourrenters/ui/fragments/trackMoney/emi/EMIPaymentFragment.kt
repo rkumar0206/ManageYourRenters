@@ -19,6 +19,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.fromEMIPaymentToString
+import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
 import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -180,7 +181,43 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
     }
 
     override fun onDeleteMenuClick() {
-        //TODO("Not yet implemented")
+
+        if (this::emiPaymentForMenus.isInitialized) {
+
+            showAlertDialogForDeletion(
+                requireContext(),
+                { dialog ->
+
+                    if (!emiPaymentForMenus.isSynced || !emiPaymentForMenus.isSupportingDocumentAdded) {
+
+                        emiPaymentViewModel.deleteEMIPayment(
+                            requireContext(),
+                            emiPaymentForMenus
+                        )
+                    } else {
+
+                        if (isInternetAvailable(requireContext())) {
+
+                            emiPaymentViewModel.deleteEMIPayment(
+                                requireContext(),
+                                emiPaymentForMenus
+                            )
+
+                        } else {
+
+                            showNoInternetMessage(requireContext())
+                        }
+                    }
+
+
+                    dialog.dismiss()
+                },
+                { dialog ->
+
+                    dialog.dismiss()
+                }
+            )
+        }
     }
 
     override fun onViewSupportingDocumentMenuClick() {

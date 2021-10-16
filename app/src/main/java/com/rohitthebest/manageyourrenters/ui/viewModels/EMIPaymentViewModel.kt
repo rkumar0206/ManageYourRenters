@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -8,15 +9,15 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.EMIRepository
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
-import com.rohitthebest.manageyourrenters.utils.fromEMIToString
-import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
-import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+private const val TAG = "EMIPaymentViewModel"
 
 @HiltViewModel
 class EMIPaymentViewModel @Inject constructor(
@@ -86,8 +87,54 @@ class EMIPaymentViewModel @Inject constructor(
         emiPaymentRepository.updateEMIPayment(emiPayment)
     }
 
-    fun deleteEMIPayment(emiPayment: EMIPayment) = viewModelScope.launch {
-        emiPaymentRepository.deleteEMIPayment(emiPayment)
+    fun deleteEMIPayment(context: Context, emiPayment: EMIPayment) = viewModelScope.launch {
+
+
+        // todo : complete this
+
+        // previous payment
+
+        Log.d(TAG, "deleteEMIPayment: ")
+        emiPaymentRepository.getPreviousRecord(emiKey = emiPayment.emiKey).collect {
+
+            Log.d(TAG, "deleteEMIPayment: $it")
+        }
+
+/*
+        // update the emi
+        emiRepository.getEMIByKey(emiPayment.emiKey).collect { emi ->
+
+            emi.amountPaid = emiPayment.amountPaid - emiPayment.amountPaid
+            emi.monthsCompleted =
+
+        }
+
+
+        if (isInternetAvailable(context)) {
+
+            // delete supporting document
+            if (emiPayment.isSupportingDocumentAdded) {
+
+                if (emiPayment.supportingDocument != null
+                    && emiPayment.supportingDocument?.documentType != DocumentType.URL
+                ) {
+
+                    deleteFileFromFirebaseStorage(
+                        context,
+                        emiPayment.supportingDocument?.documentUrl!!
+                    )
+                }
+            }
+
+            // delete the emi payment from firestore
+            deleteDocumentFromFireStore(
+                context,
+                context.getString(R.string.emiPayments),
+                emiPayment.key
+            )
+        }
+
+        emiPaymentRepository.deleteEMIPayment(emiPayment)*/
     }
 
     fun deleteAllEMIPayments() = viewModelScope.launch {

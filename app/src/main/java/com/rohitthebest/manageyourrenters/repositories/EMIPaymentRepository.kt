@@ -36,4 +36,6 @@ class EMIPaymentRepository @Inject constructor(
         dao.getEmiPaymentsKeysAndSupportingDocsByEMIKey(emiKey)
 
     fun getTotalAmountPaidOfAnEMI(emiKey: String) = dao.getTotalAmountPaidOfAnEMI(emiKey)
+
+    fun getPreviousRecord(emiKey: String) = dao.getPreviousRecord(emiKey)
 }

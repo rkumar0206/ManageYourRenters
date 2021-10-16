@@ -36,9 +36,17 @@ class BorrowerPaymentViewModel @Inject constructor(
             delay(50)
 
             // update the borrower due
-            borrowerRepository.getBorrowerByKey(borrowerPayment.borrowerKey).collect { borrower ->
 
-                borrowerPaymentRepository.getTotalDueOfTheBorrower(borrowerPayment.borrowerKey)
+            updateBorrowerDueAmount(context, borrowerPayment.borrowerKey)
+        }
+
+    private suspend fun updateBorrowerDueAmount(context: Context, borrowerKey: String) {
+
+        borrowerRepository.getBorrowerByKey(borrowerKey).collect { borrower ->
+
+            try {
+
+                borrowerPaymentRepository.getTotalDueOfTheBorrower(borrowerKey)
                     .collect { value ->
 
                         borrower.totalDueAmount = value
@@ -78,8 +86,17 @@ class BorrowerPaymentViewModel @Inject constructor(
 
                         borrowerRepository.update(borrower)
                     }
+            } catch (e: NullPointerException) {
+
+                // The last borrower payment has been deleted and therefore the collect block
+                // throws null pointer exception
+
+
+                e.printStackTrace()
             }
         }
+
+    }
 
     fun insertBorrowerPayments(borrowerPayments: List<BorrowerPayment>) = viewModelScope.launch {
         borrowerPaymentRepository.insertAllBorrowerPayment(borrowerPayments)
@@ -91,8 +108,6 @@ class BorrowerPaymentViewModel @Inject constructor(
 
     fun deleteBorrowerPayment(context: Context, borrowerPayment: BorrowerPayment) =
         viewModelScope.launch {
-
-            // todo : update the borrower payment
 
             val partialPaymentKeys =
                 partialPaymentRepository.getKeysByBorrowerPaymentKey(borrowerPayment.key)
@@ -130,6 +145,8 @@ class BorrowerPaymentViewModel @Inject constructor(
 
             borrowerPaymentRepository.deleteBorrowerPayment(borrowerPayment)
             partialPaymentRepository.deleteAllPartialPaymentByBorrowerPaymentKey(borrowerPayment.key)
+
+            updateBorrowerDueAmount(context, borrowerPayment.borrowerKey)
         }
 
 

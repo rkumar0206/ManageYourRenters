@@ -207,26 +207,28 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
     override fun onDeleteEMIPaymentBtnClicked(emiPayment: EMIPayment, position: Int) {
 
-        showAlertDialogForDeletion(
-            requireContext(),
-            { dialog ->
+        if (position == 0) {
 
-                if (!emiPayment.isSynced || !emiPayment.isSupportingDocumentAdded) {
+            showAlertDialogForDeletion(
+                requireContext(),
+                { dialog ->
 
-                    emiPaymentViewModel.deleteEMIPayment(
-                        requireContext(),
-                        emiPayment
-                    )
-                } else {
-
-                    if (isInternetAvailable(requireContext())) {
+                    if (!emiPayment.isSynced || !emiPayment.isSupportingDocumentAdded) {
 
                         emiPaymentViewModel.deleteEMIPayment(
                             requireContext(),
                             emiPayment
                         )
-
                     } else {
+
+                        if (isInternetAvailable(requireContext())) {
+
+                            emiPaymentViewModel.deleteEMIPayment(
+                                requireContext(),
+                                emiPayment
+                            )
+
+                        } else {
 
                             showNoInternetMessage(requireContext())
                         }
@@ -240,7 +242,11 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
                 }
             )
 
+        } else {
 
+            showToast(requireContext(), "You cannot delete this payment!!!!")
+            emiPaymentAdapter.notifyItemChanged(position)
+        }
     }
 
     //[START OF MENUS]

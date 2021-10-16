@@ -40,13 +40,13 @@
                 android:id="@+id/emiPaidOnTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="1dp"
+                android:layout_marginEnd="2dp"
                 android:padding="3dp"
                 android:textColor="@color/secondaryTextColor"
                 android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="@+id/emiPaymentMenuBtn"
-                app:layout_constraintEnd_toStartOf="@+id/emiPaymentMenuBtn"
-                app:layout_constraintTop_toTopOf="@+id/emiPaymentMenuBtn"
+                app:layout_constraintBottom_toBottomOf="@+id/emi_month_paid_TV"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:text="Paid on : 03-10-2021" />
 
             <View
@@ -66,11 +66,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="3dp"
-                android:layout_marginEnd="5dp"
                 android:padding="3dp"
                 android:textColor="@color/color_green"
                 android:textSize="22sp"
-                app:layout_constraintEnd_toStartOf="@+id/emiPaymentSyncedIV"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider63"
                 tools:text="Amount : 2000" />
@@ -79,35 +77,74 @@
                 android:id="@+id/divider64"
                 android:layout_width="397dp"
                 android:layout_height="1dp"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="8dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/emiAmountPaymentTV" />
+
+            <View
+                android:id="@+id/divider65"
+                android:layout_width="397dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginBottom="3dp"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/emiAmountPaymentTV" />
+                app:layout_constraintTop_toBottomOf="@+id/emiPaymentMessageIB" />
 
             <ImageButton
-                android:id="@+id/emiPaymentMenuBtn"
+                android:id="@+id/emiPaymentDocIB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:backgroundTint="@color/color_white"
+                android:contentDescription="@string/document"
+                app:layout_constraintEnd_toStartOf="@+id/emiPaymentMessageIB"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider64"
+                app:srcCompat="@drawable/ic_document" />
+
+            <ImageButton
+                android:id="@+id/emiPaymentMessageIB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/color_white"
-                android:contentDescription="@string/menubtn"
-                android:minHeight="48dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/emi_month_paid_TV"
-                app:srcCompat="@drawable/ic_baseline_more_vert_24" />
+                android:contentDescription="@string/view_message_or_note"
+                app:layout_constraintEnd_toStartOf="@+id/emiPaymentSyncedIV"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/emiPaymentDocIB"
+                app:layout_constraintTop_toTopOf="@+id/emiPaymentDocIB"
+                app:srcCompat="@drawable/ic_baseline_message_24" />
 
-            <ImageView
+            <ImageButton
+                android:id="@+id/emiPaymentDeleteIB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/color_white"
+                android:contentDescription="@string/delete_this_payment"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/emiPaymentSyncedIV"
+                app:layout_constraintTop_toTopOf="@+id/emiPaymentDocIB"
+                app:srcCompat="@drawable/ic_baseline_delete_24"
+                tools:visibility="visible" />
+
+            <ImageButton
                 android:id="@+id/emiPaymentSyncedIV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:padding="2dp"
-                app:layout_constraintBottom_toBottomOf="@+id/emiAmountPaymentTV"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/emiAmountPaymentTV"
+                android:backgroundTint="@color/color_white"
+                app:layout_constraintEnd_toStartOf="@+id/emiPaymentDeleteIB"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/emiPaymentMessageIB"
+                app:layout_constraintTop_toTopOf="@+id/emiPaymentDocIB"
                 app:srcCompat="@drawable/ic_baseline_sync_24_green" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

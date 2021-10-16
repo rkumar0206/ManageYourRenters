@@ -92,6 +92,8 @@ class BorrowerPaymentViewModel @Inject constructor(
     fun deleteBorrowerPayment(context: Context, borrowerPayment: BorrowerPayment) =
         viewModelScope.launch {
 
+            // todo : update the borrower payment
+
             val partialPaymentKeys =
                 partialPaymentRepository.getKeysByBorrowerPaymentKey(borrowerPayment.key)
 

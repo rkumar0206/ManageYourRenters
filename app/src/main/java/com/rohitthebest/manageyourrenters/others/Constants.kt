@@ -33,4 +33,8 @@ object Constants {
     const val IS_SYNCED_SHARED_PREF_KEY = "IS_SYNCED_SHARED_PREF_KEY_fkjdvkjdbdnf"
 
     const val SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY = "dcsnckjkscn"
+
+    const val SHOW_EDIT_MENU = "SHOW_EDIT_MENU_sjcjwncjkn"
+    const val SHOW_DOCUMENTS_MENU = "SHOW_DOCUMENTS_MENU_sjcjwncacacn"
+    const val SHOW_DELETE_MENU = "DELETE_MENUbkjbskjc"
 }

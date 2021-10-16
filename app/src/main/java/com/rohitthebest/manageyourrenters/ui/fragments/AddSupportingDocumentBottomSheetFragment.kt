@@ -162,7 +162,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
                         if (receivedEMIPayment.isSupportingDocumentAdded) {
 
-                            if (receivedBorrowerPayment.supportingDocument?.documentType != DocumentType.URL) {
+                            if (receivedEMIPayment.supportingDocument?.documentType != DocumentType.URL) {
 
                                 docUrlForDeletingFromCloudStorage =
                                     receivedEMIPayment.supportingDocument?.documentUrl!!

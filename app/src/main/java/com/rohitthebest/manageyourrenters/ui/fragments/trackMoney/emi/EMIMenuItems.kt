@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.EmiMenuBottomsheetLayoutBinding
+import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.utils.hide
 
 class EMIMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
 
@@ -31,6 +33,41 @@ class EMIMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
         _binding = EmiMenuBottomsheetLayoutBinding.bind(view)
 
         intiListeners()
+
+        getMessage()
+    }
+
+    private fun getMessage() {
+
+
+        if (arguments != null && !arguments?.isEmpty!!) {
+
+
+            arguments?.let { bundle ->
+
+                val isEditMenuVisible = bundle.getBoolean(Constants.SHOW_EDIT_MENU, true)
+                val isDeleteMenuVisible = bundle.getBoolean(Constants.SHOW_DELETE_MENU, true)
+                val isDocumentMenuVisible = bundle.getBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
+
+                if (!isEditMenuVisible) {
+
+                    binding.editEmiMenu.hide()
+                }
+
+                if (!isDeleteMenuVisible) {
+
+                    binding.deleteEmiMenu.hide()
+                }
+
+                if (!isDocumentMenuVisible) {
+
+                    binding.viewOrDownloadSupportingDocumentMenu.hide()
+                    binding.replaceSupportingDocumentMenu.hide()
+                    binding.deleteSupportingDocumentMenu.hide()
+                }
+            }
+        }
+
     }
 
     private fun intiListeners() {

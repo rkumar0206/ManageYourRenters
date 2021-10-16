@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.emiAdapte
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -10,6 +11,8 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.show
 
 class EMIPaymentAdapter :
     ListAdapter<EMIPayment, EMIPaymentAdapter.EMIPaymentViewHolder>(DiffUtilCallback()) {
@@ -17,31 +20,15 @@ class EMIPaymentAdapter :
     private var mListener: OnClickListener? = null
 
     inner class EMIPaymentViewHolder(val binding: AdapterEmiPaymentBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         init {
 
-            binding.emiPaymentMenuBtn.setOnClickListener {
+            binding.emiPaymentDocIB.setOnClickListener(this)
+            binding.emiPaymentSyncedIV.setOnClickListener(this)
+            binding.emiPaymentMessageIB.setOnClickListener(this)
+            binding.emiPaymentDeleteIB.setOnClickListener(this)
 
-                if (checkForNullability(absoluteAdapterPosition)) {
-
-                    mListener!!.onMenuBtnClicked(
-                        getItem(absoluteAdapterPosition),
-                        absoluteAdapterPosition
-                    )
-                }
-            }
-
-            binding.emiPaymentSyncedIV.setOnClickListener {
-
-                if (checkForNullability(absoluteAdapterPosition)) {
-
-                    mListener!!.onSyncBtnClicked(
-                        getItem(absoluteAdapterPosition),
-                        absoluteAdapterPosition
-                    )
-                }
-            }
 
         }
 
@@ -51,6 +38,15 @@ class EMIPaymentAdapter :
             emiPayment?.let { payment ->
 
                 binding.apply {
+
+                    // showing delete button only on the first item
+                    if (absoluteAdapterPosition == 0) {
+
+                        emiPaymentDeleteIB.show()
+                    } else {
+
+                        emiPaymentDeleteIB.hide()
+                    }
 
                     emiAmountPaymentTV.text = "Amount : ${payment.amountPaid}"
 
@@ -86,6 +82,45 @@ class EMIPaymentAdapter :
             return position != RecyclerView.NO_POSITION &&
                     mListener != null
         }
+
+        override fun onClick(v: View?) {
+
+            if (checkForNullability(absoluteAdapterPosition)) {
+
+                when (v?.id) {
+
+                    binding.emiPaymentDocIB.id -> {
+
+                        mListener!!.onEMIDocumentBtnClicked(
+                            getItem(absoluteAdapterPosition),
+                            absoluteAdapterPosition
+                        )
+                    }
+
+                    binding.emiPaymentSyncedIV.id -> {
+
+                        mListener!!.onSyncBtnClicked(
+                            getItem(absoluteAdapterPosition),
+                            absoluteAdapterPosition
+                        )
+                    }
+
+                    binding.emiPaymentMessageIB.id -> {
+
+                        mListener!!.onEMIPaymentMessageBtnClicked(getItem(absoluteAdapterPosition).message)
+                    }
+                    binding.emiPaymentDeleteIB.id -> {
+
+                        mListener!!.onDeleteEMIPaymentBtnClicked(
+                            getItem(absoluteAdapterPosition),
+                            absoluteAdapterPosition
+                        )
+                    }
+
+                }
+            }
+
+        }
     }
 
     companion object {
@@ -115,8 +150,10 @@ class EMIPaymentAdapter :
 
     interface OnClickListener {
 
-        fun onMenuBtnClicked(emiPayment: EMIPayment, position: Int)
+        fun onEMIDocumentBtnClicked(emiPayment: EMIPayment, position: Int)
         fun onSyncBtnClicked(emiPayment: EMIPayment, position: Int)
+        fun onEMIPaymentMessageBtnClicked(message: String)
+        fun onDeleteEMIPaymentBtnClicked(emiPayment: EMIPayment, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

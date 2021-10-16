@@ -156,6 +156,9 @@
     <string name="from_month">From month</string>
     <string name="amount_paying">Amount Paying</string>
     <string name="emiPayments">EMI_Payments</string>
+    <string name="delete_this_payment">Delete This Payment</string>
+    <string name="view_message_or_note">View Message or Note</string>
+    <string name="document">Document</string>
 
 
     <string-array name="interest_time_schedule">

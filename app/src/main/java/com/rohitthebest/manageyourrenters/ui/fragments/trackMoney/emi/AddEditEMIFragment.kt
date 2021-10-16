@@ -378,10 +378,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         includeBinding.numberOfMonthsCompltedET.onTextChangedListener { s ->
 
-            if (s?.isEmpty()!!) {
-
-                includeBinding.numberOfMonthsCompltedET.error = EDIT_TEXT_EMPTY_MESSAGE
-            } else {
+            if (!s?.trim()?.isEmpty()!!) {
 
                 if (includeBinding.totalEmiMonthsET.isTextValid()) {
 
@@ -394,6 +391,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
                         includeBinding.numberOfMonthsCompltedET.error = null
                     }
                 }
+
             }
         }
 

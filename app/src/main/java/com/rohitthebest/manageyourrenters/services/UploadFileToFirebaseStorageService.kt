@@ -277,45 +277,47 @@ class UploadFileToFirebaseStorageService : Service() {
 
             try {
 
+                var isRefreshEnabled = true
+
                 emiRepository.getEMIByKey(emiPayment.emiKey)
                     .collect { emi ->
 
-                        emiPaymentRepository.getTotalAmountPaidOfAnEMI(emi.key)
-                            .collect { value ->
+                        if (isRefreshEnabled) {
 
-                                emi.amountPaid = value
-                                emi.monthsCompleted = emiPayment.tillMonth
-                                emi.modified = System.currentTimeMillis()
+                            emi.amountPaid += emiPayment.amountPaid
+                            emi.monthsCompleted = emiPayment.tillMonth
+                            emi.modified = System.currentTimeMillis()
 
-                                val map = HashMap<String, Any?>()
-                                map["amountPaid"] = value
-                                map["monthsCompleted"] = emiPayment.tillMonth
-                                map["modified"] = System.currentTimeMillis()
+                            val map = HashMap<String, Any?>()
+                            map["amountPaid"] = emi.amountPaid
+                            map["monthsCompleted"] = emiPayment.tillMonth
+                            map["modified"] = System.currentTimeMillis()
 
-                                val docRef = FirebaseFirestore.getInstance()
-                                    .collection(getString(R.string.emis))
-                                    .document(emi.key)
+                            val docRef = FirebaseFirestore.getInstance()
+                                .collection(getString(R.string.emis))
+                                .document(emi.key)
 
 
-                                if (emi.isSynced) {
+                            if (emi.isSynced) {
 
-                                    updateDocumentOnFireStore(
-                                        docRef,
-                                        map
-                                    )
-                                } else {
+                                updateDocumentOnFireStore(
+                                    docRef,
+                                    map
+                                )
+                            } else {
 
-                                    emi.isSynced = true
+                                emi.isSynced = true
 
-                                    insertToFireStore(
-                                        docRef,
-                                        emi
-                                    )
-                                }
-
-                                emiRepository.updateEMI(emi)
-
+                                insertToFireStore(
+                                    docRef,
+                                    emi
+                                )
                             }
+
+                            emiRepository.updateEMI(emi)
+
+                            isRefreshEnabled = false
+                        }
 
                         return@collect
                     }

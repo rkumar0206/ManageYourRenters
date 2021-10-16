@@ -6,12 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.EMIRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -26,53 +27,24 @@ class EMIPaymentViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun insertEMIPayment(context: Context, emiPayment: EMIPayment) = viewModelScope.launch {
+
         emiPaymentRepository.insertEMIPayment(emiPayment)
+
+        var isRefreshEnabled = true
 
         emiRepository.getEMIByKey(emiPayment.emiKey)
             .collect { emi ->
 
-                emiPaymentRepository.getTotalAmountPaidOfAnEMI(emi.key)
-                    .collect { value ->
+                if (isRefreshEnabled) {
 
-                        emi.amountPaid = value
-                        emi.monthsCompleted = emiPayment.tillMonth
-                        emi.modified = System.currentTimeMillis()
+                    emi.amountPaid += emiPayment.amountPaid
+                    emi.monthsCompleted = emiPayment.tillMonth
+                    emi.modified = System.currentTimeMillis()
 
-                        if (isInternetAvailable(context)) {
+                    updateEMI(context, emi)
 
-                            val map = HashMap<String, Any?>()
-                            map["amountPaid"] = value
-                            map["monthsCompleted"] = emiPayment.tillMonth
-                            map["modified"] = System.currentTimeMillis()
-
-                            if (emi.isSynced) {
-
-                                updateDocumentOnFireStore(
-                                    context,
-                                    map,
-                                    context.getString(R.string.emis),
-                                    emi.key
-                                )
-                            } else {
-
-                                emi.isSynced = true
-
-                                uploadDocumentToFireStore(
-                                    context,
-                                    fromEMIToString(emi),
-                                    context.getString(R.string.emis),
-                                    emi.key
-                                )
-                            }
-
-                        } else {
-
-                            emi.isSynced = false
-                            showNoInternetMessage(context)
-                        }
-
-                        emiRepository.updateEMI(emi)
-                    }
+                    isRefreshEnabled = false
+                }
 
                 return@collect
             }
@@ -88,27 +60,6 @@ class EMIPaymentViewModel @Inject constructor(
     }
 
     fun deleteEMIPayment(context: Context, emiPayment: EMIPayment) = viewModelScope.launch {
-
-
-        // todo : complete this
-
-        // previous payment
-
-        Log.d(TAG, "deleteEMIPayment: ")
-        emiPaymentRepository.getPreviousRecord(emiKey = emiPayment.emiKey).collect {
-
-            Log.d(TAG, "deleteEMIPayment: $it")
-        }
-
-/*
-        // update the emi
-        emiRepository.getEMIByKey(emiPayment.emiKey).collect { emi ->
-
-            emi.amountPaid = emiPayment.amountPaid - emiPayment.amountPaid
-            emi.monthsCompleted =
-
-        }
-
 
         if (isInternetAvailable(context)) {
 
@@ -134,7 +85,71 @@ class EMIPaymentViewModel @Inject constructor(
             )
         }
 
-        emiPaymentRepository.deleteEMIPayment(emiPayment)*/
+        emiPaymentRepository.deleteEMIPayment(emiPayment)
+
+        var isRefreshEnabled = true
+
+        emiRepository.getEMIByKey(emiPayment.emiKey).collect { emi ->
+
+            if (isRefreshEnabled) {
+
+                val amountPaid = emi.amountPaid - emiPayment.amountPaid
+                val monthsCompleted = emiPayment.fromMonth - 1
+
+                Log.d(TAG, "updateEMI: $amountPaid")
+                Log.d(TAG, "updateEMI: $monthsCompleted")
+
+                emi.amountPaid = amountPaid
+                emi.monthsCompleted = monthsCompleted
+                emi.modified = System.currentTimeMillis()
+
+                updateEMI(context, emi)
+
+                isRefreshEnabled = false
+
+                return@collect
+            }
+        }
+
+    }
+
+    private suspend fun updateEMI(context: Context, emi: EMI) {
+
+        if (isInternetAvailable(context)) {
+
+            if (emi.isSynced) {
+
+                val map = HashMap<String, Any?>()
+                map["amountPaid"] = emi.amountPaid
+                map["monthsCompleted"] = emi.monthsCompleted
+                map["modified"] = emi.modified
+
+                updateDocumentOnFireStore(
+                    context,
+                    map,
+                    context.getString(R.string.emis),
+                    emi.key
+                )
+
+            } else {
+
+                emi.isSynced = true
+
+                uploadDocumentToFireStore(
+                    context,
+                    fromEMIToString(emi),
+                    context.getString(R.string.emis),
+                    emi.key
+                )
+            }
+
+        } else {
+
+            emi.isSynced = false
+        }
+
+        emiRepository.updateEMI(emi)
+
     }
 
     fun deleteAllEMIPayments() = viewModelScope.launch {

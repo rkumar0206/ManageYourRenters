@@ -47,6 +47,6 @@ interface EMIPaymentDao {
     @Query("SELECT SUM(amountPaid) as total FROM emi_payment_table WHERE emiKey =:emiKey")
     fun getTotalAmountPaidOfAnEMI(emiKey: String): Flow<Double>
 
-    @Query("SELECT * FROM emi_payment_table WHERE emiKey = :emiKey ORDER BY id DESC LIMIT 1,1")
-    fun getPreviousRecord(emiKey: String): Flow<EMIPayment>
+    @Query("SELECT COUNT(id) FROM emi_payment_table WHERE emiKey = :emiKey")
+    fun getTotalCountByKey(emiKey: String): Flow<Int>
 }

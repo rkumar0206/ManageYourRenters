@@ -177,7 +177,12 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
             isSupportingDocumentAdded = false
             uid = receivedEMI.uid
             key = generateKey("_$uid")
+            message = if (!includeBinding.addNoteET.isTextValid()) {
+                ""
+            } else {
 
+                includeBinding.addNoteET.text.toString().trim()
+            }
         }
 
         showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(emiPayment)

@@ -46,6 +46,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
 
     private val renterViewModel: RenterViewModel by viewModels()
     private val borrowerViewModel: BorrowerViewModel by viewModels()
+    private val emiViewModel: EMIViewModel by viewModels()
 
     private lateinit var renterTypeList: ArrayList<RenterTypes>
     private lateinit var renterTypeAdapter: RenterTypeAdapter
@@ -72,7 +73,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
             showBottomSheetProfileDialog()
         }
 
-        binding.downloadChangesBtn.setOnClickListener {
+        binding.homeSyncBtn.setOnClickListener {
 
             showAlertMessageAndNavigateToLoginActivity()
         }
@@ -113,7 +114,6 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
             )
         )
     }
-
 
     private fun setUpRecyclerView() {
 
@@ -288,6 +288,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
         try {
             renterViewModel.deleteAllRenter()
             borrowerViewModel.deleteAllBorrower()
+            emiViewModel.deleteAllEMIs()
             changeIsSyncedValue()
 
         } catch (e: Exception) {

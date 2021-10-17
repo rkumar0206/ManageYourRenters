@@ -107,6 +107,12 @@ class EMIViewModel @Inject constructor(
 
     fun deleteAllEMIs() = viewModelScope.launch {
         emiRepository.deleteAllEMIs()
+        emiPaymentRepository.deleteAllEMIPayments()
+    }
+
+    fun deleteEMIsByIsSynced(isSynced: Boolean) = viewModelScope.launch {
+
+        emiRepository.deleteEMIsByIsSynced(isSynced)
     }
 
     fun getAllEMIs() = emiRepository.getAllEMIs().asLiveData()

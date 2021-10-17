@@ -38,6 +38,8 @@ class LoginActivity : AppCompatActivity() {
     private val borrowerViewModel by viewModels<BorrowerViewModel>()
     private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
     private val partialPaymentViewModel by viewModels<PartialPaymentViewModel>()
+    private val emiViewModel by viewModels<EMIViewModel>()
+    private val emiPaymentViewModel by viewModels<EMIPaymentViewModel>()
 
     private lateinit var mAuth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -66,7 +68,7 @@ class LoginActivity : AppCompatActivity() {
 
         if (mAuth.currentUser != null && !isSynced) {
 
-            syncSavedDataFromFirebase()
+            syncRenters()
         }
 
         initListeners()
@@ -141,7 +143,7 @@ class LoginActivity : AppCompatActivity() {
 
                         showToast(this, "SignIn successful")
 
-                        syncSavedDataFromFirebase()
+                        syncRenters()
 
                     } else {
                         // If sign in fails, display a message to the user.
@@ -160,7 +162,7 @@ class LoginActivity : AppCompatActivity() {
 
     //[START OF SYNC]
     @SuppressLint("SetTextI18n")
-    private fun syncSavedDataFromFirebase() {
+    private fun syncRenters() {
 
         Log.i(TAG, "checkSyncAndNavigateToHomeFragment: ")
 
@@ -198,6 +200,9 @@ class LoginActivity : AppCompatActivity() {
                             syncRentersPayments()
                         }
                     } else {
+
+                        // when there are no renters then, deleting the synced renters from the database
+                        // calling the syncBorrowers() method
 
                         withContext(Dispatchers.Main) {
 
@@ -293,7 +298,7 @@ class LoginActivity : AppCompatActivity() {
                         borrowerViewModel.deleteBorrowerByIsSynced(true)
                         borrowerPaymentViewModel.deleteBorrowerPaymentsByIsSynced(true)
                         partialPaymentViewModel.deletePartialPaymentsByIsSynced(true)
-                        saveIsSyncedValueAndNavigateToHomeActivity()
+                        syncEMIS()
                     }
                 }
             }
@@ -333,7 +338,7 @@ class LoginActivity : AppCompatActivity() {
 
                         borrowerPaymentViewModel.deleteBorrowerPaymentsByIsSynced(true)
                         partialPaymentViewModel.deletePartialPaymentsByIsSynced(true)
-                        saveIsSyncedValueAndNavigateToHomeActivity()
+                        syncEMIS()
                     }
                 }
             }
@@ -365,18 +370,97 @@ class LoginActivity : AppCompatActivity() {
                         delay(100)
                         partialPaymentViewModel.insertAllPartialPayment(it.toObjects(PartialPayment::class.java))
 
-                        saveIsSyncedValueAndNavigateToHomeActivity()
+                        syncEMIS()
                     }
                 } else {
 
                     withContext(Dispatchers.Main) {
 
                         partialPaymentViewModel.deletePartialPaymentsByIsSynced(true)
-                        saveIsSyncedValueAndNavigateToHomeActivity()
+                        syncEMIS()
                     }
                 }
             }
         }
+    }
+
+    private suspend fun syncEMIS() {
+
+        binding.showSyncingInfoTV.text = getString(R.string.sync_emis)
+
+        val emis = getDataFromFireStore(
+            getString(R.string.emis),
+            getUid()!!,
+        ) {
+            Log.e(TAG, "syncEMIS: $it")
+            showToast(this@LoginActivity, "Something went wrong...")
+
+            saveIsSyncedValueAndNavigateToHomeActivity()
+        }
+
+        emis?.let {
+
+            if (emis.size() != 0) {
+
+                withContext(Dispatchers.Main) {
+
+                    emiViewModel.deleteEMIsByIsSynced(true)
+                    delay(50)
+                    emiViewModel.insertAllEMI(emis.toObjects(EMI::class.java))
+
+                    syncEMIPayments()
+                }
+
+            } else {
+
+                withContext(Dispatchers.Main) {
+
+                    emiViewModel.deleteEMIsByIsSynced(true)
+                    saveIsSyncedValueAndNavigateToHomeActivity()
+                }
+            }
+        }
+
+    }
+
+    private suspend fun syncEMIPayments() {
+
+        binding.showSyncingInfoTV.text = getString(R.string.sync_emi_payments)
+
+        val emiPayments = getDataFromFireStore(
+            getString(R.string.emiPayments),
+            getUid()!!,
+        ) {
+            Log.e(TAG, "syncEMIPayments: $it")
+            showToast(this@LoginActivity, "Something went wrong...")
+
+            saveIsSyncedValueAndNavigateToHomeActivity()
+        }
+
+        emiPayments?.let {
+
+            if (emiPayments.size() != 0) {
+
+                withContext(Dispatchers.Main) {
+
+                    emiPaymentViewModel.deleteEMIPaymentsByIsSynced(true)
+                    delay(50)
+                    emiPaymentViewModel.insertAllEMIPayment(emiPayments.toObjects(EMIPayment::class.java))
+
+                    saveIsSyncedValueAndNavigateToHomeActivity()
+                }
+
+            } else {
+
+                withContext(Dispatchers.Main) {
+
+                    emiPaymentViewModel.deleteEMIPaymentsByIsSynced(true)
+                    saveIsSyncedValueAndNavigateToHomeActivity()
+                }
+            }
+        }
+
+
     }
 
     private fun saveIsSyncedValueAndNavigateToHomeActivity() {

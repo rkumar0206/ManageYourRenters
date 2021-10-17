@@ -43,7 +43,7 @@ interface PartialPaymentDao {
     suspend fun getKeysByBorrowerPaymentKey(borrowerPaymentKey: String): List<String>
 
     // will give the list of keys of a particular borrower
-    @Query("SELECT `key` FROM partial_payment_table WHERE borrowerId =:borrowerId AND isSynced = 1")
+    @Query("SELECT `key` FROM partial_payment_table WHERE borrowerId =:borrowerId")
     suspend fun getKeysByBorrowerId(borrowerId: String): List<String>
 }
 

@@ -28,7 +28,7 @@
                     android:textSize="22sp" />
 
                 <ImageButton
-                    android:id="@+id/downloadChangesBtn"
+                    android:id="@+id/homeSyncBtn"
                     android:layout_width="45dp"
                     android:layout_height="45dp"
                     android:layout_centerVertical="true"

@@ -29,7 +29,7 @@ interface BorrowerPaymentDao {
     @Query("DELETE FROM borrower_payment_table  WHERE isSynced = :isSynced")
     suspend fun deleteBorrowerPaymentsByIsSynced(isSynced: Boolean)
 
-    @Query("SELECT * FROM borrower_payment_table WHERE borrowerKey= :borrowerKey ORDER BY modified desc")
+    @Query("SELECT * FROM borrower_payment_table WHERE borrowerKey= :borrowerKey ORDER BY isDueCleared = 0 desc, modified desc")
     fun getPaymentsByBorrowerKey(borrowerKey: String): Flow<List<BorrowerPayment>>
 
     // getting the due amount of the borrower where isDueCleared is false

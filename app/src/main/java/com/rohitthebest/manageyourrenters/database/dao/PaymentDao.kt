@@ -38,6 +38,6 @@ interface PaymentDao {
     @Query("SELECT SUM(amountPaid - totalRent) FROM payment_table WHERE renterKey =:renterKey")
     fun getSumOfDueOrAdvance(renterKey: String): LiveData<Double>
 
-    @Query("SELECT `key` FROM payment_table WHERE renterKey = :renterKey AND isSynced = 1")
+    @Query("SELECT `key` FROM payment_table WHERE renterKey = :renterKey")
     suspend fun getPaymentKeysByRenterKey(renterKey: String): List<String>
 }

@@ -21,6 +21,8 @@ class EMIRepository @Inject constructor(
 
     suspend fun deleteAllEMIs() = dao.deleteAllEMIs()
 
+    suspend fun deleteEMIsByIsSynced(isSynced: Boolean) = dao.deleteEMIsByIsSynced(isSynced)
+
     fun getAllEMIs() = dao.getAllEMIs()
 
     fun getEMIByKey(emiKey: String) = dao.getEMIByKey(emiKey)

@@ -159,6 +159,8 @@
     <string name="delete_this_payment">Delete This Payment</string>
     <string name="view_message_or_note">View Message or Note</string>
     <string name="document">Document</string>
+    <string name="sync_emis">syncing emis…</string>
+    <string name="sync_emi_payments">syncing emi payments…</string>
 
 
     <string-array name="interest_time_schedule">

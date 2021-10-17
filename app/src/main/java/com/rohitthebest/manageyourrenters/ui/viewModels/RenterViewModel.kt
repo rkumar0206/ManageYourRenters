@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
@@ -14,6 +15,8 @@ import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+private const val TAG = "RenterViewModel"
 
 @HiltViewModel
 class RenterViewModel @Inject constructor(
@@ -34,6 +37,8 @@ class RenterViewModel @Inject constructor(
     fun deleteRenter(context: Context, renter: Renter) = viewModelScope.launch {
 
         val paymentKeys = paymentRepository.getPaymentKeysByRenterKey(renter.key!!)
+
+        Log.d(TAG, "deleteRenter: PaymentsKeys : $paymentKeys")
 
         if (Functions.isInternetAvailable(context)) {
 

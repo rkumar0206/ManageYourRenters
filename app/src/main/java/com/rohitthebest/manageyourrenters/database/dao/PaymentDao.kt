@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.database.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.rohitthebest.manageyourrenters.database.model.Payment
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
@@ -40,4 +41,7 @@ interface PaymentDao {
 
     @Query("SELECT `key` FROM payment_table WHERE renterKey = :renterKey")
     suspend fun getPaymentKeysByRenterKey(renterKey: String): List<String>
+
+    @Query("SELECT * FROM payment_table WHERE renterKey = :renterKey ORDER BY timeStamp DESC LIMIT 1")
+    fun getLastRenterPayment(renterKey: String): Flow<List<Payment>>
 }

@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.model.Payment
 import com.rohitthebest.manageyourrenters.repositories.PaymentRepository
@@ -53,4 +54,6 @@ class PaymentViewModel @Inject constructor(
 
     fun getSumOfDueOrAdvance(renterKey: String) = repository.getSumOfDueOrAdvance(renterKey)
 
+    fun getLastRenterPayment(renterKey: String) =
+        repository.getLastRenterPayment(renterKey).asLiveData()
 }

@@ -126,40 +126,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         getLastPaymentInfo()
     }
 
-    private fun getLastPaymentInfo() {
-
-        try {
-            paymentViewModel.getAllPaymentsListOfRenter(receivedRenter?.key!!)
-                .observe(viewLifecycleOwner, {
-
-                    if (it.isNotEmpty() && !isPaymentAdded) {
-
-                        Log.i(TAG, "getLastPaymentInfo: ")
-                        lastPaymentInfo = it.first()
-                        Log.d(TAG, "getLastPaymentInfo: $lastPaymentInfo")
-
-                        lifecycleScope.launch {
-
-                            delay(100)
-
-                            withContext(Dispatchers.Main) {
-
-                                initialChanges()
-                            }
-                        }
-                    } else {
-
-                        initialChanges()
-                        binding.progressBar.hide()
-                    }
-
-                })
-
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
-    }
-
     private fun getMessage() {
 
         try {
@@ -177,7 +143,35 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
-    @SuppressLint("SetTextI18n")
+    private fun getLastPaymentInfo() {
+
+        paymentViewModel.getLastRenterPayment(receivedRenter?.key!!).observe(viewLifecycleOwner, {
+
+            if (it.isNotEmpty() && !isPaymentAdded) {
+
+                lastPaymentInfo = it.first()
+
+                Log.d(TAG, "getLastPaymentInfo: $lastPaymentInfo")
+
+                lifecycleScope.launch {
+
+                    delay(100)
+
+                    withContext(Dispatchers.Main) {
+
+                        initialChanges()
+                    }
+                }
+
+            } else {
+
+                initialChanges()
+                binding.progressBar.hide()
+            }
+        })
+    }
+
+
     private fun initialChanges() {
 
         Log.i(TAG, "initialChanges: ")
@@ -188,18 +182,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             currentTimestamp = System.currentTimeMillis()
 
-            includeBinding.dateTV.text = "Payment Date : ${
-                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                    currentTimestamp
-                )
-            }"
-
-            includeBinding.timeTV.text = "Time : ${
-                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                    currentTimestamp,
-                    "hh:mm a"
-                )
-            }"
+            setDateAndTimeInTextViews(currentTimestamp)
 
             periodType = getString(R.string.by_month)
 
@@ -256,11 +239,28 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 calculateTotalBill()
 
                 includeBinding.duesOfLastPaymentTV.text =
-                    "There are no dues and no money given in advance."
+                    getString(R.string.duesOfLastPayment_message)
             }
         }
 
         binding.progressBar.hide()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun setDateAndTimeInTextViews(currentTimestamp: Long) {
+
+        includeBinding.dateTV.text = "Payment Date : ${
+            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                currentTimestamp
+            )
+        }"
+
+        includeBinding.timeTV.text = "Time : ${
+            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                System.currentTimeMillis(),
+                "hh:mm a"
+            )
+        }"
     }
 
     @SuppressLint("SetTextI18n")
@@ -414,7 +414,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         return yearList
     }
 
-
     private fun setUpCurrencySymbolList() {
 
         includeBinding.moneySymbolSpinner.setCurrencySymbol(
@@ -439,6 +438,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         includeBinding.tillDateTV.setOnClickListener(this)
 
         includeBinding.periodTypeRG.setOnCheckedChangeListener(this)
+        includeBinding.dateContainer.setOnClickListener(this)
     }
 
     @SuppressLint("SetTextI18n")
@@ -464,6 +464,23 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             includeBinding.calculateElectrictyBtn.id -> {
 
                 calculateElectricBill()
+            }
+
+            includeBinding.dateContainer.id -> {
+
+                Functions.showCalendarDialog(
+                    currentTimestamp,
+                    {
+                        requireActivity().supportFragmentManager
+                    },
+                    { timeStamp ->
+
+                        currentTimestamp = timeStamp
+
+                        setDateAndTimeInTextViews(currentTimestamp)
+                    },
+                    false
+                )
             }
 
             binding.backBtn.id -> {

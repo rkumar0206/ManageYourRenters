@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
@@ -151,6 +152,12 @@ class EMIPaymentViewModel @Inject constructor(
 
     }
 
+    fun deleteEMIPaymentsByIsSynced(isSynced: Boolean) = viewModelScope.launch {
+
+        emiPaymentRepository.deleteEMIPaymentsByIsSynced(isSynced)
+    }
+
+
 /*
     fun deleteAllEMIPayments() = viewModelScope.launch {
         emiPaymentRepository.deleteAllEMIPayments()
@@ -162,15 +169,12 @@ class EMIPaymentViewModel @Inject constructor(
     }
 */
 
-    fun deleteEMIPaymentsByIsSynced(isSynced: Boolean) = viewModelScope.launch {
+    fun getAllEMIPaymentsByEMIKey(emiKey: String) =
+        emiPaymentRepository.getAllEMIPaymentsByEMIKey(emiKey).asLiveData()
 
-        emiPaymentRepository.deleteEMIPaymentsByIsSynced(isSynced)
-    }
 
     /* fun getAllEMIPayments() = emiPaymentRepository.getAllEMIPayments().asLiveData()
 
-     fun getAllEMIPaymentsByEMIKey(emiKey: String) =
-         emiPaymentRepository.getAllEMIPaymentsByEMIKey(emiKey).asLiveData()
 
      fun getEMIPaymentByKey(emiPaymentKey: String) =
          emiPaymentRepository.getEMIPaymentByKey(emiPaymentKey).asLiveData()

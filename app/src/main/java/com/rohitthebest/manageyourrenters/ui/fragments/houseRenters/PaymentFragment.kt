@@ -37,6 +37,8 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.abs
 
+private const val TAG = "PaymentFragment"
+
 @SuppressLint("SetTextI18n")
 @AndroidEntryPoint
 class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnClickListener {
@@ -85,7 +87,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                 val renterKey = args?.renterInfoMessage
                 getTheRenter(renterKey)
-                //receivedRenter = convertJSONtoRenter(args?.renterInfoMessage)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -94,9 +95,9 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     private fun getTheRenter(renterKey: String?) {
 
-        renterViewModel.getRenterByKey(renterKey!!).observe(viewLifecycleOwner) {
+        renterViewModel.getRenterByKey(renterKey!!).observe(viewLifecycleOwner) { renter ->
 
-            receivedRenter = it
+            receivedRenter = renter
 
             showProgressBar()
 
@@ -488,8 +489,44 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     }
 
+
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+    // ==================================================================================================
+    // todo : requires change
+    // lookup the code and make the necessary changes
     override fun onDeleteClicked(payment: Payment) {
 
+        showAlertDialogForDeletion(
+            requireContext(),
+            { dialog ->
+
+                // checking if the payment is synced, if it's not, then deleting it from
+                // only the local database
+                if (payment.isSynced == getString(R.string.f)) {
+
+                    deletePayment(payment)
+                } else {
+
+                    if (isInternetAvailable(requireContext())) {
+
+                        deletePayment(payment)
+                    } else {
+                        showNoInternetMessage(requireContext())
+                    }
+                }
+                dialog.dismiss()
+
+            },
+            { dialog ->
+
+                dialog.dismiss()
+            }
+        )
+
+/*
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Are you sure?")
             .setMessage(getString(R.string.delete_warning_message))
@@ -515,26 +552,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
             }
             .create()
             .show()
+*/
 
-    }
-
-    override fun onMessageBtnClicked(paymentMessage: String) {
-
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Message")
-            .setMessage(
-                if (paymentMessage != "") {
-                    paymentMessage
-                } else {
-                    "No message..."
-                }
-            )
-            .setPositiveButton("Ok") { dialogInterface, _ ->
-
-                dialogInterface.dismiss()
-            }
-            .create()
-            .show()
     }
 
     private fun deletePayment(payment: Payment) {
@@ -573,6 +592,26 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
             }
         )
+    }
+
+
+    override fun onMessageBtnClicked(paymentMessage: String) {
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Message")
+            .setMessage(
+                if (paymentMessage != "") {
+                    paymentMessage
+                } else {
+                    "No message..."
+                }
+            )
+            .setPositiveButton("Ok") { dialogInterface, _ ->
+
+                dialogInterface.dismiss()
+            }
+            .create()
+            .show()
     }
 
     private fun updateRenterDuesOrAdvanceTextView() {

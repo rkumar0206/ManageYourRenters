@@ -35,6 +35,6 @@ interface ExpenseCategoryAPI {
     suspend fun deleteCategoryById(
         @Path("uid") uid: String,
         @Path("id") id: Long
-    ): Response<ExpenseCategory>
+    ): Response<String?>
 
 }

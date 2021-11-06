@@ -71,6 +71,14 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
         trackMoneyTypeList.add(
             RenterTypes(
                 id = 4,
+                renterType = getString(R.string.expenses),
+                image = R.drawable.ic_expense
+            )
+        )
+
+        trackMoneyTypeList.add(
+            RenterTypes(
+                id = 5,
                 renterType = getString(R.string.others),
                 image = R.drawable.ic_other_track_money
             )

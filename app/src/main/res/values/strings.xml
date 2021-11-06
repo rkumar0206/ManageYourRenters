@@ -162,6 +162,7 @@
     <string name="sync_emis">syncing emis…</string>
     <string name="sync_emi_payments">syncing emi payments…</string>
     <string name="duesOfLastPayment_message">There are no dues and no money given in advance.</string>
+    <string name="expenses">Expenses</string>
 
 
     <string-array name="interest_time_schedule">

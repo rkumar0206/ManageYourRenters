@@ -4,7 +4,7 @@ data class ExpenseCategory(
     val categoryDescription: String?,
     val categoryName: String,
     val created: Long,
-    val id: Int,
+    val id: Long,
     val imageUrl: String? = null,
     val modified: Long,
     val uid: String

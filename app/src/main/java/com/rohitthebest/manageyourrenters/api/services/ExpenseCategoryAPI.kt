@@ -28,7 +28,8 @@ interface ExpenseCategoryAPI {
     @PUT("/api/{uid}/expenseCategories/{id}")
     suspend fun updateCategoryById(
         @Path("uid") uid: String,
-        @Path("id") id: Long
+        @Path("id") id: Long,
+        @Body expenseCategory: ExpenseCategory
     ): Response<ExpenseCategory>
 
     @DELETE("/api/{uid}/expenseCategories/{id}")

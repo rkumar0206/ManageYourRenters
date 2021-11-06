@@ -4,11 +4,13 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.rohitthebest.manageyourrenters.api.services.ExpenseCategoryAPI
 import com.rohitthebest.manageyourrenters.database.databases.*
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EMI_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EMI_PAYMENT_DATABASE_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.MANAGE_YOUR_RENTERS_API_BASE_URL
 import com.rohitthebest.manageyourrenters.others.Constants.PARTIAL_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.RENTER_DATABASE_NAME
@@ -17,7 +19,17 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Qualifier
+annotation class ExpenseCategoryRetrofit
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -155,5 +167,42 @@ object Module {
     @Provides
     @Singleton
     fun provideEMIPaymentDao(db: EMIPaymentDatabase) = db.getEMIPaymentDao()
+
+    // =========================================================================================
+
+    // ------------------------------ Expense Category API -----------------------------------
+
+    @Provides
+    @Singleton
+    fun providesOkHttpClient(): OkHttpClient {
+
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+
+        return OkHttpClient.Builder()
+            .addInterceptor(interceptor)
+            .readTimeout(35, TimeUnit.SECONDS)
+            .build()
+    }
+
+    @ExpenseCategoryRetrofit
+    @Provides
+    @Singleton
+    fun provideExpenseCategoryRetrofit(
+        okHttpClient: OkHttpClient
+    ): Retrofit = Retrofit.Builder()
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl(MANAGE_YOUR_RENTERS_API_BASE_URL)
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideExpenseCategoryAPI(
+        @ExpenseCategoryRetrofit retrofit: Retrofit
+    ): ExpenseCategoryAPI = retrofit.create(ExpenseCategoryAPI::class.java)
+
+
+    // ======================================================================================
 
 }

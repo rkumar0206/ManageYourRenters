@@ -11,29 +11,29 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExpenseCategoryViewModel @Inject constructor(
-    private val repository: ExpenseCategoryRepository
+    private val expenseCategoryRepository: ExpenseCategoryRepository
 ) : ViewModel() {
 
     fun insertExpenseCategory(expenseCategory: ExpenseCategory) = viewModelScope.launch {
-        repository.insertExpenseCategory(expenseCategory)
+        expenseCategoryRepository.insertExpenseCategory(expenseCategory)
     }
 
     fun insertAllExpenseCategory(expenseCategories: List<ExpenseCategory>) = viewModelScope.launch {
-        repository.insertAllExpenseCategory(expenseCategories)
+        expenseCategoryRepository.insertAllExpenseCategory(expenseCategories)
     }
 
     fun updateExpenseCategory(expenseCategory: ExpenseCategory) = viewModelScope.launch {
-        repository.updateExpenseCategory(expenseCategory)
+        expenseCategoryRepository.updateExpenseCategory(expenseCategory)
     }
 
     fun deleteExpenseCategory(expenseCategory: ExpenseCategory) = viewModelScope.launch {
-        repository.deleteExpenseCategory(expenseCategory)
+        expenseCategoryRepository.deleteExpenseCategory(expenseCategory)
     }
 
     fun deleteAllExpenseCategories() = viewModelScope.launch {
-        repository.deleteAllExpenseCategories()
+        expenseCategoryRepository.deleteAllExpenseCategories()
     }
 
-    fun getAllExpenseCategories() = repository.getAllExpenseCategories().asLiveData()
+    fun getAllExpenseCategories() = expenseCategoryRepository.getAllExpenseCategories().asLiveData()
 
 }

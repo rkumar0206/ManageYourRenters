@@ -79,7 +79,7 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
         trackMoneyTypeList.add(
             RenterTypes(
                 id = 5,
-                renterType = getString(R.string.others),
+                renterType = getString(R.string.monthly_payments),
                 image = R.drawable.ic_other_track_money
             )
         )
@@ -110,6 +110,11 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
             2 -> {
 
                 showToast(requireContext(), renterType.renterType)
+            }
+
+            4 -> {
+
+                findNavController().navigate(R.id.action_trackMoneyHomeFragment_to_expenseCategoryFragment)
             }
 
             else -> {

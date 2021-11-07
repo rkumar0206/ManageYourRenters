@@ -17,6 +17,14 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_trackMoneyHomeFragment_to_expenseCategoryFragment"
+            app:destination="@id/expenseCategoryFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/emiFragment"
@@ -90,4 +98,9 @@
             app:argType="string"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/expenseCategoryFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.ExpenseCategoryFragment"
+        android:label="ExpenseCategoryFragment"
+        tools:layout="@layout/fragment_expense_category" />
 </navigation>

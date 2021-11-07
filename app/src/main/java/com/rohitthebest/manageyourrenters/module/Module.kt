@@ -11,6 +11,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_DATABASE_NAM
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EMI_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EMI_PAYMENT_DATABASE_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.MANAGE_YOUR_RENTERS_API_BASE_URL
 import com.rohitthebest.manageyourrenters.others.Constants.PARTIAL_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.PAYMENT_DATABASE_NAME
@@ -170,6 +171,34 @@ object Module {
     fun provideEMIPaymentDao(db: EMIPaymentDatabase) = db.getEMIPaymentDao()
 
     // =========================================================================================
+
+    //============================== Expense Database========================================
+
+    @Provides
+    @Singleton
+    fun provideExpenseDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(
+        context,
+        ExpenseDatabase::class.java,
+        EXPENSE_DATABASE_NAME
+    ).build()
+
+    @Provides
+    @Singleton
+    fun provideExpenseCategoryDao(
+        db: ExpenseDatabase
+    ) = db.getExpenseCategoryDAO()
+
+    @Provides
+    @Singleton
+    fun provideExpenseDao(
+        db: ExpenseDatabase
+    ) = db.getExpenseDAO()
+
+
+    // =========================================================================================
+
 
     // ------------------------------ Expense Category API -----------------------------------
 

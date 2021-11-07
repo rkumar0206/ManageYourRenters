@@ -12,7 +12,8 @@ data class Expense(
     val spentOn: String,
     val uid: String,
     val key: String,
-    val categoryKey: String = ""
+    val categoryKey: String = "",
+    val isSynced: Boolean = false
 ) {
 
     constructor() : this(
@@ -23,6 +24,7 @@ data class Expense(
         "",
         "",
         "",
-        ""
+        "",
+        false
     )
 }

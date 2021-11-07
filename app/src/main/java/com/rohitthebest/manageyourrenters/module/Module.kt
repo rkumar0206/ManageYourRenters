@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.rohitthebest.manageyourrenters.api.services.ExpenseAPI
 import com.rohitthebest.manageyourrenters.api.services.ExpenseCategoryAPI
 import com.rohitthebest.manageyourrenters.database.databases.*
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_DATABASE_NAME
@@ -28,7 +29,7 @@ import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Qualifier
-annotation class ExpenseCategoryRetrofit
+annotation class ExpenseRetrofit
 
 
 @Module
@@ -185,7 +186,7 @@ object Module {
             .build()
     }
 
-    @ExpenseCategoryRetrofit
+    @ExpenseRetrofit
     @Provides
     @Singleton
     fun provideExpenseCategoryRetrofit(
@@ -199,10 +200,19 @@ object Module {
     @Provides
     @Singleton
     fun provideExpenseCategoryAPI(
-        @ExpenseCategoryRetrofit retrofit: Retrofit
+        @ExpenseRetrofit retrofit: Retrofit
     ): ExpenseCategoryAPI = retrofit.create(ExpenseCategoryAPI::class.java)
 
 
+    // ======================================================================================
+
+    // ------------------------------ Expense API -----------------------------------
+
+    @Provides
+    @Singleton
+    fun provideExpenseAPI(
+        @ExpenseRetrofit retrofit: Retrofit
+    ): ExpenseAPI = retrofit.create(ExpenseAPI::class.java)
     // ======================================================================================
 
 }

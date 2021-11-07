@@ -57,14 +57,16 @@ interface ExpenseAPI {
     suspend fun updateExpenseById(
         @Path("uid") uid: String,
         @Path("id") id: Long,
-        @Path("categoryId") categoryId: Long
+        @Path("categoryId") categoryId: Long,
+        @Body expense: Expense
     ): Response<Expense>
 
     @PUT("/api/{uid}/expenses/key/{key}/category/{categoryKey}")
     suspend fun updateExpenseByKey(
         @Path("uid") uid: String,
         @Path("key") key: String,
-        @Path("categoryKey") categoryKey: String
+        @Path("categoryKey") categoryKey: String,
+        @Body expense: Expense
     ): Response<Expense>
 
 

@@ -7,7 +7,8 @@ data class ExpenseCategory(
     val id: Long,
     val imageUrl: String? = null,
     val modified: Long,
-    val uid: String
+    val uid: String,
+    val key: String
 ) {
 
     constructor() : this(
@@ -17,6 +18,7 @@ data class ExpenseCategory(
         0,
         "",
         0L,
+        "",
         ""
     )
 }

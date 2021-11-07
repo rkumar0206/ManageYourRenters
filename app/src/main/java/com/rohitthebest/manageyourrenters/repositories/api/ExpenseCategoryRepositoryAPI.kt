@@ -21,14 +21,31 @@ class ExpenseCategoryRepositoryAPI @Inject constructor(
         uid, id
     )
 
+    suspend fun getExpenseCategoryByKey(uid: String, key: String) =
+        expenseCategoryAPI.getCategoryByKey(
+            uid, key
+        )
+
     suspend fun updateExpenseCategoryById(
         uid: String,
         id: Long,
         expenseCategory: ExpenseCategory
     ) = expenseCategoryAPI.updateCategoryById(uid, id, expenseCategory)
 
+    suspend fun updateExpenseCategoryByKey(
+        uid: String,
+        key: String,
+        expenseCategory: ExpenseCategory
+    ) = expenseCategoryAPI.updateCategoryByKey(uid, key, expenseCategory)
+
+
     suspend fun deleteExpenseCategoryById(
         uid: String,
         id: Long
     ) = expenseCategoryAPI.deleteCategoryById(uid, id)
+
+    suspend fun deleteExpenseCategoryByKey(
+        uid: String,
+        key: String
+    ) = expenseCategoryAPI.deleteCategoryByKey(uid, key)
 }

@@ -25,6 +25,13 @@ interface ExpenseCategoryAPI {
         @Path("id") id: Long
     ): Response<ExpenseCategory>
 
+    @GET("/api/{uid}/expenseCategories/key/{key}")
+    suspend fun getCategoryByKey(
+        @Path("uid") uid: String,
+        @Path("key") key: String
+    ): Response<ExpenseCategory>
+
+
     @PUT("/api/{uid}/expenseCategories/{id}")
     suspend fun updateCategoryById(
         @Path("uid") uid: String,
@@ -32,10 +39,24 @@ interface ExpenseCategoryAPI {
         @Body expenseCategory: ExpenseCategory
     ): Response<ExpenseCategory>
 
+    @PUT("/api/{uid}/expenseCategories/key/{key}")
+    suspend fun updateCategoryByKey(
+        @Path("uid") uid: String,
+        @Path("key") key: String,
+        @Body expenseCategory: ExpenseCategory
+    ): Response<ExpenseCategory>
+
+
     @DELETE("/api/{uid}/expenseCategories/{id}")
     suspend fun deleteCategoryById(
         @Path("uid") uid: String,
         @Path("id") id: Long
+    ): Response<String?>
+
+    @DELETE("/api/{uid}/expenseCategories/key/{key}")
+    suspend fun deleteCategoryByKey(
+        @Path("uid") uid: String,
+        @Path("key") key: String
     ): Response<String?>
 
 }

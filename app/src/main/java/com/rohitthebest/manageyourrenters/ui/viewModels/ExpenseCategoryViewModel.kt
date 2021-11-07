@@ -1,0 +1,39 @@
+package com.rohitthebest.manageyourrenters.ui.viewModels
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class ExpenseCategoryViewModel @Inject constructor(
+    private val repository: ExpenseCategoryRepository
+) : ViewModel() {
+
+    fun insertExpenseCategory(expenseCategory: ExpenseCategory) = viewModelScope.launch {
+        repository.insertExpenseCategory(expenseCategory)
+    }
+
+    fun insertAllExpenseCategory(expenseCategories: List<ExpenseCategory>) = viewModelScope.launch {
+        repository.insertAllExpenseCategory(expenseCategories)
+    }
+
+    fun updateExpenseCategory(expenseCategory: ExpenseCategory) = viewModelScope.launch {
+        repository.updateExpenseCategory(expenseCategory)
+    }
+
+    fun deleteExpenseCategory(expenseCategory: ExpenseCategory) = viewModelScope.launch {
+        repository.deleteExpenseCategory(expenseCategory)
+    }
+
+    fun deleteAllExpenseCategories() = viewModelScope.launch {
+        repository.deleteAllExpenseCategories()
+    }
+
+    fun getAllExpenseCategories() = repository.getAllExpenseCategories().asLiveData()
+
+}

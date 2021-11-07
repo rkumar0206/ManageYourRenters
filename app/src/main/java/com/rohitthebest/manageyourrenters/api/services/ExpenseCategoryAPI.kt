@@ -1,7 +1,7 @@
 package com.rohitthebest.manageyourrenters.api.services
 
-import com.rohitthebest.manageyourrenters.data.apiModels.ExpenseCategory
-import com.rohitthebest.manageyourrenters.data.apiModels.ExpenseCategoryResponse
+import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategoryResponse
 import retrofit2.Response
 import retrofit2.http.*
 

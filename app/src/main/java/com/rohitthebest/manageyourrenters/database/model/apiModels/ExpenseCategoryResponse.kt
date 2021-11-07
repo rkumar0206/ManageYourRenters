@@ -1,4 +1,4 @@
-package com.rohitthebest.manageyourrenters.data.apiModels
+package com.rohitthebest.manageyourrenters.database.model.apiModels
 
 data class ExpenseCategoryResponse(
     val expenseCategories: List<ExpenseCategory>

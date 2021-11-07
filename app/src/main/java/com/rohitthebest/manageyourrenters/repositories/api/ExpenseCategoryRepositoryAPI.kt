@@ -1,7 +1,7 @@
 package com.rohitthebest.manageyourrenters.repositories.api
 
 import com.rohitthebest.manageyourrenters.api.services.ExpenseCategoryAPI
-import com.rohitthebest.manageyourrenters.data.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -1,10 +1,14 @@
-package com.rohitthebest.manageyourrenters.data.apiModels
+package com.rohitthebest.manageyourrenters.database.model.apiModels
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "expense_category_table")
 data class ExpenseCategory(
+    @PrimaryKey(autoGenerate = true) val id: Long? = null,
     val categoryDescription: String?,
     val categoryName: String,
     val created: Long,
-    val id: Long,
     val imageUrl: String? = null,
     val modified: Long,
     val uid: String,
@@ -12,9 +16,9 @@ data class ExpenseCategory(
 ) {
 
     constructor() : this(
+        null,
         "",
         "",
-        0L,
         0,
         "",
         0L,

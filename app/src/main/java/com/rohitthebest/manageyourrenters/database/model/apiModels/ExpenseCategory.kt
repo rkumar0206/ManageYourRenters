@@ -6,14 +6,14 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "expense_category_table")
 data class ExpenseCategory(
     @PrimaryKey(autoGenerate = true) val id: Long? = null,
-    val categoryDescription: String?,
-    val categoryName: String,
-    val created: Long,
-    val imageUrl: String? = null,
-    val modified: Long,
-    val uid: String,
-    val key: String,
-    val isSynced: Boolean = false
+    var categoryDescription: String?,
+    var categoryName: String,
+    var created: Long,
+    var imageUrl: String? = null,
+    var modified: Long,
+    var uid: String,
+    var key: String,
+    var isSynced: Boolean = false
 ) {
 
     constructor() : this(

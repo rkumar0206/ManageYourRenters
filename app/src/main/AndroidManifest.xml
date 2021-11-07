@@ -21,7 +21,9 @@
         <activity android:name=".ui.activities.BorrowerActivity" />
         <activity android:name=".ui.activities.LoginActivity" />
         <activity android:name=".ui.activities.HouseRentersActivity" />
-        <activity android:name=".ui.activities.HomeActivity">
+        <activity
+            android:name=".ui.activities.HomeActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,6 +38,7 @@
         <service android:name=".services.UploadDocumentListToFireStoreService" />
         <service android:name=".services.DeleteFileFromFirebaseStorageService" />
         <service android:name=".services.UploadFileToFirebaseStorageService" />
+        <service android:name=".services.ExpenseCategoryService" />
 
         <meta-data
             android:name="io.sentry.dsn"

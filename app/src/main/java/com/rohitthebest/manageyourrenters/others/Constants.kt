@@ -40,4 +40,7 @@ object Constants {
     const val SHOW_EDIT_MENU = "SHOW_EDIT_MENU_sjcjwncjkn"
     const val SHOW_DOCUMENTS_MENU = "SHOW_DOCUMENTS_MENU_sjcjwncacacn"
     const val SHOW_DELETE_MENU = "DELETE_MENUbkjbskjc"
+
+    const val REQUEST_METHOD_KEY = "sacnakjnkankan"
+    const val EXPENSE_CATEGORY_KEY = "acjakjcakjbcabb"
 }

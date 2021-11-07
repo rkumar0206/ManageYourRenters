@@ -140,7 +140,7 @@
     <string name="emis">EMIs</string>
     <string name="no_EMI_added_message">Click the add (+) button below to add an EMI</string>
     <string name="edit">Edit</string>
-    <string name="delete">Delete</string>
+    <string name="_delete">Delete</string>
     <string name="delete_supporting_document">Delete supporting document</string>
     <string name="replace_supporting_document">Add / Replace supporting document</string>
     <string name="no_supporting_doc_added">No supporting document added!!!</string>
@@ -163,6 +163,12 @@
     <string name="sync_emi_payments">syncing emi payments…</string>
     <string name="duesOfLastPayment_message">There are no dues and no money given in advance.</string>
     <string name="expenses">Expenses</string>
+
+    <string name="get">GET</string>
+    <string name="get_one">GET_ONE</string>
+    <string name="post">POST</string>
+    <string name="put">PUT</string>
+    <string name="delete_one">DELETE</string>
 
 
     <string-array name="interest_time_schedule">

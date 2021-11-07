@@ -224,7 +224,7 @@
                 android:layout_toEndOf="@+id/imageView11"
                 android:gravity="center_vertical"
                 android:padding="10dp"
-                android:text="@string/delete"
+                android:text="@string/_delete"
                 android:textSize="18sp" />
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>

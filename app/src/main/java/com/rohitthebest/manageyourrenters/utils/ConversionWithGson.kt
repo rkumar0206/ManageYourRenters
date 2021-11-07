@@ -3,6 +3,8 @@ package com.rohitthebest.manageyourrenters.utils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.database.model.*
+import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
+import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 
 private val gson = Gson()
 
@@ -88,5 +90,25 @@ fun fromEMIPaymentToString(emiPayment: EMIPayment): String {
 fun fromStringToEMIPayment(str: String): EMIPayment {
 
     return Gson().fromJson(str, object : TypeToken<EMIPayment>() {}.type)
+}
+
+fun fromExpenseCategoryToString(expenseCategory: ExpenseCategory): String {
+
+    return Gson().toJson(expenseCategory)
+}
+
+fun fromStringToExpenseCategory(str: String): ExpenseCategory {
+
+    return Gson().fromJson(str, object : TypeToken<ExpenseCategory>() {}.type)
+}
+
+fun fromExpenseToString(expense: Expense): String {
+
+    return Gson().toJson(expense)
+}
+
+fun fromStringToExpense(str: String): Expense {
+
+    return Gson().fromJson(str, object : TypeToken<Expense>() {}.type)
 }
 

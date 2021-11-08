@@ -21,7 +21,20 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentExpenseCategoryBinding.bind(view)
 
+        initListeners()
+    }
 
+    private fun initListeners() {
+
+        binding.addExpenseCategoryFAB.setOnClickListener {
+
+
+        }
+
+        binding.toolbar.setNavigationOnClickListener {
+
+            requireActivity().onBackPressed()
+        }
     }
 
     override fun onDestroyView() {

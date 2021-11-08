@@ -7,16 +7,20 @@ import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
+import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.deleteFileFromFirebaseStorage
 import com.rohitthebest.manageyourrenters.utils.expenseCategoryService
+import com.rohitthebest.manageyourrenters.utils.isValid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ExpenseCategoryViewModel @Inject constructor(
-    private val expenseCategoryRepository: ExpenseCategoryRepository
+    private val expenseCategoryRepository: ExpenseCategoryRepository,
+    private val expenseRepository: ExpenseRepository
 ) : ViewModel() {
 
     fun insertExpenseCategory(context: Context, expenseCategory: ExpenseCategory) =
@@ -76,8 +80,20 @@ class ExpenseCategoryViewModel @Inject constructor(
                     expenseCategory,
                     context.getString(R.string.delete_one)
                 )
+
+                if (expenseCategory.imageUrl.isValid()) {
+
+                    if (expenseCategory.imageUrl!!.contains("firebase")) {
+
+                        deleteFileFromFirebaseStorage(
+                            context,
+                            expenseCategory.imageUrl!!
+                        )
+                    }
+                }
             }
 
+            expenseRepository.deleteExpenseByExpenseCategoryKey(expenseCategory.key)
             expenseCategoryRepository.deleteExpenseCategory(expenseCategory)
         }
 

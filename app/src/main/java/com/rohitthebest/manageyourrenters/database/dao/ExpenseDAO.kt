@@ -22,6 +22,9 @@ interface ExpenseDAO {
     @Query("DELETE FROM expense_table")
     suspend fun deleteAllExpenses()
 
+    @Query("DELETE FROM expense_table WHERE categoryKey = :expenseCategoryKey")
+    suspend fun deleteExpenseByExpenseCategoryKey(expenseCategoryKey: String)
+
     @Query("SELECT * FROM expense_table")
     fun getAllExpenses(): Flow<List<Expense>>
 

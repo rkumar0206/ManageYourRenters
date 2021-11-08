@@ -11,16 +11,23 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.ExpenseCategoryAdapter
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseCategoryBinding
+import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.show
+import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private const val TAG = "ExpenseCategoryFragment"
+
 @AndroidEntryPoint
 class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
-    ExpenseCategoryAdapter.OnClickListener {
+    ExpenseCategoryAdapter.OnClickListener, CustomMenuItems.OnItemClickListener {
 
     private var _binding: FragmentExpenseCategoryBinding? = null
     private val binding get() = _binding!!
@@ -65,6 +72,77 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
         // todo : navigate to expense fragment
     }
+
+    private lateinit var expenseCategoryForMenus: ExpenseCategory
+
+    override fun onMenuBtnClicked(expenseCategory: ExpenseCategory) {
+
+        // todo : show the custom menu dialog
+
+        expenseCategoryForMenus = expenseCategory
+
+        requireActivity().supportFragmentManager.let { fm ->
+
+            val bundle = Bundle()
+            bundle.putBoolean(Constants.SHOW_EDIT_MENU, true)
+            bundle.putBoolean(Constants.SHOW_DELETE_MENU, true)
+            bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, false)
+
+            CustomMenuItems.newInstance(
+                bundle
+            ).apply {
+
+                show(fm, TAG)
+            }.setOnClickListener(this)
+        }
+
+    }
+
+    override fun onEditMenuClick() {
+
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDeleteMenuClick() {
+
+        showAlertDialogForDeletion(
+            requireContext(),
+            { dialog ->
+
+                if (this::expenseCategoryForMenus.isInitialized) {
+
+                    if (expenseCategoryForMenus.isSynced) {
+
+                        if (isInternetAvailable(requireContext())) {
+                            expenseCategoryViewModel.deleteExpenseCategory(
+                                requireContext(), expenseCategoryForMenus
+                            )
+                        } else {
+                            showNoInternetMessage(requireContext())
+                        }
+                    } else {
+
+                        expenseCategoryViewModel.deleteExpenseCategory(
+                            requireContext(),
+                            expenseCategoryForMenus
+                        )
+                    }
+                }
+
+                dialog.dismiss()
+            },
+            { dialog ->
+
+                dialog.dismiss()
+            }
+        )
+    }
+
+    override fun onViewSupportingDocumentMenuClick() {}
+
+    override fun onReplaceSupportingDocumentClick() {}
+
+    override fun onDeleteSupportingDocumentClick() {}
 
     private fun observeExpenseCategories() {
 

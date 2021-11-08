@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -143,6 +144,7 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
         return includeBinding.expenseCatCategoryNameET.error == null
     }
 
+    @SuppressLint("SetTextI18n")
     private fun uploadImage() {
 
         if (imageUri != null) {
@@ -159,17 +161,31 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
                     uploadTask = {},
                     progressListener = { task ->
 
+                        binding.progressLL.show()
                         binding.expenseCatProgressBar.show()
-                        binding.expenseCatProgressBar.progress =
-                            ((100 * task.bytesTransferred) / task.totalByteCount).toInt()
+                        binding.progressTrackerTV.show()
+
+                        val progress = ((100 * task.bytesTransferred) / task.totalByteCount).toInt()
+                        binding.expenseCatProgressBar.progress = progress
+
+                        binding.progressTrackerTV.text = "Uploading Image... $progress"
                     },
                     completeListener = { imageUrl ->
 
                         binding.expenseCatProgressBar.hide()
+                        binding.progressTrackerTV.hide()
+                        binding.progressLL.hide()
+
                         initExpenseCategory(imageUrl)
                     },
                     successListener = {},
-                    failureListener = {}
+                    failureListener = {
+
+                        Log.i(
+                            TAG,
+                            "uploadImage: Exception in uploading expense category image : " + it.message
+                        )
+                    }
                 )
             }
         } else {

@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.ExpenseCategoryAdapter
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseCategoryBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.utils.hide
@@ -24,9 +25,13 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category) {
 
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
 
+    private lateinit var expenseCategoryAdapter: ExpenseCategoryAdapter
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentExpenseCategoryBinding.bind(view)
+
+        expenseCategoryAdapter = ExpenseCategoryAdapter()
 
         initListeners()
 
@@ -48,6 +53,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category) {
 
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
+            adapter = expenseCategoryAdapter
         }
     }
 
@@ -68,7 +74,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category) {
 
                 binding.progressbar.hide()
 
-                // submit list to adapter
+                expenseCategoryAdapter.submitList(expenseCategories)
             })
     }
 

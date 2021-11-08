@@ -32,17 +32,38 @@
 
     </androidx.core.widget.NestedScrollView>
 
-
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/expenseCatProgressBar"
+    <LinearLayout
+        android:id="@+id/progressLL"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:progress="20"
-        android:visibility="gone"
-        app:indicatorColor="@color/dark_blue"
-        app:trackColor="@color/rippleColor"
-        tools:visibility="visible" />
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/expenseCatProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:progress="20"
+            android:visibility="gone"
+            app:indicatorColor="@color/dark_blue"
+            app:trackColor="@color/rippleColor"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/progressTrackerTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:padding="3dp"
+            android:text="@string/please_wait_while_file_is_uploading"
+            android:textColor="@color/primaryTextColor"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

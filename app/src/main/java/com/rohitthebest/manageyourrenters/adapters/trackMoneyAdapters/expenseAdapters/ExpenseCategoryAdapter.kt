@@ -5,8 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.ItemExpenseCategoryBinding
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setImageToImageViewUsingGlide
+import com.rohitthebest.manageyourrenters.utils.isValid
 
 class ExpenseCategoryAdapter :
     ListAdapter<ExpenseCategory, ExpenseCategoryAdapter.ExpenseCategoryViewHolder>(DiffUtilCallback()) {
@@ -18,6 +23,13 @@ class ExpenseCategoryAdapter :
 
         init {
 
+            binding.rootL.setOnClickListener {
+
+                if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
+
+                    mListener!!.onItemClick(getItem(absoluteAdapterPosition))
+                }
+            }
         }
 
         fun setData(expenseCategory: ExpenseCategory?) {
@@ -25,6 +37,23 @@ class ExpenseCategoryAdapter :
             expenseCategory?.let { expenseCat ->
 
                 binding.apply {
+
+                    if (expenseCat.imageUrl.isValid()) {
+
+                        setImageToImageViewUsingGlide(
+                            binding.root.context,
+                            expenseCategoryIV,
+                            expenseCat.imageUrl,
+                            {},
+                            {}
+                        )
+                    } else {
+
+                        Glide.with(binding.root)
+                            .load(R.drawable.gradient_blue)
+                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .into(expenseCategoryIV)
+                    }
 
                     expenseCategoryNameTV.text = expenseCat.categoryName
                 }

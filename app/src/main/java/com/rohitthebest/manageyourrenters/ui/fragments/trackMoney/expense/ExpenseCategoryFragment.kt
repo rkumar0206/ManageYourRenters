@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseCategoryBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
@@ -28,7 +29,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category) {
 
         binding.addExpenseCategoryFAB.setOnClickListener {
 
-
+            findNavController().navigate(R.id.action_expenseCategoryFragment_to_addEditExpenseCategoryFragment)
         }
 
         binding.toolbar.setNavigationOnClickListener {

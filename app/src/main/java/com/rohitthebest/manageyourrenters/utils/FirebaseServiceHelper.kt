@@ -90,7 +90,7 @@ fun deleteDocumentFromFireStore(
     val foregroundService = Intent(context, DeleteService::class.java)
 
     foregroundService.putExtra(
-        Constants.COLLECTION_KEY,
+        COLLECTION_KEY,
         collection
     )
 

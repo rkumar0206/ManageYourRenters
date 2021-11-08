@@ -102,5 +102,19 @@
         android:id="@+id/expenseCategoryFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.ExpenseCategoryFragment"
         android:label="ExpenseCategoryFragment"
-        tools:layout="@layout/fragment_expense_category" />
+        tools:layout="@layout/fragment_expense_category">
+        <action
+            android:id="@+id/action_expenseCategoryFragment_to_addEditExpenseCategoryFragment"
+            app:destination="@id/addEditExpenseCategoryFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/addEditExpenseCategoryFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.AddEditExpenseCategoryFragment"
+        android:label="AddEditExpenseCategoryFragment"
+        tools:layout="@layout/add_expense_category_layout">
+        <argument
+            android:name="expenseCategoryKey"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
 </navigation>

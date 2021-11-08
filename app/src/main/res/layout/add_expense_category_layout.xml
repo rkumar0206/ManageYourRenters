@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/expenseCatClearImageBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:contentDescription="@string/clear_image"
+        android:focusable="true"
+        android:visibility="gone"
+        app:fabSize="mini"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/expenseCatIV"
+        app:srcCompat="@drawable/ic_cancel"
+        tools:visibility="visible" />
+
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/expenseCatIV"
         android:layout_width="0dp"
         android:layout_height="200dp"
         android:contentDescription="@string/expense_category_image"
@@ -24,11 +40,11 @@
         android:text="@string/add_image"
         android:textAllCaps="false"
         app:icon="@drawable/ic_baseline_add_circle_outline_24"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+        app:layout_constraintBottom_toBottomOf="@+id/expenseCatIV"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView2" />
+        app:layout_constraintTop_toTopOf="@+id/expenseCatIV" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView19"
@@ -40,7 +56,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2">
+        app:layout_constraintTop_toBottomOf="@+id/expenseCatIV">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/expenseCatCategoryNameET"
@@ -48,10 +64,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/expense_category_name"
-            app:boxBackgroundColor="@color/color_white"
-            app:boxBackgroundMode="none"
             app:counterEnabled="true"
             app:counterMaxLength="25"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             app:errorEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -64,6 +80,7 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView20"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -97,7 +114,6 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="3dp"
                 android:hint="@string/expense_description"
-                android:hintTextColor="#78909C"
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine"
                 android:maxLength="300"
@@ -108,6 +124,18 @@
 
 
     </androidx.cardview.widget.CardView>
+
+    <View
+        android:id="@+id/divider66"
+        android:layout_width="409dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView20" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

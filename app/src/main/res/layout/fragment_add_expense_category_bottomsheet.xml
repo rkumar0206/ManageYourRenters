@@ -37,8 +37,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginTop="250dp"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/expenseCatProgressBar"

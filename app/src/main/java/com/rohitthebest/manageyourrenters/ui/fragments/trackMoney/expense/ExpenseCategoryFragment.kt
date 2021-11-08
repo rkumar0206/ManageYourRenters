@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.ExpenseCategoryAdapter
+import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseCategoryBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.utils.hide
@@ -18,7 +19,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category) {
+class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
+    ExpenseCategoryAdapter.OnClickListener {
 
     private var _binding: FragmentExpenseCategoryBinding? = null
     private val binding get() = _binding!!
@@ -55,6 +57,13 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category) {
             setHasFixedSize(true)
             adapter = expenseCategoryAdapter
         }
+
+        expenseCategoryAdapter.setOnClickListener(this)
+    }
+
+    override fun onItemClick(expenseCategory: ExpenseCategory) {
+
+        // todo : navigate to expense fragment
     }
 
     private fun observeExpenseCategories() {
@@ -95,4 +104,5 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category) {
         super.onDestroyView()
         _binding = null
     }
+
 }

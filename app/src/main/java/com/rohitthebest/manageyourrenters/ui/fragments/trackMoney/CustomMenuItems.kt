@@ -1,4 +1,4 @@
-package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi
+package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney
 
 
 import android.os.Bundle
@@ -11,7 +11,7 @@ import com.rohitthebest.manageyourrenters.databinding.EmiMenuBottomsheetLayoutBi
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.utils.hide
 
-class EMIMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
+class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
 
     private var _binding: EmiMenuBottomsheetLayoutBinding? = null
     private val binding get() = _binding!!
@@ -135,9 +135,9 @@ class EMIMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
     companion object {
 
         @JvmStatic
-        fun newInstance(bundle: Bundle?): EMIMenuItems {
+        fun newInstance(bundle: Bundle?): CustomMenuItems {
 
-            val fragment = EMIMenuItems()
+            val fragment = CustomMenuItems()
             fragment.arguments = bundle
             return fragment
         }

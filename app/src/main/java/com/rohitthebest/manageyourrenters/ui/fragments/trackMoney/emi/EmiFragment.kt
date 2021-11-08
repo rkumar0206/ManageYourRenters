@@ -19,6 +19,7 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentEmiBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.IS_DOCUMENT_FOR_EDITING_KEY
 import com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBottomSheetFragment
+import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -33,7 +34,7 @@ private const val TAG = "EmiFragment"
 
 @AndroidEntryPoint
 class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
-    EMIMenuItems.OnItemClickListener {
+    CustomMenuItems.OnItemClickListener {
 
     private var _binding: FragmentEmiBinding? = null
     private val binding get() = _binding!!
@@ -88,7 +89,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
         requireActivity().supportFragmentManager.let {
 
-            EMIMenuItems.newInstance(
+            CustomMenuItems.newInstance(
                 null
             ).apply {
                 show(it, "emi_menu_bottomsheet_tag")

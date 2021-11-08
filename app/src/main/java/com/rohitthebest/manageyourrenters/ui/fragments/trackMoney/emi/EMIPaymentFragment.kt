@@ -18,6 +18,7 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.SHOW_DOCUMENTS_MENU
 import com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBottomSheetFragment
+import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -32,7 +33,7 @@ private const val TAG = "EMIPaymentFragment"
 
 @AndroidEntryPoint
 class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
-    EMIPaymentAdapter.OnClickListener, EMIMenuItems.OnItemClickListener {
+    EMIPaymentAdapter.OnClickListener, CustomMenuItems.OnItemClickListener {
 
     private var _binding: FragmentEmiPaymentBinding? = null
     private val binding get() = _binding!!
@@ -144,7 +145,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
             bundle.putBoolean(Constants.SHOW_DELETE_MENU, false)
             bundle.putBoolean(SHOW_DOCUMENTS_MENU, true)
 
-            EMIMenuItems.newInstance(
+            CustomMenuItems.newInstance(
                 bundle
             ).apply {
 

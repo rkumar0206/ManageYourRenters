@@ -14,6 +14,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.REQUEST_METHOD_KEY
 import com.rohitthebest.manageyourrenters.repositories.api.ExpenseCategoryRepositoryAPI
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
 import com.rohitthebest.manageyourrenters.utils.fromStringToExpenseCategory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,6 +23,7 @@ import kotlin.random.Random
 
 private const val TAG = "ExpenseCategoryService"
 
+@AndroidEntryPoint
 class ExpenseCategoryService : Service() {
 
     @Inject
@@ -82,6 +84,8 @@ class ExpenseCategoryService : Service() {
                         )
 
                         Log.i(TAG, "onStartCommand: ${response.body()}")
+
+                        stopSelf()
                     }
 
                 }
@@ -104,6 +108,9 @@ class ExpenseCategoryService : Service() {
                         )
 
                         Log.i(TAG, "onStartCommand: ${response.body()}")
+
+                        stopSelf()
+
                     }
                 }
 
@@ -123,6 +130,8 @@ class ExpenseCategoryService : Service() {
                             TAG,
                             "onStartCommand: expense category successfully deleted with key ${expenseCategory.key}"
                         )
+
+                        stopSelf()
                     }
                 }
 

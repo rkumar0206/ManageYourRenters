@@ -11,18 +11,24 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.storage.FirebaseStorage
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.AddExpenseCategoryLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseCategoryBottomsheetBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.getFileNameAndSize
-import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
-import com.rohitthebest.manageyourrenters.utils.showSnackbarWithActionAndDismissListener
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 private const val TAG = "AddEditExpenseCategoryF"
 
@@ -35,6 +41,8 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
     private lateinit var includeBinding: AddExpenseCategoryLayoutBinding
 
     private var imageUri: Uri? = null
+
+    private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,9 +94,11 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
 
         binding.toolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
 
+            Log.i(TAG, "initListeners: isFormValid : ${isFormValid()}")
+
             if (isFormValid()) {
 
-                // todo : init expense category model
+                uploadImage()
             }
 
             true
@@ -116,11 +126,89 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
         }
     }
 
+
     private fun isFormValid(): Boolean {
 
-        return includeBinding.expenseCatCategoryNameET.error != null
+        Log.i(
+            TAG,
+            "isFormValid: ${!includeBinding.expenseCatCategoryNameET.editText.isTextValid()}"
+        )
+
+        if (!includeBinding.expenseCatCategoryNameET.editText.isTextValid()) {
+
+            includeBinding.expenseCatCategoryNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
+        return includeBinding.expenseCatCategoryNameET.error == null
     }
 
+    private fun uploadImage() {
+
+        if (imageUri != null) {
+
+            lifecycleScope.launch {
+
+                uploadFileUriOnFirebaseStorage(
+                    documentUri = imageUri!!,
+                    fileReference = FirebaseStorage.getInstance()
+                        .getReference("${getUid()}/ExpenseCategory/image")
+                        .child(
+                            generateKey("", 60)
+                        ),
+                    uploadTask = {},
+                    progressListener = { task ->
+
+                        binding.expenseCatProgressBar.show()
+                        binding.expenseCatProgressBar.progress =
+                            ((100 * task.bytesTransferred) / task.totalByteCount).toInt()
+                    },
+                    completeListener = { imageUrl ->
+
+                        binding.expenseCatProgressBar.hide()
+                        initExpenseCategory(imageUrl)
+                    },
+                    successListener = {},
+                    failureListener = {}
+                )
+            }
+        } else {
+
+            initExpenseCategory("")
+        }
+    }
+
+
+    private fun initExpenseCategory(imageUrl: String) {
+
+        val expenseCategory = ExpenseCategory(
+
+            null,
+            includeBinding.expenseCatAddDescriptionET.text.toString(),
+            includeBinding.expenseCatCategoryNameET.editText?.text.toString(),
+            if (imageUrl != "") imageUrl else null,
+            System.currentTimeMillis(),
+            System.currentTimeMillis(),
+            getUid()!!,
+            generateKey("_${getUid()}", 60),
+            false
+        )
+
+        saveToDatabase(expenseCategory)
+
+    }
+
+    private fun saveToDatabase(expenseCategory: ExpenseCategory) {
+
+        expenseCategoryViewModel.insertExpenseCategory(
+            requireContext(),
+            expenseCategory
+        )
+
+        Log.i(TAG, "saveToDatabase: $expenseCategory")
+
+        dismiss()
+    }
 
     private val chooseImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()

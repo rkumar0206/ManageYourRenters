@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.expenseCategoryService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +20,7 @@ class ExpenseCategoryViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun insertExpenseCategory(context: Context, expenseCategory: ExpenseCategory) =
+
         viewModelScope.launch {
 
             if (isInternetAvailable(context)) {
@@ -37,6 +39,7 @@ class ExpenseCategoryViewModel @Inject constructor(
 
             expenseCategoryRepository.insertExpenseCategory(expenseCategory)
 
+            Functions.showToast(context, "Expense Category saved")
         }
 
     fun insertAllExpenseCategory(expenseCategories: List<ExpenseCategory>) = viewModelScope.launch {

@@ -233,6 +233,13 @@ object Module {
     ): ExpenseCategoryAPI = retrofit.create(ExpenseCategoryAPI::class.java)
 
 
+    /*   @Provides
+       @Singleton
+       fun provideExpenseCategoryRepositoryAPI(
+           expenseCategoryAPI: ExpenseCategoryAPI
+       ) = ExpenseCategoryRepositoryAPI(expenseCategoryAPI)
+
+   */
     // ======================================================================================
 
     // ------------------------------ Expense API -----------------------------------

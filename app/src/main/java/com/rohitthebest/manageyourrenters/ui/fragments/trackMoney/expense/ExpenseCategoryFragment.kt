@@ -77,8 +77,6 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
     override fun onMenuBtnClicked(expenseCategory: ExpenseCategory) {
 
-        // todo : show the custom menu dialog
-
         expenseCategoryForMenus = expenseCategory
 
         requireActivity().supportFragmentManager.let { fm ->
@@ -100,7 +98,19 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
     override fun onEditMenuClick() {
 
-        //TODO("Not yet implemented")
+/*
+        if (this::expenseCategoryForMenus.isInitialized) {
+
+            val action =
+                ExpenseCategoryFragmentDirections.actionExpenseCategoryFragmentToAddEditExpenseCategoryFragment(
+                    expenseCategoryForMenus.key
+                )
+
+            findNavController().navigate(action)
+        }
+*/
+
+
     }
 
     override fun onDeleteMenuClick() {

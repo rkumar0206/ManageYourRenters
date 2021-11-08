@@ -101,6 +101,9 @@ class ExpenseCategoryViewModel @Inject constructor(
         expenseCategoryRepository.deleteAllExpenseCategories()
     }
 
+    fun getExpenseCategoryByKey(key: String) =
+        expenseCategoryRepository.getExpenseCategoryByKey(key).asLiveData()
+
     fun getAllExpenseCategories() = expenseCategoryRepository.getAllExpenseCategories().asLiveData()
 
 }

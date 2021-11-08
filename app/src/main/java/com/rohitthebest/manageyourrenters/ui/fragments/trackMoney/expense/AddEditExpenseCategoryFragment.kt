@@ -27,6 +27,7 @@ import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setImageToImageViewUsingGlide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -44,6 +45,11 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
     private var imageUri: Uri? = null
 
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
+
+    private lateinit var receivedExpenseCategoryKey: String
+    private lateinit var receivedExpenseCategory: ExpenseCategory
+
+    private var isMessageReceivedForEditing = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,6 +74,59 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
         initListeners()
 
         textWatchers()
+
+        getMessage()
+    }
+
+    private fun getMessage() {
+
+        if (!arguments?.isEmpty!!) {
+
+            val args = arguments?.let { bundle ->
+
+                AddEditExpenseCategoryFragmentArgs.fromBundle(bundle)
+            }
+
+            receivedExpenseCategoryKey = args?.expenseCategoryKey!!
+
+            isMessageReceivedForEditing = true
+            getExpenseCategory()
+        }
+    }
+
+    private fun getExpenseCategory() {
+
+        expenseCategoryViewModel.getExpenseCategoryByKey(receivedExpenseCategoryKey)
+            .observe(viewLifecycleOwner, { expenseCategory ->
+
+                receivedExpenseCategory = expenseCategory
+
+                updateUI()
+            })
+    }
+
+    private fun updateUI() {
+
+        if (this::receivedExpenseCategory.isInitialized) {
+
+            if (receivedExpenseCategory.imageUrl.isValid()) {
+
+                setImageToImageViewUsingGlide(
+                    requireContext(),
+                    includeBinding.expenseCatIV,
+                    receivedExpenseCategory.imageUrl,
+                    {},
+                    {}
+                )
+            }
+
+            includeBinding.expenseCatCategoryNameET.editText?.setText(receivedExpenseCategory.categoryName)
+
+            if (receivedExpenseCategory.categoryDescription.isValid()) {
+
+                includeBinding.expenseCatAddDescriptionET.setText(receivedExpenseCategory.categoryDescription)
+            }
+        }
     }
 
     private fun textWatchers() {

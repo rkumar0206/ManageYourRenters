@@ -25,4 +25,7 @@ interface ExpenseCategoryDAO {
     @Query("SELECT * FROM expense_category_table ORDER BY modified DESC")
     fun getAllExpenseCategories(): Flow<List<ExpenseCategory>>
 
+    @Query("SELECT * FROM expense_category_table WHERE `key` = :key")
+    fun getExpenseCategoryByKey(key: String): Flow<ExpenseCategory>
+
 }

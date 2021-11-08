@@ -10,13 +10,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.AddExpenseCategoryLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseCategoryBottomsheetBinding
+import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.getFileNameAndSize
+import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
 import com.rohitthebest.manageyourrenters.utils.showSnackbarWithActionAndDismissListener
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -53,6 +57,23 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
         includeBinding = binding.includeLayout
 
         initListeners()
+
+        textWatchers()
+    }
+
+    private fun textWatchers() {
+
+        includeBinding.expenseCatCategoryNameET.editText?.onTextChangedListener { s ->
+
+            if (s?.isEmpty()!!) {
+
+                includeBinding.expenseCatCategoryNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+            } else {
+
+                includeBinding.expenseCatCategoryNameET.error = null
+            }
+
+        }
     }
 
     private fun initListeners() {
@@ -65,7 +86,10 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
 
         binding.toolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
 
-            showToast(requireContext(), "Category saved")
+            if (isFormValid()) {
+
+                // todo : init expense category model
+            }
 
             true
         }
@@ -83,6 +107,18 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
             }
 
         }
+
+        includeBinding.expenseCatClearImageBtn.setOnClickListener {
+
+            includeBinding.expenseCatIV.setImageResource(R.drawable.gradient_blue)
+            isAddImageBtnVisible(true)
+            imageUri = null
+        }
+    }
+
+    private fun isFormValid(): Boolean {
+
+        return includeBinding.expenseCatCategoryNameET.error != null
     }
 
 
@@ -104,17 +140,26 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
                 )
             } else {
 
-                //todo : load the image to the image view
-                //todo :  hide the add button and show the cancel button
+                Glide.with(this)
+                    .load(imageUri)
+                    .into(includeBinding.expenseCatIV)
+
+                isAddImageBtnVisible(false)
+
                 this.imageUri = imageUri
             }
-
         }
+    }
+
+    private fun isAddImageBtnVisible(isVisible: Boolean) {
+
+        includeBinding.expenseCatAddImage.isVisible = isVisible
+        includeBinding.expenseCatClearImageBtn.isVisible = !isVisible
     }
 
     private fun isPermissionGranted(): Boolean {
 
-        return requireContext().checkIfPermissionsGranted(Manifest.permission.READ_EXTERNAL_STORAGE);
+        return requireContext().checkIfPermissionsGranted(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
 
     // adding conditions for requesting permission

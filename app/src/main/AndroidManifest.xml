@@ -39,6 +39,7 @@
         <service android:name=".services.DeleteFileFromFirebaseStorageService" />
         <service android:name=".services.UploadFileToFirebaseStorageService" />
         <service android:name=".services.ExpenseCategoryService" />
+        <service android:name=".services.ExpenseService" />
 
         <meta-data
             android:name="io.sentry.dsn"

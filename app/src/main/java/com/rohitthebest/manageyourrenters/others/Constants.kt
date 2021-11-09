@@ -45,6 +45,7 @@ object Constants {
 
     const val REQUEST_METHOD_KEY = "sacnakjnkankan"
     const val EXPENSE_CATEGORY_KEY = "acjakjcakjbcabb"
+    const val EXPENSE_KEY = "ajcakjckackjabkbnslsn"
 
     const val NETWORK_PAGE_SIZE_UNSPLASH = 30
 

@@ -9,11 +9,9 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_CATEGORY_KEY
-import com.rohitthebest.manageyourrenters.others.Constants.REQUEST_METHOD_KEY
-import com.rohitthebest.manageyourrenters.repositories.api.ExpenseCategoryRepositoryAPI
+import com.rohitthebest.manageyourrenters.repositories.api.ExpenseRepositoryAPI
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
-import com.rohitthebest.manageyourrenters.utils.fromStringToExpenseCategory
+import com.rohitthebest.manageyourrenters.utils.fromStringToExpense
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,19 +19,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.random.Random
 
-private const val TAG = "ExpenseCategoryService"
+private const val TAG = "ExpenseService"
 
 @AndroidEntryPoint
-class ExpenseCategoryService : Service() {
+class ExpenseService : Service() {
 
     @Inject
-    lateinit var expenseCategoryRepositoryAPI: ExpenseCategoryRepositoryAPI
+    private lateinit var expenseRepositoryAPI: ExpenseRepositoryAPI
 
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        val requestMethod = intent?.getStringExtra(REQUEST_METHOD_KEY)
-        val expenseCategoryString = intent?.getStringExtra(EXPENSE_CATEGORY_KEY)
+        val requestMethod = intent?.getStringExtra(Constants.REQUEST_METHOD_KEY)
+        val expenseString = intent?.getStringExtra(Constants.EXPENSE_KEY)
 
         val pendingIntent: PendingIntent =
             Intent(this, HomeActivity::class.java).let { notificationIntent ->
@@ -52,35 +50,24 @@ class ExpenseCategoryService : Service() {
 
         startForeground(Random.nextInt(1001, 8999), notification)
 
-        val expenseCategory = fromStringToExpenseCategory(expenseCategoryString!!)
+        val expense = fromStringToExpense(expenseString!!)
 
         when (requestMethod) {
 
-            /*getString(R.string.get) -> {
-
-                CoroutineScope(Dispatchers.IO).launch {
-
-
-                }
-            }
-
-            getString(R.string.get_one) -> {
-
-            }*/
 
             getString(R.string.post) -> {
 
                 CoroutineScope(Dispatchers.IO).launch {
 
-                    val response = expenseCategoryRepositoryAPI.addExpenseCategory(
-                        expenseCategory.uid, expenseCategory
+                    val response = expenseRepositoryAPI.addExpenseByCategoryKey(
+                        expense.uid, expense.categoryKey, expense
                     )
 
                     if (response.isSuccessful && response.code() == 201) {
 
                         Log.i(
                             TAG,
-                            "onStartCommand: expense category successfully added with key ${expenseCategory.key}"
+                            "onStartCommand: expense category successfully added with key ${expense.key}"
                         )
 
                         Log.i(TAG, "onStartCommand: ${response.body()}")
@@ -96,15 +83,15 @@ class ExpenseCategoryService : Service() {
 
                 CoroutineScope(Dispatchers.IO).launch {
 
-                    val response = expenseCategoryRepositoryAPI.updateExpenseCategoryByKey(
-                        expenseCategory.uid, expenseCategory.key, expenseCategory
+                    val response = expenseRepositoryAPI.updateExpenseByKey(
+                        expense.uid, expense.key, expense.categoryKey, expense
                     )
 
                     if (response.isSuccessful && response.code() == 200) {
 
                         Log.i(
                             TAG,
-                            "onStartCommand: expense category successfully update with key ${expenseCategory.key}"
+                            "onStartCommand: expense category successfully update with key ${expense.key}"
                         )
 
                         Log.i(TAG, "onStartCommand: ${response.body()}")
@@ -120,15 +107,15 @@ class ExpenseCategoryService : Service() {
 
                 CoroutineScope(Dispatchers.IO).launch {
 
-                    val response = expenseCategoryRepositoryAPI.deleteExpenseCategoryByKey(
-                        expenseCategory.uid, expenseCategory.key
+                    val response = expenseRepositoryAPI.deleteExpenseByKey(
+                        expense.uid, expense.key
                     )
 
                     if (response.isSuccessful && response.code() == 204) {
 
                         Log.i(
                             TAG,
-                            "onStartCommand: expense category successfully deleted with key ${expenseCategory.key}"
+                            "onStartCommand: expense category successfully deleted with key ${expense.key}"
                         )
 
                         stopSelf()
@@ -137,6 +124,7 @@ class ExpenseCategoryService : Service() {
 
             }
         }
+
 
         return START_NOT_STICKY
     }

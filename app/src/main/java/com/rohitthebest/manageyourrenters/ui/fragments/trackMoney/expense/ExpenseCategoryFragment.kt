@@ -88,6 +88,11 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
             bundle.putBoolean(Constants.SHOW_DELETE_MENU, true)
             bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, false)
 
+            if (!expenseCategory.isSynced) {
+
+                bundle.putBoolean(Constants.SHOW_SYNC_MENU, true)
+            }
+
             CustomMenuItems.newInstance(
                 bundle
             ).apply {
@@ -144,6 +149,27 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
                 dialog.dismiss()
             }
         )
+    }
+
+    override fun onSyncMenuClick() {
+
+        if (this::expenseCategoryForMenus.isInitialized) {
+
+            if (!expenseCategoryForMenus.isSynced) {
+
+                if (isInternetAvailable(requireContext())) {
+
+                    expenseCategoryViewModel.insertExpenseCategory(
+                        requireContext(),
+                        expenseCategoryForMenus
+                    )
+                } else {
+
+                    showNoInternetMessage(requireContext())
+                }
+
+            }
+        }
     }
 
     override fun onViewSupportingDocumentMenuClick() {}

@@ -7,13 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.databinding.EmiMenuBottomsheetLayoutBinding
+import com.rohitthebest.manageyourrenters.databinding.CustomMenuBottomsheetLayoutBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.utils.hide
 
 class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
 
-    private var _binding: EmiMenuBottomsheetLayoutBinding? = null
+    private var _binding: CustomMenuBottomsheetLayoutBinding? = null
     private val binding get() = _binding!!
 
     private var mListener: OnItemClickListener? = null
@@ -24,13 +24,13 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
 
-        return inflater.inflate(R.layout.emi_menu_bottomsheet_layout, container, false)
+        return inflater.inflate(R.layout.custom_menu_bottomsheet_layout, container, false)
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = EmiMenuBottomsheetLayoutBinding.bind(view)
+        _binding = CustomMenuBottomsheetLayoutBinding.bind(view)
 
         intiListeners()
 
@@ -48,6 +48,7 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
                 val isEditMenuVisible = bundle.getBoolean(Constants.SHOW_EDIT_MENU, true)
                 val isDeleteMenuVisible = bundle.getBoolean(Constants.SHOW_DELETE_MENU, true)
                 val isDocumentMenuVisible = bundle.getBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
+                val isSyncMenuVisible = bundle.getBoolean(Constants.SHOW_SYNC_MENU, false)
 
                 if (!isEditMenuVisible) {
 
@@ -65,6 +66,11 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
                     binding.replaceSupportingDocumentMenu.hide()
                     binding.deleteSupportingDocumentMenu.hide()
                 }
+
+                if (!isSyncMenuVisible) {
+
+                    binding.syncMenu.hide()
+                }
             }
         }
 
@@ -77,6 +83,7 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
         binding.viewOrDownloadSupportingDocumentMenu.setOnClickListener(this)
         binding.replaceSupportingDocumentMenu.setOnClickListener(this)
         binding.deleteSupportingDocumentMenu.setOnClickListener(this)
+        binding.syncMenu.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
@@ -113,6 +120,12 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
                 dismiss()
             }
 
+            binding.syncMenu.id -> {
+
+                mListener?.onSyncMenuClick()
+                dismiss()
+            }
+
         }
 
     }
@@ -125,6 +138,7 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
         fun onViewSupportingDocumentMenuClick()
         fun onReplaceSupportingDocumentClick()
         fun onDeleteSupportingDocumentClick()
+        fun onSyncMenuClick()
     }
 
     fun setOnClickListener(listener: OnItemClickListener) {

@@ -358,6 +358,8 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
         }
 
     }
+
+    override fun onSyncMenuClick() {}
     //[END OF MENUS]
 
     private fun initListeners() {

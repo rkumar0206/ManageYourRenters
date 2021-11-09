@@ -270,6 +270,8 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
 
     }
+
+    override fun onSyncMenuClick() {}
     //[END OF MENUS]
 
     private fun getEMIs() {

@@ -31,21 +31,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/gradient_blue" />
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/expenseCatAddImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        android:text="@string/add_image"
-        android:textAllCaps="false"
-        app:icon="@drawable/ic_baseline_add_circle_outline_24"
-        app:layout_constraintBottom_toBottomOf="@+id/expenseCatIV"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/expenseCatIV" />
-
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView19"
         android:layout_width="0dp"
@@ -63,18 +48,18 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:hint="@string/expense_category_name"
             app:counterEnabled="true"
             app:counterMaxLength="25"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
             app:errorEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLength="25"
                 android:inputType="textPersonName"
+                android:maxLength="25"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
     </androidx.cardview.widget.CardView>
@@ -125,17 +110,81 @@
 
     </androidx.cardview.widget.CardView>
 
-    <View
-        android:id="@+id/divider66"
-        android:layout_width="409dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="16dp"
-        android:background="?android:attr/listDivider"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/expense_category_image_RV"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="12dp"
         android:visibility="invisible"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView20" />
+        app:layout_constraintTop_toBottomOf="@+id/cardView20"
+        tools:listitem="@layout/item_unsplash_photo"
+        tools:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/expense_category_image_RV"
+        app:layout_constraintEnd_toEndOf="@+id/expense_category_image_RV"
+        app:layout_constraintStart_toStartOf="@+id/expense_category_image_RV"
+        app:layout_constraintTop_toTopOf="@+id/expense_category_image_RV"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/noResultsFoundTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="5dp"
+        android:text="@string/no_results_found"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="18sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/expense_category_image_RV"
+        app:layout_constraintStart_toStartOf="@+id/expense_category_image_RV"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        tools:visibility="visible" />
+
+    <EditText
+        android:id="@+id/expenseCategorySearchTextET"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/search_images_here"
+        android:imeOptions="actionSearch"
+        android:inputType="textPersonName"
+        android:maxLength="20"
+        android:maxLines="1"
+        android:minHeight="48dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/expenseCatIV"
+        app:layout_constraintEnd_toEndOf="@+id/expenseCatIV"
+        app:layout_constraintStart_toStartOf="@+id/expenseCatIV"
+        app:layout_constraintTop_toTopOf="@+id/expenseCatIV"
+        tools:visibility="visible" />
+
+
+    <!--
+        <View
+            android:id="@+id/divider66"
+            android:layout_width="409dp"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
+    -->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

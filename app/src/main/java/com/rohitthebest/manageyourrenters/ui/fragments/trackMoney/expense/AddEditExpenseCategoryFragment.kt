@@ -1,55 +1,59 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
+import android.view.inputmethod.EditorInfo
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
+import androidx.paging.LoadState
+import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.firebase.storage.FirebaseStorage
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.unsplashAdapters.UnsplashSearchResultsAdapter
+import com.rohitthebest.manageyourrenters.data.UnsplashPhoto
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.AddExpenseCategoryLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseCategoryBottomsheetBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
-import com.rohitthebest.manageyourrenters.utils.*
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
+import com.rohitthebest.manageyourrenters.ui.viewModels.apiViewModels.UnsplashViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setImageToImageViewUsingGlide
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.isTextValid
+import com.rohitthebest.manageyourrenters.utils.isValid
+import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 private const val TAG = "AddEditExpenseCategoryF"
 
 @AndroidEntryPoint
-class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
+class AddEditExpenseCategoryFragment : BottomSheetDialogFragment(),
+    UnsplashSearchResultsAdapter.OnClickListener {
 
 
     private var _binding: FragmentAddExpenseCategoryBottomsheetBinding? = null
     private val binding get() = _binding!!
     private lateinit var includeBinding: AddExpenseCategoryLayoutBinding
 
-    private var imageUri: Uri? = null
-
+    private val unsplashViewModel by viewModels<UnsplashViewModel>()
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
 
     private lateinit var receivedExpenseCategoryKey: String
     private lateinit var receivedExpenseCategory: ExpenseCategory
 
+    private lateinit var unsplashSearchAdapter: UnsplashSearchResultsAdapter
+
     private var isMessageReceivedForEditing = false
+
+    private var imageUrl = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,12 +75,74 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
 
         includeBinding = binding.includeLayout
 
+        unsplashSearchAdapter = UnsplashSearchResultsAdapter()
+
         initListeners()
+
+        observeUnsplashSearchResult()
 
         textWatchers()
 
         getMessage()
+
+        setUpRecyclerView()
+
+        setUpLoadStateListener()
+
+        initImageSearchEditText()
     }
+
+
+    private fun setUpRecyclerView() {
+
+        includeBinding.expenseCategoryImageRV.apply {
+
+            setHasFixedSize(true)
+            layoutManager = GridLayoutManager(requireContext(), 3)
+            adapter = unsplashSearchAdapter
+        }
+
+        unsplashSearchAdapter.setOnClickListener(this)
+    }
+
+    override fun onImageClicked(unsplashPhoto: UnsplashPhoto) {
+
+        imageUrl = unsplashPhoto.urls.small
+
+        setImageToImageViewUsingGlide(
+            requireContext(),
+            includeBinding.expenseCatIV,
+            imageUrl,
+            {},
+            {}
+        )
+
+        isImageClearBtnVisible(true)
+    }
+
+    private fun setUpLoadStateListener() {
+
+        unsplashSearchAdapter.addLoadStateListener { loadState ->
+
+            includeBinding.apply {
+
+                progressBar.isVisible = loadState.source.refresh is LoadState.Loading
+                expenseCategoryImageRV.isVisible = loadState.source.refresh is LoadState.NotLoading
+            }
+        }
+    }
+
+    private fun observeUnsplashSearchResult() {
+
+        unsplashViewModel.unsplashSearchResult.observe(viewLifecycleOwner, {
+
+            Log.d(TAG, "observeUnsplashSearchResult: $it")
+            unsplashSearchAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+            includeBinding.noResultsFoundTV.hide()
+
+        })
+    }
+
 
     private fun getMessage() {
 
@@ -158,34 +224,45 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
 
             if (isFormValid()) {
 
-                uploadImage()
+                initExpenseCategory()
             }
 
             true
         }
 
-        includeBinding.expenseCatAddImage.setOnClickListener {
-
-            if (isPermissionGranted()) {
-
-                chooseImageLauncher.launch(
-                    "image/*"
-                )
-            } else {
-
-                requestPermission()
-            }
-
-        }
 
         includeBinding.expenseCatClearImageBtn.setOnClickListener {
 
             includeBinding.expenseCatIV.setImageResource(R.drawable.gradient_blue)
-            isAddImageBtnVisible(true)
-            imageUri = null
+            imageUrl = ""
+            isImageClearBtnVisible(false)
+            includeBinding.expenseCategorySearchTextET.setText("")
         }
     }
 
+    private fun initImageSearchEditText() {
+
+        includeBinding.expenseCategorySearchTextET.setOnEditorActionListener { _, actionId, _ ->
+
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+
+                if (includeBinding.expenseCategorySearchTextET.isTextValid()) {
+
+                    hideKeyBoard(requireActivity())
+
+                    if (isInternetAvailable(requireContext())) {
+
+                        unsplashViewModel.searchImage(includeBinding.expenseCategorySearchTextET.text.toString())
+                    } else {
+
+                        showNoInternetMessage(requireContext())
+                    }
+                }
+            }
+            true
+        }
+
+    }
 
     private fun isFormValid(): Boolean {
 
@@ -203,58 +280,7 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
         return includeBinding.expenseCatCategoryNameET.error == null
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun uploadImage() {
-
-        if (imageUri != null) {
-
-            lifecycleScope.launch {
-
-                uploadFileUriOnFirebaseStorage(
-                    documentUri = imageUri!!,
-                    fileReference = FirebaseStorage.getInstance()
-                        .getReference("${getUid()}/ExpenseCategory/image")
-                        .child(
-                            generateKey("", 60)
-                        ),
-                    uploadTask = {},
-                    progressListener = { task ->
-
-                        binding.progressLL.show()
-                        binding.expenseCatProgressBar.show()
-                        binding.progressTrackerTV.show()
-
-                        val progress = ((100 * task.bytesTransferred) / task.totalByteCount).toInt()
-                        binding.expenseCatProgressBar.progress = progress
-
-                        binding.progressTrackerTV.text = "Uploading Image... $progress"
-                    },
-                    completeListener = { imageUrl ->
-
-                        binding.expenseCatProgressBar.hide()
-                        binding.progressTrackerTV.hide()
-                        binding.progressLL.hide()
-
-                        initExpenseCategory(imageUrl)
-                    },
-                    successListener = {},
-                    failureListener = {
-
-                        Log.i(
-                            TAG,
-                            "uploadImage: Exception in uploading expense category image : " + it.message
-                        )
-                    }
-                )
-            }
-        } else {
-
-            initExpenseCategory("")
-        }
-    }
-
-
-    private fun initExpenseCategory(imageUrl: String) {
+    private fun initExpenseCategory() {
 
         val expenseCategory = ExpenseCategory(
 
@@ -285,98 +311,10 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
         dismiss()
     }
 
-    private val chooseImageLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri ->
+    private fun isImageClearBtnVisible(isVisible: Boolean) {
 
-        uri?.let { imageUri ->
-
-            val fileNameAndSize = imageUri.getFileNameAndSize(requireActivity().contentResolver)
-
-            // checking file size in MB
-            if (fileNameAndSize?.second?.div((1024 * 1024))!! > 0.5) {
-
-                showToast(
-                    requireContext(),
-                    "File size should be less than or equal to 500KB",
-                    Toast.LENGTH_LONG
-                )
-            } else {
-
-                Glide.with(this)
-                    .load(imageUri)
-                    .into(includeBinding.expenseCatIV)
-
-                isAddImageBtnVisible(false)
-
-                this.imageUri = imageUri
-            }
-        }
-    }
-
-    private fun isAddImageBtnVisible(isVisible: Boolean) {
-
-        includeBinding.expenseCatAddImage.isVisible = isVisible
-        includeBinding.expenseCatClearImageBtn.isVisible = !isVisible
-    }
-
-    private fun isPermissionGranted(): Boolean {
-
-        return requireContext().checkIfPermissionsGranted(Manifest.permission.READ_EXTERNAL_STORAGE)
-    }
-
-    // adding conditions for requesting permission
-    private fun requestPermission() {
-
-        when {
-
-            //check if permission already granted
-            isPermissionGranted() -> {
-
-                //permission is granted
-
-            }
-
-            // if the app deems that they should show the request permission rationale
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) -> {
-
-                binding.root.showSnackbarWithActionAndDismissListener(
-                    "Permission is required for selecting image from your storage.",
-                    "Ok",
-                    {
-                        requestPermissionLauncher.launch(
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        )
-                    },
-                    {
-                        //null
-                    }
-                )
-            }
-
-            // request for permission
-            else -> {
-
-                requestPermissionLauncher.launch(
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                )
-            }
-        }
-    }
-
-    //[START OF LAUNCHERS]
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-
-        if (isGranted) {
-            Log.i(TAG, "Permission granted: ")
-        } else {
-            Log.i(TAG, "Permission denied: ")
-        }
+        includeBinding.expenseCatClearImageBtn.isVisible = isVisible
+        includeBinding.expenseCategorySearchTextET.isVisible = !isVisible
     }
 
     override fun onDestroyView() {
@@ -384,5 +322,6 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment() {
 
         _binding = null
     }
+
 
 }

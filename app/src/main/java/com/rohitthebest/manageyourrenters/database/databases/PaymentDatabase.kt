@@ -9,7 +9,8 @@ import com.rohitthebest.manageyourrenters.database.typeConverters.TypeConverters
 
 @Database(
     entities = [Payment::class],
-    version = 21
+    version = 21,
+    exportSchema = false
 )
 @TypeConverters(TypeConvertersForDatabase::class)
 abstract class PaymentDatabase : RoomDatabase() {

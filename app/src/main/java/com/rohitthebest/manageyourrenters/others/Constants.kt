@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.others
 object Constants {
 
     const val MANAGE_YOUR_RENTERS_API_BASE_URL = "https://serene-crag-89401.herokuapp.com"
+    const val UNSPLASH_BASE_URL = "https://api.unsplash.com/"
 
     const val NO_INTERNET_MESSAGE = "Please check your Internet connection!!!"
     const val RC_SIGN_IN = 1001
@@ -43,4 +44,7 @@ object Constants {
 
     const val REQUEST_METHOD_KEY = "sacnakjnkankan"
     const val EXPENSE_CATEGORY_KEY = "acjakjcakjbcabb"
+
+    const val NETWORK_PAGE_SIZE_UNSPLASH = 30
+
 }

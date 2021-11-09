@@ -1,9 +1,14 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: "androidx.navigation.safeargs.kotlin"
-apply plugin: 'dagger.hilt.android.plugin'
+plugins {
+
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id "androidx.navigation.safeargs.kotlin"
+    id 'dagger.hilt.android.plugin'
+    id 'com.google.gms.google-services'
+    id "com.google.secrets_gradle_plugin" version "0.6.1"
+
+}
 
 android {
     compileSdkVersion 30
@@ -139,5 +144,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.9.0"
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.0"
 
+    //paging 3.0
+    implementation "androidx.paging:paging-runtime-ktx:3.0.1"
 
 }

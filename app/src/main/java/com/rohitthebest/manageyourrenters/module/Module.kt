@@ -6,6 +6,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.rohitthebest.manageyourrenters.api.services.ExpenseAPI
 import com.rohitthebest.manageyourrenters.api.services.ExpenseCategoryAPI
+import com.rohitthebest.manageyourrenters.api.unsplash.UnsplashAPI
 import com.rohitthebest.manageyourrenters.database.databases.*
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_PAYMENT_DATABASE_NAME
@@ -16,6 +17,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.MANAGE_YOUR_RENTERS_A
 import com.rohitthebest.manageyourrenters.others.Constants.PARTIAL_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.RENTER_DATABASE_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.UNSPLASH_BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,6 +34,8 @@ import javax.inject.Singleton
 @Qualifier
 annotation class ExpenseRetrofit
 
+@Qualifier
+annotation class UnsplashImageRetrofit
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -250,5 +254,27 @@ object Module {
         @ExpenseRetrofit retrofit: Retrofit
     ): ExpenseAPI = retrofit.create(ExpenseAPI::class.java)
     // ======================================================================================
+
+    // ----------------------------- Unsplash API ----------------------------------------
+
+    @UnsplashImageRetrofit
+    @Singleton
+    @Provides
+    fun provideUnsplashRetrofit(
+        okHttpClient: OkHttpClient
+    ): Retrofit = Retrofit.Builder()
+        .client(okHttpClient)
+        .baseUrl(UNSPLASH_BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideUnsplashAPI(
+        @UnsplashImageRetrofit retrofit: Retrofit
+    ): UnsplashAPI = retrofit.create(UnsplashAPI::class.java)
+
+
+    // ==================================================================================
 
 }

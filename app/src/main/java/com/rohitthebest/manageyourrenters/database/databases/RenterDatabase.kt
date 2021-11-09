@@ -7,7 +7,8 @@ import com.rohitthebest.manageyourrenters.database.model.Renter
 
 @Database(
     entities = [Renter::class],
-    version = 124
+    version = 124,
+    exportSchema = false
 )
 abstract class RenterDatabase : RoomDatabase() {
 

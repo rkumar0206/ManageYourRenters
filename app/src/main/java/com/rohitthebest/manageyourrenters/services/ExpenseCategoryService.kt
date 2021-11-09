@@ -56,18 +56,6 @@ class ExpenseCategoryService : Service() {
 
         when (requestMethod) {
 
-            /*getString(R.string.get) -> {
-
-                CoroutineScope(Dispatchers.IO).launch {
-
-
-                }
-            }
-
-            getString(R.string.get_one) -> {
-
-            }*/
-
             getString(R.string.post) -> {
 
                 CoroutineScope(Dispatchers.IO).launch {

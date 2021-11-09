@@ -51,6 +51,7 @@ class ExpenseCategoryViewModel @Inject constructor(
     }
 
     fun updateExpenseCategory(context: Context, expenseCategory: ExpenseCategory) =
+
         viewModelScope.launch {
 
             if (isInternetAvailable(context)) {

@@ -24,6 +24,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setImageToImageViewUsingGlide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.isTextValid
 import com.rohitthebest.manageyourrenters.utils.isValid
 import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
@@ -51,6 +52,10 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
     private var isMessageReceivedForEditing = false
 
     private var imageUrl = ""
+
+    private var oldCategoryName = ""
+    private var oldCategoryDescription = ""
+    private var oldCategoryImageUrl = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -157,6 +162,12 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
 
         if (this::receivedExpenseCategory.isInitialized) {
 
+            oldCategoryName = receivedExpenseCategory.categoryName
+            oldCategoryDescription = receivedExpenseCategory.categoryDescription.toString()
+            oldCategoryImageUrl = receivedExpenseCategory.imageUrl.toString()
+
+            imageUrl = receivedExpenseCategory.imageUrl.toString()
+
             if (receivedExpenseCategory.imageUrl.isValid()) {
 
                 setImageToImageViewUsingGlide(
@@ -166,6 +177,11 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
                     {},
                     {}
                 )
+
+                isImageClearBtnVisible(true)
+            } else {
+
+                isImageClearBtnVisible(false)
             }
 
             includeBinding.expenseCatCategoryNameET.editText?.setText(receivedExpenseCategory.categoryName)
@@ -197,7 +213,7 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
 
         binding.toolbar.setNavigationOnClickListener {
 
-            requireActivity()
+            requireActivity().onBackPressed()
 
         }
 
@@ -265,31 +281,74 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
 
     private fun initExpenseCategory() {
 
-        val expenseCategory = ExpenseCategory(
+        val expenseCategory: ExpenseCategory
 
-            null,
-            includeBinding.expenseCatAddDescriptionET.text.toString(),
-            includeBinding.expenseCatCategoryNameET.editText?.text.toString(),
-            if (imageUrl != "") imageUrl else null,
-            System.currentTimeMillis(),
-            System.currentTimeMillis(),
-            getUid()!!,
-            generateKey("_${getUid()}", 60),
-            false
-        )
+        if (!isMessageReceivedForEditing) {
 
-        saveToDatabase(expenseCategory)
+            expenseCategory = ExpenseCategory(
 
+                null,
+                includeBinding.expenseCatAddDescriptionET.text.toString(),
+                includeBinding.expenseCatCategoryNameET.editText?.text.toString(),
+                imageUrl,
+                System.currentTimeMillis(),
+                System.currentTimeMillis(),
+                getUid()!!,
+                generateKey("_${getUid()}", 60),
+                false
+            )
+
+            saveToDatabase(expenseCategory)
+
+        } else {
+
+            expenseCategory = receivedExpenseCategory
+
+            // add conditions for editing to happen
+            if (
+                includeBinding.expenseCatCategoryNameET.editText?.text.toString()
+                    .trim() != oldCategoryName
+                || includeBinding.expenseCatAddDescriptionET.text.toString()
+                    .trim() != oldCategoryDescription
+                || imageUrl != oldCategoryImageUrl
+            ) {
+
+                if (imageUrl != oldCategoryImageUrl) {
+
+                    expenseCategory.imageUrl = imageUrl
+                }
+
+                expenseCategory.categoryName =
+                    includeBinding.expenseCatCategoryNameET.editText?.text.toString().trim()
+                expenseCategory.categoryDescription =
+                    includeBinding.expenseCatAddDescriptionET.text.toString().trim()
+                expenseCategory.modified = System.currentTimeMillis()
+
+                saveToDatabase(expenseCategory)
+            } else {
+
+                showToast(requireContext(), "No change detected...")
+            }
+        }
     }
 
     private fun saveToDatabase(expenseCategory: ExpenseCategory) {
 
-        expenseCategoryViewModel.insertExpenseCategory(
-            requireContext(),
-            expenseCategory
-        )
+        if (!isMessageReceivedForEditing) {
 
-        Log.i(TAG, "saveToDatabase: $expenseCategory")
+            expenseCategoryViewModel.insertExpenseCategory(
+                requireContext(),
+                expenseCategory
+            )
+
+            Log.i(TAG, "saveToDatabase: $expenseCategory")
+        } else {
+
+            expenseCategoryViewModel.updateExpenseCategory(
+                requireContext(),
+                expenseCategory
+            )
+        }
 
         requireActivity().onBackPressed()
     }

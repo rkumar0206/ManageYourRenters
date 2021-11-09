@@ -16,6 +16,7 @@ import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItem
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.show
 import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
@@ -63,6 +64,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
             adapter = expenseCategoryAdapter
+            changeVisibilityOfFABOnScrolled(binding.addExpenseCategoryFAB)
         }
 
         expenseCategoryAdapter.setOnClickListener(this)
@@ -98,7 +100,6 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
     override fun onEditMenuClick() {
 
-/*
         if (this::expenseCategoryForMenus.isInitialized) {
 
             val action =
@@ -108,9 +109,6 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
             findNavController().navigate(action)
         }
-*/
-
-
     }
 
     override fun onDeleteMenuClick() {

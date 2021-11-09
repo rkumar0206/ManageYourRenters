@@ -25,7 +25,7 @@ private const val TAG = "ExpenseService"
 class ExpenseService : Service() {
 
     @Inject
-    private lateinit var expenseRepositoryAPI: ExpenseRepositoryAPI
+    lateinit var expenseRepositoryAPI: ExpenseRepositoryAPI
 
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

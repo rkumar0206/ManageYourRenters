@@ -178,6 +178,7 @@
     <string name="expense_description">Expense description</string>
     <string name="expense_category_image">Expense category image</string>
     <string name="clear_image">clear image</string>
+    <string name="unsplash_photo">unsplash photo</string>
 
 
     <string-array name="interest_time_schedule">

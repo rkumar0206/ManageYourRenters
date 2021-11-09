@@ -489,6 +489,7 @@ class Functions {
                 .load(imageUrl)
                 .apply {
                     this.error(R.drawable.ic_outline_error_outline_24)
+                    this.placeholder(R.drawable.gradient_blue)
                 }
                 .listener(object : RequestListener<Drawable> {
 

@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:menu="@menu/save_menu"
-            app:navigationIcon="@drawable/ic_cancel"
+            app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
             app:title="@string/expense_category" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -42,13 +42,13 @@
         android:visibility="gone"
         tools:visibility="visible">
 
-        <com.google.android.material.progressindicator.CircularProgressIndicator
+        <ProgressBar
             android:id="@+id/expenseCatProgressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:progress="20"
-            android:visibility="gone"
+            android:visibility="visible"
             app:indicatorColor="@color/dark_blue"
             app:trackColor="@color/rippleColor"
             tools:visibility="visible" />
@@ -60,9 +60,9 @@
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:padding="3dp"
-            android:text="@string/please_wait_while_file_is_uploading"
+            android:text="@string/please_wait"
             android:textColor="@color/primaryTextColor"
-            android:visibility="gone"
+            android:visibility="visible"
             tools:visibility="visible" />
 
     </LinearLayout>

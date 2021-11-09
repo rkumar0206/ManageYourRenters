@@ -2,21 +2,19 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.unsplashAdapters.UnsplashSearchResultsAdapter
 import com.rohitthebest.manageyourrenters.data.UnsplashPhoto
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.AddExpenseCategoryLayoutBinding
-import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseCategoryBottomsheetBinding
+import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseCategoryBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.apiViewModels.UnsplashViewModel
@@ -26,7 +24,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setImageToImageViewUsingGlide
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
-import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.isTextValid
 import com.rohitthebest.manageyourrenters.utils.isValid
 import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
@@ -35,11 +32,11 @@ import dagger.hilt.android.AndroidEntryPoint
 private const val TAG = "AddEditExpenseCategoryF"
 
 @AndroidEntryPoint
-class AddEditExpenseCategoryFragment : BottomSheetDialogFragment(),
+class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_category),
     UnsplashSearchResultsAdapter.OnClickListener {
 
 
-    private var _binding: FragmentAddExpenseCategoryBottomsheetBinding? = null
+    private var _binding: FragmentAddExpenseCategoryBinding? = null
     private val binding get() = _binding!!
     private lateinit var includeBinding: AddExpenseCategoryLayoutBinding
 
@@ -55,23 +52,10 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment(),
 
     private var imageUrl = ""
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        return inflater.inflate(
-            R.layout.fragment_add_expense_category_bottomsheet,
-            container,
-            false
-        )
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        _binding = FragmentAddExpenseCategoryBottomsheetBinding.bind(view)
+        _binding = FragmentAddExpenseCategoryBinding.bind(view)
 
         includeBinding = binding.includeLayout
 
@@ -107,7 +91,7 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment(),
 
     override fun onImageClicked(unsplashPhoto: UnsplashPhoto) {
 
-        imageUrl = unsplashPhoto.urls.small
+        imageUrl = unsplashPhoto.urls.regular
 
         setImageToImageViewUsingGlide(
             requireContext(),
@@ -126,7 +110,7 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment(),
 
             includeBinding.apply {
 
-                progressBar.isVisible = loadState.source.refresh is LoadState.Loading
+                binding.progressLL.isVisible = loadState.source.refresh is LoadState.Loading
                 expenseCategoryImageRV.isVisible = loadState.source.refresh is LoadState.NotLoading
             }
         }
@@ -138,8 +122,6 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment(),
 
             Log.d(TAG, "observeUnsplashSearchResult: $it")
             unsplashSearchAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-            includeBinding.noResultsFoundTV.hide()
-
         })
     }
 
@@ -215,7 +197,8 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment(),
 
         binding.toolbar.setNavigationOnClickListener {
 
-            dismiss()
+            requireActivity()
+
         }
 
         binding.toolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
@@ -308,7 +291,7 @@ class AddEditExpenseCategoryFragment : BottomSheetDialogFragment(),
 
         Log.i(TAG, "saveToDatabase: $expenseCategory")
 
-        dismiss()
+        requireActivity().onBackPressed()
     }
 
     private fun isImageClearBtnVisible(isVisible: Boolean) {

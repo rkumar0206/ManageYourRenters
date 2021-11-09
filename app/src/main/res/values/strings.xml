@@ -90,7 +90,7 @@
     <string name="pdf">pdf</string>
     <string name="image">image</string>
     <string name="url">url</string>
-    <string name="please_wait_while_file_is_uploading">Please wait while file is uploading…</string>
+    <string name="please_wait">Please wait…</string>
     <string name="sync_borrower_payments">syncing borrower payments…</string>
     <string name="sync_partial_payments">syncing partial payments…</string>
     <string name="sync_renters_payments">syncing renters payments…</string>

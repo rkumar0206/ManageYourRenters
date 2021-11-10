@@ -111,12 +111,30 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_expenseCategoryFragment_to_expenseFragment"
+            app:destination="@id/expenseFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/addEditExpenseCategoryFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.AddEditExpenseCategoryFragment"
         android:label="AddEditExpenseCategoryFragment"
         tools:layout="@layout/fragment_add_expense_category">
+        <argument
+            android:name="expenseCategoryKey"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/expenseFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.ExpenseFragment"
+        android:label="ExpenseFragment"
+        tools:layout="@layout/fragment_expense">
         <argument
             android:name="expenseCategoryKey"
             app:argType="string"

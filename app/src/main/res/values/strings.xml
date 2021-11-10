@@ -182,6 +182,7 @@
     <string name="no_results_found">No results found !!!</string>
     <string name="search_images_here">Search images here</string>
     <string name="sync_with_cloud">Sync with cloud</string>
+    <string name="no_expense_added_message">Click (+) button to add expense in this category</string>
 
 
     <string-array name="interest_time_schedule">

@@ -183,6 +183,7 @@
     <string name="search_images_here">Search images here</string>
     <string name="sync_with_cloud">Sync with cloud</string>
     <string name="no_expense_added_message">Click (+) button to add expense in this category</string>
+    <string name="add_expense">Add Expense</string>
 
 
     <string-array name="interest_time_schedule">

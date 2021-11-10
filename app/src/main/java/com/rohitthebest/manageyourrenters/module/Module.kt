@@ -215,7 +215,7 @@ object Module {
 
         return OkHttpClient.Builder()
             .addInterceptor(interceptor)
-            .readTimeout(35, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
             .build()
     }
 

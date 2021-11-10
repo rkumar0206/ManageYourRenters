@@ -24,6 +24,22 @@ class ExpenseAdapter(val categoryName: String = "") :
 
         init {
 
+            binding.rootL.setOnClickListener {
+
+                if (checkForNullability()) {
+
+                    mListener!!.onItemClick(getItem(absoluteAdapterPosition))
+                }
+            }
+
+            binding.expenseMenuBtn.setOnClickListener {
+
+                if (checkForNullability()) {
+
+                    mListener!!.onMenuBtnClicked(getItem(absoluteAdapterPosition))
+                }
+            }
+
         }
 
         @SuppressLint("SetTextI18n")
@@ -56,6 +72,12 @@ class ExpenseAdapter(val categoryName: String = "") :
                 }
             }
         }
+
+        private fun checkForNullability(): Boolean {
+
+            return absoluteAdapterPosition != RecyclerView.NO_POSITION && mListener != null
+        }
+
     }
 
     companion object {
@@ -85,6 +107,7 @@ class ExpenseAdapter(val categoryName: String = "") :
     interface OnClickListener {
 
         fun onItemClick(expense: Expense)
+        fun onMenuBtnClicked(expense: Expense)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

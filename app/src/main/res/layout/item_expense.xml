@@ -37,13 +37,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginBottom="5dp"
                 android:ellipsize="end"
                 android:maxLines="4"
                 android:padding="4dp"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/expenseMenuBtn"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider68"
                 tools:text="Spent on : Petrol" />
@@ -95,6 +96,17 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/expenseAmountTV" />
+
+            <ImageButton
+                android:id="@+id/expenseMenuBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:backgroundTint="@color/color_white"
+                android:minHeight="48dp"
+                app:layout_constraintEnd_toEndOf="@+id/expenseAmountTV"
+                app:layout_constraintTop_toBottomOf="@+id/divider68"
+                app:srcCompat="@drawable/ic_baseline_more_vert_24" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

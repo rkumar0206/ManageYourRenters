@@ -7,13 +7,21 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.ExpenseAdapter
+import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseBinding
+import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.show
+import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -21,7 +29,8 @@ import kotlinx.coroutines.launch
 private const val TAG = "ExpenseFragment"
 
 @AndroidEntryPoint
-class ExpenseFragment : Fragment(R.layout.fragment_expense) {
+class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnClickListener,
+    CustomMenuItems.OnItemClickListener {
 
     private var _binding: FragmentExpenseBinding? = null
     private val binding get() = _binding!!
@@ -33,6 +42,8 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense) {
 
     private lateinit var receivedExpenseCategory: ExpenseCategory
 
+    private lateinit var expenseAdapter: ExpenseAdapter
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentExpenseBinding.bind(view)
@@ -43,7 +54,6 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense) {
         getMessage()
 
         initListeners()
-
     }
 
     private fun getMessage() {
@@ -60,7 +70,6 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense) {
             lifecycleScope.launch {
 
                 delay(300)
-                observeExpenses()
                 getExpenseCategory()
             }
 
@@ -78,8 +87,120 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense) {
                     receivedExpenseCategory = expenseCategory
 
                     binding.toolbar.title = "${expenseCategory.categoryName} Expenses"
+
+                    expenseAdapter = ExpenseAdapter(receivedExpenseCategory.categoryName)
+
+                    setUpRecyclerView()
+
+                    observeExpenses()
                 })
         }
+    }
+
+    private fun setUpRecyclerView() {
+
+        binding.expenseRV.apply {
+
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = expenseAdapter
+        }
+
+        expenseAdapter.setOnClickListener(this)
+
+    }
+
+    override fun onItemClick(expense: Expense) {
+
+    }
+
+    private lateinit var expenseForMenuItems: Expense
+
+    override fun onMenuBtnClicked(expense: Expense) {
+
+        expenseForMenuItems = expense
+
+        requireActivity().supportFragmentManager.let { fm ->
+
+            val bundle = Bundle()
+            bundle.putBoolean(Constants.SHOW_EDIT_MENU, true)
+            bundle.putBoolean(Constants.SHOW_DELETE_MENU, true)
+            bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, false)
+
+            if (!expense.isSynced) {
+
+                bundle.putBoolean(Constants.SHOW_SYNC_MENU, true)
+            }
+
+            CustomMenuItems.newInstance(
+                bundle
+            ).apply {
+
+                show(fm, TAG)
+            }.setOnClickListener(this)
+
+        }
+    }
+
+    override fun onEditMenuClick() {
+
+        // todo : send data to AddEditExpenseFragment
+    }
+
+    override fun onDeleteMenuClick() {
+
+        if (this::expenseForMenuItems.isInitialized) {
+
+            showAlertDialogForDeletion(
+                requireContext(),
+                { dialog ->
+
+                    if (expenseForMenuItems.isSynced) {
+
+                        if (isInternetAvailable(requireContext())) {
+
+                            expenseViewModel.deleteExpense(requireContext(), expenseForMenuItems)
+                        } else {
+
+                            showNoInternetMessage(requireContext())
+                        }
+                    } else {
+
+                        expenseViewModel.deleteExpense(requireContext(), expenseForMenuItems)
+                    }
+
+                    dialog.dismiss()
+                },
+                { dialog ->
+
+                    dialog.dismiss()
+                }
+            )
+        }
+    }
+
+    override fun onViewSupportingDocumentMenuClick() {}
+
+    override fun onReplaceSupportingDocumentClick() {}
+
+    override fun onDeleteSupportingDocumentClick() {}
+
+    override fun onSyncMenuClick() {
+
+        if (this::expenseForMenuItems.isInitialized) {
+
+            if (!expenseForMenuItems.isSynced) {
+
+                if (isInternetAvailable(requireContext())) {
+
+                    expenseViewModel.insertExpense(requireContext(), expenseForMenuItems)
+                } else {
+
+                    showNoInternetMessage(requireContext())
+                }
+            }
+        }
+
     }
 
     private fun observeExpenses() {
@@ -101,7 +222,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense) {
 
                     Log.d(TAG, "observeExpenses: $expenses")
 
-                    //todo :  submit list to the adapter
+                    expenseAdapter.submitList(expenses)
                 }
             )
         }
@@ -130,5 +251,6 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense) {
         super.onDestroyView()
         _binding = null
     }
+
 }
 

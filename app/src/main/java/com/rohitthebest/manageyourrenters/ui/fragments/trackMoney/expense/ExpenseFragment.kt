@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -16,6 +17,8 @@ import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+private const val TAG = "ExpenseFragment"
 
 @AndroidEntryPoint
 class ExpenseFragment : Fragment(R.layout.fragment_expense) {
@@ -95,6 +98,8 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense) {
                         binding.noExpenseCategoryTV.show()
                         binding.expenseRV.hide()
                     }
+
+                    Log.d(TAG, "observeExpenses: $expenses")
 
                     //todo :  submit list to the adapter
                 }

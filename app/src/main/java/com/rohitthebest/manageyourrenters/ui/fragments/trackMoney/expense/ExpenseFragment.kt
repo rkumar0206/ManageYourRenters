@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseBinding
@@ -112,7 +113,11 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense) {
 
         binding.addExpensesFAB.setOnClickListener {
 
-            // todo : navigate to the add expense fragment
+            val action = ExpenseFragmentDirections.actionExpenseFragmentToAddEditExpense(
+                receivedExpenseCategoryKey
+            )
+
+            findNavController().navigate(action)
         }
     }
 

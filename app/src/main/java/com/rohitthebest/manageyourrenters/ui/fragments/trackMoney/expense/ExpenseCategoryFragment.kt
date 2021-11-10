@@ -72,7 +72,12 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
     override fun onItemClick(expenseCategory: ExpenseCategory) {
 
-        // todo : navigate to expense fragment
+        val action =
+            ExpenseCategoryFragmentDirections.actionExpenseCategoryFragmentToExpenseFragment(
+                expenseCategory.key
+            )
+
+        findNavController().navigate(action)
     }
 
     private lateinit var expenseCategoryForMenus: ExpenseCategory

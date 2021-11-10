@@ -56,7 +56,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense) {
             lifecycleScope.launch {
 
                 delay(300)
-                getALlExpenses()
+                observeExpenses()
                 getExpenseCategory()
             }
 
@@ -78,7 +78,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense) {
         }
     }
 
-    private fun getALlExpenses() {
+    private fun observeExpenses() {
 
         if (this::receivedExpenseCategoryKey.isInitialized) {
 

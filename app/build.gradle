@@ -147,4 +147,7 @@ dependencies {
     //paging 3.0
     implementation "androidx.paging:paging-runtime-ktx:3.0.1"
 
+    // pretty time library
+    implementation 'org.ocpsoft.prettytime:prettytime:4.0.4.Final'
+
 }

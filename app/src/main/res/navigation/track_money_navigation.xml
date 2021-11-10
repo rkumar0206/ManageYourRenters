@@ -139,5 +139,23 @@
             android:name="expenseCategoryKey"
             app:argType="string"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_expenseFragment_to_addEditExpense"
+            app:destination="@id/addEditExpense"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/addEditExpense"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.AddEditExpense"
+        android:label="AddEditExpense"
+        tools:layout="@layout/fragment_add_expense">
+        <argument
+            android:name="expenseCategoryKey"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 </navigation>

@@ -184,6 +184,10 @@
     <string name="sync_with_cloud">Sync with cloud</string>
     <string name="no_expense_added_message">Click (+) button to add expense in this category</string>
     <string name="add_expense">Add Expense</string>
+    <string name="date">Date</string>
+    <string name="amount_spent">Amount spent</string>
+    <string name="spent_on">Spent on (Optional)</string>
+    <string name="where_did_you_spent_your_money">Where did you spent your money</string>
 
 
     <string-array name="interest_time_schedule">

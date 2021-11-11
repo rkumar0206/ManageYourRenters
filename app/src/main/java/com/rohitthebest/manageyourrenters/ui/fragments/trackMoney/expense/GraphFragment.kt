@@ -138,19 +138,32 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
                         lifecycleScope.launch {
 
-                            expenseViewModel.getExpenseAmountSumByExpenseCategoryKey(
-                                expenseCategory.key
-                            ).collect { amount ->
 
-                                Log.d(
-                                    TAG,
-                                    "getAllExpenseCategory: category : ${expenseCategory.categoryName} -> amount : $amount"
-                                )
+                            try {
+                                expenseViewModel.getExpenseAmountSumByExpenseCategoryKey(
+                                    expenseCategory.key
+                                ).collect { amount ->
+
+                                    Log.d(
+                                        TAG,
+                                        "getAllExpenseCategory: category : ${expenseCategory.categoryName} -> amount : $amount"
+                                    )
+
+                                    data.add(
+                                        ValueDataEntry(
+                                            expenseCategory.categoryName,
+                                            amount
+                                        )
+                                    )
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            } finally {
 
                                 data.add(
                                     ValueDataEntry(
                                         expenseCategory.categoryName,
-                                        amount
+                                        0.0
                                     )
                                 )
                             }

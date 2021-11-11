@@ -144,7 +144,15 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     override fun onEditMenuClick() {
 
-        // todo : send data to AddEditExpenseFragment
+        if (this::expenseForMenuItems.isInitialized) {
+
+            val action = ExpenseFragmentDirections.actionExpenseFragmentToAddEditExpense(
+                receivedExpenseCategoryKey, expenseForMenuItems.key
+            )
+
+            findNavController().navigate(action)
+        }
+
     }
 
     override fun onDeleteMenuClick() {
@@ -240,7 +248,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         binding.addExpensesFAB.setOnClickListener {
 
             val action = ExpenseFragmentDirections.actionExpenseFragmentToAddEditExpense(
-                receivedExpenseCategoryKey
+                receivedExpenseCategoryKey, ""
             )
 
             findNavController().navigate(action)

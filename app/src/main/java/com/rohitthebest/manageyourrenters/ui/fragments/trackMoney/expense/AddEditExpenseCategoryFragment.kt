@@ -328,6 +328,7 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
             } else {
 
                 showToast(requireContext(), "No change detected...")
+                requireActivity().onBackPressed()
             }
         }
     }

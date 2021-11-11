@@ -42,6 +42,10 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
     private var selectedDate = 0L
 
+    private var receivedExpenseKey = ""
+    private lateinit var receivedExpense: Expense
+    private var isMessageReceivedForEditing = false
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAddExpenseBinding.bind(view)
@@ -72,15 +76,49 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
             val args = arguments?.let { bundle ->
 
-                ExpenseFragmentArgs.fromBundle(bundle)
+                AddEditExpenseArgs.fromBundle(bundle)
             }
 
             receivedExpenseCategoryKey = args?.expenseCategoryKey!!
+
+            receivedExpenseKey = args.expenseKey!!
+
+            if (receivedExpenseKey != "") {
+
+                isMessageReceivedForEditing = true
+
+                getExpense()
+            }
 
             lifecycleScope.launch {
 
                 delay(300)
                 getExpenseCategory()
+            }
+        }
+    }
+
+    private fun getExpense() {
+
+        expenseViewModel.getExpenseByKey(receivedExpenseKey)
+            .observe(viewLifecycleOwner, { expense ->
+
+                receivedExpense = expense
+
+                updateUI()
+            })
+    }
+
+    private fun updateUI() {
+
+        if (this::receivedExpense.isInitialized) {
+
+            includeBinding.apply {
+
+                selectedDate = receivedExpense.created
+                updateSelectedDateTextView()
+                expenseAmountET.editText?.setText(receivedExpense.amount.toString())
+                expenseSpentOnET.setText(receivedExpense.spentOn)
             }
         }
     }
@@ -141,24 +179,79 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
     private fun initExpense() {
 
-        val expense = Expense(
-            null,
-            includeBinding.expenseAmountET.editText?.text.toString().trim().toDouble(),
-            selectedDate,
-            System.currentTimeMillis(),
-            includeBinding.expenseSpentOnET.text.toString().trim(),
-            getUid()!!,
-            generateKey("_${getUid()}", 60),
-            receivedExpenseCategoryKey,
-            false
-        )
+        val expense: Expense
 
-        saveExpenseInDatabase(expense)
+        if (!isMessageReceivedForEditing) {
+
+            expense = Expense(
+                null,
+                includeBinding.expenseAmountET.editText?.text.toString().trim().toDouble(),
+                selectedDate,
+                System.currentTimeMillis(),
+                includeBinding.expenseSpentOnET.text.toString().trim(),
+                getUid()!!,
+                generateKey("_${getUid()}", 60),
+                receivedExpenseCategoryKey,
+                false
+            )
+
+            saveExpenseInDatabase(expense)
+
+        } else {
+
+            expense = receivedExpense
+
+            val oldDate = receivedExpense.created
+            val oldAmount = receivedExpense.amount
+            val oldSpentOn = receivedExpense.spentOn
+
+            Log.d(TAG, "initExpense: oldDate = $oldDate -> newDate = $selectedDate")
+            Log.d(
+                TAG, "initExpense: oldAmount = $oldAmount -> newAmount = ${
+                    includeBinding.expenseAmountET.editText?.text.toString().trim()
+                        .toDouble()
+                }"
+            )
+            Log.d(
+                TAG,
+                "initExpense: oldSpentOn = $oldSpentOn -> newSpentOn = ${
+                    includeBinding.expenseSpentOnET.text.toString().trim()
+                }"
+            )
+
+            if (oldDate != selectedDate
+                || oldAmount != includeBinding.expenseAmountET.editText?.text.toString().trim()
+                    .toDouble()
+                || oldSpentOn != includeBinding.expenseSpentOnET.text.toString().trim()
+            ) {
+
+                expense.created = selectedDate
+                expense.amount =
+                    includeBinding.expenseAmountET.editText?.text.toString().trim().toDouble()
+                expense.spentOn = includeBinding.expenseSpentOnET.text.toString().trim()
+
+                expense.modified = System.currentTimeMillis()
+
+                saveExpenseInDatabase(expense)
+
+            } else {
+
+                Functions.showToast(requireContext(), "No change detected...")
+                requireActivity().onBackPressed()
+            }
+        }
+
     }
 
     private fun saveExpenseInDatabase(expense: Expense) {
 
-        expenseViewModel.insertExpense(requireContext(), expense)
+        if (!isMessageReceivedForEditing) {
+
+            expenseViewModel.insertExpense(requireContext(), expense)
+        } else {
+
+            expenseViewModel.updateExpense(requireContext(), expense)
+        }
 
         Log.d(TAG, "saveExpenseInDatabase: expense saved -> $expense")
 

@@ -73,6 +73,16 @@ class ExpenseService : Service() {
                         Log.i(TAG, "onStartCommand: ${response.body()}")
 
                         stopSelf()
+                    } else {
+
+                        Log.i(
+                            TAG,
+                            "Error occurred"
+                        )
+
+                        Log.i(TAG, "onStartCommand: ${response.body()}")
+
+                        stopSelf()
                     }
 
                 }
@@ -98,6 +108,16 @@ class ExpenseService : Service() {
 
                         stopSelf()
 
+                    } else {
+
+                        Log.i(
+                            TAG,
+                            "Error occurred"
+                        )
+
+                        Log.i(TAG, "onStartCommand: ${response.body()}")
+
+                        stopSelf()
                     }
                 }
 
@@ -117,6 +137,16 @@ class ExpenseService : Service() {
                             TAG,
                             "onStartCommand: expense category successfully deleted with key ${expense.key}"
                         )
+
+                        stopSelf()
+                    } else {
+
+                        Log.i(
+                            TAG,
+                            "Error occurred"
+                        )
+
+                        Log.i(TAG, "onStartCommand: ${response.body()}")
 
                         stopSelf()
                     }

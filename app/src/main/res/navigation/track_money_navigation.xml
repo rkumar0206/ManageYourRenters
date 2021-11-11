@@ -157,5 +157,9 @@
             android:name="expenseCategoryKey"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="expenseKey"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 </navigation>

@@ -31,4 +31,6 @@ interface ExpenseDAO {
     @Query("SELECT * FROM expense_table WHERE categoryKey = :expenseCategoryKey")
     fun getExpensesByExpenseCategoryKey(expenseCategoryKey: String): Flow<List<Expense>>
 
+    @Query("SELECT * FROM expense_table WHERE `key` = :expenseKey")
+    fun getExpenseByKey(expenseKey: String): Flow<Expense>
 }

@@ -3,8 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_search_expense_category"
+        android:icon="@drawable/ic_baseline_search_24"
+        android:title="@string/search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always" />
+
+
+    <item
         android:id="@+id/menu_expense_graph"
-        android:icon="@drawable/ic_baseline_pie_chart_24"
+        android:icon="@drawable/ic_baseline_bar_chart_24"
         android:title="@string/show_graph"
         app:showAsAction="always" />
+
+
 </menu>

@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -14,15 +15,13 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseCategoryBin
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
-import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
-import com.rohitthebest.manageyourrenters.utils.hide
-import com.rohitthebest.manageyourrenters.utils.show
-import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 
 private const val TAG = "ExpenseCategoryFragment"
 
@@ -192,6 +191,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
                     binding.noExpenseCategoryTV.hide()
                     binding.expenseCategoryRV.show()
+                    setUpSearchView(expenseCategories)
                 } else {
 
                     binding.noExpenseCategoryTV.show()
@@ -202,6 +202,34 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
                 expenseCategoryAdapter.submitList(expenseCategories)
             })
+    }
+
+    private fun setUpSearchView(expenseCategories: List<ExpenseCategory>?) {
+
+        val searchView =
+            binding.toolbar.menu.findItem(R.id.menu_search_expense_category).actionView as SearchView
+
+        searchView.searchText { s ->
+
+            if (s?.isEmpty()!!) {
+
+                binding.expenseCategoryRV.scrollToPosition(0)
+                expenseCategoryAdapter.submitList(expenseCategories)
+            } else {
+
+                val filteredList = expenseCategories?.filter { expenseCategory ->
+
+                    expenseCategory.categoryName.lowercase(Locale.ROOT).contains(
+                        s.toString().trim().lowercase(Locale.ROOT)
+                    )
+                }
+
+                expenseCategoryAdapter.submitList(filteredList)
+
+            }
+
+        }
+
     }
 
     private fun initListeners() {

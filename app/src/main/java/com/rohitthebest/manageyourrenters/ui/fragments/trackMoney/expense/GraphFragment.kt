@@ -3,6 +3,8 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +21,10 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.FragmentGraphBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -38,14 +44,16 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
     private lateinit var pie: Pie
     private lateinit var cartesian: Cartesian
 
+    private var isAllTimeSelected = true
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentGraphBinding.bind(view)
 
-        setUpPieChart()
         //setUpCartesianChart()
+        setUpPieChart()
 
-        getAllExpenseCategory()
+        getExpenseCategoryExpensesByAllTime()
         initListeners()
     }
 
@@ -53,6 +61,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
     private fun setUpPieChart() {
 
         pie = AnyChart.pie()
+
         binding.chart.setProgressBar(binding.progressBar)
 
         pie.title("Expenses on each category")
@@ -118,14 +127,49 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         })
     }
 
+    private var d1 = System.currentTimeMillis() - 200000000L
+    private var d2 = System.currentTimeMillis()
+
     private fun initListeners() {
 
         binding.toolbar.setNavigationOnClickListener {
             requireActivity().onBackPressed()
         }
+
+        binding.allTimeBtn.setOnClickListener {
+
+            if (!isAllTimeSelected) {
+
+                isAllTimeSelected = true
+
+                getExpenseCategoryExpensesByAllTime()
+
+                changeSelectionUI()
+            }
+
+        }
+
+        binding.selectRangeBtn.setOnClickListener {
+
+            Functions.showDateRangePickerDialog(
+                d1,
+                d2, {
+                    requireActivity().supportFragmentManager
+                },
+                { dates: Pair<Long, Long> ->
+
+                    d1 = dates.first
+                    d2 = dates.second
+
+                    isAllTimeSelected = false
+                    changeSelectionUI()
+                    getExpenseCategoryExpensesByDateRange(dates.first, dates.second)
+                }
+            )
+        }
     }
 
-    private fun getAllExpenseCategory() {
+    private fun getExpenseCategoryExpensesByDateRange(date1: Long?, date2: Long?) {
 
         expenseCategoryViewModel.getAllExpenseCategories()
             .observe(viewLifecycleOwner, { expenseCategories ->
@@ -138,15 +182,14 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
                         lifecycleScope.launch {
 
-
                             try {
-                                expenseViewModel.getExpenseAmountSumByExpenseCategoryKey(
-                                    expenseCategory.key
+                                expenseViewModel.getExpenseAmountSumByExpenseCategoryByDateRange(
+                                    expenseCategory.key, date1!!, date2!!
                                 ).collect { amount ->
 
                                     Log.d(
                                         TAG,
-                                        "getAllExpenseCategory: category : ${expenseCategory.categoryName} -> amount : $amount"
+                                        "getExpenseCategoryExpensesByDateRange: category : ${expenseCategory.categoryName} -> amount : $amount"
                                     )
 
                                     data.add(
@@ -158,14 +201,6 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
-                            } finally {
-
-                                data.add(
-                                    ValueDataEntry(
-                                        expenseCategory.categoryName,
-                                        0.0
-                                    )
-                                )
                             }
                         }
                     }
@@ -176,15 +211,143 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
                         Log.d(TAG, "getAllExpenseCategory: $data")
 
-                        pie.data(data)
-                        //cartesian.data(data)
+                        if (data.isNotEmpty()) {
 
-                        binding.chart.setChart(pie)
+                            binding.chart.show()
+                            pie.data(data)
+                            binding.chart.setChart(pie)
+                        } else {
+
+                            binding.chart.hide()
+                            showToast(requireContext(), "No data found")
+                        }
+                    }
+
+                }
+            })
+
+    }
+
+    private fun getExpenseCategoryExpensesByAllTime() {
+
+        expenseCategoryViewModel.getAllExpenseCategories()
+            .observe(viewLifecycleOwner, { expenseCategories ->
+
+                if (expenseCategories.isNotEmpty()) {
+
+                    val data = ArrayList<DataEntry>()
+
+                    expenseCategories.forEach { expenseCategory ->
+
+                        lifecycleScope.launch {
+
+                            try {
+                                expenseViewModel.getExpenseAmountSumByExpenseCategoryKey(
+                                    expenseCategory.key
+                                ).collect { amount ->
+
+                                    Log.d(
+                                        TAG,
+                                        "getExpenseCategoryExpensesByAllTime: category : ${expenseCategory.categoryName} -> amount : $amount"
+                                    )
+
+                                    data.add(
+                                        ValueDataEntry(
+                                            expenseCategory.categoryName,
+                                            amount
+                                        )
+                                    )
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+
+                    lifecycleScope.launch {
+
+                        delay(500)
+
+                        Log.d(TAG, "getAllExpenseCategory: $data")
+
+                        if (data.isNotEmpty()) {
+
+                            binding.chart.show()
+                            pie.data(data)
+                            binding.chart.setChart(pie)
+                        } else {
+
+                            binding.chart.hide()
+                        }
+
                     }
 
                 }
             })
     }
+
+    private fun changeSelectionUI() {
+
+        if (isAllTimeSelected) {
+
+            binding.allTimeBtn.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.purple_500
+                )
+            )
+            binding.allTimeBtn.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.color_white
+                )
+            )
+
+            binding.selectRangeBtn.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.color_white
+                )
+            )
+            binding.selectRangeBtn.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.primaryTextColor
+                )
+            )
+
+
+        } else {
+
+            binding.allTimeBtn.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.color_white
+                )
+            )
+            binding.allTimeBtn.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.primaryTextColor
+                )
+            )
+
+            binding.selectRangeBtn.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.purple_500
+                )
+            )
+            binding.selectRangeBtn.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.color_white
+                )
+            )
+
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

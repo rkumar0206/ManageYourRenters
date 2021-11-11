@@ -218,7 +218,10 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
         binding.toolbar.menu.findItem(R.id.menu_expense_graph).setOnMenuItemClickListener {
 
-            //todo : navigate to graph fragment
+            findNavController().navigate(R.id.action_expenseCategoryFragment_to_graphFragment)
+
+            //startActivity(Intent(requireContext(), GraphActivity::class.java))
+
             true
         }
     }

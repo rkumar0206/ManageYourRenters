@@ -90,8 +90,11 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
         requireActivity().supportFragmentManager.let {
 
+            val bundle = Bundle()
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
+
             CustomMenuItems.newInstance(
-                null
+                bundle
             ).apply {
                 show(it, "emi_menu_bottomsheet_tag")
             }.setOnClickListener(this)

@@ -151,6 +151,6 @@ dependencies {
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.4.Final'
 
     //Any chart library for showing graphs
-    implementation 'com.github.AnyChart:AnyChart-Android:1.1.4'
+    implementation 'com.github.AnyChart:AnyChart-Android:1.1.2'
 
 }

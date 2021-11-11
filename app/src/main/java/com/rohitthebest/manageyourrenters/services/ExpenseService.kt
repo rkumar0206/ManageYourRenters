@@ -63,7 +63,7 @@ class ExpenseService : Service() {
                         expense.uid, expense.categoryKey, expense
                     )
 
-                    if (response.isSuccessful && response.code() == 201) {
+                    if (response.isSuccessful && (response.code() == 201 || response.code() == 200)) {
 
                         Log.i(
                             TAG,

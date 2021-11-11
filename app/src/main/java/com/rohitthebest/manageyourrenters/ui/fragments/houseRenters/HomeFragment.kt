@@ -144,6 +144,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                 adapter = mAdapter
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true)
+                changeVisibilityOfFABOnScrolled(binding.addRenterFAB)
             }
 
 

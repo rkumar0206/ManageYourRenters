@@ -115,6 +115,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
             setHasFixedSize(true)
             adapter = borrowerAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            changeVisibilityOfFABOnScrolled(binding.addIndividualRenterFAB)
         }
 
         borrowerAdapter.setOnClickListener(this)

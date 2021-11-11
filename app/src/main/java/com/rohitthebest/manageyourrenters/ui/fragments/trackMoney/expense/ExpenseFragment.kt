@@ -19,6 +19,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.show
 import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
@@ -104,6 +105,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             adapter = expenseAdapter
+            changeVisibilityOfFABOnScrolled(binding.addExpensesFAB)
         }
 
         expenseAdapter.setOnClickListener(this)

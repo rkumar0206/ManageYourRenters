@@ -127,6 +127,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             adapter = emiPaymentAdapter
+            changeVisibilityOfFABOnScrolled(binding.addEmiPaymentFAB)
         }
 
         emiPaymentAdapter.setOnClickListener(this)

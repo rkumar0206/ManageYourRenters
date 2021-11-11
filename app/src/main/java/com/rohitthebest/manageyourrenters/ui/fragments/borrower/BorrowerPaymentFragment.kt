@@ -126,6 +126,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
             adapter = borrowerPaymentAdapter
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
+            changeVisibilityOfFABOnScrolled(binding.addPaymentFAB)
         }
 
         borrowerPaymentAdapter.setOnClickListener(this)

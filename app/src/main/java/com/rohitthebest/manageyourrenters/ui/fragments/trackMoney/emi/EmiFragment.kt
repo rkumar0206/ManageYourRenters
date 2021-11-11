@@ -69,6 +69,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
             adapter = emiAdapter
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
+            changeVisibilityOfFABOnScrolled(binding.addEmiCategoryFAB)
         }
 
         emiAdapter.setOnClickListener(this)

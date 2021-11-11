@@ -233,6 +233,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 adapter = paymentAdapter
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true)
+                changeVisibilityOfFABOnScrolled(binding.addPyamentFAB)
             }
 
             paymentAdapter.setOnClickListener(this)

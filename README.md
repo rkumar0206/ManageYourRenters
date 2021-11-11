@@ -61,4 +61,5 @@ In this category you can keep track of the borrowers (the person to whom you hav
  * EMI
  * Loan
  * Contracts / Deals
- * Others
+ * Expense
+ * Monthly Payments

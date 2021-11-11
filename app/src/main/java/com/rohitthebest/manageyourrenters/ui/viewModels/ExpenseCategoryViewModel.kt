@@ -99,7 +99,9 @@ class ExpenseCategoryViewModel @Inject constructor(
         }
 
     fun deleteAllExpenseCategories() = viewModelScope.launch {
+
         expenseCategoryRepository.deleteAllExpenseCategories()
+        expenseRepository.deleteAllExpenses()
     }
 
     fun getExpenseCategoryByKey(key: String) =

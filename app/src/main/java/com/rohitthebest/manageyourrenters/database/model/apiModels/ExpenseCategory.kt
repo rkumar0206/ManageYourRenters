@@ -13,7 +13,7 @@ data class ExpenseCategory(
     var modified: Long,
     var uid: String,
     var key: String,
-    var isSynced: Boolean = false
+    var isSynced: Boolean = true
 ) {
 
     constructor() : this(
@@ -25,6 +25,6 @@ data class ExpenseCategory(
         0L,
         "",
         "",
-        false
+        true
     )
 }

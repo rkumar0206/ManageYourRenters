@@ -47,6 +47,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
     private val renterViewModel: RenterViewModel by viewModels()
     private val borrowerViewModel: BorrowerViewModel by viewModels()
     private val emiViewModel: EMIViewModel by viewModels()
+    private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
 
     private lateinit var renterTypeList: ArrayList<RenterTypes>
     private lateinit var renterTypeAdapter: RenterTypeAdapter
@@ -289,6 +290,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
             renterViewModel.deleteAllRenter()
             borrowerViewModel.deleteAllBorrower()
             emiViewModel.deleteAllEMIs()
+            expenseCategoryViewModel.deleteAllExpenseCategories()
             changeIsSyncedValue()
 
         } catch (e: Exception) {

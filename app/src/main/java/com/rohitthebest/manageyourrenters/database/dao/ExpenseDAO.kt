@@ -25,6 +25,9 @@ interface ExpenseDAO {
     @Query("DELETE FROM expense_table WHERE categoryKey = :expenseCategoryKey")
     suspend fun deleteExpenseByExpenseCategoryKey(expenseCategoryKey: String)
 
+    @Query("DELETE FROM expense_table WHERE isSynced = :isSynced")
+    suspend fun deleteExpenseByIsSynced(isSynced: Boolean)
+
     @Query("SELECT * FROM expense_table")
     fun getAllExpenses(): Flow<List<Expense>>
 

@@ -19,9 +19,11 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.*
 import com.rohitthebest.manageyourrenters.databinding.ActivityLoginBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.services.GetAllExpenseAndExpenseCategoryService
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -68,7 +70,7 @@ class LoginActivity : AppCompatActivity() {
 
         if (mAuth.currentUser != null && !isSynced) {
 
-            syncRenters()
+            syncExpenseCategoryAndExpense()
         }
 
         initListeners()
@@ -143,7 +145,7 @@ class LoginActivity : AppCompatActivity() {
 
                         showToast(this, "SignIn successful")
 
-                        syncRenters()
+                        syncExpenseCategoryAndExpense()
 
                     } else {
                         // If sign in fails, display a message to the user.
@@ -161,6 +163,20 @@ class LoginActivity : AppCompatActivity() {
     }
 
     //[START OF SYNC]
+
+    private fun syncExpenseCategoryAndExpense() {
+
+        if (isInternetAvailable(this)) {
+
+            val intent =
+                Intent(applicationContext, GetAllExpenseAndExpenseCategoryService::class.java)
+
+            this.startService(intent)
+        }
+
+        syncRenters()
+    }
+
     @SuppressLint("SetTextI18n")
     private fun syncRenters() {
 
@@ -462,6 +478,7 @@ class LoginActivity : AppCompatActivity() {
 
 
     }
+
 
     private fun saveIsSyncedValueAndNavigateToHomeActivity() {
 

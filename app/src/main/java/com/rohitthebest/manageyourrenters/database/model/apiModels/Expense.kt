@@ -13,7 +13,7 @@ data class Expense(
     var uid: String,
     var key: String,
     var categoryKey: String = "",
-    var isSynced: Boolean = false
+    var isSynced: Boolean = true
 ) {
 
     constructor() : this(
@@ -25,6 +25,6 @@ data class Expense(
         "",
         "",
         "",
-        false
+        true
     )
 }

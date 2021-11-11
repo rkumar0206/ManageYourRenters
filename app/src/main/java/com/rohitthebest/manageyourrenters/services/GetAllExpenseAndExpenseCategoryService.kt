@@ -46,6 +46,8 @@ class GetAllExpenseAndExpenseCategoryService : Service() {
 
                 if (expenseCategoryResponse.isSuccessful && expenseCategoryResponse.code() == 200) {
 
+                    expenseCategoryRepository.deleteAllExpenseCategoriesByIsSynced(true)
+
                     expenseCategoryResponse.body()?.expenseCategories?.let { expenseCategories ->
 
                         expenseCategoryRepository.insertAllExpenseCategory(
@@ -60,6 +62,8 @@ class GetAllExpenseAndExpenseCategoryService : Service() {
                 val expenseResponse = expenseRepositoryAPI.getExpensesByUID(uid.toString())
 
                 if (expenseResponse.isSuccessful && expenseResponse.code() == 200) {
+
+                    expenseRepository.deleteExpenseByIsSynced(true)
 
                     expenseResponse.body()?.expenses?.let { expenses ->
 

@@ -215,6 +215,12 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
             requireActivity().onBackPressed()
         }
+
+        binding.toolbar.menu.findItem(R.id.menu_expense_graph).setOnMenuItemClickListener {
+
+            //todo : navigate to graph fragment
+            true
+        }
     }
 
     override fun onDestroyView() {

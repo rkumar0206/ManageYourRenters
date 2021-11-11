@@ -188,6 +188,7 @@
     <string name="amount_spent">Amount spent</string>
     <string name="spent_on">Spent on (Optional)</string>
     <string name="where_did_you_spent_your_money">Where did you spent your money</string>
+    <string name="show_graph">Show graph</string>
 
 
     <string-array name="interest_time_schedule">

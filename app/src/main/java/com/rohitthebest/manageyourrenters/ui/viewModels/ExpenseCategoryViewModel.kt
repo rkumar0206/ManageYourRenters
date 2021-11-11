@@ -50,11 +50,15 @@ class ExpenseCategoryViewModel @Inject constructor(
         expenseCategoryRepository.insertAllExpenseCategory(expenseCategories)
     }
 
-    fun updateExpenseCategory(context: Context, expenseCategory: ExpenseCategory) =
+    fun updateExpenseCategory(
+        context: Context,
+        expenseCategory: ExpenseCategory,
+        shouldUpload: Boolean = true
+    ) =
 
         viewModelScope.launch {
 
-            if (isInternetAvailable(context)) {
+            if (isInternetAvailable(context) && shouldUpload) {
 
                 expenseCategory.isSynced = true
 
@@ -65,7 +69,9 @@ class ExpenseCategoryViewModel @Inject constructor(
                 )
             } else {
 
-                expenseCategory.isSynced = false
+                if (shouldUpload) {
+                    expenseCategory.isSynced = false
+                }
             }
 
             expenseCategoryRepository.updateExpenseCategory(expenseCategory)

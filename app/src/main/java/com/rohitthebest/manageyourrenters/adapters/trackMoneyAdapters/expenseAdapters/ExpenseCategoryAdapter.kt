@@ -11,7 +11,9 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.ItemExpenseCategoryBinding
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setImageToImageViewUsingGlide
+import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.isValid
+import com.rohitthebest.manageyourrenters.utils.show
 
 class ExpenseCategoryAdapter :
     ListAdapter<ExpenseCategory, ExpenseCategoryAdapter.ExpenseCategoryViewHolder>(DiffUtilCallback()) {
@@ -64,6 +66,15 @@ class ExpenseCategoryAdapter :
                     }
 
                     expenseCategoryNameTV.text = expenseCat.categoryName
+
+                    if (expenseCat.categoryDescription.isValid()) {
+
+                        expenseCategoryDescriptionTV.show()
+                        expenseCategoryDescriptionTV.text = expenseCat.categoryDescription
+                    } else {
+
+                        expenseCategoryDescriptionTV.hide()
+                    }
                 }
             }
         }

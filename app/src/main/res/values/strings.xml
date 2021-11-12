@@ -192,6 +192,7 @@
     <string name="search">Search</string>
     <string name="all_time">All time</string>
     <string name="select_range">Select range</string>
+    <string name="profile">Profile</string>
 
 
     <string-array name="interest_time_schedule">

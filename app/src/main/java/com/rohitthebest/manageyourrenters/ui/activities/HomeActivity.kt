@@ -4,20 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.afollestad.materialdialogs.LayoutMode
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.bottomsheets.BottomSheet
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
-import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -27,8 +19,11 @@ import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
 import com.rohitthebest.manageyourrenters.data.RenterTypes
 import com.rohitthebest.manageyourrenters.databinding.ActivityHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.ProfileBottomSheet
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
 import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +34,8 @@ import kotlinx.coroutines.withContext
 private const val TAG = "HomeActivity"
 
 @AndroidEntryPoint
-class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
+class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
+    ProfileBottomSheet.OnItemClickListener {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var mAuth: FirebaseAuth
@@ -64,26 +60,32 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
 
             navigateToLoginActivity()
 
-        } else {
-
-            updateUI()
         }
 
-        binding.profileImage.setOnClickListener {
+        initListeners()
 
-            showBottomSheetProfileDialog()
-        }
-
-        binding.homeSyncBtn.setOnClickListener {
-
-            showAlertMessageAndNavigateToLoginActivity()
-        }
 
         populateRenterTypeList()
 
         renterTypeAdapter = RenterTypeAdapter()
         setUpRecyclerView()
         renterTypeAdapter.submitList(renterTypeList)
+
+    }
+
+    private fun initListeners() {
+
+        binding.toolbar.menu.findItem(R.id.menu_sync_with_cloud).setOnMenuItemClickListener {
+
+            showAlertMessageAndNavigateToLoginActivity()
+            true
+        }
+
+        binding.toolbar.menu.findItem(R.id.menu_profile).setOnMenuItemClickListener {
+
+            showBottomSheetProfileDialog()
+            true
+        }
 
     }
 
@@ -160,7 +162,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
             .setMessage("If any changes has been done on cloud this will sync them with your phone.")
             .setPositiveButton("Request sync") { d, _ ->
 
-                if (Functions.isInternetAvailable(this)) {
+                if (isInternetAvailable(this)) {
 
                     Functions.saveBooleanToSharedPreference(
                         this,
@@ -174,7 +176,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
                     d.dismiss()
                 } else {
 
-                    Functions.showNoInternetMessage(this)
+                    showNoInternetMessage(this)
                 }
             }.setNegativeButton("Cancel") { d, _ ->
 
@@ -191,55 +193,26 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
         startActivity(intent)
     }
 
-    private fun updateUI() {
-
-        if (mAuth.currentUser != null) {
-
-            try {
-
-                if (mAuth.currentUser!!.photoUrl != null) {
-
-                    Glide.with(this)
-                        .load(mAuth.currentUser!!.photoUrl)
-                        .into(binding.profileImage)
-                }
-            } catch (e: Exception) {
-
-                e.printStackTrace()
-            }
-
-        }
-    }
-
     @SuppressLint("SetTextI18n")
     private fun showBottomSheetProfileDialog() {
 
-        MaterialDialog(this, BottomSheet(layoutMode = LayoutMode.WRAP_CONTENT)).show {
+        this.supportFragmentManager.let { fragmentManager ->
 
-            customView(
-                R.layout.user_info_with_sign_out_layout,
-                scrollable = true
-            )
+            ProfileBottomSheet.newInstance(null)
+                .apply {
+                    show(fragmentManager, TAG)
+                }.setOnClickListener(this)
+        }
+    }
 
-            val userName = getCustomView().findViewById<TextView>(R.id.userNameTV)
-            val emailId = getCustomView().findViewById<TextView>(R.id.userEmailTV)
-            val signOutBtn = getCustomView().findViewById<MaterialCardView>(R.id.signOutBtn)
+    override fun onSignOutBtnClicked() {
 
-            userName.text = mAuth.currentUser?.displayName
-            emailId.text = mAuth.currentUser?.email
+        if (isInternetAvailable(this)) {
 
-            signOutBtn.setOnClickListener {
+            signOut()
+        } else {
 
-                if (Functions.isInternetAvailable(this@HomeActivity)) {
-
-                    signOut()
-
-                    dismiss()
-                } else {
-
-                    Functions.showNoInternetMessage(this@HomeActivity)
-                }
-            }
+            showNoInternetMessage(this)
         }
     }
 
@@ -248,6 +221,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener {
         try {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Are You Sure?")
+                .setMessage("You will be signed out from this app.")
                 .setPositiveButton("Yes") { _, _ ->
 
                     mAuth.signOut()

@@ -1,16 +1,21 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
 import com.rohitthebest.manageyourrenters.data.RenterTypes
 import com.rohitthebest.manageyourrenters.databinding.FragmentTrackMoneyHomeBinding
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.isValid
 import dagger.hilt.android.AndroidEntryPoint
+
+private const val TAG = "TrackMoneyHomeFragment"
 
 @AndroidEntryPoint
 class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
@@ -37,6 +42,46 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
         binding.trackMoneyHomeToolbar.setNavigationOnClickListener {
 
             requireActivity().onBackPressed()
+        }
+
+        getMessage()
+    }
+
+    private fun getMessage() {
+
+        if (!arguments?.isEmpty!!) {
+
+            val args: TrackMoneyHomeFragmentArgs by navArgs()
+
+            val fragmentName = args.shortcutFragmentNameKey
+
+            Log.d(TAG, "getMessage: $fragmentName")
+
+            arguments = Bundle.EMPTY
+
+            if (fragmentName.isValid()) {
+
+                when (fragmentName) {
+
+                    getString(R.string.expenses) -> {
+
+                        findNavController().navigate(R.id.action_trackMoneyHomeFragment_to_expenseCategoryFragment)
+                    }
+
+                    getString(R.string.emis) -> {
+
+                        findNavController().navigate(R.id.action_trackMoneyHomeFragment_to_emiFragment)
+                    }
+
+                    else -> {
+
+                        Log.d(TAG, "getMessage: Not mapped")
+
+                        showToast(requireContext(), "Not available")
+                        requireActivity().onBackPressed()
+                    }
+                }
+            }
         }
     }
 

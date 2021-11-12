@@ -48,5 +48,6 @@ object Constants {
     const val EXPENSE_KEY = "ajcakjckackjabkbnslsn"
 
     const val NETWORK_PAGE_SIZE_UNSPLASH = 30
+    const val SHORTCUT_FRAGMENT_NAME_KEY = "sdcjnsknkanckbajcbabacjk"
 
 }

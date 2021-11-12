@@ -20,6 +20,7 @@ import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
 import com.rohitthebest.manageyourrenters.data.RenterTypes
 import com.rohitthebest.manageyourrenters.databinding.ActivityHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_FRAGMENT_NAME_KEY
 import com.rohitthebest.manageyourrenters.ui.ProfileBottomSheet
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
 import com.rohitthebest.manageyourrenters.utils.Functions
@@ -96,23 +97,27 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
     override fun onClick(v: View?) {
 
+        val intent = Intent(this, TrackMoneyActivity::class.java)
+
         when (v?.id) {
 
             binding.shortcutExpenses.id -> {
 
-                // todo :  open expense category fragment
+                intent.putExtra(SHORTCUT_FRAGMENT_NAME_KEY, getString(R.string.expenses))
             }
 
             binding.shortcutMonthlyPayments.id -> {
 
-                // todo :  open monthly payments category fragment
+                intent.putExtra(SHORTCUT_FRAGMENT_NAME_KEY, getString(R.string.monthly_payments))
             }
 
             binding.shortcutEmis.id -> {
 
-                // todo :  open emis fragment
+                intent.putExtra(SHORTCUT_FRAGMENT_NAME_KEY, getString(R.string.emis))
             }
         }
+
+        startActivity(intent)
     }
 
 

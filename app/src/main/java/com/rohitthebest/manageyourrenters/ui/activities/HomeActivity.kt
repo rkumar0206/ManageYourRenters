@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -35,7 +36,7 @@ private const val TAG = "HomeActivity"
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
-    ProfileBottomSheet.OnItemClickListener {
+    ProfileBottomSheet.OnItemClickListener, View.OnClickListener {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var mAuth: FirebaseAuth
@@ -87,7 +88,33 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
             true
         }
 
+        binding.shortcutExpenses.setOnClickListener(this)
+        binding.shortcutMonthlyPayments.setOnClickListener(this)
+        binding.shortcutEmis.setOnClickListener(this)
+
     }
+
+    override fun onClick(v: View?) {
+
+        when (v?.id) {
+
+            binding.shortcutExpenses.id -> {
+
+                // todo :  open expense category fragment
+            }
+
+            binding.shortcutMonthlyPayments.id -> {
+
+                // todo :  open monthly payments category fragment
+            }
+
+            binding.shortcutEmis.id -> {
+
+                // todo :  open emis fragment
+            }
+        }
+    }
+
 
     private fun populateRenterTypeList() {
 

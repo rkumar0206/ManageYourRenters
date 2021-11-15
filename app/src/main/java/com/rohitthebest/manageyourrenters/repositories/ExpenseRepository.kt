@@ -37,6 +37,10 @@ class ExpenseRepository @Inject constructor(
         expenseCategoryKey, date1, date2
     )
 
+    fun getExpenseByDateRangeAndExpenseCategoryKey(
+        expenseCategoryKey: String, date1: Long, date2: Long
+    ) = dao.getExpenseByDateRangeAndExpenseCategoryKey(expenseCategoryKey, date1, date2)
+
     fun getExpensesByExpenseCategoryKey(expenseCategoryKey: String) =
         dao.getExpensesByExpenseCategoryKey(expenseCategoryKey)
 

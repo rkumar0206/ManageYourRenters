@@ -13,7 +13,6 @@ import android.widget.ArrayAdapter
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,7 +20,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillInfo
 import com.rohitthebest.manageyourrenters.data.ElectricityBillInfo
@@ -519,25 +517,25 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             tillDateTimeStamp
         }
 
-        val builder = MaterialDatePicker.Builder.dateRangePicker()
-            .setSelection(Pair(fromDateTimestamp, endDate))
-            .setTitleText("Select date range")
-            .build()
+        Functions.showDateRangePickerDialog(
+            fromDateTimestamp!!,
+            endDate!!,
+            {
+                requireActivity().supportFragmentManager
+            },
+            { dates ->
 
-        builder.show(requireActivity().supportFragmentManager, "date_range_picker")
+                fromDateTimestamp = dates.first
+                tillDateTimeStamp = dates.second
+                includeBinding.fromDateTV.setDateInTextView(dates.first)
+                includeBinding.tillDateTV.setDateInTextView(dates.second)
 
+                numberOfDays = calculateNumberOfDays(dates.first!!, dates.second!!)
 
-        builder.addOnPositiveButtonClickListener {
-
-            fromDateTimestamp = it.first
-            tillDateTimeStamp = it.second
-            includeBinding.fromDateTV.setDateInTextView(it.first)
-            includeBinding.tillDateTV.setDateInTextView(it.second)
-
-            numberOfDays = calculateNumberOfDays(it.first!!, it.second!!)
-
-            setNumberOfDays()
-        }
+                setNumberOfDays()
+            },
+            true
+        )
     }
 
     private fun setNumberOfDays() {

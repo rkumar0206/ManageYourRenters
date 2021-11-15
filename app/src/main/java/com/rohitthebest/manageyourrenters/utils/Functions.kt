@@ -351,13 +351,24 @@ class Functions {
             startDate: Long,
             endDate: Long,
             crossinline fragmentManager: () -> FragmentManager,
-            crossinline positiveListener: (androidx.core.util.Pair<Long, Long>) -> Unit
+            crossinline positiveListener: (androidx.core.util.Pair<Long, Long>) -> Unit,
+            isUpcomingDatesValid: Boolean = false
         ) {
 
-            val builder = MaterialDatePicker.Builder.dateRangePicker()
+            val datePicker = MaterialDatePicker.Builder.dateRangePicker()
                 .setSelection(androidx.core.util.Pair(startDate, endDate))
                 .setTitleText("Select date range")
-                .build()
+
+            if (!isUpcomingDatesValid) {
+
+                val constrainBuilder = CalendarConstraints.Builder()
+                    .setValidator(DateValidatorPointBackward.now())
+                    .build()
+
+                datePicker.setCalendarConstraints(constrainBuilder)
+            }
+
+            val builder = datePicker.build()
 
             builder.show(
                 fragmentManager(),

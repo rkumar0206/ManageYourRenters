@@ -17,17 +17,20 @@ import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
-import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
-import com.rohitthebest.manageyourrenters.utils.hide
-import com.rohitthebest.manageyourrenters.utils.show
-import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val TAG = "ExpenseFragment"
+
+enum class SortExpense {
+
+    BY_DATE_RANGE,
+    BY_CREATED
+}
 
 @AndroidEntryPoint
 class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnClickListener,
@@ -45,10 +48,18 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     private lateinit var expenseAdapter: ExpenseAdapter
 
+    private var startDate = 0L
+    private var endDate = 0L
+
+    private var sortBy: SortExpense = SortExpense.BY_CREATED
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentExpenseBinding.bind(view)
 
+        sortBy = SortExpense.BY_CREATED
+        startDate = System.currentTimeMillis()
+        endDate = System.currentTimeMillis()
 
         binding.progressbar.show()
 
@@ -217,25 +228,44 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
         if (this::receivedExpenseCategoryKey.isInitialized) {
 
-            expenseViewModel.getExpensesByExpenseCategoryKey(receivedExpenseCategoryKey).observe(
-                viewLifecycleOwner, { expenses ->
+            if (sortBy == SortExpense.BY_CREATED) {
 
-                    if (expenses.isNotEmpty()) {
+                expenseViewModel.getExpensesByExpenseCategoryKey(receivedExpenseCategoryKey)
+                    .observe(
+                        viewLifecycleOwner, { expenses ->
 
-                        binding.noExpenseCategoryTV.hide()
-                        binding.expenseRV.show()
-                    } else {
+                            showExpenseItems(expenses)
+                        })
+            } else if (sortBy == SortExpense.BY_DATE_RANGE) {
 
-                        binding.noExpenseCategoryTV.show()
-                        binding.expenseRV.hide()
-                    }
+                // and number of milliseconds in one day to the endDate for accurate result
 
-                    Log.d(TAG, "observeExpenses: $expenses")
+                expenseViewModel.getExpenseByDateRangeAndExpenseCategoryKey(
+                    receivedExpenseCategoryKey, startDate, (endDate + 86400000L)
+                ).observe(viewLifecycleOwner, { expenses ->
 
-                    expenseAdapter.submitList(expenses)
-                }
-            )
+                    showExpenseItems(expenses)
+                })
+            }
+
         }
+    }
+
+    private fun showExpenseItems(expenses: List<Expense>) {
+
+        if (expenses.isNotEmpty()) {
+
+            binding.noExpenseCategoryTV.hide()
+            binding.expenseRV.show()
+        } else {
+
+            binding.noExpenseCategoryTV.show()
+            binding.expenseRV.hide()
+        }
+
+        Log.d(TAG, "observeExpenses: $expenses")
+
+        expenseAdapter.submitList(expenses)
 
         binding.progressbar.hide()
     }
@@ -255,6 +285,51 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
             findNavController().navigate(action)
         }
+
+        binding.toolbar.menu.findItem(R.id.menu_expense_date_range).setOnMenuItemClickListener {
+
+            handleMenuExpenseDateRange()
+
+            true
+        }
+
+        binding.toolbar.menu.findItem(R.id.menu_show_all_expenses).setOnMenuItemClickListener {
+
+            sortBy = SortExpense.BY_CREATED
+
+            binding.progressbar.show()
+            lifecycleScope.launch {
+                delay(200)
+                observeExpenses()
+            }
+
+            true
+        }
+
+    }
+
+    private fun handleMenuExpenseDateRange() {
+
+        Functions.showDateRangePickerDialog(
+            startDate,
+            System.currentTimeMillis(),
+            {
+                requireActivity().supportFragmentManager
+            },
+            { dates ->
+
+                sortBy = SortExpense.BY_DATE_RANGE
+                startDate = dates.first
+                endDate = dates.second
+
+                binding.progressbar.show()
+                lifecycleScope.launch {
+                    delay(200)
+                    observeExpenses()
+                }
+            }
+        )
+
     }
 
     override fun onDestroyView() {

@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.ExpenseAdapter
 import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
@@ -124,6 +125,21 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
     }
 
     override fun onItemClick(expense: Expense) {
+
+        val msg =
+            "\nDate : ${WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(expense.created)}\n\n" +
+                    "Amount : ${expense.amount}\n\n" +
+                    "Spent On : ${expense.spentOn}"
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Expense info")
+            .setMessage(msg)
+            .setPositiveButton("Ok") { dialog, _ ->
+
+                dialog.dismiss()
+            }
+            .create()
+            .show()
 
     }
 

@@ -58,8 +58,9 @@ In this category you can keep track of the borrowers (the person to whom you hav
 ## Track Money
  
  In this category you can track your money based on other sub categories like :
+ * Expense
  * EMI
+ * Monthly Payments
  * Loan
  * Contracts / Deals
- * Expense
- * Monthly Payments
+

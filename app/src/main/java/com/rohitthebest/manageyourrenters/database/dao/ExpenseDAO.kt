@@ -39,6 +39,9 @@ interface ExpenseDAO {
         expenseCategoryKey: String, date1: Long, date2: Long
     ): Flow<Double>
 
+    @Query("SELECT SUM(amount) FROM expense_table WHERE categoryKey = :expenseCategoryKey")
+    fun getTotalExpenseAmountByExpenseCategory(expenseCategoryKey: String): Flow<Double>
+
     @Query("SELECT * FROM expense_table WHERE categoryKey =:expenseCategoryKey AND created BETWEEN :date1 AND :date2 ORDER BY created DESC")
     fun getExpenseByDateRangeAndExpenseCategoryKey(
         expenseCategoryKey: String, date1: Long, date2: Long

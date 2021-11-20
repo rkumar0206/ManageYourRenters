@@ -184,7 +184,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
                             try {
                                 expenseViewModel.getExpenseAmountSumByExpenseCategoryByDateRange(
-                                    expenseCategory.key, date1!!, date2!!
+                                    expenseCategory.key, date1!!, date2!! + 86400000L
                                 ).collect { amount ->
 
                                     Log.d(

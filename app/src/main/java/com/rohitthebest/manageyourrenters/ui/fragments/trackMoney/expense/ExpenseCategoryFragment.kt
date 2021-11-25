@@ -16,6 +16,7 @@ import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -209,6 +210,9 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
         val searchView =
             binding.toolbar.menu.findItem(R.id.menu_search_expense_category).actionView as SearchView
 
+        searchView.clearFocus()
+        searchView.setQuery("", true)
+
         searchView.searchText { s ->
 
             if (s?.isEmpty()!!) {
@@ -256,6 +260,9 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        hideKeyBoard(requireActivity())
+
         _binding = null
     }
 

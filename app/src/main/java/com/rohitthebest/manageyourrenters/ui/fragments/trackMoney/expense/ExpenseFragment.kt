@@ -322,6 +322,23 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             true
         }
 
+        binding.toolbar.menu.findItem(R.id.menu_total_expense).setOnMenuItemClickListener {
+
+            expenseViewModel.getTotalExpenseAmountByExpenseCategory(
+                receivedExpenseCategoryKey
+            ).observe(viewLifecycleOwner) { totalAmount ->
+
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(receivedExpenseCategory.categoryName)
+                    .setMessage("Total expense : $totalAmount")
+                    .setPositiveButton("Ok") { dialog, _ -> dialog.dismiss() }
+                    .create()
+                    .show()
+            }
+
+            true
+        }
+
     }
 
     private fun handleMenuExpenseDateRange() {

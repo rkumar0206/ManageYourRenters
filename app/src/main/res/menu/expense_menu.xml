@@ -10,4 +10,8 @@
     <item
         android:id="@+id/menu_show_all_expenses"
         android:title="Show all expenses" />
+    <item
+        android:id="@+id/menu_total_expense"
+        android:title="@string/see_total"
+        app:showAsAction="never" />
 </menu>

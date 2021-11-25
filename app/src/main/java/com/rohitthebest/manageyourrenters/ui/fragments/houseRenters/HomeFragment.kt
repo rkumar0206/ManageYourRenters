@@ -227,6 +227,11 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         findNavController().navigate(action)
     }
 
+    override fun onMobileNumberClicked(mobileNumber: String) {
+
+        showToast(requireContext(), mobileNumber)
+    }
+
     private fun hideNoRentersAddedTV() {
 
         try {

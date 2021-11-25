@@ -72,7 +72,7 @@ class ShowRentersAdapter :
             binding.adapterIsSyncedBtn.setOnClickListener(this)
             binding.adapterRenterEditBtn.setOnClickListener(this)
             binding.adapterRenterDeleteBtn.setOnClickListener(this)
-
+            binding.adapterRenterMobileTV.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {
@@ -109,6 +109,14 @@ class ShowRentersAdapter :
                     if (checkForNullability(absoluteAdapterPosition)) {
 
                         mListener!!.onSyncButtonClicked(getItem(absoluteAdapterPosition))
+                    }
+                }
+
+                binding.adapterRenterMobileTV.id -> {
+
+                    if (checkForNullability(absoluteAdapterPosition)) {
+
+                        mListener!!.onMobileNumberClicked(getItem(absoluteAdapterPosition).mobileNumber)
                     }
                 }
             }
@@ -162,6 +170,7 @@ class ShowRentersAdapter :
         //fun onExtendInfoButtonClicked(renter : Renter)
         fun onDeleteClicked(renter: Renter)
         fun onEditClicked(renter: Renter)
+        fun onMobileNumberClicked(mobileNumber: String)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

@@ -1,8 +1,10 @@
 package com.rohitthebest.manageyourrenters.others
 
+import com.rohitthebest.manageyourrenters.BuildConfig.MANAGE_YOUR_RENTERS_BASE_URL
+
 object Constants {
 
-    const val MANAGE_YOUR_RENTERS_API_BASE_URL = "https://serene-crag-89401.herokuapp.com"
+    const val MANAGE_YOUR_RENTERS_API_BASE_URL = MANAGE_YOUR_RENTERS_BASE_URL
     const val UNSPLASH_BASE_URL = "https://api.unsplash.com/"
 
     const val NO_INTERNET_MESSAGE = "Please check your Internet connection!!!"

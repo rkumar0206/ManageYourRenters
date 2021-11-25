@@ -205,6 +205,15 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         findNavController().navigate(action)
     }
 
+    override fun onMobileNumberClicked(mobileNumber: String, view: View) {
+
+        Functions.showMobileNumberOptionMenu(
+            requireActivity(),
+            view,
+            mobileNumber
+        )
+    }
+
     private fun showHideProgressBar(isVisible: Boolean) {
 
         binding.individualRentersRV.isVisible = !isVisible

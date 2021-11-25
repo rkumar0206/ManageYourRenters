@@ -29,6 +29,7 @@ class BorrowerAdapter :
             binding.adapterIsSyncedBtn.setOnClickListener(this)
             binding.adapterRenterDeleteBtn.setOnClickListener(this)
             binding.adapterRenterEditBtn.setOnClickListener(this)
+            binding.adapterRenterMobileTV.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {
@@ -58,6 +59,14 @@ class BorrowerAdapter :
                     binding.adapterRenterEditBtn.id -> {
 
                         mListener!!.onEditClicked(getItem(absoluteAdapterPosition).key)
+                    }
+
+                    binding.adapterRenterMobileTV.id -> {
+
+                        mListener!!.onMobileNumberClicked(
+                            getItem(absoluteAdapterPosition).mobileNumber,
+                            binding.adapterRenterMobileTV
+                        )
                     }
                 }
             }
@@ -169,6 +178,7 @@ class BorrowerAdapter :
         fun onSyncButtonClicked(borrower: Borrower?, position: Int)
         fun onDeleteClicked(borrower: Borrower?)
         fun onEditClicked(borrowerKey: String)
+        fun onMobileNumberClicked(mobileNumber: String, view: View)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

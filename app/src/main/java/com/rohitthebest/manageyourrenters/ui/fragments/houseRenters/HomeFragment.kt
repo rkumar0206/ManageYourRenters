@@ -21,6 +21,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showMobileNumberOptionMenu
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -227,9 +228,9 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         findNavController().navigate(action)
     }
 
-    override fun onMobileNumberClicked(mobileNumber: String) {
+    override fun onMobileNumberClicked(mobileNumber: String, view: View) {
 
-        showToast(requireContext(), mobileNumber)
+        showMobileNumberOptionMenu(requireActivity(), view, mobileNumber)
     }
 
     private fun hideNoRentersAddedTV() {

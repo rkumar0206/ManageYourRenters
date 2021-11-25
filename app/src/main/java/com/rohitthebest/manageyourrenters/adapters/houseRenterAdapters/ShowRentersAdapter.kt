@@ -116,7 +116,10 @@ class ShowRentersAdapter :
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
-                        mListener!!.onMobileNumberClicked(getItem(absoluteAdapterPosition).mobileNumber)
+                        mListener!!.onMobileNumberClicked(
+                            getItem(absoluteAdapterPosition).mobileNumber,
+                            binding.adapterRenterMobileTV
+                        )
                     }
                 }
             }
@@ -170,7 +173,7 @@ class ShowRentersAdapter :
         //fun onExtendInfoButtonClicked(renter : Renter)
         fun onDeleteClicked(renter: Renter)
         fun onEditClicked(renter: Renter)
-        fun onMobileNumberClicked(mobileNumber: String)
+        fun onMobileNumberClicked(mobileNumber: String, view: View)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

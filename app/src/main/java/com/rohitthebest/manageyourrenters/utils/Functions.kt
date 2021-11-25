@@ -1,6 +1,8 @@
 package com.rohitthebest.manageyourrenters.utils
 
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,6 +12,7 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
@@ -530,6 +533,55 @@ class Functions {
                 })
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(imageView)
+
+        }
+
+        fun copyToClipBoard(activity: Activity, text: String, label: String = "text") {
+
+            val clipboardManager =
+                activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+            val clipData = ClipData.newPlainText(label, text)
+
+            clipboardManager.setPrimaryClip(clipData)
+
+            showToast(activity, "copied")
+        }
+
+        fun showMobileNumberOptionMenu(
+            activity: Activity,
+            view: View,
+            mobileNumber: String
+        ) {
+
+            val popupMenu = PopupMenu(activity, view)
+
+            popupMenu.menuInflater.inflate(R.menu.mobile_number_option_menu, popupMenu.menu)
+
+            popupMenu.show()
+
+            popupMenu.setOnMenuItemClickListener {
+
+                return@setOnMenuItemClickListener when (it.itemId) {
+
+                    R.id.menu_mobile_copy -> {
+
+                        copyToClipBoard(activity, mobileNumber, "mobile number")
+                        true
+                    }
+
+                    R.id.menu_mobile_call -> {
+
+                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$mobileNumber"))
+                        activity.startActivity(intent)
+                        true
+                    }
+
+                    else -> {
+                        false
+                    }
+                }
+            }
 
         }
 

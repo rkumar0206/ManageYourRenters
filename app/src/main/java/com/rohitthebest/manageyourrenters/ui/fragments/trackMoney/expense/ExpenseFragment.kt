@@ -92,6 +92,18 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             // show all the expenses
             isArgumentEmpty = true
 
+            binding.toolbar.title = "All Expenses"
+
+            expenseAdapter = ExpenseAdapter("All expenses")
+
+            setUpRecyclerView()
+
+            lifecycleScope.launch {
+
+                delay(300)
+                observeExpenses()
+            }
+
         }
 
     }
@@ -114,6 +126,76 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                     observeExpenses()
                 })
         }
+    }
+
+
+    private fun observeExpenses() {
+
+        binding.expenseRV.scrollToPosition(0)
+
+        if (!isArgumentEmpty) {
+
+            if (this::receivedExpenseCategoryKey.isInitialized) {
+
+                if (sortBy == SortExpense.BY_CREATED) {
+
+                    expenseViewModel.getExpensesByExpenseCategoryKey(receivedExpenseCategoryKey)
+                        .observe(
+                            viewLifecycleOwner, { expenses ->
+
+                                handleExpenseList(expenses)
+                            })
+                } else if (sortBy == SortExpense.BY_DATE_RANGE) {
+
+                    // adding number of milliseconds in one day to the endDate for accurate result
+
+                    expenseViewModel.getExpenseByDateRangeAndExpenseCategoryKey(
+                        receivedExpenseCategoryKey, startDate, (endDate + 86400000L)
+                    ).observe(viewLifecycleOwner, { expenses ->
+
+                        handleExpenseList(expenses)
+                    })
+                }
+
+            }
+        } else {
+
+            if (sortBy == SortExpense.BY_CREATED) {
+
+                expenseViewModel.getAllExpenses().observe(viewLifecycleOwner) { expenses ->
+
+                    handleExpenseList(expenses)
+                }
+            } else if (sortBy == SortExpense.BY_DATE_RANGE) {
+
+                expenseViewModel.getExpensesByDateRange(
+                    startDate, (endDate + 86400000L)
+                ).observe(viewLifecycleOwner) { expenses ->
+
+                    handleExpenseList(expenses)
+                }
+            }
+        }
+
+    }
+
+    private fun handleExpenseList(expenses: List<Expense>) {
+
+        if (expenses.isNotEmpty()) {
+
+            binding.noExpenseCategoryTV.hide()
+            binding.expenseRV.show()
+        } else {
+
+            binding.noExpenseCategoryTV.show()
+            binding.expenseRV.hide()
+        }
+
+        Log.d(TAG, "observeExpenses: $expenses")
+
+        expenseAdapter.submitList(expenses)
+
+        binding.progressbar.hide()
     }
 
     private fun setUpRecyclerView() {
@@ -182,7 +264,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         if (this::expenseForMenuItems.isInitialized) {
 
             val action = ExpenseFragmentDirections.actionExpenseFragmentToAddEditExpense(
-                receivedExpenseCategoryKey, expenseForMenuItems.key
+                expenseForMenuItems.categoryKey, expenseForMenuItems.key
             )
 
             findNavController().navigate(action)
@@ -246,52 +328,6 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     }
 
-    private fun observeExpenses() {
-
-        if (this::receivedExpenseCategoryKey.isInitialized) {
-
-            if (sortBy == SortExpense.BY_CREATED) {
-
-                expenseViewModel.getExpensesByExpenseCategoryKey(receivedExpenseCategoryKey)
-                    .observe(
-                        viewLifecycleOwner, { expenses ->
-
-                            showExpenseItems(expenses)
-                        })
-            } else if (sortBy == SortExpense.BY_DATE_RANGE) {
-
-                // and number of milliseconds in one day to the endDate for accurate result
-
-                expenseViewModel.getExpenseByDateRangeAndExpenseCategoryKey(
-                    receivedExpenseCategoryKey, startDate, (endDate + 86400000L)
-                ).observe(viewLifecycleOwner, { expenses ->
-
-                    showExpenseItems(expenses)
-                })
-            }
-
-        }
-    }
-
-    private fun showExpenseItems(expenses: List<Expense>) {
-
-        if (expenses.isNotEmpty()) {
-
-            binding.noExpenseCategoryTV.hide()
-            binding.expenseRV.show()
-        } else {
-
-            binding.noExpenseCategoryTV.show()
-            binding.expenseRV.hide()
-        }
-
-        Log.d(TAG, "observeExpenses: $expenses")
-
-        expenseAdapter.submitList(expenses)
-
-        binding.progressbar.hide()
-    }
-
     private fun initListeners() {
 
         binding.toolbar.setNavigationOnClickListener {
@@ -310,7 +346,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
         binding.toolbar.menu.findItem(R.id.menu_expense_date_range).setOnMenuItemClickListener {
 
-            handleMenuExpenseDateRange()
+            handleExpenseDateRangeMenu()
 
             true
         }
@@ -320,6 +356,8 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
                 sortBy = SortExpense.BY_CREATED
 
+                binding.toolbar.subtitle = ""
+
                 binding.progressbar.show()
                 lifecycleScope.launch {
                     delay(200)
@@ -327,28 +365,109 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 }
 
                 true
-        }
+            }
 
         binding.toolbar.menu.findItem(R.id.menu_total_expense).setOnMenuItemClickListener {
 
-            expenseViewModel.getTotalExpenseAmountByExpenseCategory(
-                receivedExpenseCategoryKey
-            ).observe(viewLifecycleOwner) { totalAmount ->
-
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(receivedExpenseCategory.categoryName)
-                    .setMessage("Total expense : $totalAmount")
-                    .setPositiveButton("Ok") { dialog, _ -> dialog.dismiss() }
-                    .create()
-                    .show()
-            }
-
+            handleTotalExpenseMenu()
             true
         }
 
     }
 
-    private fun handleMenuExpenseDateRange() {
+    private fun handleTotalExpenseMenu() {
+
+        if (!isArgumentEmpty) {
+
+            // Expenses by category
+
+            if (sortBy == SortExpense.BY_CREATED) {
+
+                expenseViewModel.getTotalExpenseAmountByExpenseCategory(
+                    receivedExpenseCategoryKey
+                ).observe(viewLifecycleOwner) { totalAmount ->
+
+                    showTotalAmountSumInAlertDialog(
+                        receivedExpenseCategory.categoryName,
+                        totalAmount
+                    )
+                }
+
+            } else {
+
+                expenseViewModel.getTotalExpenseAmountByCategoryKeyAndDateRange(
+                    receivedExpenseCategoryKey,
+                    startDate, endDate + 86400000L
+                ).observe(viewLifecycleOwner) { totalAmount ->
+
+                    val title = "${receivedExpenseCategory.categoryName}\nFrom ${
+                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                            startDate
+                        )
+                    } to " +
+                            "${
+                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                    endDate
+                                )
+                            }"
+
+                    showTotalAmountSumInAlertDialog(
+                        title,
+                        totalAmount
+                    )
+                }
+            }
+        } else {
+
+            // All expenses
+
+            if (sortBy == SortExpense.BY_CREATED) {
+
+                expenseViewModel.getTotalExpenseAmount()
+                    .observe(viewLifecycleOwner) { totalAmount ->
+
+                        showTotalAmountSumInAlertDialog(
+                            "All expenses", totalAmount
+                        )
+
+                    }
+            } else if (sortBy == SortExpense.BY_DATE_RANGE) {
+
+                expenseViewModel.getTotalExpenseAmountByDateRange(
+                    startDate, (endDate + 86400000L)
+                ).observe(viewLifecycleOwner) { totalAmount ->
+
+                    val title = "From ${
+                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                            startDate
+                        )
+                    } to " +
+                            "${
+                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                    endDate
+                                )
+                            }"
+                    showTotalAmountSumInAlertDialog(
+                        title, totalAmount
+                    )
+
+                }
+            }
+        }
+    }
+
+    private fun showTotalAmountSumInAlertDialog(title: String, totalAmount: Double?) {
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(title)
+            .setMessage("Total expense : $totalAmount")
+            .setPositiveButton("Ok") { dialog, _ -> dialog.dismiss() }
+            .create()
+            .show()
+
+    }
+
+    private fun handleExpenseDateRangeMenu() {
 
         Functions.showDateRangePickerDialog(
             startDate,
@@ -362,7 +481,16 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 startDate = dates.first
                 endDate = dates.second
 
+                binding.toolbar.subtitle =
+                    "${WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(startDate)} - " +
+                            "${
+                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                    endDate
+                                )
+                            }"
+
                 binding.progressbar.show()
+
                 lifecycleScope.launch {
                     delay(200)
                     observeExpenses()

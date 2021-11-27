@@ -45,13 +45,21 @@ interface ExpenseDAO {
     @Query("SELECT SUM(amount) FROM expense_table WHERE created BETWEEN :date1 AND :date2")
     fun getTotalExpenseAmountByDateRange(date1: Long, date2: Long): Flow<Double>
 
+    @Query("SELECT SUM(amount) FROM expense_table WHERE categoryKey = :expenseCategoryKey AND created BETWEEN :date1 AND :date2")
+    fun getTotalExpenseAmountByCategoryKeyAndDateRange(
+        expenseCategoryKey: String,
+        date1: Long,
+        date2: Long
+    ): Flow<Double>
+
+
     @Query("SELECT * FROM expense_table WHERE `key` = :expenseKey")
     fun getExpenseByKey(expenseKey: String): Flow<Expense>
 
-    @Query("SELECT * FROM expense_table ORDER BY modified DESC")
+    @Query("SELECT * FROM expense_table ORDER BY created DESC")
     fun getAllExpenses(): Flow<List<Expense>>
 
-    @Query("SELECT * FROM expense_table WHERE created BETWEEN :date1 AND :date2")
+    @Query("SELECT * FROM expense_table WHERE created BETWEEN :date1 AND :date2 ORDER BY created DESC")
     fun getExpensesByDateRange(date1: Long, date2: Long): Flow<List<Expense>>
 
     @Query("SELECT * FROM expense_table WHERE categoryKey =:expenseCategoryKey AND created BETWEEN :date1 AND :date2 ORDER BY created DESC")

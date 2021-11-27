@@ -14,7 +14,11 @@
         android:id="@+id/menu_expense_graph"
         android:icon="@drawable/ic_baseline_bar_chart_24"
         android:title="@string/show_graph"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_show_all_expenses"
+        android:title="@string/show_all_expenses"
+        app:showAsAction="never" />
 
 
 </menu>

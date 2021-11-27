@@ -53,6 +53,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
     private var endDate = 0L
 
     private var sortBy: SortExpense = SortExpense.BY_CREATED
+    private var isArgumentEmpty = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -85,6 +86,11 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 delay(300)
                 getExpenseCategory()
             }
+
+        } else {
+
+            // show all the expenses
+            isArgumentEmpty = true
 
         }
 
@@ -309,17 +315,18 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             true
         }
 
-        binding.toolbar.menu.findItem(R.id.menu_show_all_expenses).setOnMenuItemClickListener {
+        binding.toolbar.menu.findItem(R.id.menu_expense_clear_date_range)
+            .setOnMenuItemClickListener {
 
-            sortBy = SortExpense.BY_CREATED
+                sortBy = SortExpense.BY_CREATED
 
-            binding.progressbar.show()
-            lifecycleScope.launch {
-                delay(200)
-                observeExpenses()
-            }
+                binding.progressbar.show()
+                lifecycleScope.launch {
+                    delay(200)
+                    observeExpenses()
+                }
 
-            true
+                true
         }
 
         binding.toolbar.menu.findItem(R.id.menu_total_expense).setOnMenuItemClickListener {

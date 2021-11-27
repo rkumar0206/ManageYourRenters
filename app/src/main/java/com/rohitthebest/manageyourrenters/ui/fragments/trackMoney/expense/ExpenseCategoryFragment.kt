@@ -256,6 +256,13 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
             true
         }
+
+        binding.toolbar.menu.findItem(R.id.menu_show_all_expenses).setOnMenuItemClickListener {
+
+            findNavController().navigate(R.id.action_expenseCategoryFragment_to_expenseFragment)
+
+            true
+        }
     }
 
     override fun onDestroyView() {

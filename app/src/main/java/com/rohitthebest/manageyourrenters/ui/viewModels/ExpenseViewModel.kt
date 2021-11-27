@@ -96,6 +96,14 @@ class ExpenseViewModel @Inject constructor(
     fun getTotalExpenseAmountByExpenseCategory(expenseCategoryKey: String) =
         expenseRepository.getTotalExpenseAmountByExpenseCategory(expenseCategoryKey).asLiveData()
 
+    fun getTotalExpenseAmount() = expenseRepository.getTotalExpenseAmount().asLiveData()
+
+    fun getTotalExpenseAmountByDateRange(date1: Long, date2: Long) =
+        expenseRepository.getTotalExpenseAmountByDateRange(date1, date2).asLiveData()
+
+    fun getExpensesByDateRange(date1: Long, date2: Long) =
+        expenseRepository.getExpensesByDateRange(date1, date2).asLiveData()
+
     fun getExpenseByDateRangeAndExpenseCategoryKey(
         expenseCategoryKey: String, date1: Long, date2: Long
     ) = expenseRepository.getExpenseByDateRangeAndExpenseCategoryKey(

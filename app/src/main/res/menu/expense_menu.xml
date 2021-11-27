@@ -8,8 +8,8 @@
         android:title="@string/select_range"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/menu_show_all_expenses"
-        android:title="Show all expenses" />
+        android:id="@+id/menu_expense_clear_date_range"
+        android:title="Clear date range" />
     <item
         android:id="@+id/menu_total_expense"
         android:title="@string/see_total"

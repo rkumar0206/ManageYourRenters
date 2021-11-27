@@ -28,9 +28,6 @@ interface ExpenseDAO {
     @Query("DELETE FROM expense_table WHERE isSynced = :isSynced")
     suspend fun deleteExpenseByIsSynced(isSynced: Boolean)
 
-    @Query("SELECT * FROM expense_table ORDER BY modified DESC")
-    fun getAllExpenses(): Flow<List<Expense>>
-
     @Query("SELECT SUM(amount) FROM expense_table WHERE categoryKey = :expenseCategoryKey")
     fun getExpenseAmountSumByExpenseCategoryKey(expenseCategoryKey: String): Flow<Double>
 
@@ -42,6 +39,21 @@ interface ExpenseDAO {
     @Query("SELECT SUM(amount) FROM expense_table WHERE categoryKey = :expenseCategoryKey")
     fun getTotalExpenseAmountByExpenseCategory(expenseCategoryKey: String): Flow<Double>
 
+    @Query("SELECT SUM(amount) FROM expense_table")
+    fun getTotalExpenseAmount(): Flow<Double>
+
+    @Query("SELECT SUM(amount) FROM expense_table WHERE created BETWEEN :date1 AND :date2")
+    fun getTotalExpenseAmountByDateRange(date1: Long, date2: Long): Flow<Double>
+
+    @Query("SELECT * FROM expense_table WHERE `key` = :expenseKey")
+    fun getExpenseByKey(expenseKey: String): Flow<Expense>
+
+    @Query("SELECT * FROM expense_table ORDER BY modified DESC")
+    fun getAllExpenses(): Flow<List<Expense>>
+
+    @Query("SELECT * FROM expense_table WHERE created BETWEEN :date1 AND :date2")
+    fun getExpensesByDateRange(date1: Long, date2: Long): Flow<List<Expense>>
+
     @Query("SELECT * FROM expense_table WHERE categoryKey =:expenseCategoryKey AND created BETWEEN :date1 AND :date2 ORDER BY created DESC")
     fun getExpenseByDateRangeAndExpenseCategoryKey(
         expenseCategoryKey: String, date1: Long, date2: Long
@@ -50,6 +62,4 @@ interface ExpenseDAO {
     @Query("SELECT * FROM expense_table WHERE categoryKey = :expenseCategoryKey ORDER BY created DESC")
     fun getExpensesByExpenseCategoryKey(expenseCategoryKey: String): Flow<List<Expense>>
 
-    @Query("SELECT * FROM expense_table WHERE `key` = :expenseKey")
-    fun getExpenseByKey(expenseKey: String): Flow<Expense>
 }

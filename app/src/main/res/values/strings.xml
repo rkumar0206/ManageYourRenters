@@ -198,6 +198,7 @@
     <string name="_mobile_number">Mobile Number :</string>
     <string name="show_more">show more</string>
     <string name="call">Call</string>
+    <string name="show_all_expenses">Show All Expenses</string>
 
 
     <string-array name="interest_time_schedule">

@@ -131,6 +131,9 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <deepLink
+            android:id="@+id/deepLink"
+            app:uri="http://www.rtb/expense/" />
     </fragment>
     <fragment
         android:id="@+id/addEditExpenseCategoryFragment"

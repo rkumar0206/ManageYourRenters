@@ -17,8 +17,7 @@
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/fade_out"
-            />
+            app:popExitAnim="@anim/fade_out" />
         <action
             android:id="@+id/action_homeFragment_to_paymentFragment"
             app:destination="@id/paymentFragment"
@@ -26,8 +25,10 @@
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/fade_out"
-            />
+            app:popExitAnim="@anim/fade_out" />
+        <deepLink
+            android:id="@+id/deepLink2"
+            app:uri="http://www.rtb/houserenters/" />
     </fragment>
     <fragment
         android:id="@+id/addRenterFragment"

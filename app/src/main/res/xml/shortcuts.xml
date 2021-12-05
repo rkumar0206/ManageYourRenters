@@ -1,0 +1,51 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_expense"
+        android:shortcutDisabledMessage="@string/expense_disabled_message"
+        android:shortcutId="compose1"
+        android:shortcutLongLabel="@string/expenses"
+        android:shortcutShortLabel="@string/expenses"
+        tools:targetApi="n_mr1">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="http://www.rtb/expense/"
+            android:targetClass="com.rohitthebest.manageyourrenters.ui.activities.TrackMoneyActivity"
+            android:targetPackage="com.rohitthebest.manageyourrenters"
+
+            />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+
+        <categories android:name="android.shortcut.conversation" />
+        <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
+    </shortcut>
+    <!-- Specify more shortcuts here. -->
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_house_renters"
+        android:shortcutDisabledMessage="@string/house_renters_disabled_message"
+        android:shortcutId="compose2"
+        android:shortcutLongLabel="@string/house_renters"
+        android:shortcutShortLabel="@string/house_renters"
+        tools:targetApi="n_mr1">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="http://www.rtb/houserenters/"
+            android:targetClass="com.rohitthebest.manageyourrenters.ui.activities.HouseRentersActivity"
+            android:targetPackage="com.rohitthebest.manageyourrenters"
+
+            />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+
+        <categories android:name="android.shortcut.conversation" />
+        <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
+    </shortcut>
+
+
+</shortcuts>

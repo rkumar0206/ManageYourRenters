@@ -54,16 +54,19 @@ class ExpenseAdapter(val categoryName: String = "") :
 
                     expenseAmountTV.text = exp.amount.toString()
 
+
                     if (exp.spentOn.isValid()) {
 
                         expenseSpentOnTV.show()
-                        expenseSpentOnTV.text = "Spent on : ${exp.spentOn}"
+                        //expenseSpentOnTV.text = setSpannableText("Spent on :- ${exp.spentOn}")
+                        expenseSpentOnTV.text = exp.spentOn
+
                     } else {
 
                         if (categoryName.isValid()) {
 
                             expenseSpentOnTV.show()
-                            expenseSpentOnTV.text = "Spent on : $categoryName"
+                            expenseSpentOnTV.text = categoryName
                         } else {
 
                             expenseSpentOnTV.hide()
@@ -72,6 +75,24 @@ class ExpenseAdapter(val categoryName: String = "") :
                 }
             }
         }
+
+/*
+        private fun setSpannableText(s: String): CharSequence {
+
+            val span = StyleSpan(Typeface.BOLD_ITALIC)
+
+            val spannableStringBuilder = SpannableStringBuilder(s)
+
+           spannableStringBuilder.setSpan(
+                span,
+                0,
+                11,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            return spannableStringBuilder
+        }
+*/
 
         private fun checkForNullability(): Boolean {
 

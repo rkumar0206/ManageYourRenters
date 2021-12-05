@@ -22,6 +22,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -93,6 +94,8 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
             // show all the expenses
             isArgumentEmpty = true
+
+            binding.addExpensesFAB.hide()
 
             binding.toolbar.title = "All Expenses"
 
@@ -232,7 +235,11 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
             adapter = expenseAdapter
-            changeVisibilityOfFABOnScrolled(binding.addExpensesFAB)
+
+            if (!isArgumentEmpty) {
+
+                changeVisibilityOfFABOnScrolled(binding.addExpensesFAB)
+            }
         }
 
         expenseAdapter.setOnClickListener(this)
@@ -241,20 +248,29 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     override fun onItemClick(expense: Expense) {
 
-        val msg =
-            "\nDate : ${WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(expense.created)}\n\n" +
-                    "Amount : ${expense.amount}\n\n" +
-                    "Spent On : ${expense.spentOn}"
+        expenseCategoryViewModel.getExpenseCategoryByKey(expense.categoryKey)
+            .observe(viewLifecycleOwner, { expenseCategory ->
 
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Expense info")
-            .setMessage(msg)
-            .setPositiveButton("Ok") { dialog, _ ->
+                val msg =
+                    "\nDate : ${
+                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                            expense.created
+                        )
+                    }\n\n" +
+                            "Amount : ${expense.amount}\n\n" +
+                            "Spent On : ${expense.spentOn}\n\n" +
+                            "Category : ${expenseCategory.categoryName}"
 
-                dialog.dismiss()
-            }
-            .create()
-            .show()
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Expense info")
+                    .setMessage(msg)
+                    .setPositiveButton("Ok") { dialog, _ ->
+
+                        dialog.dismiss()
+                    }
+                    .create()
+                    .show()
+            })
 
     }
 
@@ -364,11 +380,17 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
         binding.addExpensesFAB.setOnClickListener {
 
-            val action = ExpenseFragmentDirections.actionExpenseFragmentToAddEditExpense(
-                receivedExpenseCategoryKey, ""
-            )
+            if (receivedExpenseCategoryKey.isValid()) {
 
-            findNavController().navigate(action)
+                val action = ExpenseFragmentDirections.actionExpenseFragmentToAddEditExpense(
+                    receivedExpenseCategoryKey, ""
+                )
+
+                findNavController().navigate(action)
+            } else {
+
+                showToast(requireContext(), "No category chosen!!!")
+            }
         }
 
         binding.toolbar.menu.findItem(R.id.menu_expense_date_range).setOnMenuItemClickListener {

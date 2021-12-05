@@ -9,6 +9,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class HouseRentersActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setTheme(R.style.Theme_ManageYourRenters)
+
         setContentView(R.layout.activity_house_renters)
     }
 

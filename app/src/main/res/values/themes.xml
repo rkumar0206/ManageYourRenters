@@ -15,4 +15,11 @@
         <item name="fontFamily">@font/nunito_sans_semibold</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="Theme.SplashScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="android:statusBarColor">@color/sky_blue</item>
+
+    </style>
 </resources>

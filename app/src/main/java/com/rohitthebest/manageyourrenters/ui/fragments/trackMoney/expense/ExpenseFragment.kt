@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -24,6 +25,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoIntern
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 
 private const val TAG = "ExpenseFragment"
 
@@ -103,9 +105,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 delay(300)
                 observeExpenses()
             }
-
         }
-
     }
 
     private fun getExpenseCategory() {
@@ -195,7 +195,34 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
         expenseAdapter.submitList(expenses)
 
+        setUpSearchMenuButton(expenses)
+
         binding.progressbar.hide()
+    }
+
+    private fun setUpSearchMenuButton(expenses: List<Expense>) {
+
+        val searchView =
+            binding.toolbar.menu.findItem(R.id.menu_expense_search).actionView as SearchView
+
+        searchView.searchText { s ->
+
+            if (s?.isEmpty()!!) {
+
+                binding.expenseRV.scrollToPosition(0)
+                expenseAdapter.submitList(expenses)
+            } else {
+
+                val filteredList = expenses.filter { expense ->
+
+                    expense.spentOn.lowercase(Locale.ROOT)
+                        .contains(s.trim().lowercase(Locale.ROOT)) || expense.amount.toString()
+                        .lowercase(Locale.ROOT).contains(s.trim().lowercase(Locale.ROOT))
+                }
+
+                expenseAdapter.submitList(filteredList)
+            }
+        }
     }
 
     private fun setUpRecyclerView() {

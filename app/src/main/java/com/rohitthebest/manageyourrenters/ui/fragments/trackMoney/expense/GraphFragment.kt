@@ -64,32 +64,35 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
         binding.chart.setProgressBar(binding.progressBar)
 
-        pie.title("Expenses on each category")
+        pie.title().enabled(false)
+        //pie.title("Expenses on each category")
 
         pie.labels().position("outside")
 
-        pie.legend().title().enabled(true)
+        pie.legend().title().enabled(false)
         pie.legend().title()
             .text("Expense categories")
             .padding(0.0, 0.0, 10.0, 0.0)
 
         pie.legend()
-            .position("center-bottom")
-            .itemsLayout(LegendLayout.HORIZONTAL)
+            .position("bottom")
+            .itemsLayout(LegendLayout.HORIZONTAL_EXPANDABLE)
             .align(Align.CENTER)
 
+/*
         pie.setOnClickListener(object :
             ListenersInterface.OnClickListener(arrayOf("x", "value")) {
             override fun onClick(event: Event) {
-/*
+
                             Toast.makeText(
                                 requireContext(),
                                 event.data["x"].toString() + ":" + event.data["value"],
                                 Toast.LENGTH_SHORT
                             ).show()
-*/
+
             }
         })
+*/
 
 
     }

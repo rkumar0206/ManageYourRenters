@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 
+
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -18,11 +19,13 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.isTextValid
-import com.rohitthebest.manageyourrenters.utils.setDateInTextView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 
 private const val TAG = "AddEditExpense"
 
@@ -40,7 +43,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
     private lateinit var receivedExpenseCategoryKey: String
     private lateinit var receivedExpenseCategory: ExpenseCategory
 
-    private var selectedDate = 0L
+    private lateinit var selectedDate: Calendar
 
     private var receivedExpenseKey = ""
     private lateinit var receivedExpense: Expense
@@ -52,7 +55,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
         includeBinding = binding.includeLayout
 
-        selectedDate = System.currentTimeMillis()
+        selectedDate = Calendar.getInstance()
 
         updateSelectedDateTextView()
 
@@ -65,9 +68,10 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
     private fun updateSelectedDateTextView() {
 
-        includeBinding.expenseDateTV.setDateInTextView(
-            selectedDate
-        )
+        includeBinding.expenseDateTV.text =
+            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                selectedDate.timeInMillis, "dd-MM-yyyy hh:mm a"
+            )
     }
 
     private fun getMessage() {
@@ -115,7 +119,8 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
             includeBinding.apply {
 
-                selectedDate = receivedExpense.created
+                selectedDate =
+                    WorkingWithDateAndTime().convertMillisecondsToCalendarInstance(receivedExpense.created)
                 updateSelectedDateTextView()
                 expenseAmountET.editText?.setText(receivedExpense.amount.toString())
                 expenseSpentOnET.setText(receivedExpense.spentOn)
@@ -162,20 +167,20 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
         if (v?.id == includeBinding.expenseDateTV.id || v?.id == includeBinding.expenseDateIB.id) {
 
-            Functions.showCalendarDialog(
-                selectedDate,
-                {
-                    requireActivity().supportFragmentManager
-                },
-                { selectedDate ->
 
-                    this.selectedDate = selectedDate
-                    updateSelectedDateTextView()
-                }
-            )
+            Functions.showDateAndTimePickerDialog(
+                requireContext(),
+                selectedDate,
+                false
+            ) { selectedDate ->
+
+                this.selectedDate = selectedDate
+                updateSelectedDateTextView()
+            }
         }
 
     }
+
 
     private fun initExpense() {
 
@@ -186,7 +191,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
             expense = Expense(
                 null,
                 includeBinding.expenseAmountET.editText?.text.toString().trim().toDouble(),
-                selectedDate,
+                selectedDate.timeInMillis,
                 System.currentTimeMillis(),
                 includeBinding.expenseSpentOnET.text.toString().trim(),
                 getUid()!!,
@@ -219,13 +224,14 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
                 }"
             )
 
-            if (oldDate != selectedDate
+
+            if (oldDate != selectedDate.timeInMillis
                 || oldAmount != includeBinding.expenseAmountET.editText?.text.toString().trim()
                     .toDouble()
                 || oldSpentOn != includeBinding.expenseSpentOnET.text.toString().trim()
             ) {
 
-                expense.created = selectedDate
+                expense.created = selectedDate.timeInMillis
                 expense.amount =
                     includeBinding.expenseAmountET.editText?.text.toString().trim().toDouble()
                 expense.spentOn = includeBinding.expenseSpentOnET.text.toString().trim()
@@ -236,7 +242,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
             } else {
 
-                Functions.showToast(requireContext(), "No change detected...")
+                showToast(requireContext(), "No change detected...")
                 requireActivity().onBackPressed()
             }
         }

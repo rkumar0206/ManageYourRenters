@@ -1,6 +1,8 @@
 package com.rohitthebest.manageyourrenters.utils
 
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -36,7 +38,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
 import kotlin.random.Random
+
+private const val TAG = "Functions"
 
 class Functions {
 
@@ -321,14 +326,14 @@ class Functions {
             selectedDate: Long,
             crossinline show: () -> FragmentManager,
             crossinline positiveListener: (time: Long) -> Unit,
-            isUpcomingDatesValid: Boolean = false
+            isFutureDatesValid: Boolean = false
         ) {
 
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select a date")
                 .setSelection(selectedDate)
 
-            if (!isUpcomingDatesValid) {
+            if (!isFutureDatesValid) {
 
                 val constrainBuilder = CalendarConstraints.Builder()
                     .setValidator(DateValidatorPointBackward.now())
@@ -383,6 +388,44 @@ class Functions {
                 positiveListener(it)
             }
         }
+
+        inline fun showDateAndTimePickerDialog(
+            context: Context,
+            selectedDate: Calendar,
+            isFutureDatesValid: Boolean = false,
+            crossinline pickedDateListener: (calendar: Calendar) -> Unit
+        ) {
+
+            val startYear = selectedDate.get(Calendar.YEAR)
+            val startMonth = selectedDate.get(Calendar.MONTH)
+            val startDay = selectedDate.get(Calendar.DAY_OF_MONTH)
+            val startHour = selectedDate.get(Calendar.HOUR_OF_DAY)
+            val startMinute = selectedDate.get(Calendar.MINUTE)
+
+            val dateListener = DatePickerDialog.OnDateSetListener { _, year, month, day ->
+
+                TimePickerDialog(context, { _, hour, minute ->
+
+                    val pickedDateTime = Calendar.getInstance()
+                    pickedDateTime.set(year, month, day, hour, minute)
+
+                    pickedDateListener(pickedDateTime)
+
+                }, startHour, startMinute, false).show()
+
+            }
+
+            val datePickerDialog =
+                DatePickerDialog(context, dateListener, startYear, startMonth, startDay)
+
+            if (!isFutureDatesValid) {
+
+                datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
+            }
+
+            datePickerDialog.show()
+        }
+
 
         fun calculateNumberOfDays(startDate: Long, endDate: Long): Int {
 

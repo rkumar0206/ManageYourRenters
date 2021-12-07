@@ -109,6 +109,10 @@ dependencies {
     //Recycler View
     implementation "androidx.recyclerview:recyclerview:1.2.1"
 
+    //recycler view multi-select
+    implementation 'androidx.recyclerview:recyclerview-selection:1.1.0'
+
+
     //Dagger-Hilt
     def daggerHilt_version = '2.37'
     implementation "com.google.dagger:hilt-android:$daggerHilt_version"

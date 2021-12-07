@@ -9,7 +9,7 @@ import java.util.*
 @SuppressLint("SimpleDateFormat")
 class WorkingWithDateAndTime {
 
-    fun convertTimeStampToDateOrTime(timestamps: Timestamp?, pattern: String): String? {
+    fun convertTimeStampToDateOrTimePattern(timestamps: Timestamp?, pattern: String): String? {
 
         //converting timestamp to Date format
         val date = timestamps?.time?.let { Date(it) }
@@ -76,10 +76,23 @@ class WorkingWithDateAndTime {
 
         val timeStamp = timeInMillis?.let { Timestamp(it) }
         return if (pattern != "") {
-            convertTimeStampToDateOrTime(timeStamp, pattern!!)
+            convertTimeStampToDateOrTimePattern(timeStamp, pattern!!)
         } else {
             null
         }
+    }
+
+    fun convertMillisecondsToCalendarInstance(
+        timeInMillis: Long?
+    ): Calendar {
+
+        val timeStamp = timeInMillis?.let { Timestamp(it) }
+
+        val date = timeStamp?.time?.let { Date(it) }
+
+        val cal = Calendar.getInstance()
+        cal.time = date!!
+        return cal
     }
 
 }

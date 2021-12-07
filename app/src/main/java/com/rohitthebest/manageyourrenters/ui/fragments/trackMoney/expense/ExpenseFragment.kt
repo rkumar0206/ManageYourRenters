@@ -254,7 +254,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 val msg =
                     "\nDate : ${
                         WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                            expense.created
+                            expense.created, "dd-MM-yyyy hh:mm a"
                         )
                     }\n\n" +
                             "Amount : ${expense.amount}\n\n" +

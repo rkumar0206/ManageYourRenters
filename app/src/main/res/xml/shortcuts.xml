@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <shortcut
         android:enabled="true"
-        android:icon="@drawable/ic_expense"
+        android:icon="@drawable/expense_shortcut_icon"
         android:shortcutDisabledMessage="@string/expense_disabled_message"
         android:shortcutId="compose1"
         android:shortcutLongLabel="@string/expenses"

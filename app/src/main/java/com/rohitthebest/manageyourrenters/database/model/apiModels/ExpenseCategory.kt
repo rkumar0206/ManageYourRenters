@@ -3,6 +3,9 @@ package com.rohitthebest.manageyourrenters.database.model.apiModels
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+/**
+ * Model for API ManageYourRenters - ExpenseCategory
+ */
 @Entity(tableName = "expense_category_table")
 data class ExpenseCategory(
     @PrimaryKey(autoGenerate = true) val id: Long? = null,
@@ -13,7 +16,8 @@ data class ExpenseCategory(
     var modified: Long,
     var uid: String,
     var key: String,
-    var isSynced: Boolean = true
+    var isSynced: Boolean = true,  // will be used only in this app
+    var isSelected: Boolean = false  // will be used only in this app
 ) {
 
     constructor() : this(
@@ -25,6 +29,7 @@ data class ExpenseCategory(
         0L,
         "",
         "",
-        true
+        true,
+        false
     )
 }

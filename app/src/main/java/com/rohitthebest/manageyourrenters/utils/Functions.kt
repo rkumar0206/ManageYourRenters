@@ -8,6 +8,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
@@ -626,6 +627,37 @@ class Functions {
                 }
             }
 
+        }
+
+        fun getBackgroundColor(color: Int? = null): Int {
+
+            val h: Float
+            var s: Float
+            var v: Float
+
+            val hsv = FloatArray(3)
+
+            if (color != null) {
+
+                Color.colorToHSV(color, hsv)
+
+                h = hsv[0]
+                s = hsv[1]
+                v = hsv[2]
+
+                if (s <= 0.1 && v >= 0.9) {
+
+                    s = 0.1f
+                    v = 0.9f
+                }
+            } else {
+
+                h = Random.nextFloat() * 360
+                s = 1f
+                v = 1f
+            }
+
+            return Color.HSVToColor(30, floatArrayOf(h, s, v))
         }
 
     }

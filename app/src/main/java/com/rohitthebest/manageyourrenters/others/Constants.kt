@@ -52,4 +52,5 @@ object Constants {
     const val NETWORK_PAGE_SIZE_UNSPLASH = 30
     const val SHORTCUT_FRAGMENT_NAME_KEY = "sdcjnsknkanckbajcbabacjk"
 
+    const val ONE_DAY_MILLISECONDS = 86400000L
 }

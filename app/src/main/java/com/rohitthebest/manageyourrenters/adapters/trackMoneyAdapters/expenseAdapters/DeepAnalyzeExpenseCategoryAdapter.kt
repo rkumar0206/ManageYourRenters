@@ -51,13 +51,14 @@ class DeepAnalyzeExpenseCategoryAdapter :
                         addRemoveExpenseCategorySelection.animate().rotation(45f).setDuration(800)
                             .start()
                         root.strokeColor = color
-                        root.setBackgroundColor(Functions.getBackgroundColor(color))
+                        expenseCategoryNameTV.setBackgroundColor(Functions.getBackgroundColor(color))
                     } else {
 
                         addRemoveExpenseCategorySelection.animate().rotation(0f).setDuration(800)
                             .start()
-                        root.strokeColor = Color.TRANSPARENT
-                        root.setBackgroundColor(Color.WHITE)
+                        root.strokeColor =
+                            ContextCompat.getColor(root.context, R.color.divider_color)
+                        expenseCategoryNameTV.setBackgroundColor(Color.WHITE)
                     }
                 }
             }

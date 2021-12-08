@@ -51,6 +51,7 @@ object Module {
         }
     }
 
+
     @Provides
     @Singleton
     fun provideRenterDatabase(
@@ -178,6 +179,13 @@ object Module {
 
     //============================== Expense Database========================================
 
+    private val expense_database_migration_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+            database.execSQL("ALTER TABLE 'expense_category_table' ADD COLUMN 'isSelected' INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
     @Provides
     @Singleton
     fun provideExpenseDatabase(
@@ -186,7 +194,9 @@ object Module {
         context,
         ExpenseDatabase::class.java,
         EXPENSE_DATABASE_NAME
-    ).build()
+    )
+        .addMigrations(expense_database_migration_1_2)
+        .build()
 
     @Provides
     @Singleton

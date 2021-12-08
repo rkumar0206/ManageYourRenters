@@ -9,7 +9,7 @@ import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCatego
 
 @Database(
     entities = [ExpenseCategory::class, Expense::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class ExpenseDatabase : RoomDatabase() {

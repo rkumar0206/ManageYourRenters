@@ -29,7 +29,6 @@ data class ExpenseCategory(
         0L,
         "",
         "",
-        true,
-        false
+        true
     )
 }

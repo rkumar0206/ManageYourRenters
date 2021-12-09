@@ -1,7 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -33,6 +32,7 @@ import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -57,6 +57,7 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
     private var isExpenseCategoryRVVisible = true
 
     private var isDateRangeSelected = false
+    private var isBackButtonPressed = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -78,11 +79,6 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
     private fun initListeners() {
 
-        binding.applyChanagesFAB.setOnClickListener {
-
-            initChartData()
-            binding.applyChanagesFAB.disable()
-        }
 
         binding.clearSelectionFAB.setOnClickListener {
 
@@ -128,6 +124,7 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
         binding.toolbar.setNavigationOnClickListener {
 
+            isBackButtonPressed = true
             requireActivity().onBackPressed()
         }
     }
@@ -231,7 +228,6 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
         binding.selectAllFAB.disable()
         binding.clearSelectionFAB.enable()
-        binding.applyChanagesFAB.disable()
 
         initChartData()
     }
@@ -276,7 +272,6 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
         deepAnalyzeExpenseCategoryAdapter.notifyItemRangeChanged(0, 2)
 
         binding.clearSelectionFAB.disable()
-        binding.applyChanagesFAB.disable()
 
         initChartData()
     }
@@ -420,8 +415,9 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
     }
 
-    override fun onItemClick(expenseCategory: ExpenseCategory, position: Int) {
+    private var changeChartDataJob: Job? = null
 
+    override fun onItemClick(expenseCategory: ExpenseCategory, position: Int) {
 
         if (expenseCategory.isSelected) {
 
@@ -431,8 +427,6 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
                 return
             }
         }
-
-        binding.applyChanagesFAB.enable()
 
         expenseCategory.isSelected = !expenseCategory.isSelected
         deepAnalyzeExpenseCategoryAdapter.notifyItemChanged(position)
@@ -450,6 +444,23 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
             binding.clearSelectionFAB.enable()
         }
 
+        try {
+
+            if (changeChartDataJob != null && changeChartDataJob?.isActive == true) {
+
+                changeChartDataJob?.cancel()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+
+            changeChartDataJob = lifecycleScope.launch {
+
+                delay(250)
+
+                initChartData()
+            }
+        }
     }
 
     private fun getSelectedExpenseCategoryCount(): Int {
@@ -501,15 +512,8 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
     private fun FloatingActionButton.enable() {
 
         this.isEnabled = true
-
-        var color = ContextCompat.getColor(requireContext(), R.color.teal_200)
-
-        if (this.id == binding.applyChanagesFAB.id) {
-
-            color = Color.parseColor("#64DD17")
-        }
-
-        this.backgroundTintList = ColorStateList.valueOf(color)
+        this.backgroundTintList =
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.teal_200))
 
     }
 
@@ -517,8 +521,11 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
         super.onPause()
 
         Log.d(TAG, "onPause: ")
-        requireActivity().onBackPressed()
 
+        if (!isBackButtonPressed) {
+
+            requireActivity().onBackPressed()
+        }
     }
 
 

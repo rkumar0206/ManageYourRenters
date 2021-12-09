@@ -109,9 +109,6 @@ dependencies {
     //Recycler View
     implementation "androidx.recyclerview:recyclerview:1.2.1"
 
-    //recycler view multi-select
-    implementation 'androidx.recyclerview:recyclerview-selection:1.1.0'
-
 
     //Dagger-Hilt
     def daggerHilt_version = '2.37'
@@ -151,7 +148,7 @@ dependencies {
     // pretty time library
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.4.Final'
 
-    //Any chart library for showing graphs
+    //Any chart library for showing graphs - don't update the dependency
     implementation 'com.github.AnyChart:AnyChart-Android:1.1.2'
 
 }

@@ -75,24 +75,8 @@
         android:src="@drawable/ic_baseline_select_all_24"
         android:tooltipText="Select All"
         app:fabSize="mini"
-        app:layout_constraintEnd_toStartOf="@+id/applyChanagesFAB"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/clearSelectionFAB"
-        app:layout_constraintTop_toTopOf="@+id/clearSelectionFAB"
-        tools:targetApi="o" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/applyChanagesFAB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/clear_selection_fab"
-        android:rotation="180"
-        android:src="@drawable/ic_baseline_arrow_back_24"
-        android:tooltipText="Apply Changes"
-        app:fabSize="mini"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/selectAllFAB"
+        app:layout_constraintStart_toEndOf="@+id/clearSelectionFAB"
         app:layout_constraintTop_toTopOf="@+id/clearSelectionFAB"
         tools:targetApi="o" />
 

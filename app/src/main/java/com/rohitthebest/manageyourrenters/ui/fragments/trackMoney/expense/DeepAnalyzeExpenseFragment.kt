@@ -513,9 +513,20 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        Log.d(TAG, "onPause: ")
+        requireActivity().onBackPressed()
+
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        Log.d(TAG, "onDestroyView: ")
+
         _binding = null
     }
 

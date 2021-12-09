@@ -24,9 +24,12 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.DeepAnalyzeExpenseCategoryAdapter
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentDeepAnalyzeExpenseBinding
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,6 +56,8 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
     private var isExpenseCategoryRVVisible = true
 
+    private var isDateRangeSelected = false
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDeepAnalyzeExpenseBinding.bind(view)
@@ -67,6 +72,9 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
         initListeners()
     }
+
+    private var startDate = System.currentTimeMillis() - (Constants.ONE_DAY_MILLISECONDS * 30)
+    private var endDate = System.currentTimeMillis()
 
     private fun initListeners() {
 
@@ -100,10 +108,58 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
             }
         }
 
+        binding.toolbar.menu.findItem(R.id.menu_select_range_deep_analyze_expense)
+            .setOnMenuItemClickListener {
+
+                handleDateRangeMenu()
+
+                true
+            }
+
+        binding.toolbar.menu.findItem(R.id.menu_clear_date_range_deep_analyze_expense)
+            .setOnMenuItemClickListener {
+
+                isDateRangeSelected = false
+                binding.toolbar.subtitle = ""
+
+                initChartData()
+                true
+            }
+
         binding.toolbar.setNavigationOnClickListener {
 
             requireActivity().onBackPressed()
         }
+    }
+
+    private fun handleDateRangeMenu() {
+
+        Functions.showDateRangePickerDialog(
+            startDate,
+            endDate,
+            {
+                requireActivity().supportFragmentManager
+            },
+            { date ->
+
+                startDate = date.first
+                endDate = date.second
+
+                isDateRangeSelected = true
+
+                binding.toolbar.subtitle =
+                    "${WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(startDate)} - " +
+                            "${
+                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                    endDate
+                                )
+                            }"
+
+                initChartData()
+
+            }
+        )
+
     }
 
     private fun hideExpenseCategoryRVBySlidingUp() {
@@ -192,7 +248,6 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
         deepAnalyzeExpenseCategoryAdapter.setOnClickListener(this)
     }
 
-
     private fun getAllExpenseCategories() {
 
         expenseCategoryViewModel.getAllExpenseCategories()
@@ -250,21 +305,50 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
                 lifecycleScope.launch {
 
-                    try {
-                        expenseViewModel.getExpenseAmountSumByExpenseCategoryKey(
-                            expenseCategory.key
-                        ).collect { amount ->
+                    if (!isDateRangeSelected) {
 
-                            data.add(
-                                ValueDataEntry(
-                                    expenseCategory.categoryName,
-                                    amount
+                        // get the all time amount
+
+                        try {
+                            expenseViewModel.getExpenseAmountSumByExpenseCategoryKey(
+                                expenseCategory.key
+                            ).collect { amount ->
+
+                                data.add(
+                                    ValueDataEntry(
+                                        expenseCategory.categoryName,
+                                        amount
+                                    )
                                 )
-                            )
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+
+                    } else {
+
+                        // get the amount by the date range selected
+
+                        try {
+                            expenseViewModel.getExpenseAmountSumByExpenseCategoryByDateRange(
+                                expenseCategory.key,
+                                startDate,
+                                endDate + Constants.ONE_DAY_MILLISECONDS
+                            ).collect { amount ->
+
+                                data.add(
+                                    ValueDataEntry(
+                                        expenseCategory.categoryName,
+                                        amount
+                                    )
+                                )
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+
                     }
+
                 }
             }
 
@@ -293,18 +377,44 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
         var total = 0.0
 
-        selectedCategories.forEach { expenseCategory ->
+        if (!isDateRangeSelected) {
 
-            expenseViewModel.getTotalExpenseAmountByExpenseCategory(expenseCategory.key)
-                .observe(viewLifecycleOwner) { amount ->
+            selectedCategories.forEach { expenseCategory ->
 
-                    total += amount
-                }
+                expenseViewModel.getTotalExpenseAmountByExpenseCategory(expenseCategory.key)
+                    .observe(viewLifecycleOwner) { amount ->
+
+                        total += amount
+                    }
+            }
+        } else {
+
+            selectedCategories.forEach { expenseCategory ->
+
+
+                expenseViewModel.getTotalExpenseAmountByCategoryKeyAndDateRange(
+                    expenseCategory.key,
+                    startDate,
+                    endDate + Constants.ONE_DAY_MILLISECONDS
+                )
+                    .observe(viewLifecycleOwner) { amount ->
+
+                        try {
+
+                            total += amount
+                        } catch (e: Exception) {
+
+                            e.printStackTrace()
+                        }
+                    }
+
+            }
+
         }
 
         lifecycleScope.launch {
             delay(500)
-            pie.title("Total expense : $total")
+            pie.title("Total expense amount: $total")
 
         }
 

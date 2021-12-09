@@ -15,7 +15,7 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_expense_clear_date_range"
-        android:title="Clear date range" />
+        android:title="@string/clear_date_range" />
     <item
         android:id="@+id/menu_total_expense"
         android:title="@string/see_total"

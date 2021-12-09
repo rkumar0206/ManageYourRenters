@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
@@ -146,7 +147,21 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
         binding.toolbar.menu.findItem(R.id.menu_deep_analyze_expense).setOnMenuItemClickListener {
 
-            findNavController().navigate(R.id.action_graphFragment_to_deepAnalyzeExpenseFragment)
+            expenseCategoryViewModel.getAllExpenseCategories().observe(viewLifecycleOwner) {
+
+                if (it.size >= 2) {
+
+                    findNavController().navigate(R.id.action_graphFragment_to_deepAnalyzeExpenseFragment)
+                } else {
+
+                    showToast(
+                        requireContext(),
+                        "You must have at least 2 categories for deep analyze mode",
+                        Toast.LENGTH_LONG
+                    )
+                }
+            }
+
             true
         }
 

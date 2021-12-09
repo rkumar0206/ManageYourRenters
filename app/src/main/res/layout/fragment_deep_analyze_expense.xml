@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    >
+    android:background="@color/white">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -28,13 +28,73 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/expense_categories_rv"
         android:layout_width="match_parent"
-        android:layout_height="230dp"
+        android:layout_height="160dp"
+        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-        tools:listitem="@layout/item_deep_analyze_expense_category"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
+        tools:listitem="@layout/item_deep_analyze_expense_category" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/clearSelectionFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:contentDescription="@string/clear_selection_fab"
+        android:src="@drawable/ic_clear_black_24dp"
+        android:tooltipText="Clear selection"
+        app:fabSize="mini"
+        app:layout_constraintEnd_toStartOf="@+id/selectAllFAB"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/showHideRVBtn"
+        tools:ignore="ImageContrastCheck,UnusedAttribute" />
+
+
+    <ImageButton
+        android:id="@+id/showHideRVBtn"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/color_white"
+        android:rotation="180"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/expense_categories_rv"
+        app:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/selectAllFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/clear_selection_fab"
+        android:src="@drawable/ic_baseline_select_all_24"
+        android:tooltipText="Select All"
+        app:fabSize="mini"
+        app:layout_constraintEnd_toStartOf="@+id/applyChanagesFAB"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/clearSelectionFAB"
+        app:layout_constraintTop_toTopOf="@+id/clearSelectionFAB"
+        tools:targetApi="o" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/applyChanagesFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/clear_selection_fab"
+        android:rotation="180"
+        android:src="@drawable/ic_baseline_arrow_back_24"
+        android:tooltipText="Apply Changes"
+        app:fabSize="mini"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/selectAllFAB"
+        app:layout_constraintTop_toTopOf="@+id/clearSelectionFAB"
+        tools:targetApi="o" />
+
 
     <com.anychart.AnyChartView
         android:id="@+id/chart"
@@ -45,7 +105,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/expense_categories_rv" />
+        app:layout_constraintTop_toBottomOf="@+id/clearSelectionFAB" />
 
     <ProgressBar
         android:id="@+id/progressBar"

@@ -26,6 +26,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
@@ -70,14 +71,15 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         binding.chart.setProgressBar(binding.progressBar)
 
         pie.title().enabled(true)
+        pie.title("All time")
         //pie.title("Expenses on each category")
 
         pie.labels().position("outside")
 
-        pie.legend().title().enabled(false)
+        pie.legend().title().enabled(true)
         pie.legend().title()
-            .text("Expense categories")
-            .padding(0.0, 0.0, 10.0, 0.0)
+            .fontColor("#212121")
+            .padding(0.0, 0.0, 30.0, 0.0)
 
         pie.legend()
             .position("bottom")
@@ -210,7 +212,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             )
                 .observe(viewLifecycleOwner) { total ->
 
-                    pie.title("Total expense : $total")
+                    pie.legend().title("Total expense : $total")
                 }
 
 
@@ -281,7 +283,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
             expenseViewModel.getTotalExpenseAmount().observe(viewLifecycleOwner) { total ->
 
-                pie.title("Total expense : $total")
+                pie.legend().title("Total expense : $total")
             }
 
 
@@ -372,6 +374,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                 )
             )
 
+            pie.title("All time")
 
         } else {
 
@@ -399,6 +402,14 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                     requireContext(),
                     R.color.color_white
                 )
+            )
+
+            pie.title(
+                "${WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(d1)} to ${
+                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        d2
+                    )
+                }"
             )
 
         }

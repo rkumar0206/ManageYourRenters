@@ -379,7 +379,14 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
                 expenseViewModel.getTotalExpenseAmountByExpenseCategory(expenseCategory.key)
                     .observe(viewLifecycleOwner) { amount ->
 
-                        total += amount
+                        try {
+
+                            total += amount
+                        } catch (e: NullPointerException) {
+
+                            e.printStackTrace()
+                        }
+
                     }
             }
         } else {
@@ -477,6 +484,8 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
         binding.chart.setProgressBar(binding.progressBar)
 
         pie.title().enabled(true)
+            .fontColor("#212121")
+
         //pie.title("Expenses on each category")
 
         pie.labels().position("outside")

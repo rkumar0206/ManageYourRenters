@@ -115,6 +115,9 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
         binding.toolbar.menu.findItem(R.id.menu_clear_date_range_deep_analyze_expense)
             .setOnMenuItemClickListener {
 
+                binding.toolbar.menu.findItem(R.id.menu_select_range_deep_analyze_expense)
+                    .setIcon(R.drawable.ic_baseline_date_range_24)
+
                 isDateRangeSelected = false
                 binding.toolbar.subtitle = ""
 
@@ -138,6 +141,9 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
                 requireActivity().supportFragmentManager
             },
             { date ->
+
+                binding.toolbar.menu.findItem(R.id.menu_select_range_deep_analyze_expense)
+                    .setIcon(R.drawable.ic_baseline_date_range_24_coloured)
 
                 startDate = date.first
                 endDate = date.second

@@ -403,6 +403,9 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         binding.toolbar.menu.findItem(R.id.menu_expense_clear_date_range)
             .setOnMenuItemClickListener {
 
+                binding.toolbar.menu.findItem(R.id.menu_expense_date_range)
+                    .setIcon(R.drawable.ic_baseline_date_range_24)
+
                 sortBy = SortExpense.BY_CREATED
 
                 binding.toolbar.subtitle = ""
@@ -525,6 +528,10 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 requireActivity().supportFragmentManager
             },
             { dates ->
+
+                binding.toolbar.menu.findItem(R.id.menu_expense_date_range).setIcon(
+                    R.drawable.ic_baseline_date_range_24_coloured
+                )
 
                 sortBy = SortExpense.BY_DATE_RANGE
                 startDate = dates.first

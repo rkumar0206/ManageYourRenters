@@ -61,6 +61,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private lateinit var monthList: List<String>
     private lateinit var currencyList: List<String>
+    private lateinit var yearList: ArrayList<Int>
 
     private var periodType: String = ""
     private var billMonth: String? = null
@@ -114,6 +115,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 System.currentTimeMillis(),
                 "yyyy"
             )?.toInt()!!
+
+        yearList = populateYearList(selectedYear)
 
         setUpSpinnerYear()
 
@@ -327,6 +330,16 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         includeBinding.monthSelectSpinner.setSelection(billMonthNumber - 1)
 
+        // setting the selected year to be the year of november if this
+        // payment is for month of december, because if the payment of
+        // december is paid in the month of january of the next year
+        // then the selected year will be increased by 1
+
+        if (billMonthNumber == 12) {
+
+            selectedYear = lastPaymentInfo?.bill?.billYear!!
+            includeBinding.selectYearSpinner.setSelection(1)
+        }
     }
 
     private fun setUpSpinnerMonth() {
@@ -366,8 +379,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun setUpSpinnerYear() {
 
-        val yearList = populateYearList(selectedYear)
-
         includeBinding.selectYearSpinner.apply {
 
             adapter = ArrayAdapter(
@@ -400,7 +411,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
-    private fun populateYearList(selectedYear: Int): java.util.ArrayList<Int> {
+    private fun populateYearList(selectedYear: Int): ArrayList<Int> {
 
         val yearList = ArrayList<Int>()
 

@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney
 
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,9 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.CustomMenuBottomsheetLayoutBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.show
+
+private const val TAG = "CustomMenuItems"
 
 class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
 
@@ -50,14 +54,22 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
                 val isDocumentMenuVisible = bundle.getBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
                 val isSyncMenuVisible = bundle.getBoolean(Constants.SHOW_SYNC_MENU, false)
 
+                Log.d(TAG, "getMessage: sync_menu : $isSyncMenuVisible")
+
                 if (!isEditMenuVisible) {
 
                     binding.editEmiMenu.hide()
+                } else {
+
+                    binding.editEmiMenu.show()
                 }
 
                 if (!isDeleteMenuVisible) {
 
                     binding.deleteEmiMenu.hide()
+                } else {
+
+                    binding.deleteEmiMenu.show()
                 }
 
                 if (!isDocumentMenuVisible) {
@@ -65,11 +77,19 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
                     binding.viewOrDownloadSupportingDocumentMenu.hide()
                     binding.replaceSupportingDocumentMenu.hide()
                     binding.deleteSupportingDocumentMenu.hide()
+                } else {
+
+                    binding.viewOrDownloadSupportingDocumentMenu.show()
+                    binding.replaceSupportingDocumentMenu.show()
+                    binding.deleteSupportingDocumentMenu.show()
                 }
 
                 if (!isSyncMenuVisible) {
 
                     binding.syncMenu.hide()
+                } else {
+
+                    binding.syncMenu.show()
                 }
             }
         }

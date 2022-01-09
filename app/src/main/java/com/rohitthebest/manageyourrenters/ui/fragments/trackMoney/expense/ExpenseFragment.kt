@@ -99,7 +99,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
             binding.toolbar.title = "All Expenses"
 
-            expenseAdapter = ExpenseAdapter("All expenses")
+            expenseAdapter = ExpenseAdapter("Not specified")
 
             setUpRecyclerView()
 

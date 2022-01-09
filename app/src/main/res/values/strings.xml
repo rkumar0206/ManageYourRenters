@@ -205,6 +205,10 @@
     <string name="add_remove_expense_category_selection">Add Remove Expense category selection</string>
     <string name="clear_selection_fab">clear selection fab</string>
     <string name="clear_date_range">Clear date range</string>
+    <string name="last_1_month">Last 1 month</string>
+    <string name="last_1_week">Last 1 week</string>
+    <string name="last_1_year">Last 1 year</string>
+    <string name="custom_range">Custom range</string>
 
 
     <string-array name="interest_time_schedule">

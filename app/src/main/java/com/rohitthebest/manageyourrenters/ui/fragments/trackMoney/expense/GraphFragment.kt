@@ -1,10 +1,10 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,6 +20,7 @@ import com.anychart.charts.Pie
 import com.anychart.enums.Align
 import com.anychart.enums.LegendLayout
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.databinding.FragmentGraphBinding
 import com.rohitthebest.manageyourrenters.others.Constants.ONE_DAY_MILLISECONDS
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
@@ -55,6 +56,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         _binding = FragmentGraphBinding.bind(view)
 
         //setUpCartesianChart()
+        changeSelectionUI(CustomDateRange.ALL_TIME)
         setUpPieChart()
 
         getExpenseCategoryExpensesByAllTime()
@@ -70,8 +72,8 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
         binding.chart.setProgressBar(binding.progressBar)
 
-        pie.title().enabled(true)
-        pie.title("All time")
+        pie.title().enabled(false)
+        //pie.title("All time")
         //pie.title("Expenses on each category")
 
         pie.labels().position("outside")
@@ -167,37 +169,138 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             true
         }
 
-        binding.allTimeBtn.setOnClickListener {
+        binding.dateRangeMenuBtn.setOnClickListener { view ->
 
-            if (!isAllTimeSelected) {
-
-                isAllTimeSelected = true
-
-                getExpenseCategoryExpensesByAllTime()
-
-                changeSelectionUI()
-            }
+            showMenuForSelectingCustomTime(view)
 
         }
 
-        binding.selectRangeBtn.setOnClickListener {
+        binding.dateRangeTv.setOnClickListener { view ->
 
-            Functions.showDateRangePickerDialog(
-                d1,
-                d2, {
-                    requireActivity().supportFragmentManager
-                },
-                { dates: Pair<Long, Long> ->
+            showMenuForSelectingCustomTime(view)
+        }
+    }
 
-                    d1 = dates.first
-                    d2 = dates.second
+    private fun showMenuForSelectingCustomTime(view: View) {
+
+        Functions.showCustomDateRangeOptionMenu(
+            requireActivity(),
+            view
+        ) { selectedMenu ->
+
+            when (selectedMenu) {
+
+                CustomDateRange.ALL_TIME -> {
+
+                    if (!isAllTimeSelected) {
+
+                        isAllTimeSelected = true
+
+                        getExpenseCategoryExpensesByAllTime()
+
+                        changeSelectionUI(selectedMenu)
+                    }
+                }
+
+                CustomDateRange.LAST_1_MONTH -> {
 
                     isAllTimeSelected = false
-                    changeSelectionUI()
-                    getExpenseCategoryExpensesByDateRange(dates.first, dates.second)
+                    changeSelectionUI(selectedMenu)
+
+                    getExpenseCategoryExpensesByDateRange(
+                        System.currentTimeMillis() - (30 * ONE_DAY_MILLISECONDS),
+                        System.currentTimeMillis()
+                    )
+
                 }
-            )
+
+                CustomDateRange.LAST_1_WEEK -> {
+
+                    isAllTimeSelected = false
+                    changeSelectionUI(selectedMenu)
+
+                    getExpenseCategoryExpensesByDateRange(
+                        System.currentTimeMillis() - (7 * ONE_DAY_MILLISECONDS),
+                        System.currentTimeMillis()
+                    )
+
+                }
+
+                CustomDateRange.LAST_1_YEAR -> {
+
+                    isAllTimeSelected = false
+
+                    changeSelectionUI(selectedMenu)
+
+                    getExpenseCategoryExpensesByDateRange(
+                        System.currentTimeMillis() - (365 * ONE_DAY_MILLISECONDS),
+                        System.currentTimeMillis()
+                    )
+                }
+
+                CustomDateRange.CUSTOM_DATE_RANGE -> {
+
+                    Functions.showDateRangePickerDialog(
+                        d1,
+                        d2, {
+                            requireActivity().supportFragmentManager
+                        },
+                        { dates: Pair<Long, Long> ->
+
+                            d1 = dates.first
+                            d2 = dates.second
+
+                            isAllTimeSelected = false
+                            changeSelectionUI(selectedMenu)
+                            getExpenseCategoryExpensesByDateRange(dates.first, dates.second)
+                        }
+                    )
+
+                }
+            }
         }
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun changeSelectionUI(selectedMenu: CustomDateRange) {
+
+        when (selectedMenu) {
+
+            CustomDateRange.ALL_TIME -> {
+
+                binding.dateRangeTv.text = "All time"
+            }
+
+            CustomDateRange.LAST_1_MONTH -> {
+
+                binding.dateRangeTv.text = "Last 1 month (30 days)"
+            }
+
+            CustomDateRange.LAST_1_WEEK -> {
+
+                binding.dateRangeTv.text = "Last 1 week (7 days)"
+            }
+
+            CustomDateRange.LAST_1_YEAR -> {
+
+                binding.dateRangeTv.text = "Last 1 year (365 days)"
+            }
+
+            CustomDateRange.CUSTOM_DATE_RANGE -> {
+
+                binding.dateRangeTv.text = "${
+                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        d1
+                    )
+                } to ${
+                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        d2
+                    )
+                }"
+            }
+        }
+
     }
 
     private fun getExpenseCategoryExpensesByDateRange(date1: Long?, date2: Long?) {
@@ -343,78 +446,6 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                 })
         }
     }
-
-    private fun changeSelectionUI() {
-
-        if (isAllTimeSelected) {
-
-            binding.allTimeBtn.setBackgroundColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.purple_500
-                )
-            )
-            binding.allTimeBtn.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.color_white
-                )
-            )
-
-            binding.selectRangeBtn.setBackgroundColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.color_white
-                )
-            )
-            binding.selectRangeBtn.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.primaryTextColor
-                )
-            )
-
-            pie.title("All time")
-
-        } else {
-
-            binding.allTimeBtn.setBackgroundColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.color_white
-                )
-            )
-            binding.allTimeBtn.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.primaryTextColor
-                )
-            )
-
-            binding.selectRangeBtn.setBackgroundColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.purple_500
-                )
-            )
-            binding.selectRangeBtn.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.color_white
-                )
-            )
-
-            pie.title(
-                "${WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(d1)} to ${
-                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                        d2
-                    )
-                }"
-            )
-
-        }
-    }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

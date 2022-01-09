@@ -32,6 +32,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
@@ -627,6 +628,48 @@ class Functions {
                 }
             }
 
+        }
+
+        inline fun showCustomDateRangeOptionMenu(
+            activity: Activity,
+            view: View,
+            crossinline onMenuItemClicked: (CustomDateRange) -> Unit
+        ) {
+
+            val popupMenu = PopupMenu(activity, view)
+
+            popupMenu.menuInflater.inflate(R.menu.custom_expense_date_range_menu, popupMenu.menu)
+
+            popupMenu.show()
+
+            popupMenu.setOnMenuItemClickListener {
+
+                return@setOnMenuItemClickListener when (it.itemId) {
+
+                    R.id.menu_date_range_last_1_month -> {
+                        onMenuItemClicked(CustomDateRange.LAST_1_MONTH)
+                        true
+                    }
+                    R.id.menu_date_range_last_1_week -> {
+                        onMenuItemClicked(CustomDateRange.LAST_1_WEEK)
+                        true
+                    }
+                    R.id.menu_date_range_last_1_year -> {
+                        onMenuItemClicked(CustomDateRange.LAST_1_YEAR)
+                        true
+                    }
+                    R.id.menu_date_range_all_time -> {
+                        onMenuItemClicked(CustomDateRange.ALL_TIME)
+                        true
+                    }
+                    R.id.menu_date_range_custom_range -> {
+                        onMenuItemClicked(CustomDateRange.CUSTOM_DATE_RANGE)
+                        true
+                    }
+
+                    else -> false
+                }
+            }
         }
 
         fun getBackgroundColor(color: Int? = null): Int {

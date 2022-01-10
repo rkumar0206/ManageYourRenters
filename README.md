@@ -66,8 +66,8 @@ In this category you can keep track of the borrowers (the person to whom you hav
 
 ### Expenses
 
-As the name suggests here you can add your daily expenses and keep trac of it.
-- First you need to add a category with a beutiful image using unsplash.
-- Then inside that category you can add your expenses related to the category.
+As the name suggests here you can add your daily expenses and keep track of it.
+- First you need to add a category with a beautiful image using unsplash.
+- Then inside this category you can add your expenses related to this category.
 - You can also analyze ypur expenses using the graph.
 - You can compare the expeses based on categories.

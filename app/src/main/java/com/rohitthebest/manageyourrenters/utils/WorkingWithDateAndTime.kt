@@ -3,7 +3,6 @@ package com.rohitthebest.manageyourrenters.utils
 import android.annotation.SuppressLint
 import android.util.Log
 import java.sql.Timestamp
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -23,6 +22,7 @@ class WorkingWithDateAndTime {
         return formattedDate.format(date!!)
     }
 
+/*
     fun getDateFromDateInString(dateInString: String?, pattern: String): Date? {
 
         val dateFormat = SimpleDateFormat(pattern)
@@ -38,7 +38,9 @@ class WorkingWithDateAndTime {
 
         return myDate
     }
+*/
 
+/*
     fun getTimeInMillisFromDateInString(dateInString: String, pattern: String): Long? {
 
         val myDate = getDateFromDateInString(dateInString, pattern)
@@ -46,7 +48,9 @@ class WorkingWithDateAndTime {
         return myDate?.time
 
     }
+*/
 
+/*
     fun convertDateToPattern(date: Date?, pattern: String? = "dd-MM-yyyy"): String? {
 
         var sdf: SimpleDateFormat? = null
@@ -59,6 +63,7 @@ class WorkingWithDateAndTime {
             null
         }
     }
+*/
 
     /**
      * converts milliseconds in any date pattern
@@ -85,6 +90,10 @@ class WorkingWithDateAndTime {
         }
     }
 
+    /**
+     * Used for converting time in milliseconds to the calendar instance
+     */
+
     fun convertMillisecondsToCalendarInstance(
         timeInMillis: Long
     ): Calendar {
@@ -97,6 +106,10 @@ class WorkingWithDateAndTime {
         cal.time = date
         return cal
     }
+
+    /**
+     * Get the date (day), month, year from the time in milliseconds
+     */
 
     fun getDateMonthYearByTimeInMillis(
         timeInMillis: Long
@@ -130,13 +143,9 @@ class WorkingWithDateAndTime {
         timeInMillis: Long
     ): Pair<Long, Long> {
 
-        Log.d(TAG, "getMillisecondsOfStartAndEndDayOfMonth: Given time : $timeInMillis")
 
         val month = convertMillisecondsToDateAndTimePattern(timeInMillis, "MM")?.toInt()
         val year = convertMillisecondsToDateAndTimePattern(timeInMillis, "yyyy")?.toInt()
-
-        Log.d(TAG, "getMillisecondsOfStartAndEndDayOfMonth: Month : $month")
-        Log.d(TAG, "getMillisecondsOfStartAndEndDayOfMonth: Year : $year")
 
         val firstDayCal = Calendar.getInstance()
         val lastDayCal = Calendar.getInstance()
@@ -151,33 +160,19 @@ class WorkingWithDateAndTime {
 
             lastDayCal.set(year, month - 1, dayInMonth, 0, 0, 0)
 
-            Log.d(
-                TAG,
-                "getMillisecondsOfStartAndEndDayOfMonth: firstDate : ${
-                    convertMillisecondsToDateAndTimePattern(
-                        firstDayCal.timeInMillis
-                    )
-                }"
-            )
-            Log.d(
-                TAG,
-                "getMillisecondsOfStartAndEndDayOfMonth: lastDate : ${
-                    convertMillisecondsToDateAndTimePattern(
-                        lastDayCal.timeInMillis
-                    )
-                }"
-            )
-
-            Log.d(
-                TAG,
-                "getMillisecondsOfStartAndEndDayOfMonth: Pair : " + firstDayCal.timeInMillis + ", ${lastDayCal.timeInMillis}"
-            )
 
             return Pair(firstDayCal.timeInMillis, lastDayCal.timeInMillis)
         }
 
         return Pair(timeInMillis, timeInMillis)
     }
+
+    /**
+     * used for getting the milliseconds of the first day and the last day of any week
+     *
+     * @param timeInMillis
+     * @return Pair(firstDayMilliseconds, lastDayMilliseconds)
+     */
 
     fun getMillisecondsOfStartAndEndOfWeek(
         timeInMillis: Long
@@ -192,11 +187,6 @@ class WorkingWithDateAndTime {
         )
 
         val dayOfWeek = firstCal.get(Calendar.DAY_OF_WEEK)
-
-        Log.d(
-            TAG,
-            "getMillisecondsOfStartAndEndOfWeek: Day : ${firstCal.get(Calendar.DAY_OF_WEEK)}"
-        )
 
         val lastCal = Calendar.getInstance()
         lastCal.set(
@@ -258,28 +248,6 @@ class WorkingWithDateAndTime {
             else -> {
             }
         }
-
-        Log.d(
-            TAG, "getMillisecondsOfStartAndEndOfWeek: firstDate : ${
-                convertMillisecondsToDateAndTimePattern(
-                    firstCal.timeInMillis
-                )
-            }"
-        )
-
-        Log.d(
-            TAG, "getMillisecondsOfStartAndEndOfWeek: lastDate : ${
-                convertMillisecondsToDateAndTimePattern(
-                    lastCal.timeInMillis
-                )
-            }"
-        )
-
-        Log.d(
-            TAG,
-            "getMillisecondsOfStartAndEndOfWeek: Pair : ${firstCal.timeInMillis}, ${lastCal.timeInMillis}"
-        )
-
 
         return Pair(firstCal.timeInMillis, lastCal.timeInMillis)
     }

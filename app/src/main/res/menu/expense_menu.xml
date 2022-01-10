@@ -13,9 +13,9 @@
         android:icon="@drawable/ic_baseline_date_range_24"
         android:title="@string/select_range"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/menu_expense_clear_date_range"
-        android:title="@string/clear_date_range" />
+    <!--    <item-->
+    <!--        android:id="@+id/menu_expense_clear_date_range"-->
+    <!--        android:title="@string/clear_date_range" />-->
     <item
         android:id="@+id/menu_total_expense"
         android:title="@string/see_total"

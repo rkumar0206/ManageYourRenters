@@ -72,8 +72,6 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentGraphBinding.bind(view)
 
-        WorkingWithDateAndTime().getMillisecondsOfStartAndEndDayOfMonth(System.currentTimeMillis())
-
         //setUpCartesianChart()
         changeSelectionUI()
         setUpPieChart()

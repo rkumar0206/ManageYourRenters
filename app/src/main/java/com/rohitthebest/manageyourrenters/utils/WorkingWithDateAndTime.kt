@@ -98,6 +98,26 @@ class WorkingWithDateAndTime {
         return cal
     }
 
+    fun getDateMonthYearByTimeInMillis(
+        timeInMillis: Long
+    ): Triple<Int, Int, Int> {
+
+        try {
+
+            val date = convertMillisecondsToDateAndTimePattern(timeInMillis, "dd")?.toInt()!!
+            val month = convertMillisecondsToDateAndTimePattern(timeInMillis, "MM")?.toInt()!!
+            val year = convertMillisecondsToDateAndTimePattern(timeInMillis, "yyyy")?.toInt()!!
+
+            return Triple(date, month, year)
+
+        } catch (e: Exception) {
+
+            e.printStackTrace()
+        }
+
+        return Triple(1, 1, 1)
+    }
+
 
     /**
      * used for getting the milliseconds of the first day and the last day of any month
@@ -123,13 +143,13 @@ class WorkingWithDateAndTime {
 
         if (year != null && month != null) {
 
-            firstDayCal.set(year, month - 1, 1)
+            firstDayCal.set(year, month - 1, 1, 0, 0, 0)
 
             val dayInMonth = firstDayCal.getActualMaximum(Calendar.DAY_OF_MONTH)
 
             Log.d(TAG, "getMillisecondsOfStartAndEndDayOfMonth: Day In month : $dayInMonth")
 
-            lastDayCal.set(year, month - 1, dayInMonth)
+            lastDayCal.set(year, month - 1, dayInMonth, 0, 0, 0)
 
             Log.d(
                 TAG,
@@ -156,14 +176,20 @@ class WorkingWithDateAndTime {
             return Pair(firstDayCal.timeInMillis, lastDayCal.timeInMillis)
         }
 
-        return Pair(timeInMillis, timeInMillis);
+        return Pair(timeInMillis, timeInMillis)
     }
 
     fun getMillisecondsOfStartAndEndOfWeek(
         timeInMillis: Long
     ): Pair<Long, Long> {
 
-        val firstCal = convertMillisecondsToCalendarInstance(timeInMillis)
+        val dateMonthYear = getDateMonthYearByTimeInMillis(timeInMillis)
+
+        val firstCal = Calendar.getInstance()
+        firstCal.set(
+            dateMonthYear.third, dateMonthYear.second - 1, dateMonthYear.first,
+            0, 0, 0
+        )
 
         val dayOfWeek = firstCal.get(Calendar.DAY_OF_WEEK)
 
@@ -172,7 +198,11 @@ class WorkingWithDateAndTime {
             "getMillisecondsOfStartAndEndOfWeek: Day : ${firstCal.get(Calendar.DAY_OF_WEEK)}"
         )
 
-        val lastCal = convertMillisecondsToCalendarInstance(timeInMillis)
+        val lastCal = Calendar.getInstance()
+        lastCal.set(
+            dateMonthYear.third, dateMonthYear.second - 1, dateMonthYear.first,
+            0, 0, 0
+        )
 
         when (dayOfWeek) {
             1 -> {
@@ -251,7 +281,7 @@ class WorkingWithDateAndTime {
         )
 
 
-        return Pair(firstCal.timeInMillis, lastCal.timeInMillis);
+        return Pair(firstCal.timeInMillis, lastCal.timeInMillis)
     }
 
 }

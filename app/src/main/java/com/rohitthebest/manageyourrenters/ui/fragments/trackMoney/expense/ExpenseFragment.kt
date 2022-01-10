@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.ExpenseAdapter
+import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseBinding
@@ -63,6 +64,9 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         _binding = FragmentExpenseBinding.bind(view)
 
         sortBy = SortExpense.BY_CREATED
+
+        binding.toolbar.subtitle = getString(R.string.all_time)
+
         startDate = System.currentTimeMillis()
         endDate = System.currentTimeMillis()
 
@@ -130,7 +134,6 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 })
         }
     }
-
 
     private fun observeExpenses() {
 
@@ -250,6 +253,8 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
         expenseCategoryViewModel.getExpenseCategoryByKey(expense.categoryKey)
             .observe(viewLifecycleOwner, { expenseCategory ->
+
+                Log.d("WorkingWithDateAndTime", "onItemClick: ${expense.created}")
 
                 val msg =
                     "\nDate : ${
@@ -400,25 +405,6 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             true
         }
 
-        binding.toolbar.menu.findItem(R.id.menu_expense_clear_date_range)
-            .setOnMenuItemClickListener {
-
-                binding.toolbar.menu.findItem(R.id.menu_expense_date_range)
-                    .setIcon(R.drawable.ic_baseline_date_range_24)
-
-                sortBy = SortExpense.BY_CREATED
-
-                binding.toolbar.subtitle = ""
-
-                binding.progressbar.show()
-                lifecycleScope.launch {
-                    delay(200)
-                    observeExpenses()
-                }
-
-                true
-            }
-
         binding.toolbar.menu.findItem(R.id.menu_total_expense).setOnMenuItemClickListener {
 
             handleTotalExpenseMenu()
@@ -521,39 +507,130 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     private fun handleExpenseDateRangeMenu() {
 
-        Functions.showDateRangePickerDialog(
-            startDate,
-            System.currentTimeMillis(),
-            {
-                requireActivity().supportFragmentManager
-            },
-            { dates ->
+        Functions.showCustomDateRangeOptionMenu(
+            requireActivity(),
+            binding.toolbar
+        ) { selectedOption ->
 
-                binding.toolbar.menu.findItem(R.id.menu_expense_date_range).setIcon(
-                    R.drawable.ic_baseline_date_range_24_coloured
-                )
+            when (selectedOption) {
 
-                sortBy = SortExpense.BY_DATE_RANGE
-                startDate = dates.first
-                endDate = dates.second
+                CustomDateRange.ALL_TIME -> {
 
-                binding.toolbar.subtitle =
-                    "${WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(startDate)} - " +
-                            "${
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                    endDate
-                                )
-                            }"
+                    if (sortBy != SortExpense.BY_CREATED) {
 
-                binding.progressbar.show()
+                        sortBy = SortExpense.BY_CREATED
 
-                lifecycleScope.launch {
-                    delay(200)
-                    observeExpenses()
+                        binding.toolbar.subtitle = getString(R.string.all_time)
+
+                        updateSort()
+                    }
+                }
+
+                CustomDateRange.LAST_30_DAYS -> {
+
+                    sortBy = SortExpense.BY_DATE_RANGE
+                    startDate = System.currentTimeMillis() - (30 * Constants.ONE_DAY_MILLISECONDS)
+                    endDate = System.currentTimeMillis()
+
+                    binding.toolbar.subtitle = getString(R.string.last_30_days)
+                    updateSort()
+                }
+
+                CustomDateRange.LAST_7_DAYS -> {
+
+                    sortBy = SortExpense.BY_DATE_RANGE
+                    startDate = System.currentTimeMillis() - (7 * Constants.ONE_DAY_MILLISECONDS)
+                    endDate = System.currentTimeMillis()
+
+                    binding.toolbar.subtitle = getString(R.string.last_7_days)
+
+                    updateSort()
+                }
+
+                CustomDateRange.LAST_365_DAYS -> {
+
+                    sortBy = SortExpense.BY_DATE_RANGE
+                    startDate = System.currentTimeMillis() - (365 * Constants.ONE_DAY_MILLISECONDS)
+                    endDate = System.currentTimeMillis()
+
+                    binding.toolbar.subtitle = getString(R.string.last_365_days)
+
+                    updateSort()
+                }
+
+                CustomDateRange.CUSTOM_DATE_RANGE -> {
+
+                    Functions.showDateRangePickerDialog(
+                        startDate,
+                        endDate,
+                        {
+                            requireActivity().supportFragmentManager
+                        },
+                        { date ->
+
+                            startDate = date.first
+                            endDate = date.second
+
+                            sortBy = SortExpense.BY_DATE_RANGE
+
+                            binding.toolbar.subtitle =
+                                "${
+                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                        startDate
+                                    )
+                                } - " +
+                                        "${
+                                            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                                endDate
+                                            )
+                                        }"
+
+                            updateSort()
+                        }
+                    )
+
+                }
+
+                else -> {
+
+                    sortBy = SortExpense.BY_DATE_RANGE
+
+                    val pair = Functions.getMillisecondsOfStartAndEndUsingConstants(
+                        selectedOption
+                    )
+
+                    startDate = pair.first
+                    endDate = pair.second
+
+                    when (selectedOption) {
+
+                        CustomDateRange.THIS_MONTH -> binding.toolbar.subtitle =
+                            getString(R.string.this_month)
+                        CustomDateRange.THIS_WEEK -> binding.toolbar.subtitle =
+                            getString(R.string.this_week)
+                        CustomDateRange.PREVIOUS_MONTH -> binding.toolbar.subtitle =
+                            getString(R.string.previous_month)
+                        CustomDateRange.PREVIOUS_WEEK -> binding.toolbar.subtitle =
+                            getString(R.string.previous_week)
+                        else -> {}
+                    }
+
+                    updateSort()
+
                 }
             }
-        )
 
+        }
+    }
+
+    private fun updateSort() {
+
+        binding.progressbar.show()
+
+        lifecycleScope.launch {
+            delay(200)
+            observeExpenses()
+        }
     }
 
     override fun onDestroyView() {

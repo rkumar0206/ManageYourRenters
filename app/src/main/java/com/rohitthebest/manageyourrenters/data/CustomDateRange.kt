@@ -2,8 +2,12 @@ package com.rohitthebest.manageyourrenters.data
 
 enum class CustomDateRange {
     ALL_TIME,
-    LAST_1_MONTH,
-    LAST_1_WEEK,
-    LAST_1_YEAR,
+    THIS_MONTH,
+    PREVIOUS_MONTH,
+    THIS_WEEK,
+    PREVIOUS_WEEK,
+    LAST_30_DAYS,
+    LAST_7_DAYS,
+    LAST_365_DAYS,
     CUSTOM_DATE_RANGE
 }

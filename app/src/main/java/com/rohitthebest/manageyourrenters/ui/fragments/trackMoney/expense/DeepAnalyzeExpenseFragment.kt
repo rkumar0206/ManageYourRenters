@@ -21,6 +21,7 @@ import com.anychart.enums.LegendLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.DeepAnalyzeExpenseCategoryAdapter
+import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentDeepAnalyzeExpenseBinding
 import com.rohitthebest.manageyourrenters.others.Constants
@@ -115,13 +116,7 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
         binding.toolbar.menu.findItem(R.id.menu_clear_date_range_deep_analyze_expense)
             .setOnMenuItemClickListener {
 
-                binding.toolbar.menu.findItem(R.id.menu_select_range_deep_analyze_expense)
-                    .setIcon(R.drawable.ic_baseline_date_range_24)
-
-                isDateRangeSelected = false
-                binding.toolbar.subtitle = ""
-
-                initChartData()
+                clearDateRange()
                 true
             }
 
@@ -132,7 +127,43 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
         }
     }
 
+    // todo : complete this -
+    // todo : 1 : remove menu clear date range
+    // todo : 2 : rename the date range menu to select custom time
+    // todo : 3 : handle the click on menu
+
+    private fun clearDateRange() {
+
+        binding.toolbar.menu.findItem(R.id.menu_select_range_deep_analyze_expense)
+            .setIcon(R.drawable.ic_baseline_date_range_24)
+
+        isDateRangeSelected = false
+        binding.toolbar.subtitle = ""
+
+        initChartData()
+
+    }
+
     private fun handleDateRangeMenu() {
+
+        Functions.showCustomDateRangeOptionMenu(
+            requireActivity(),
+            binding.toolbar.menu.findItem(R.id.menu_select_range_deep_analyze_expense).actionView
+        ) { selectedOption ->
+
+            when (selectedOption) {
+
+                CustomDateRange.ALL_TIME -> {
+
+                    clearDateRange()
+                }
+
+                CustomDateRange.LAST_30_DAYS -> {
+
+
+                }
+            }
+        }
 
         Functions.showDateRangePickerDialog(
             startDate,

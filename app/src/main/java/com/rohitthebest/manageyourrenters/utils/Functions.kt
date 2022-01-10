@@ -646,16 +646,37 @@ class Functions {
 
                 return@setOnMenuItemClickListener when (it.itemId) {
 
-                    R.id.menu_date_range_last_1_month -> {
-                        onMenuItemClicked(CustomDateRange.LAST_1_MONTH)
+                    R.id.menu_date_range_this_month -> {
+
+                        onMenuItemClicked(CustomDateRange.THIS_MONTH)
                         true
                     }
-                    R.id.menu_date_range_last_1_week -> {
-                        onMenuItemClicked(CustomDateRange.LAST_1_WEEK)
+                    R.id.menu_date_range_this_week -> {
+
+                        onMenuItemClicked(CustomDateRange.THIS_WEEK)
                         true
                     }
-                    R.id.menu_date_range_last_1_year -> {
-                        onMenuItemClicked(CustomDateRange.LAST_1_YEAR)
+                    R.id.menu_date_range_previous_month -> {
+
+                        onMenuItemClicked(CustomDateRange.PREVIOUS_MONTH)
+                        true
+                    }
+                    R.id.menu_date_range_previous_week -> {
+
+                        onMenuItemClicked(CustomDateRange.PREVIOUS_WEEK)
+                        true
+                    }
+
+                    R.id.menu_date_range_last_30_days -> {
+                        onMenuItemClicked(CustomDateRange.LAST_30_DAYS)
+                        true
+                    }
+                    R.id.menu_date_range_last_7_days -> {
+                        onMenuItemClicked(CustomDateRange.LAST_7_DAYS)
+                        true
+                    }
+                    R.id.menu_date_range_last_365_days -> {
+                        onMenuItemClicked(CustomDateRange.LAST_365_DAYS)
                         true
                     }
                     R.id.menu_date_range_all_time -> {
@@ -671,6 +692,76 @@ class Functions {
                 }
             }
         }
+
+        fun getMillisecondsOfStartAndEndUsingConstants(
+            customDateRange: CustomDateRange
+        ): Pair<Long, Long> {
+
+            val workingWithDateAndTime = WorkingWithDateAndTime()
+            val timeInMillis = System.currentTimeMillis()
+
+            when (customDateRange) {
+
+                CustomDateRange.THIS_MONTH -> {
+
+                    return workingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonth(
+                        timeInMillis
+                    )
+                }
+
+                CustomDateRange.PREVIOUS_MONTH -> {
+
+                    val cal =
+                        workingWithDateAndTime.convertMillisecondsToCalendarInstance(timeInMillis)
+
+                    cal.add(Calendar.MONTH, -1)
+
+                    Log.d(
+                        TAG,
+                        "getMillisecondsOfStartAndEndUsingConstants: month ,year ${cal.get(Calendar.MONTH)}, ${
+                            cal.get(Calendar.YEAR)
+                        }"
+                    )
+
+                    return workingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonth(cal.timeInMillis)
+                }
+
+                CustomDateRange.THIS_WEEK -> {
+
+                    return workingWithDateAndTime.getMillisecondsOfStartAndEndOfWeek(timeInMillis)
+                }
+
+                CustomDateRange.PREVIOUS_WEEK -> {
+
+                    val cal =
+                        workingWithDateAndTime.convertMillisecondsToCalendarInstance(timeInMillis)
+
+                    Log.d(
+                        TAG, "getMillisecondsOfStartAndEndUsingConstants: Day of week : "
+                                + cal.get(Calendar.DAY_OF_WEEK)
+                    )
+
+                    when (cal.get(Calendar.DAY_OF_WEEK)) {
+
+                        1 -> cal.add(Calendar.DATE, -7)
+                        2 -> cal.add(Calendar.DATE, -1)
+                        3 -> cal.add(Calendar.DATE, -2)
+                        4 -> cal.add(Calendar.DATE, -3)
+                        5 -> cal.add(Calendar.DATE, -4)
+                        6 -> cal.add(Calendar.DATE, -5)
+                        7 -> cal.add(Calendar.DATE, -6)
+                    }
+
+                    return workingWithDateAndTime.getMillisecondsOfStartAndEndOfWeek(cal.timeInMillis)
+                }
+
+                else -> {
+
+                    return Pair(timeInMillis, timeInMillis)
+                }
+            }
+        }
+
 
         fun getBackgroundColor(color: Int? = null): Int {
 

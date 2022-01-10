@@ -19,6 +19,8 @@ import com.anychart.charts.Cartesian
 import com.anychart.charts.Pie
 import com.anychart.enums.Align
 import com.anychart.enums.LegendLayout
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.databinding.FragmentGraphBinding
@@ -49,17 +51,37 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
     private lateinit var pie: Pie
     private lateinit var cartesian: Cartesian
 
-    private var isAllTimeSelected = true
+    private val SELECTED_DATE_RANGE_KEY = "custom_date_range_key"
+    private var isAllTimeSelected = false
+    private var selectedCustomDateRange: CustomDateRange = CustomDateRange.ALL_TIME
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState != null) {
+
+            Log.d(TAG, "onCreate: ${savedInstanceState.getString(SELECTED_DATE_RANGE_KEY)}")
+
+            val dateRange = savedInstanceState.getString(SELECTED_DATE_RANGE_KEY)
+            val type = object : TypeToken<CustomDateRange>() {}.type
+            selectedCustomDateRange = Gson().fromJson(dateRange, type)
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentGraphBinding.bind(view)
 
+        WorkingWithDateAndTime().getMillisecondsOfStartAndEndDayOfMonth(System.currentTimeMillis())
+
         //setUpCartesianChart()
-        changeSelectionUI(CustomDateRange.ALL_TIME)
+        changeSelectionUI()
         setUpPieChart()
 
-        getExpenseCategoryExpensesByAllTime()
+        Log.d(TAG, "onViewCreated: selected custom : $selectedCustomDateRange")
+
+        //getExpenseCategoryExpensesByAllTime()
+        handleDateRangeSelectionMenu(selectedCustomDateRange)
         initListeners()
     }
 
@@ -72,8 +94,8 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
         binding.chart.setProgressBar(binding.progressBar)
 
-        pie.title().enabled(false)
-        //pie.title("All time")
+        pie.title().enabled(true)
+        pie.title("All time")
         //pie.title("Expenses on each category")
 
         pie.labels().position("outside")
@@ -188,119 +210,145 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             view
         ) { selectedMenu ->
 
-            when (selectedMenu) {
+            selectedCustomDateRange = selectedMenu
 
-                CustomDateRange.ALL_TIME -> {
+            handleDateRangeSelectionMenu(selectedCustomDateRange)
 
-                    if (!isAllTimeSelected) {
-
-                        isAllTimeSelected = true
-
-                        getExpenseCategoryExpensesByAllTime()
-
-                        changeSelectionUI(selectedMenu)
-                    }
-                }
-
-                CustomDateRange.LAST_1_MONTH -> {
-
-                    isAllTimeSelected = false
-                    changeSelectionUI(selectedMenu)
-
-                    getExpenseCategoryExpensesByDateRange(
-                        System.currentTimeMillis() - (30 * ONE_DAY_MILLISECONDS),
-                        System.currentTimeMillis()
-                    )
-
-                }
-
-                CustomDateRange.LAST_1_WEEK -> {
-
-                    isAllTimeSelected = false
-                    changeSelectionUI(selectedMenu)
-
-                    getExpenseCategoryExpensesByDateRange(
-                        System.currentTimeMillis() - (7 * ONE_DAY_MILLISECONDS),
-                        System.currentTimeMillis()
-                    )
-
-                }
-
-                CustomDateRange.LAST_1_YEAR -> {
-
-                    isAllTimeSelected = false
-
-                    changeSelectionUI(selectedMenu)
-
-                    getExpenseCategoryExpensesByDateRange(
-                        System.currentTimeMillis() - (365 * ONE_DAY_MILLISECONDS),
-                        System.currentTimeMillis()
-                    )
-                }
-
-                CustomDateRange.CUSTOM_DATE_RANGE -> {
-
-                    Functions.showDateRangePickerDialog(
-                        d1,
-                        d2, {
-                            requireActivity().supportFragmentManager
-                        },
-                        { dates: Pair<Long, Long> ->
-
-                            d1 = dates.first
-                            d2 = dates.second
-
-                            isAllTimeSelected = false
-                            changeSelectionUI(selectedMenu)
-                            getExpenseCategoryExpensesByDateRange(dates.first, dates.second)
-                        }
-                    )
-
-                }
-            }
         }
-
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun changeSelectionUI(selectedMenu: CustomDateRange) {
+    private fun handleDateRangeSelectionMenu(selectedMenu: CustomDateRange) {
 
         when (selectedMenu) {
 
             CustomDateRange.ALL_TIME -> {
 
-                binding.dateRangeTv.text = "All time"
+                if (!isAllTimeSelected) {
+
+                    isAllTimeSelected = true
+
+                    getExpenseCategoryExpensesByAllTime()
+
+                    changeSelectionUI()
+
+                    pie.title(getString(R.string.all_time))
+                }
             }
 
-            CustomDateRange.LAST_1_MONTH -> {
+            CustomDateRange.LAST_30_DAYS -> {
 
-                binding.dateRangeTv.text = "Last 1 month (30 days)"
+                isAllTimeSelected = false
+
+                d1 = System.currentTimeMillis() - (30 * ONE_DAY_MILLISECONDS)
+                d2 = System.currentTimeMillis()
+
+                getExpenseByDateRange()
+
+                pie.title(getString(R.string.last_30_days))
             }
 
-            CustomDateRange.LAST_1_WEEK -> {
+            CustomDateRange.LAST_7_DAYS -> {
 
-                binding.dateRangeTv.text = "Last 1 week (7 days)"
+                isAllTimeSelected = false
+                d1 = System.currentTimeMillis() - (7 * ONE_DAY_MILLISECONDS)
+                d2 = System.currentTimeMillis()
+
+                getExpenseByDateRange()
+
+                pie.title(getString(R.string.last_7_days))
             }
 
-            CustomDateRange.LAST_1_YEAR -> {
+            CustomDateRange.LAST_365_DAYS -> {
 
-                binding.dateRangeTv.text = "Last 1 year (365 days)"
+                isAllTimeSelected = false
+
+                d1 = System.currentTimeMillis() - (365 * ONE_DAY_MILLISECONDS)
+                d2 = System.currentTimeMillis()
+
+                getExpenseByDateRange()
+
+                pie.title(getString(R.string.last_365_days))
             }
 
             CustomDateRange.CUSTOM_DATE_RANGE -> {
 
-                binding.dateRangeTv.text = "${
-                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                        d1
-                    )
-                } to ${
-                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                        d2
-                    )
-                }"
+                Functions.showDateRangePickerDialog(
+                    d1,
+                    d2, {
+                        requireActivity().supportFragmentManager
+                    },
+                    { dates: Pair<Long, Long> ->
+
+                        d1 = dates.first
+                        d2 = dates.second
+
+                        isAllTimeSelected = false
+
+                        getExpenseByDateRange()
+                    }
+                )
+
+                pie.title(getString(R.string.custom_range))
+            }
+
+            else -> {
+
+                isAllTimeSelected = false
+
+                val pair = Functions.getMillisecondsOfStartAndEndUsingConstants(
+                    selectedMenu
+                )
+
+                d1 = pair.first
+                d2 = pair.second
+
+                getExpenseByDateRange()
+
+                when (selectedMenu) {
+
+                    CustomDateRange.THIS_MONTH -> pie.title(getString(R.string.this_month))
+                    CustomDateRange.THIS_WEEK -> pie.title(getString(R.string.this_week))
+                    CustomDateRange.PREVIOUS_MONTH -> pie.title(getString(R.string.previous_month))
+                    CustomDateRange.PREVIOUS_WEEK -> pie.title(getString(R.string.previous_week))
+                    else -> {}
+                }
+
             }
         }
 
+    }
+
+    private fun getExpenseByDateRange() {
+
+        if (!isAllTimeSelected) {
+
+            changeSelectionUI()
+            getExpenseCategoryExpensesByDateRange(
+                d1,
+                d2
+            )
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun changeSelectionUI() {
+
+        if (isAllTimeSelected) {
+
+            binding.dateRangeTv.text = "All time"
+        } else {
+
+            binding.dateRangeTv.text = "${
+                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                    d1
+                )
+            } to ${
+                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                    d2
+                )
+            }"
+
+        }
     }
 
     private fun getExpenseCategoryExpensesByDateRange(date1: Long?, date2: Long?) {
@@ -315,7 +363,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             )
                 .observe(viewLifecycleOwner) { total ->
 
-                    pie.legend().title("Total expense : $total")
+                    pie.legend().title("Total expense : %.3f".format(total))
                 }
 
 
@@ -445,6 +493,12 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                     }
                 })
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+
+        outState.putString(SELECTED_DATE_RANGE_KEY, Gson().toJson(selectedCustomDateRange))
+        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroyView() {

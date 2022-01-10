@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.utils
 
 import android.annotation.SuppressLint
+import android.util.Log
 import java.sql.Timestamp
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -8,6 +9,8 @@ import java.util.*
 
 @SuppressLint("SimpleDateFormat")
 class WorkingWithDateAndTime {
+
+    private val TAG = "WorkingWithDateAndTime"
 
     fun convertTimeStampToDateOrTimePattern(timestamps: Timestamp?, pattern: String): String? {
 
@@ -36,9 +39,9 @@ class WorkingWithDateAndTime {
         return myDate
     }
 
-    fun getTimeInMillisFromDateInString(dateInString: String?, pattern: String?): Long? {
+    fun getTimeInMillisFromDateInString(dateInString: String, pattern: String): Long? {
 
-        val myDate = pattern?.let { getDateFromDateInString(dateInString, it) }
+        val myDate = getDateFromDateInString(dateInString, pattern)
 
         return myDate?.time
 
@@ -83,16 +86,172 @@ class WorkingWithDateAndTime {
     }
 
     fun convertMillisecondsToCalendarInstance(
-        timeInMillis: Long?
+        timeInMillis: Long
     ): Calendar {
 
-        val timeStamp = timeInMillis?.let { Timestamp(it) }
+        val timeStamp = Timestamp(timeInMillis)
 
-        val date = timeStamp?.time?.let { Date(it) }
+        val date = Date(timeStamp.time)
 
         val cal = Calendar.getInstance()
-        cal.time = date!!
+        cal.time = date
         return cal
+    }
+
+
+    /**
+     * used for getting the milliseconds of the first day and the last day of any month
+     *
+     * @param timeInMillis
+     * @return Pair(firstDayMilliseconds, lastDayMilliseconds)
+     */
+
+    fun getMillisecondsOfStartAndEndDayOfMonth(
+        timeInMillis: Long
+    ): Pair<Long, Long> {
+
+        Log.d(TAG, "getMillisecondsOfStartAndEndDayOfMonth: Given time : $timeInMillis")
+
+        val month = convertMillisecondsToDateAndTimePattern(timeInMillis, "MM")?.toInt()
+        val year = convertMillisecondsToDateAndTimePattern(timeInMillis, "yyyy")?.toInt()
+
+        Log.d(TAG, "getMillisecondsOfStartAndEndDayOfMonth: Month : $month")
+        Log.d(TAG, "getMillisecondsOfStartAndEndDayOfMonth: Year : $year")
+
+        val firstDayCal = Calendar.getInstance()
+        val lastDayCal = Calendar.getInstance()
+
+        if (year != null && month != null) {
+
+            firstDayCal.set(year, month - 1, 1)
+
+            val dayInMonth = firstDayCal.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+            Log.d(TAG, "getMillisecondsOfStartAndEndDayOfMonth: Day In month : $dayInMonth")
+
+            lastDayCal.set(year, month - 1, dayInMonth)
+
+            Log.d(
+                TAG,
+                "getMillisecondsOfStartAndEndDayOfMonth: firstDate : ${
+                    convertMillisecondsToDateAndTimePattern(
+                        firstDayCal.timeInMillis
+                    )
+                }"
+            )
+            Log.d(
+                TAG,
+                "getMillisecondsOfStartAndEndDayOfMonth: lastDate : ${
+                    convertMillisecondsToDateAndTimePattern(
+                        lastDayCal.timeInMillis
+                    )
+                }"
+            )
+
+            Log.d(
+                TAG,
+                "getMillisecondsOfStartAndEndDayOfMonth: Pair : " + firstDayCal.timeInMillis + ", ${lastDayCal.timeInMillis}"
+            )
+
+            return Pair(firstDayCal.timeInMillis, lastDayCal.timeInMillis)
+        }
+
+        return Pair(timeInMillis, timeInMillis);
+    }
+
+    fun getMillisecondsOfStartAndEndOfWeek(
+        timeInMillis: Long
+    ): Pair<Long, Long> {
+
+        val firstCal = convertMillisecondsToCalendarInstance(timeInMillis)
+
+        val dayOfWeek = firstCal.get(Calendar.DAY_OF_WEEK)
+
+        Log.d(
+            TAG,
+            "getMillisecondsOfStartAndEndOfWeek: Day : ${firstCal.get(Calendar.DAY_OF_WEEK)}"
+        )
+
+        val lastCal = convertMillisecondsToCalendarInstance(timeInMillis)
+
+        when (dayOfWeek) {
+            1 -> {
+
+                // sunday
+                firstCal.add(Calendar.DATE, -6) // till monday
+            }
+
+            2 -> {
+
+                // monday
+                lastCal.add(Calendar.DATE, 6) // till sunday
+            }
+
+            3 -> {
+
+                //tuesday
+
+                firstCal.add(Calendar.DATE, -1) // monday
+                lastCal.add(Calendar.DATE, 5) // sunday
+            }
+
+            4 -> {
+                // wednesday
+                firstCal.add(Calendar.DATE, -2) // monday
+                lastCal.add(Calendar.DATE, 4) // sunday
+
+            }
+
+            5 -> {
+
+                // thursday
+                firstCal.add(Calendar.DATE, -3) // monday
+                lastCal.add(Calendar.DATE, 3) // sunday
+
+            }
+
+            6 -> {
+
+                // friday
+                firstCal.add(Calendar.DATE, -4) // monday
+                lastCal.add(Calendar.DATE, 2) // sunday
+            }
+
+            7 -> {
+
+                // saturday
+                firstCal.add(Calendar.DATE, -5) // monday
+                lastCal.add(Calendar.DATE, 1) // sunday
+
+            }
+
+            else -> {
+            }
+        }
+
+        Log.d(
+            TAG, "getMillisecondsOfStartAndEndOfWeek: firstDate : ${
+                convertMillisecondsToDateAndTimePattern(
+                    firstCal.timeInMillis
+                )
+            }"
+        )
+
+        Log.d(
+            TAG, "getMillisecondsOfStartAndEndOfWeek: lastDate : ${
+                convertMillisecondsToDateAndTimePattern(
+                    lastCal.timeInMillis
+                )
+            }"
+        )
+
+        Log.d(
+            TAG,
+            "getMillisecondsOfStartAndEndOfWeek: Pair : ${firstCal.timeInMillis}, ${lastCal.timeInMillis}"
+        )
+
+
+        return Pair(firstCal.timeInMillis, lastCal.timeInMillis);
     }
 
 }

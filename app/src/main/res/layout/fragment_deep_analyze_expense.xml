@@ -16,13 +16,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-            app:menu="@menu/deep_analyze_expense_menu"
-            app:title="Analyze Expense" />
+            android:layout_height="match_parent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/deep_analyze_expense_menu_btn"
+                app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+                app:title="Analyze Expense" />
+
+            <ImageButton
+                android:id="@+id/deep_analyze_expense_menu_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:backgroundTint="@color/white"
+                android:contentDescription="@string/menubtn"
+                app:srcCompat="@drawable/ic_baseline_date_range_24" />
+
+
+        </RelativeLayout>
+
 
     </com.google.android.material.appbar.AppBarLayout>
 

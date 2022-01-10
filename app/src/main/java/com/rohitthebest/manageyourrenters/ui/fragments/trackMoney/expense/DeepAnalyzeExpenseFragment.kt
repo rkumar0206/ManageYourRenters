@@ -64,6 +64,8 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDeepAnalyzeExpenseBinding.bind(view)
 
+        binding.toolbar.subtitle = getString(R.string.all_time)
+
         deepAnalyzeExpenseCategoryAdapter = DeepAnalyzeExpenseCategoryAdapter()
 
         setUpPieChart()
@@ -105,19 +107,10 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
             }
         }
 
-        binding.toolbar.menu.findItem(R.id.menu_select_range_deep_analyze_expense)
-            .setOnMenuItemClickListener {
+        binding.deepAnalyzeExpenseMenuBtn
+            .setOnClickListener {
 
                 handleDateRangeMenu()
-
-                true
-            }
-
-        binding.toolbar.menu.findItem(R.id.menu_clear_date_range_deep_analyze_expense)
-            .setOnMenuItemClickListener {
-
-                clearDateRange()
-                true
             }
 
         binding.toolbar.setNavigationOnClickListener {
@@ -127,73 +120,116 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
         }
     }
 
-    // todo : complete this -
-    // todo : 1 : remove menu clear date range
-    // todo : 2 : rename the date range menu to select custom time
-    // todo : 3 : handle the click on menu
-
-    private fun clearDateRange() {
-
-        binding.toolbar.menu.findItem(R.id.menu_select_range_deep_analyze_expense)
-            .setIcon(R.drawable.ic_baseline_date_range_24)
-
-        isDateRangeSelected = false
-        binding.toolbar.subtitle = ""
-
-        initChartData()
-
-    }
 
     private fun handleDateRangeMenu() {
 
         Functions.showCustomDateRangeOptionMenu(
             requireActivity(),
-            binding.toolbar.menu.findItem(R.id.menu_select_range_deep_analyze_expense).actionView
+            binding.deepAnalyzeExpenseMenuBtn
         ) { selectedOption ->
 
             when (selectedOption) {
 
                 CustomDateRange.ALL_TIME -> {
 
-                    clearDateRange()
+                    isDateRangeSelected = false
+                    binding.toolbar.subtitle = getString(R.string.all_time)
+                    initChartData()
                 }
 
                 CustomDateRange.LAST_30_DAYS -> {
 
+                    isDateRangeSelected = true
+                    startDate = System.currentTimeMillis() - (30 * Constants.ONE_DAY_MILLISECONDS)
+                    endDate = System.currentTimeMillis()
 
+                    binding.toolbar.subtitle = getString(R.string.last_30_days)
+                    initChartData()
+                }
+
+                CustomDateRange.LAST_7_DAYS -> {
+
+                    isDateRangeSelected = true
+                    startDate = System.currentTimeMillis() - (7 * Constants.ONE_DAY_MILLISECONDS)
+                    endDate = System.currentTimeMillis()
+
+                    binding.toolbar.subtitle = getString(R.string.last_7_days)
+
+                    initChartData()
+                }
+
+                CustomDateRange.LAST_365_DAYS -> {
+
+                    isDateRangeSelected = true
+                    startDate = System.currentTimeMillis() - (365 * Constants.ONE_DAY_MILLISECONDS)
+                    endDate = System.currentTimeMillis()
+
+                    binding.toolbar.subtitle = getString(R.string.last_365_days)
+
+                    initChartData()
+                }
+
+                CustomDateRange.CUSTOM_DATE_RANGE -> {
+
+                    Functions.showDateRangePickerDialog(
+                        startDate,
+                        endDate,
+                        {
+                            requireActivity().supportFragmentManager
+                        },
+                        { date ->
+
+                            startDate = date.first
+                            endDate = date.second
+
+                            isDateRangeSelected = true
+
+                            binding.toolbar.subtitle =
+                                "${
+                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                        startDate
+                                    )
+                                } - " +
+                                        "${
+                                            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                                endDate
+                                            )
+                                        }"
+
+
+                            initChartData()
+                        }
+                    )
+
+                }
+
+                else -> {
+
+                    isDateRangeSelected = true
+
+                    val pair = Functions.getMillisecondsOfStartAndEndUsingConstants(
+                        selectedOption
+                    )
+
+                    startDate = pair.first
+                    endDate = pair.second
+
+                    when (selectedOption) {
+
+                        CustomDateRange.THIS_MONTH -> binding.toolbar.subtitle =
+                            getString(R.string.this_month)
+                        CustomDateRange.THIS_WEEK -> binding.toolbar.subtitle =
+                            getString(R.string.this_week)
+                        CustomDateRange.PREVIOUS_MONTH -> binding.toolbar.subtitle =
+                            getString(R.string.previous_month)
+                        CustomDateRange.PREVIOUS_WEEK -> binding.toolbar.subtitle =
+                            getString(R.string.previous_week)
+                        else -> {}
+                    }
+                    initChartData()
                 }
             }
         }
-
-        Functions.showDateRangePickerDialog(
-            startDate,
-            endDate,
-            {
-                requireActivity().supportFragmentManager
-            },
-            { date ->
-
-                binding.toolbar.menu.findItem(R.id.menu_select_range_deep_analyze_expense)
-                    .setIcon(R.drawable.ic_baseline_date_range_24_coloured)
-
-                startDate = date.first
-                endDate = date.second
-
-                isDateRangeSelected = true
-
-                binding.toolbar.subtitle =
-                    "${WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(startDate)} - " +
-                            "${
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                    endDate
-                                )
-                            }"
-
-                initChartData()
-
-            }
-        )
-
     }
 
     private fun hideExpenseCategoryRVBySlidingUp() {

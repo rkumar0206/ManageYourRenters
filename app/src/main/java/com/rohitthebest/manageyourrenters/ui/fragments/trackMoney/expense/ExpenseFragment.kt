@@ -254,8 +254,6 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         expenseCategoryViewModel.getExpenseCategoryByKey(expense.categoryKey)
             .observe(viewLifecycleOwner, { expenseCategory ->
 
-                Log.d("WorkingWithDateAndTime", "onItemClick: ${expense.created}")
-
                 val msg =
                     "\nDate : ${
                         WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(

@@ -33,6 +33,9 @@ interface PaymentDao {
     @Query("SELECT * FROM payment_table WHERE renterKey =:renterKey ORDER BY timeStamp DESC")
     fun getAllPaymentsListOfRenter(renterKey: String): LiveData<List<Payment>>
 
+    @Query("SELECT * FROM payment_table WHERE `key` =:paymentKey")
+    fun getPaymentByPaymentKey(paymentKey: String): Flow<Payment>
+
     @Query("SELECT COUNT(id) FROM payment_table WHERE renterKey =:renterKey")
     fun getCountOfPaymentsOfRenter(renterKey: String): LiveData<Int>
 

@@ -5,16 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.bottomsheets.BottomSheet
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowPaymentAdapter
@@ -248,218 +243,12 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         //showToast(requireContext(), payment.id.toString())
 
-        MaterialDialog(requireContext(), BottomSheet())
-            .show {
+        val action = PaymentFragmentDirections.actionPaymentFragmentToRenterBillFragment(
+            paymentKey = payment.key
+        )
 
-                title(text = "BILL")
+        findNavController().navigate(action)
 
-                customView(
-                    R.layout.show_bill_layout,
-                    scrollable = true,
-                    noVerticalPadding = true
-                )
-
-                initializeValuesToBill(getCustomView(), payment)
-            }
-    }
-
-    private fun initializeValuesToBill(customView: View, payment: Payment) {
-
-        setRenterInfo(customView)
-
-        setBillingParameters(customView, payment)
-
-        setElectricFields(customView, payment)
-
-        setDuesOrAdvanceOdLastPayment(customView, payment)
-
-        setExtraFields(customView, payment)
-
-        setDuesOrAdvance(customView, payment)
-
-        setTotalRent(customView, payment)
-    }
-
-    //[Start of setting fields in bills textViews]
-
-    private fun setRenterInfo(customView: View) {
-
-        //renter info
-        customView.findViewById<TextView>(R.id.showBill_renterName).text = receivedRenter?.name
-        customView.findViewById<TextView>(R.id.showBill_renterMobile).text =
-            receivedRenter?.mobileNumber
-        customView.findViewById<TextView>(R.id.showBill_renterAddress).text =
-            receivedRenter?.address
-
-    }
-
-    private fun setBillingParameters(customView: View, payment: Payment) {
-
-        //billing parameter
-        customView.findViewById<TextView>(R.id.showBill_billDate)
-            .setDateInTextView(payment.timeStamp)
-        customView.findViewById<TextView>(R.id.showBill_billTime)
-            .setDateInTextView(payment.timeStamp, "hh:mm a")
-        customView.findViewById<TextView>(R.id.showBill_billPeriod).text =
-            if (payment.bill?.billPeriodType == getString(R.string.by_month)) {
-
-                "${payment.bill!!.billMonth}, ${
-                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                        payment.timeStamp,
-                        "yyyy"
-                    )
-                }"
-            } else {
-
-                "${WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(payment.bill?.billDateFrom)}" +
-                        " to ${
-                            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                payment.bill?.billDateTill
-                            )
-                        }"
-            }
-    }
-
-    private fun setElectricFields(customView: View, payment: Payment) {
-
-        //electricity
-        customView.findViewById<TextView>(R.id.showBill_previousReading).text =
-            "${String.format("%.2f", payment.electricBill?.previousReading)} unit(s)"
-        customView.findViewById<TextView>(R.id.showBill_currentReading).text =
-            "${String.format("%.2f", payment.electricBill?.currentReading)} unit(s)"
-        customView.findViewById<TextView>(R.id.showBill_rate).text =
-            "${String.format("%.2f", payment.electricBill?.rate)} per/unit"
-        customView.findViewById<TextView>(R.id.showBill_difference).text =
-            "${String.format("%.2f", payment.electricBill?.differenceInReading)} unit(s)"
-        customView.findViewById<TextView>(R.id.showBill_electricity_total).text =
-            "${payment.bill?.currencySymbol} ${payment.electricBill?.totalElectricBill}"
-
-    }
-
-    private fun setExtraFields(customView: View, payment: Payment) {
-
-        //Extra
-        customView.findViewById<TextView>(R.id.showBill_extraFieldName).text =
-            if (payment.extraFieldName == "") {
-
-                "Extra"
-            } else {
-                payment.extraFieldName
-            }
-
-        customView.findViewById<TextView>(R.id.showBill_extraFieldAmount).text =
-            if (payment.extraAmount == "") {
-
-                "${payment.bill?.currencySymbol} 0.0"
-            } else {
-
-                "${payment.bill?.currencySymbol} ${payment.extraAmount}"
-            }
-    }
-
-    private fun setDuesOrAdvanceOdLastPayment(customView: View, payment: Payment) {
-
-        val dueOfLastPayment = getDuesOfLastPayment(payment)
-
-        when {
-
-            dueOfLastPayment > 0.0 -> {
-
-                //due
-                customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
-                    "${payment.bill?.currencySymbol} $dueOfLastPayment"
-
-                customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
-                    "${payment.bill?.currencySymbol} 0.0"
-
-            }
-
-            dueOfLastPayment < 0.0 -> {
-
-                //advance
-                customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
-                    "${payment.bill?.currencySymbol} 0.0"
-
-                customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
-                    "${payment.bill?.currencySymbol} $dueOfLastPayment"
-            }
-
-            else -> {
-                customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
-                    "${payment.bill?.currencySymbol} 0.0"
-
-                customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
-                    "${payment.bill?.currencySymbol} 0.0"
-            }
-        }
-    }
-
-    private fun setDuesOrAdvance(customView: View, payment: Payment) {
-
-        val dueOrAdvance = payment.amountPaid?.toDouble()?.minus(payment.totalRent.toDouble())!!
-
-        customView.findViewById<TextView>(R.id.showBill_dueAmount).text =
-
-            when {
-
-                dueOrAdvance < 0.0 -> {
-
-                    //due
-                    "${payment.bill?.currencySymbol} ${String.format("%.2f", abs(dueOrAdvance))}"
-                }
-
-                dueOrAdvance > 0.0 -> {
-
-                    customView.findViewById<TextView>(R.id.show_billDueOrArrearTV).text =
-                        "Paid in advance"
-                    "${payment.bill?.currencySymbol} ${String.format("%.2f", dueOrAdvance)}"
-                }
-                else -> {
-
-                    "${payment.bill?.currencySymbol} 0.0"
-                }
-            }
-
-    }
-
-    private fun setTotalRent(customView: View, payment: Payment) {
-
-        //total rent
-        customView.findViewById<TextView>(R.id.showBill_houseRent).text =
-            "${payment.bill?.currencySymbol} ${payment.houseRent}"
-
-        customView.findViewById<TextView>(R.id.showBill_parking).text =
-            "${payment.bill?.currencySymbol} ${payment.parkingRent}"
-
-        customView.findViewById<TextView>(R.id.showBill_electricity).text =
-            "${payment.bill?.currencySymbol} ${payment.electricBill?.totalElectricBill}"
-
-        customView.findViewById<TextView>(R.id.showBill_AmountPaid).text =
-            "${payment.bill?.currencySymbol} ${payment.amountPaid}"
-
-        customView.findViewById<TextView>(R.id.showBill_netDemand).text =
-            "${payment.bill?.currencySymbol} ${payment.totalRent}"
-    }
-
-    //[END of setting fields in bills textViews]
-
-    private fun getDuesOfLastPayment(payment: Payment): Double {
-
-        val houseRent = payment.houseRent.toDouble()
-        val parking = if (payment.isTakingParkingBill == getString(R.string.t))
-            payment.parkingRent?.toDouble()!!
-        else
-            0.0
-        val electricBill = if (payment.electricBill?.isTakingElectricBill == getString(R.string.t))
-            payment.electricBill?.totalElectricBill?.toDouble()!!
-        else
-            0.0
-        val extra = if (payment.extraAmount != "")
-            payment.extraAmount?.toDouble()!!
-        else
-            0.0
-
-        return payment.totalRent.toDouble() - (houseRent + parking + electricBill + extra)
     }
 
     override fun onSyncClicked(payment: Payment) {

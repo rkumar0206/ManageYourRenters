@@ -61,6 +61,9 @@ class PaymentViewModel @Inject constructor(
 
     fun getSumOfDueOrAdvance(renterKey: String) = repository.getSumOfDueOrAdvance(renterKey)
 
+    fun getPaymentByPaymentKey(paymentKey: String) =
+        repository.getPaymentByPaymentKey(paymentKey).asLiveData()
+
     fun getLastRenterPayment(renterKey: String) =
         repository.getLastRenterPayment(renterKey).asLiveData()
 }

@@ -52,20 +52,37 @@
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/fade_out"
-            />
+            app:popExitAnim="@anim/fade_out" />
+        <argument
+            android:name="renterInfoMessage"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_paymentFragment_to_renterBillFragment"
+            app:destination="@id/renterBillFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/addPaymentFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.addContentFragments.AddPaymentFragment"
+        android:label="fragment_add_payment"
+        tools:layout="@layout/fragment_add_payment">
         <argument
             android:name="renterInfoMessage"
             app:argType="string"
             app:nullable="true" />
     </fragment>
     <fragment
-        android:id="@+id/addPaymentFragment"
-        android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.addContentFragments.AddPaymentFragment"
-        android:label="fragment_add_payment"
-        tools:layout="@layout/fragment_add_payment" >
+        android:id="@+id/renterBillFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.RenterBillFragment"
+        android:label="RenterBillFragment"
+        tools:layout="@layout/fragment_renter_bill">
         <argument
-            android:name="renterInfoMessage"
+            android:name="payment_key"
             app:argType="string"
             app:nullable="true" />
     </fragment>

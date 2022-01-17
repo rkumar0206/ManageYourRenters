@@ -19,19 +19,16 @@ import com.anychart.charts.Cartesian
 import com.anychart.charts.Pie
 import com.anychart.enums.Align
 import com.anychart.enums.LegendLayout
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.databinding.FragmentGraphBinding
 import com.rohitthebest.manageyourrenters.others.Constants.ONE_DAY_MILLISECONDS
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
-import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBitmapToCacheDirectoryAndShare
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
-import com.rohitthebest.manageyourrenters.utils.hide
-import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -51,22 +48,8 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
     private lateinit var pie: Pie
     private lateinit var cartesian: Cartesian
 
-    private val SELECTED_DATE_RANGE_KEY = "custom_date_range_key"
     private var isAllTimeSelected = false
-    private var selectedCustomDateRange: CustomDateRange = CustomDateRange.ALL_TIME
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        if (savedInstanceState != null) {
-
-            Log.d(TAG, "onCreate: ${savedInstanceState.getString(SELECTED_DATE_RANGE_KEY)}")
-
-            val dateRange = savedInstanceState.getString(SELECTED_DATE_RANGE_KEY)
-            val type = object : TypeToken<CustomDateRange>() {}.type
-            selectedCustomDateRange = Gson().fromJson(dateRange, type)
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -76,10 +59,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         changeSelectionUI()
         setUpPieChart()
 
-        Log.d(TAG, "onViewCreated: selected custom : $selectedCustomDateRange")
-
-        //getExpenseCategoryExpensesByAllTime()
-        handleDateRangeSelectionMenu(selectedCustomDateRange)
+        handleDateRangeSelectionMenu(CustomDateRange.ALL_TIME)
         initListeners()
     }
 
@@ -189,6 +169,37 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             true
         }
 
+        binding.toolbar.menu.findItem(R.id.menu_share_expense_graph_sc).setOnMenuItemClickListener {
+
+            binding.toolbar.hide()
+
+            val bitmap = binding.root.loadBitmap()
+
+            binding.toolbar.show()
+
+            lifecycleScope.launch {
+
+                saveBitmapToCacheDirectoryAndShare(requireActivity(), bitmap)
+            }
+
+            true
+        }
+
+        binding.toolbar.menu.findItem(R.id.menu_save_expense_graph_sc).setOnMenuItemClickListener {
+
+            binding.toolbar.hide()
+
+            val bitmap = binding.root.loadBitmap()
+
+            binding.toolbar.show()
+
+            bitmap.saveToStorage(requireContext(), "${getUid()}_expense_graph")
+
+            showToast(requireContext(), "Screenshot saved to phone storage")
+
+            true
+        }
+
         binding.dateRangeMenuBtn.setOnClickListener { view ->
 
             showMenuForSelectingCustomTime(view)
@@ -208,20 +219,26 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             view
         ) { selectedMenu ->
 
-            selectedCustomDateRange = selectedMenu
 
-            handleDateRangeSelectionMenu(selectedCustomDateRange)
+            handleDateRangeSelectionMenu(selectedMenu)
 
         }
     }
 
     private fun handleDateRangeSelectionMenu(selectedMenu: CustomDateRange) {
 
+        Log.d(TAG, "handleDateRangeSelectionMenu: selectedMenu -> $selectedMenu")
+
         when (selectedMenu) {
 
             CustomDateRange.ALL_TIME -> {
 
                 if (!isAllTimeSelected) {
+
+                    Log.d(
+                        TAG,
+                        "handleDateRangeSelectionMenu: all time selected : $isAllTimeSelected"
+                    )
 
                     isAllTimeSelected = true
 
@@ -290,6 +307,8 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             }
 
             else -> {
+
+                Log.d(TAG, "date range: selectedMenu -> $selectedMenu")
 
                 isAllTimeSelected = false
 
@@ -491,12 +510,6 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                     }
                 })
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-
-        outState.putString(SELECTED_DATE_RANGE_KEY, Gson().toJson(selectedCustomDateRange))
-        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroyView() {

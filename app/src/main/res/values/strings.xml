@@ -215,6 +215,8 @@
     <string name="previous_week">Previous week</string>
     <string name="share">Share</string>
     <string name="save">Save</string>
+    <string name="share_screenshot">Share screenshot</string>
+    <string name="save_screenshot">Save screenshot</string>
 
 
     <string-array name="interest_time_schedule">

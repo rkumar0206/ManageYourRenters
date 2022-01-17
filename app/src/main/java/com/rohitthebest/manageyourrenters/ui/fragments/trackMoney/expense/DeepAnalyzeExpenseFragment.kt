@@ -58,7 +58,6 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
     private var isExpenseCategoryRVVisible = true
 
     private var isDateRangeSelected = false
-    private var isBackButtonPressed = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -115,7 +114,6 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
         binding.toolbar.setNavigationOnClickListener {
 
-            isBackButtonPressed = true
             requireActivity().onBackPressed()
         }
     }
@@ -598,18 +596,6 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.teal_200))
 
     }
-
-    override fun onPause() {
-        super.onPause()
-
-        Log.d(TAG, "onPause: ")
-
-        if (!isBackButtonPressed) {
-
-            requireActivity().onBackPressed()
-        }
-    }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

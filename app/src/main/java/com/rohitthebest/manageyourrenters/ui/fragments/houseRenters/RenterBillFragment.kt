@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Payment
 import com.rohitthebest.manageyourrenters.database.model.Renter
@@ -12,11 +13,12 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentRenterBillBinding
 import com.rohitthebest.manageyourrenters.databinding.ShowBillLayoutBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
+import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBitmapToCacheDirectoryAndShare
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showMobileNumberOptionMenu
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
-import com.rohitthebest.manageyourrenters.utils.isValid
-import com.rohitthebest.manageyourrenters.utils.setDateInTextView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 @AndroidEntryPoint
@@ -46,11 +48,60 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         getMessage()
 
+        intiListeners()
+
+    }
+
+    private fun intiListeners() {
+
         binding.toolbar.setNavigationOnClickListener {
 
             requireActivity().onBackPressed()
         }
 
+
+        binding.toolbar.menu.findItem(R.id.menu_share_bill).setOnMenuItemClickListener {
+
+            val bitmap = includeBinding.root.loadBitmap()
+
+            lifecycleScope.launch {
+
+                saveBitmapToCacheDirectoryAndShare(requireActivity(), bitmap)
+
+            }
+
+            true
+        }
+
+        binding.toolbar.menu.findItem(R.id.menu_save_bill).setOnMenuItemClickListener {
+
+            val bitmap = includeBinding.root.loadBitmap()
+
+            val fileName =
+                if (receivedPayment.bill?.billPeriodType == getString(R.string.by_month)) {
+
+                    "${receivedRenter.name}_${receivedPayment.bill?.billMonth}"
+                } else {
+
+                    "${receivedRenter.name}_" + "${
+                        workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            receivedPayment.bill?.billDateFrom
+                        )
+                    }" +
+                            "_to_${
+                                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                    receivedPayment.bill?.billDateTill
+                                )
+                            }"
+
+                }
+
+            bitmap.saveToStorage(requireContext(), fileName)
+
+            showToast(requireContext(), "Payment saved to phone storage.")
+
+            true
+        }
     }
 
     private fun getMessage() {
@@ -102,6 +153,14 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
                 binding.toolbar.title = "${renter.name} - payment"
 
+                includeBinding.showBillRenterMobile.setOnClickListener {
+
+                    showMobileNumberOptionMenu(
+                        requireActivity(),
+                        includeBinding.showBillRenterMobile,
+                        receivedRenter.mobileNumber
+                    )
+                }
                 initializeValuesToBill()
             })
     }
@@ -144,12 +203,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
         includeBinding.showBillBillPeriod.text =
             if (receivedPayment.bill?.billPeriodType == getString(R.string.by_month)) {
 
-                "${receivedPayment.bill!!.billMonth}, ${
-                    workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                        receivedPayment.timeStamp,
-                        "yyyy"
-                    )
-                }"
+                "${receivedPayment.bill!!.billMonth}, ${receivedPayment.bill!!.billYear}"
             } else {
 
                 "${workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(receivedPayment.bill?.billDateFrom)}" +

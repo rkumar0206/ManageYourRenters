@@ -60,7 +60,7 @@
     <string name="address_n_n">Address : </string>
     <string name="e_mail_id_">Email-Id : </string>
     <string name="billing_parameter">Billing Parameters</string>
-    <string name="bill_date_and_time">Bill date and time : </string>
+    <string name="payment_date_and_time">Payment date/time : </string>
     <string name="period_">Period : </string>
     <string name="electricity">Electricity</string>
     <string name="previous_reading_">Previous Reading : </string>
@@ -213,6 +213,8 @@
     <string name="this_week">This week</string>
     <string name="previous_month">Previous month</string>
     <string name="previous_week">Previous week</string>
+    <string name="share">Share</string>
+    <string name="save">Save</string>
 
 
     <string-array name="interest_time_schedule">

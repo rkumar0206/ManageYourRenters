@@ -53,4 +53,6 @@ object Constants {
     const val SHORTCUT_FRAGMENT_NAME_KEY = "sdcjnsknkanckbajcbabacjk"
 
     const val ONE_DAY_MILLISECONDS = 86400000L
+
+    const val FILE_PROVIDER_AUTHORITY = "com.rohitthebest.manageyourrenters.provider"
 }

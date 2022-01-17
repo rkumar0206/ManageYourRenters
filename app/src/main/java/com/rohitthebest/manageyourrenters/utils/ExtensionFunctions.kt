@@ -1,9 +1,15 @@
 package com.rohitthebest.manageyourrenters.utils
 
 import android.content.ContentResolver
+import android.content.ContentValues
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.SpannableStringBuilder
@@ -19,6 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.rohitthebest.manageyourrenters.R
+import java.io.ByteArrayOutputStream
 
 fun View.show() {
 
@@ -258,4 +265,71 @@ inline fun Spinner.setCurrencySymbol(
         }
 
     }
+}
+
+fun View.loadBitmap(): Bitmap {
+
+    val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+        Bitmap.createBitmap(this.width, this.height, Bitmap.Config.RGBA_F16)
+
+    } else {
+
+        Bitmap.createBitmap(this.width, this.height, Bitmap.Config.ARGB_8888)
+    }
+    val canvas = Canvas(bitmap)
+
+    this.draw(canvas)
+
+    return bitmap
+}
+
+fun Bitmap.saveToStorage(context: Context, fileName: String): Uri? {
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
+        val resolver = context.contentResolver
+
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, "$fileName.jpeg")
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            put(
+                MediaStore.MediaColumns.RELATIVE_PATH,
+                "${Environment.DIRECTORY_PICTURES}/ManageYourRenters"
+            )
+        }
+
+        val uri = resolver?.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+        uri?.let {
+            resolver.openOutputStream(it).use { fout ->
+
+                try {
+
+                    this.compress(Bitmap.CompressFormat.JPEG, 100, fout)
+                    fout?.close()
+
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        return uri
+
+    } else {
+
+        val bytes = ByteArrayOutputStream()
+        this.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+
+        val path = MediaStore.Images.Media.insertImage(
+            context.contentResolver,
+            this,
+            fileName,
+            null
+        )
+
+        return Uri.parse(path)
+    }
+
 }

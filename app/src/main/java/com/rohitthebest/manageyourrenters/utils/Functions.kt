@@ -8,6 +8,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -18,6 +19,7 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -35,11 +37,15 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.util.*
 import kotlin.random.Random
 
@@ -792,6 +798,60 @@ class Functions {
             }
 
             return Color.HSVToColor(30, floatArrayOf(h, s, v))
+        }
+
+        suspend fun saveBitmapToCacheDirectoryAndShare(activity: Activity, bitmap: Bitmap?) {
+
+            withContext(Dispatchers.IO) {
+                try {
+
+                    val cachePath = File(activity.cacheDir, "images")
+                    cachePath.mkdirs()
+                    val fos =
+                        FileOutputStream("$cachePath/image.png") //overwrites the image everytime
+                    bitmap?.compress(Bitmap.CompressFormat.PNG, 100, fos)
+                    fos.close()
+
+                    //sharing the image
+                    shareCachedImage(activity)
+
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+
+            }
+
+        }
+
+        private fun shareCachedImage(activity: Activity) {
+
+            val imagePath = File(activity.cacheDir, "images")
+            val newFile = File(imagePath, "image.png")
+
+            val contentUri = FileProvider.getUriForFile(
+                activity,
+                Constants.FILE_PROVIDER_AUTHORITY,
+                newFile
+            )
+
+            if (contentUri != null) {
+
+                shareUri(
+                    activity,
+                    contentUri
+                )
+            }
+        }
+
+        fun shareUri(activity: Activity, contentUri: Uri) {
+
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // temp permission for receiving app to read this file
+            shareIntent.setDataAndType(contentUri, activity.contentResolver.getType(contentUri))
+            shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
+            activity.startActivity(Intent.createChooser(shareIntent, "Share Via"))
+
         }
 
     }

@@ -59,6 +59,19 @@
         <meta-data
             android:name="io.sentry.dsn"
             android:value="https://d4027b3e1bca445192c0e2011c07ea31@o453884.ingest.sentry.io/5502470" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.rohitthebest.manageyourrenters.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+
+        </provider>
+
     </application>
 
 </manifest>

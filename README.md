@@ -1,10 +1,14 @@
-# ManageYourRenters
+# ManageYourRenters - [Click for latest release](https://github.com/rkumar0206/ManageYourRenters/releases/tag/2.6.0)
 
-This app helps you to keep track of your renters. It makes your life easier by: 
+## Key Features 👇
+
+This is an all in one app for everything related to managing your money. It makes your life easier by: 
 - doing calculations
 - eliminating paper work
-- tracking payments
-- automate
+- automation
+- backup
+- cloud support
+- much more...
 
 This app include several categories like : 
 - [House Renters](#house-renters)
@@ -23,7 +27,7 @@ Using this category you can add renters of your apartment with various details l
 - room number
 - address
 
-After adding a renter, you can track his payments. 
+After adding a renter, you can track his/her payments. 
 
 For adding the payment of a renter you just need to:
 
@@ -58,10 +62,10 @@ In this category you can keep track of the borrowers (the person to whom you hav
 ## Track Money
  
  In this category you can track your money based on other sub categories like :
- * Expense
- * EMI
+ * [Expenses](#expenses)
+ * EMIs
  * Monthly Payments
- * Loan
+ * Loans
  * Contracts / Deals
 
 ### Expenses
@@ -69,5 +73,5 @@ In this category you can keep track of the borrowers (the person to whom you hav
 As the name suggests here you can add your daily expenses and keep track of it.
 - First you need to add a category with a beautiful image using unsplash.
 - Then inside this category you can add your expenses related to this category.
-- You can also analyze ypur expenses using the graph.
+- You can also track your expenses using the graph.
 - You can compare the expeses based on categories.

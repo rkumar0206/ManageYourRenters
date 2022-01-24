@@ -11,11 +11,13 @@ import androidx.core.app.NotificationCompat
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
+import com.rohitthebest.manageyourrenters.repositories.api.ExpenseCategoryRepositoryAPI
 import com.rohitthebest.manageyourrenters.repositories.api.ExpenseRepositoryAPI
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.fromStringToExpense
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,13 +36,19 @@ class ExpenseService : Service() {
     lateinit var expenseRepositoryAPI: ExpenseRepositoryAPI
 
     @Inject
+    lateinit var expenseCategoryRepositoryAPI: ExpenseCategoryRepositoryAPI
+
+    @Inject
     lateinit var expenseRepository: ExpenseRepository
+
+    @Inject
+    lateinit var expenseCategoryRepository: ExpenseCategoryRepository
 
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         val requestMethod = intent?.getStringExtra(Constants.REQUEST_METHOD_KEY)
-        val expenseString = intent?.getStringExtra(Constants.EXPENSE_KEY)
+        val expenseKey = intent?.getStringExtra(Constants.EXPENSE_KEY)
 
         val pendingIntent: PendingIntent =
             Intent(this, HomeActivity::class.java).let { notificationIntent ->
@@ -54,136 +62,201 @@ class ExpenseService : Service() {
             Constants.NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(image)
             .setContentIntent(pendingIntent)
-            .setContentTitle("Expense")
+            .setContentTitle(
+                when (requestMethod) {
+                    getString(R.string.post) -> "Saving to cloud"
+                    getString(R.string.put) -> "Updating on cloud"
+                    getString(R.string.delete_one) -> "Deleting from cloud"
+                    else -> "Expense"
+                }
+            )
             .setProgress(100, 0, true)
             .build()
 
         startForeground(Random.nextInt(1001, 8999), notification)
 
-        val expense = fromStringToExpense(expenseString!!)
+        CoroutineScope(Dispatchers.IO).launch {
 
+            val expense = expenseRepository.getExpenseByKey(expenseKey!!).first()
 
-        when (requestMethod) {
+            when (requestMethod) {
 
-            getString(R.string.post) -> {
+                getString(R.string.post) -> {
 
-                CoroutineScope(Dispatchers.IO).launch {
+                    try {
 
-                    val response = expenseRepositoryAPI.addExpenseByCategoryKey(
-                        expense.uid, expense.categoryKey, expense
-                    )
+                        val expenseCategory =
+                            expenseCategoryRepository.getExpenseCategoryByKey(expense.categoryKey)
+                                .first()
 
-                    if (response.isSuccessful && (response.code() == 201 || response.code() == 200)) {
+                        // check if the expense category is synced with cloud database, if not, sync it first
 
-                        Log.i(
-                            TAG,
-                            "onStartCommand: expense category successfully added with key ${expense.key}"
-                        )
+                        if (!expenseCategory.isSynced) {
 
-                        Log.i(TAG, "onStartCommand: ${response.body()}")
+                            val catResponse = expenseCategoryRepositoryAPI.addExpenseCategory(
+                                expenseCategory.uid,
+                                expenseCategory
+                            )
 
-                        updateExpenseSyncValueInLocalDatabase(expense, true)
-                        stopSelf()
-                    } else {
+                            if (catResponse.isSuccessful && (catResponse.code() == 201 || catResponse.code() == 200)) {
 
-                        Log.i(
-                            TAG,
-                            "Error occurred"
-                        )
+                                expenseCategory.isSynced = true
+                                expenseCategoryRepository.updateExpenseCategory(expenseCategory)
 
-                        Log.i(TAG, "onStartCommand: ${response.body()}")
+                                postExpense(expense)
+                            } else {
 
-                        val expenseOriginal = expenseRepository.getExpenseByKey(expense.key).first()
+                                updateExpenseSyncValueInLocalDatabase(expense, false)
+                                stopSelf()
+                            }
+                        } else {
 
-                        expenseOriginal.isSynced = false
-                        expenseRepository.updateExpense(expenseOriginal)
+                            postExpense(expense)
+                        }
 
-                        delay(200)
+                    } catch (e: Exception) {
 
-                        //updateExpenseSyncValueInLocalDatabase(expense, false)
-                        stopSelf()
+                        e.printStackTrace()
                     }
 
                 }
 
-            }
+                getString(R.string.put) -> {
 
-            getString(R.string.put) -> {
+                    try {
 
-                CoroutineScope(Dispatchers.IO).launch {
+                        val expenseCategory =
+                            expenseCategoryRepository.getExpenseCategoryByKey(expense.categoryKey)
+                                .first()
 
-                    val response = expenseRepositoryAPI.updateExpenseByKey(
-                        expense.uid, expense.key, expense.categoryKey, expense
-                    )
+                        // check if the expense category is synced with cloud database, if not, sync it first
+                        if (!expenseCategory.isSynced) {
 
-                    if (response.isSuccessful && response.code() == 200) {
+                            val catResponse = expenseCategoryRepositoryAPI.addExpenseCategory(
+                                expenseCategory.uid,
+                                expenseCategory
+                            )
 
-                        Log.i(
-                            TAG,
-                            "onStartCommand: expense category successfully update with key ${expense.key}"
-                        )
+                            if (catResponse.isSuccessful && (catResponse.code() == 201 || catResponse.code() == 200)) {
 
-                        Log.i(TAG, "onStartCommand: ${response.body()}")
+                                expenseCategory.isSynced = true
+                                expenseCategoryRepository.updateExpenseCategory(expenseCategory)
 
-                        updateExpenseSyncValueInLocalDatabase(expense, true)
+                                putExpense(expense)
+                            } else {
 
-                        stopSelf()
+                                updateExpenseSyncValueInLocalDatabase(expense, false)
+                                stopSelf()
+                            }
+                        } else {
 
-                    } else {
+                            putExpense(expense)
+                        }
 
-                        Log.i(
-                            TAG,
-                            "Error occurred"
-                        )
+                    } catch (e: Exception) {
 
-                        Log.i(TAG, "onStartCommand: ${response.body()}")
-
-                        updateExpenseSyncValueInLocalDatabase(expense, false)
-                        stopSelf()
+                        e.printStackTrace()
                     }
                 }
 
-            }
+                getString(R.string.delete_one) -> {
 
-            getString(R.string.delete_one) -> {
+                    try {// [Note] : in delete method, the expense will not be initialized as it
+                        // will not be present in the local database anymore because it has been deleted
+                        // from the viewModel, and hence cannot be used inside this condition
 
-                CoroutineScope(Dispatchers.IO).launch {
-
-                    val response = expenseRepositoryAPI.deleteExpenseByKey(
-                        expense.uid, expense.key
-                    )
-
-                    if (response.isSuccessful && response.code() == 204) {
-
-                        Log.i(
-                            TAG,
-                            "onStartCommand: expense category successfully deleted with key ${expense.key}"
+                        val response = expenseRepositoryAPI.deleteExpenseByKey(
+                            getUid()!!, expenseKey
                         )
 
-                        stopSelf()
-                    } else {
+                        if (response.isSuccessful && response.code() == 204) {
 
-                        Log.i(
-                            TAG,
-                            "Error occurred"
-                        )
+                            Log.i(
+                                TAG,
+                                "onStartCommand: expense category successfully deleted with key $expenseKey"
+                            )
 
-                        Log.i(TAG, "onStartCommand: ${response.body()}")
+                            stopSelf()
+                        } else {
 
-                        showToast("Something went wrong!! Try again!", Toast.LENGTH_LONG)
+                            Log.i(TAG, "Error occurred")
 
-                        // when the expense is not deleted from cloud then insert the expense to the local database again
-                        expenseRepository.insertExpense(expense)
+                            showToast("Something went wrong!! Try again!", Toast.LENGTH_LONG)
 
+                            // when the expense is not deleted from cloud then insert the expense to the local database again
+                            val exp =
+                                expenseRepositoryAPI.getExpenseByKey(getUid()!!, expenseKey).body()
+
+                            //[Note] : this is not the appropriate way to do this, as when the exp
+                            // is null, then the expense will be deleted from the local database,
+                            // but it will never be deleted from the cloud database
+                            exp?.let { myExpense ->
+
+                                expenseRepository.insertExpense(myExpense)
+
+                            }
+
+                            delay(200)
+
+                            stopSelf()
+                        }
+                    } catch (e: Exception) {
+
+                        e.printStackTrace()
                         stopSelf()
                     }
-                }
 
+                }
             }
+
         }
 
-
         return START_NOT_STICKY
+    }
+
+    private suspend fun putExpense(expense: Expense) {
+
+        val response = expenseRepositoryAPI.updateExpenseByKey(
+            expense.uid, expense.key, expense.categoryKey, expense
+        )
+
+        if (response.isSuccessful && response.code() == 200) {
+
+            Log.i(TAG, "onStartCommand: ${response.body()}")
+
+            updateExpenseSyncValueInLocalDatabase(expense, true)
+
+        } else {
+
+            Log.i(TAG, "Error occurred")
+
+            updateExpenseSyncValueInLocalDatabase(expense, false)
+        }
+
+        stopSelf()
+    }
+
+    private suspend fun postExpense(expense: Expense) {
+
+        val response = expenseRepositoryAPI.addExpenseByCategoryKey(
+            expense.uid, expense.categoryKey, expense
+        )
+
+        if (response.isSuccessful && (response.code() == 201 || response.code() == 200)) {
+
+
+            Log.i(TAG, "onStartCommand: ${response.body()}")
+
+            updateExpenseSyncValueInLocalDatabase(expense, true)
+
+        } else {
+
+            Log.i(TAG, "Error occurred")
+
+            updateExpenseSyncValueInLocalDatabase(expense, false)
+        }
+
+        stopSelf()
     }
 
     private suspend fun updateExpenseSyncValueInLocalDatabase(

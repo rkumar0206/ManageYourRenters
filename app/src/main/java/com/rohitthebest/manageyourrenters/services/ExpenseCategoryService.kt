@@ -138,7 +138,8 @@ class ExpenseCategoryService : Service() {
                 //[DELETE]
                 getString(R.string.delete_one) -> {
 
-                    try {// [Note] : in delete method, the expenseCategory will not be initialized as it
+                    try {
+                        // [Note] : in delete method, the expenseCategory will not be initialized as it
                         // will not be present in the local database anymore because it has been deleted
                         // from the viewModel, and hence cannot be used inside this condition
 
@@ -192,6 +193,7 @@ class ExpenseCategoryService : Service() {
                     } catch (e: Exception) {
 
                         e.printStackTrace()
+                        stopSelf()
                     }
                 }
             }

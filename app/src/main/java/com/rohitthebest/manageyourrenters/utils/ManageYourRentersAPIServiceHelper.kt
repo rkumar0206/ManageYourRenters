@@ -3,7 +3,6 @@ package com.rohitthebest.manageyourrenters.utils
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_CATEGORY_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.REQUEST_METHOD_KEY
@@ -33,7 +32,7 @@ fun expenseCategoryServiceHelper(
 
 fun expenseServiceHelper(
     context: Context,
-    expense: Expense,
+    expenseKey: String,
     requestMethod: String
 ) {
 
@@ -46,7 +45,7 @@ fun expenseServiceHelper(
 
     foregroundService.putExtra(
         EXPENSE_KEY,
-        fromExpenseToString(expense)
+        expenseKey
     )
 
     ContextCompat.startForegroundService(context, foregroundService)

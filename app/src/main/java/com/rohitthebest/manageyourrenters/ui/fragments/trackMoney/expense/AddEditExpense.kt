@@ -261,10 +261,16 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
         if (!isMessageReceivedForEditing) {
 
-            expenseViewModel.insertExpense(requireContext(), expense)
+            expenseViewModel.insertExpense(
+                requireContext(),
+                expense
+            )
         } else {
 
-            expenseViewModel.updateExpense(requireContext(), expense)
+            expenseViewModel.updateExpense(
+                requireContext(),
+                expense
+            )
         }
 
         Log.d(TAG, "saveExpenseInDatabase: expense saved -> $expense")

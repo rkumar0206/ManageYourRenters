@@ -328,18 +328,12 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 requireContext(),
                 { dialog ->
 
-                    if (expenseForMenuItems.isSynced) {
-
-                        if (isInternetAvailable(requireContext())) {
-
-                            expenseViewModel.deleteExpense(requireContext(), expenseForMenuItems)
-                        } else {
-
-                            showNoInternetMessage(requireContext())
-                        }
-                    } else {
+                    if (isInternetAvailable(requireContext())) {
 
                         expenseViewModel.deleteExpense(requireContext(), expenseForMenuItems)
+                    } else {
+
+                        showNoInternetMessage(requireContext())
                     }
 
                     dialog.dismiss()
@@ -366,7 +360,10 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
                 if (isInternetAvailable(requireContext())) {
 
-                    expenseViewModel.insertExpense(requireContext(), expenseForMenuItems)
+                    expenseViewModel.insertExpense(
+                        requireContext(),
+                        expenseForMenuItems
+                    )
                     expenseAdapter.notifyItemChanged(expenseForMenuPosition)
                 } else {
 

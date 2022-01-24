@@ -14,49 +14,49 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val TAG = "ExpenseViewModel"
+
 @HiltViewModel
 class ExpenseViewModel @Inject constructor(
     private val expenseRepository: ExpenseRepository
 ) : ViewModel() {
 
-    fun insertExpense(context: Context, expense: Expense) = viewModelScope.launch {
+    fun insertExpense(context: Context, expense: Expense) =
+        viewModelScope.launch {
 
-        if (isInternetAvailable(context)) {
+            if (isInternetAvailable(context)) {
 
-            expense.isSynced = true
+                expenseServiceHelper(
+                    context,
+                    expense.key,
+                    context.getString(R.string.post)
+                )
+            }
 
-            expenseServiceHelper(
-                context,
-                expense,
-                context.getString(R.string.post)
-            )
+            expenseRepository.insertExpense(expense)
+
+            Functions.showToast(context, "Expense saved")
+
         }
-
-        expenseRepository.insertExpense(expense)
-
-        Functions.showToast(context, "Expense saved")
-
-    }
 
     fun insertAllExpense(expenses: List<Expense>) = viewModelScope.launch {
         expenseRepository.insertAllExpense(expenses)
     }
 
-    fun updateExpense(context: Context, expense: Expense) = viewModelScope.launch {
+    fun updateExpense(context: Context, expense: Expense) =
+        viewModelScope.launch {
 
-        if (isInternetAvailable(context)) {
+            if (isInternetAvailable(context)) {
 
-            expense.isSynced = true
+                expenseServiceHelper(
+                    context,
+                    expense.key,
+                    context.getString(R.string.put)
+                )
+            } else {
 
-            expenseServiceHelper(
-                context,
-                expense,
-                context.getString(R.string.put)
-            )
-        } else {
-
-            expense.isSynced = false
-        }
+                expense.isSynced = false
+            }
 
         expenseRepository.updateExpense(expense)
 
@@ -69,7 +69,7 @@ class ExpenseViewModel @Inject constructor(
 
             expenseServiceHelper(
                 context,
-                expense,
+                expense.key,
                 context.getString(R.string.delete_one)
             )
         }

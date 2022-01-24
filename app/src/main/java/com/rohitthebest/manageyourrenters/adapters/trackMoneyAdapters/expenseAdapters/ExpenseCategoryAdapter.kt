@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAd
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -75,6 +76,25 @@ class ExpenseCategoryAdapter :
 
                         expenseCategoryDescriptionTV.hide()
                     }
+
+                    if (expenseCat.isSynced) {
+
+                        binding.root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_green
+                            )
+                        )
+                    } else {
+
+                        binding.root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_orange
+                            )
+                        )
+                    }
+
                 }
             }
         }

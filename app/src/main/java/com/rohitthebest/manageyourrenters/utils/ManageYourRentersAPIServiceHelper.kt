@@ -4,16 +4,15 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_CATEGORY_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.REQUEST_METHOD_KEY
 import com.rohitthebest.manageyourrenters.services.ExpenseCategoryService
 import com.rohitthebest.manageyourrenters.services.ExpenseService
 
-fun expenseCategoryService(
+fun expenseCategoryServiceHelper(
     context: Context,
-    expenseCategory: ExpenseCategory,
+    expenseCategoryKey: String,
     requestMethod: String
 ) {
 
@@ -26,13 +25,13 @@ fun expenseCategoryService(
 
     foregroundService.putExtra(
         EXPENSE_CATEGORY_KEY,
-        fromExpenseCategoryToString(expenseCategory)
+        expenseCategoryKey
     )
 
     ContextCompat.startForegroundService(context, foregroundService)
 }
 
-fun expenseService(
+fun expenseServiceHelper(
     context: Context,
     expense: Expense,
     requestMethod: String

@@ -9,7 +9,7 @@ import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.expenseService
+import com.rohitthebest.manageyourrenters.utils.expenseServiceHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,7 +25,7 @@ class ExpenseViewModel @Inject constructor(
 
             expense.isSynced = true
 
-            expenseService(
+            expenseServiceHelper(
                 context,
                 expense,
                 context.getString(R.string.post)
@@ -48,7 +48,7 @@ class ExpenseViewModel @Inject constructor(
 
             expense.isSynced = true
 
-            expenseService(
+            expenseServiceHelper(
                 context,
                 expense,
                 context.getString(R.string.put)
@@ -67,7 +67,7 @@ class ExpenseViewModel @Inject constructor(
 
         if (isInternetAvailable(context)) {
 
-            expenseService(
+            expenseServiceHelper(
                 context,
                 expense,
                 context.getString(R.string.delete_one)

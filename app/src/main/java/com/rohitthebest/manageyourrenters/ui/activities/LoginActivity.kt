@@ -85,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
 
         binding.signInButton.setOnClickListener {
 
-            if (Functions.isInternetAvailable(this)) {
+            if (isInternetAvailable(this)) {
                 signIn()
             } else {
                 Functions.showNoInternetMessage(this)

@@ -129,21 +129,16 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
                 if (this::expenseCategoryForMenus.isInitialized) {
 
-                    if (expenseCategoryForMenus.isSynced) {
-
-                        if (isInternetAvailable(requireContext())) {
-                            expenseCategoryViewModel.deleteExpenseCategory(
-                                requireContext(), expenseCategoryForMenus
-                            )
-                        } else {
-                            showNoInternetMessage(requireContext())
-                        }
-                    } else {
+                    // internet is always required to delete any object,
+                    // even if it is not synced to the cloud, as it may have been inserted to the
+                    // cloud database and been updated later and is not synced now
+                    if (isInternetAvailable(requireContext())) {
 
                         expenseCategoryViewModel.deleteExpenseCategory(
-                            requireContext(),
-                            expenseCategoryForMenus
+                            requireContext(), expenseCategoryForMenus
                         )
+                    } else {
+                        showNoInternetMessage(requireContext())
                     }
                 }
 

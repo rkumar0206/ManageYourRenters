@@ -11,7 +11,7 @@ import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.deleteFileFromFirebaseStorage
-import com.rohitthebest.manageyourrenters.utils.expenseCategoryService
+import com.rohitthebest.manageyourrenters.utils.expenseCategoryServiceHelper
 import com.rohitthebest.manageyourrenters.utils.isValid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -31,9 +31,10 @@ class ExpenseCategoryViewModel @Inject constructor(
 
                 expenseCategory.isSynced = true
 
-                expenseCategoryService(
+                // this method invokes the expense category foreground service to upload the category
+                expenseCategoryServiceHelper(
                     context,
-                    expenseCategory,
+                    expenseCategory.key,
                     context.getString(R.string.post)
                 )
             } else {
@@ -62,9 +63,9 @@ class ExpenseCategoryViewModel @Inject constructor(
 
                 expenseCategory.isSynced = true
 
-                expenseCategoryService(
+                expenseCategoryServiceHelper(
                     context,
-                    expenseCategory,
+                    expenseCategory.key,
                     context.getString(R.string.put)
                 )
             } else {
@@ -82,12 +83,13 @@ class ExpenseCategoryViewModel @Inject constructor(
 
             if (isInternetAvailable(context)) {
 
-                expenseCategoryService(
+                expenseCategoryServiceHelper(
                     context,
-                    expenseCategory,
+                    expenseCategory.key,
                     context.getString(R.string.delete_one)
                 )
 
+                // check if the image is saved to the firebase storage, if found, delete
                 if (expenseCategory.imageUrl.isValid()) {
 
                     if (expenseCategory.imageUrl!!.contains("firebase")) {
@@ -100,7 +102,6 @@ class ExpenseCategoryViewModel @Inject constructor(
                 }
             }
 
-            expenseRepository.deleteExpenseByExpenseCategoryKey(expenseCategory.key)
             expenseCategoryRepository.deleteExpenseCategory(expenseCategory)
         }
 

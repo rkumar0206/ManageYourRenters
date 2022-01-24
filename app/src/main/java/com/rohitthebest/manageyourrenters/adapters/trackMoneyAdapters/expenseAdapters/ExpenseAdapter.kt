@@ -3,9 +3,11 @@ package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAd
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
 import com.rohitthebest.manageyourrenters.databinding.ItemExpenseBinding
 import com.rohitthebest.manageyourrenters.utils.hide
@@ -36,7 +38,10 @@ class ExpenseAdapter(val categoryName: String = "") :
 
                 if (checkForNullability()) {
 
-                    mListener!!.onMenuBtnClicked(getItem(absoluteAdapterPosition))
+                    mListener!!.onMenuBtnClicked(
+                        getItem(absoluteAdapterPosition),
+                        absoluteAdapterPosition
+                    )
                 }
             }
 
@@ -54,6 +59,23 @@ class ExpenseAdapter(val categoryName: String = "") :
 
                     expenseAmountTV.text = exp.amount.toString()
 
+                    if (exp.isSynced) {
+
+                        binding.root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_green
+                            )
+                        )
+                    } else {
+
+                        binding.root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_orange
+                            )
+                        )
+                    }
 
                     if (exp.spentOn.isValid()) {
 
@@ -128,7 +150,7 @@ class ExpenseAdapter(val categoryName: String = "") :
     interface OnClickListener {
 
         fun onItemClick(expense: Expense)
-        fun onMenuBtnClicked(expense: Expense)
+        fun onMenuBtnClicked(expense: Expense, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

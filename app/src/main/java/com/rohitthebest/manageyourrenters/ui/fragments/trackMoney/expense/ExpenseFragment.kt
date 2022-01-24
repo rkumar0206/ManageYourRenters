@@ -278,10 +278,12 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
     }
 
     private lateinit var expenseForMenuItems: Expense
+    private var expenseForMenuPosition: Int = 0
 
-    override fun onMenuBtnClicked(expense: Expense) {
+    override fun onMenuBtnClicked(expense: Expense, position: Int) {
 
         expenseForMenuItems = expense
+        expenseForMenuPosition = position
 
         requireActivity().supportFragmentManager.let { fm ->
 
@@ -365,6 +367,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 if (isInternetAvailable(requireContext())) {
 
                     expenseViewModel.insertExpense(requireContext(), expenseForMenuItems)
+                    expenseAdapter.notifyItemChanged(expenseForMenuPosition)
                 } else {
 
                     showNoInternetMessage(requireContext())

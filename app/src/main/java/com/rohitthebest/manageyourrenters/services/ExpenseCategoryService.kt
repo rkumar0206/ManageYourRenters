@@ -8,9 +8,11 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_CATEGORY_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.REQUEST_METHOD_KEY
+import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.api.ExpenseCategoryRepositoryAPI
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
 import com.rohitthebest.manageyourrenters.utils.fromStringToExpenseCategory
@@ -28,6 +30,9 @@ class ExpenseCategoryService : Service() {
 
     @Inject
     lateinit var expenseCategoryRepositoryAPI: ExpenseCategoryRepositoryAPI
+
+    @Inject
+    lateinit var expenseCategoryRepository: ExpenseCategoryRepository
 
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -48,6 +53,7 @@ class ExpenseCategoryService : Service() {
         ).setSmallIcon(image)
             .setContentIntent(pendingIntent)
             .setContentTitle("Expense category")
+            .setProgress(100, 0, true)
             .build()
 
         startForeground(Random.nextInt(1001, 8999), notification)
@@ -73,6 +79,8 @@ class ExpenseCategoryService : Service() {
 
                         Log.i(TAG, "onStartCommand: ${response.body()}")
 
+                        updateExpenseCategoryIsSyncedValue(expenseCategory, true)
+
                         stopSelf()
                     } else {
 
@@ -83,6 +91,7 @@ class ExpenseCategoryService : Service() {
 
                         Log.i(TAG, "onStartCommand: ${response.body()}")
 
+                        updateExpenseCategoryIsSyncedValue(expenseCategory, false)
                         stopSelf()
                     }
 
@@ -107,6 +116,8 @@ class ExpenseCategoryService : Service() {
 
                         Log.i(TAG, "onStartCommand: ${response.body()}")
 
+                        updateExpenseCategoryIsSyncedValue(expenseCategory, true)
+
                         stopSelf()
 
                     } else {
@@ -118,6 +129,7 @@ class ExpenseCategoryService : Service() {
 
                         Log.i(TAG, "onStartCommand: ${response.body()}")
 
+                        updateExpenseCategoryIsSyncedValue(expenseCategory, false)
                         stopSelf()
                     }
                 }
@@ -149,6 +161,10 @@ class ExpenseCategoryService : Service() {
 
                         Log.i(TAG, "onStartCommand: ${response.body()}")
 
+                        // when the category is not deleted from the cloud, then insert it again to
+                        // the local database
+                        expenseCategoryRepository.insertExpenseCategory(expenseCategory)
+
                         stopSelf()
                     }
                 }
@@ -157,6 +173,15 @@ class ExpenseCategoryService : Service() {
         }
 
         return START_NOT_STICKY
+    }
+
+    private suspend fun updateExpenseCategoryIsSyncedValue(
+        expenseCategory: ExpenseCategory,
+        isSyncedValue: Boolean
+    ) {
+
+        expenseCategory.isSynced = isSyncedValue
+        expenseCategoryRepository.updateExpenseCategory(expenseCategory)
     }
 
     override fun onBind(intent: Intent?): IBinder? {

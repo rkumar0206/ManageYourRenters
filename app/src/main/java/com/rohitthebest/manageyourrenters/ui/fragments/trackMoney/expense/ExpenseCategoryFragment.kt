@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -37,6 +38,8 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
     private lateinit var expenseCategoryAdapter: ExpenseCategoryAdapter
 
+    private var rvStateParcelable: Parcelable? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentExpenseCategoryBinding.bind(view)
@@ -47,6 +50,8 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
         binding.progressbar.show()
 
+        getExpenseCategoryRvState()
+
         lifecycleScope.launch {
 
             delay(300)
@@ -55,6 +60,17 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
         setUpRecyclerView()
 
+    }
+
+    private fun getExpenseCategoryRvState() {
+
+        expenseCategoryViewModel.expenseCategoryRvState.observe(viewLifecycleOwner, { parcelable ->
+
+            parcelable?.let {
+
+                rvStateParcelable = it
+            }
+        })
     }
 
     private fun setUpRecyclerView() {
@@ -197,6 +213,8 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
                 binding.progressbar.hide()
 
                 expenseCategoryAdapter.submitList(expenseCategories)
+
+                binding.expenseCategoryRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
             })
     }
 
@@ -262,6 +280,10 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        expenseCategoryViewModel.saveExpenseCategoryRvState(
+            binding.expenseCategoryRV.layoutManager?.onSaveInstanceState()
+        )
 
         hideKeyBoard(requireActivity())
 

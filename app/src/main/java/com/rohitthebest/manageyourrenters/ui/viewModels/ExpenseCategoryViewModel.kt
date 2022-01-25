@@ -1,9 +1,8 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import android.os.Parcelable
+import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
@@ -20,9 +19,32 @@ import javax.inject.Inject
 @HiltViewModel
 class ExpenseCategoryViewModel @Inject constructor(
     private val expenseCategoryRepository: ExpenseCategoryRepository,
-    private val expenseRepository: ExpenseRepository
+    private val expenseRepository: ExpenseRepository,
+    private val state: SavedStateHandle
 ) : ViewModel() {
 
+    // ------------------------- UI related ----------------------------
+
+    companion object {
+
+        private const val EXPENSE_CATEGORY_RV_KEY = "dcnjsncjkajakbaba_dcnjdn"
+    }
+
+    fun saveExpenseCategoryRvState(rvState: Parcelable?) {
+
+        state.set(EXPENSE_CATEGORY_RV_KEY, rvState)
+    }
+
+    private val _expenseCategoryRvState: MutableLiveData<Parcelable> = state.getLiveData(
+        EXPENSE_CATEGORY_RV_KEY
+    )
+
+    val expenseCategoryRvState: LiveData<Parcelable> get() = _expenseCategoryRvState
+
+    // ---------------------------------------------------------------
+
+
+    // ------------------------- Database related ---------------------------
     fun insertExpenseCategory(context: Context, expenseCategory: ExpenseCategory) =
 
         viewModelScope.launch {

@@ -264,7 +264,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                 uploadDocumentToFireStore(
                     requireContext(),
-                    convertPaymentToJSONString(payment),
                     getString(R.string.renters),
                     payment.key
                 )
@@ -454,7 +453,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 //insert on firestore
                 uploadDocumentToFireStore(
                     requireContext(),
-                    convertRenterToJSONString(renter),
                     getString(R.string.renters),
                     renter.key!!
                 )

@@ -12,6 +12,8 @@ class PaymentRepository @Inject constructor(
 
     suspend fun insertPayments(payments: List<Payment>) = dao.insertPayments(payments)
 
+    suspend fun updatePayment(payment: Payment) = dao.updatePayment(payment)
+
     suspend fun deletePayment(payment: Payment) = dao.deletePayment(payment)
 
     suspend fun deleteAllPayments() = dao.deleteAllPayment()

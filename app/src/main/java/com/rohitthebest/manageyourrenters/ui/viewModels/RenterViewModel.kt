@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Renter
@@ -73,11 +74,11 @@ class RenterViewModel @Inject constructor(
         repo.deleteRenterByIsSynced(isSynced)
     }
 
-    fun getAllRentersList() = repo.getAllRentersList()
+    fun getAllRentersList() = repo.getAllRentersList().asLiveData()
 
-    fun getRenterCount() = repo.getRenterCount()
+    fun getRenterCount() = repo.getRenterCount().asLiveData()
 
-    fun getRenterByIsSynced(isSynced: String) = repo.getRenterByIsSynced(isSynced)
+    fun getRenterByIsSynced(isSynced: String) = repo.getRenterByIsSynced(isSynced).asLiveData()
 
-    fun getRenterByKey(renterKey: String) = repo.getRenterByKey(renterKey)
+    fun getRenterByKey(renterKey: String) = repo.getRenterByKey(renterKey).asLiveData()
 }

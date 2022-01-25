@@ -972,7 +972,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 //upload the renter to firestore
                 uploadDocumentToFireStore(
                     requireContext(),
-                    convertRenterToJSONString(renter),
                     getString(R.string.renters),
                     renter.key!!
                 )
@@ -1012,7 +1011,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         uploadDocumentToFireStore(
             requireContext(),
-            convertPaymentToJSONString(payment),
             getString(R.string.payments),
             payment.key
         )

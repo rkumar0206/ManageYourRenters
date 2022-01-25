@@ -263,7 +263,6 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
 
             uploadDocumentToFireStore(
                 requireContext(),
-                fromEMIPaymentToString(emiPayment),
                 getString(R.string.emiPayments),
                 emiPayment.key
             )

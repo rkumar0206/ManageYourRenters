@@ -74,7 +74,6 @@ class BorrowerPaymentViewModel @Inject constructor(
 
                                 uploadDocumentToFireStore(
                                     context,
-                                    fromBorrowerToString(borrower),
                                     context.getString(R.string.borrowers),
                                     borrower.key
                                 )

@@ -16,7 +16,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
@@ -213,32 +212,19 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
             isSynced = false
         }
 
-        if (isInternetAvailable(requireContext())) {
-
-            borrower.isSynced = true
-
-            uploadDocumentToFireStore(
-                requireContext(),
-                fromBorrowerToString(borrower),
-                getString(R.string.borrowers),
-                borrower.key
-            )
-
-            insertToDatabase(borrower)
-        } else {
-
-            insertToDatabase(borrower)
-        }
+        insertToDatabase(borrower)
     }
 
     private fun insertToDatabase(borrower: Borrower) {
 
         if (!isMessageReceivedForEditing) {
 
-            borrowerViewModel.insertBorrower(borrower)
+            // insert
+            borrowerViewModel.insertBorrower(requireContext(), borrower)
             showToast(requireContext(), "Borrower added")
         } else {
-            borrowerViewModel.updateBorrower(borrower)
+            // update
+            borrowerViewModel.updateBorrower(requireContext(), borrower)
             showToast(requireContext(), "Borrower info updated")
         }
 

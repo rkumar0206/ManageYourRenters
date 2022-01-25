@@ -1,8 +1,8 @@
 package com.rohitthebest.manageyourrenters.database.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.rohitthebest.manageyourrenters.database.model.Renter
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RenterDao {
@@ -12,6 +12,9 @@ interface RenterDao {
 
     @Insert
     suspend fun insertRenters(renters: List<Renter>)
+
+    @Update
+    suspend fun updateRenter(renter: Renter)
 
     @Delete
     suspend fun deleteRenter(renter: Renter)
@@ -23,15 +26,15 @@ interface RenterDao {
     suspend fun deleteRenterByIsSynced(isSynced: String)
 
     @Query("SELECT * FROM renter_table ORDER BY modified DESC, timeStamp DESC")
-    fun getAllRentersList(): LiveData<List<Renter>>
+    fun getAllRentersList(): Flow<List<Renter>>
 
     @Query("SELECT COUNT(id) FROM renter_table")
-    fun getRentersCount(): LiveData<Int>
+    fun getRentersCount(): Flow<Int>
 
     @Query("SELECT * FROM renter_table WHERE isSynced = :isSynced ORDER BY modified DESC, timeStamp DESC")
-    fun getRenterByIsSynced(isSynced: String): LiveData<List<Renter>>
+    fun getRenterByIsSynced(isSynced: String): Flow<List<Renter>>
 
     @Query("SELECT * FROM renter_table WHERE `key` =:renterKey")
-    fun getRenterByKey(renterKey: String): LiveData<Renter>
+    fun getRenterByKey(renterKey: String): Flow<Renter>
 
 }

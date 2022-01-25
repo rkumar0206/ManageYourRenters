@@ -29,7 +29,21 @@ class BorrowerViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    fun insertBorrower(borrower: Borrower) = viewModelScope.launch {
+    fun insertBorrower(context: Context, borrower: Borrower) = viewModelScope.launch {
+
+        if (Functions.isInternetAvailable(context)) {
+
+            borrower.isSynced = true
+
+            uploadDocumentToFireStore(
+                context,
+                context.getString(R.string.borrowers),
+                borrower.key
+            )
+        } else {
+
+            borrower.isSynced = false
+        }
 
         borrowerRepository.insertBorrower(borrower)
     }
@@ -39,7 +53,7 @@ class BorrowerViewModel @Inject constructor(
         borrowerRepository.insertBorrowers(borrowers)
     }
 
-    fun updateBorrower(borrower: Borrower) = viewModelScope.launch {
+    fun updateBorrower(context: Context, borrower: Borrower) = viewModelScope.launch {
 
         borrowerRepository.update(borrower)
     }

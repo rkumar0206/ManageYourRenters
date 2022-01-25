@@ -114,7 +114,6 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
                 uploadDocumentToFireStore(
                     requireContext(),
-                    fromEMIToString(emi),
                     getString(R.string.emis),
                     emi.key
                 )

@@ -144,12 +144,11 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
                 uploadDocumentToFireStore(
                     requireContext(),
-                    fromBorrowerToString(borrower),
                     getString(R.string.borrowers),
                     borrower.key
                 )
 
-                borrowerViewModel.updateBorrower(borrower)
+                borrowerViewModel.updateBorrower(requireContext(), borrower)
 
                 borrowerAdapter.notifyItemChanged(position)
             }

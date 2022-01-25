@@ -9,27 +9,50 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.database.model.*
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
-import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
+import com.rohitthebest.manageyourrenters.repositories.*
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
-import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.insertToFireStore
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val TAG = "UploadService"
 
+@AndroidEntryPoint
 class UploadService : Service() {
+
+    @Inject
+    lateinit var borrowerRepository: BorrowerRepository
+
+    @Inject
+    lateinit var borrowerPaymentRepository: BorrowerPaymentRepository
+
+    @Inject
+    lateinit var renterRepository: RenterRepository
+
+    @Inject
+    lateinit var renterPaymentRepository: PaymentRepository
+
+    @Inject
+    lateinit var emiRepository: EMIRepository
+
+    @Inject
+    lateinit var emiPaymentRepository: EMIPaymentRepository
+
 
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         val collection = intent?.getStringExtra(COLLECTION_KEY)
         val key = intent?.getStringExtra(DOCUMENT_KEY)
-        val uploadData = intent?.getStringExtra(UPLOAD_DATA_KEY)
         val randomId = intent?.getIntExtra(RANDOM_ID_KEY, 1003)
 
         val image = R.drawable.ic_house_renters
@@ -45,6 +68,7 @@ class UploadService : Service() {
         ).setSmallIcon(image)
             .setContentIntent(pendingIntent)
             .setContentTitle("Uploading to $collection.")
+            .setProgress(100, 0, true)
             .build()
 
         startForeground(randomId!!, notification)
@@ -59,74 +83,80 @@ class UploadService : Service() {
 
                 getString(R.string.renters) -> {
 
-                    if (insertToFireStore(docRef, convertJSONtoRenter(uploadData))) {
+                    val renter = renterRepository.getRenterByKey(key).first()
 
-                        Log.d(
-                            TAG,
-                            "onStartCommand: Uploaded renter details to collection $collection with key : $key"
-                        )
-                        stopSelf()
-                    }
+                    updateIsSyncedValueOfDocument(
+                        collection,
+                        renter,
+                        insertToFireStore(docRef, renter)
+                    )
+                    stopSelf()
                 }
 
                 getString(R.string.payments) -> {
 
-                    if (insertToFireStore(docRef, convertJSONtoPayment(uploadData))) {
+                    val payment = borrowerPaymentRepository.getBorrowerPaymentByKey(key).first()
 
-                        Log.d(
-                            TAG,
-                            "onStartCommand: Uploaded payment to collection $collection with key $key"
-                        )
-                        stopSelf()
-                    }
+                    updateIsSyncedValueOfDocument(
+                        collection,
+                        payment,
+                        insertToFireStore(docRef, payment)
+                    )
+
+                    stopSelf()
                 }
 
                 getString(R.string.borrowers) -> {
 
-                    if (insertToFireStore(docRef, fromStringToBorrower(uploadData!!))) {
+                    val borrower = borrowerRepository.getBorrowerByKey(key).first()
 
-                        Log.d(
-                            TAG,
-                            "onStartCommand: Uploaded borrower to collection $collection with key $key"
-                        )
-                        stopSelf()
-                    }
+                    updateIsSyncedValueOfDocument(
+                        collection,
+                        borrower,
+                        insertToFireStore(docRef, borrower)
+                    )
+
+                    stopSelf()
                 }
 
                 getString(R.string.borrowerPayments) -> {
 
-                    if (insertToFireStore(docRef, fromStringToBorrowerPayment(uploadData!!))) {
+                    val borrowerPayment =
+                        borrowerPaymentRepository.getBorrowerPaymentByKey(key).first()
 
-                        Log.d(
-                            TAG,
-                            "onStartCommand: Uploaded borrower payment to collection $collection with key $key"
-                        )
-                        stopSelf()
-                    }
+                    updateIsSyncedValueOfDocument(
+                        collection,
+                        borrowerPayment,
+                        insertToFireStore(docRef, borrowerPayment)
+                    )
+
+                    stopSelf()
                 }
 
                 getString(R.string.emis) -> {
 
-                    if (insertToFireStore(docRef, fromStringToEMI(uploadData!!))) {
+                    val emi = emiRepository.getEMIByKey(key).first()
 
-                        Log.d(
-                            TAG,
-                            "onStartCommand: Uploaded emi to collection $collection with key $key"
-                        )
-                        stopSelf()
-                    }
+                    updateIsSyncedValueOfDocument(
+                        collection,
+                        emi,
+                        insertToFireStore(docRef, emi)
+                    )
+
+                    stopSelf()
                 }
 
                 getString(R.string.emiPayments) -> {
 
-                    if (insertToFireStore(docRef, fromStringToEMIPayment(uploadData!!))) {
+                    val emiPayment = emiPaymentRepository.getEMIPaymentByKey(key).first()
 
-                        Log.d(
-                            TAG,
-                            "onStartCommand: Uploaded emi_payment to collection $collection with key $key"
-                        )
-                        stopSelf()
-                    }
+                    updateIsSyncedValueOfDocument(
+                        collection,
+                        emiPayment,
+                        insertToFireStore(docRef, emiPayment)
+                    )
+
+                    stopSelf()
                 }
 
                 else -> {
@@ -141,6 +171,77 @@ class UploadService : Service() {
         return START_NOT_STICKY
     }
 
+
+    private suspend fun updateIsSyncedValueOfDocument(
+        collection: String,
+        document: Any,
+        isSyncedValue: Boolean
+    ) {
+
+        when (collection) {
+
+            getString(R.string.renters) -> {
+
+                val renter = document as Renter
+
+                renter.isSynced =
+                    if (isSyncedValue) getString(R.string.t) else getString(R.string.f)
+
+                renterRepository.updateRenter(renter)
+            }
+
+            getString(R.string.payments) -> {
+
+                val payment = document as Payment
+                payment.isSynced =
+                    if (isSyncedValue) getString(R.string.t) else getString(R.string.f)
+                renterPaymentRepository.updatePayment(payment)
+            }
+
+            getString(R.string.borrowers) -> {
+
+                val borrower = document as Borrower
+                borrower.isSynced = isSyncedValue
+                borrowerRepository.update(borrower)
+            }
+
+            getString(R.string.borrowerPayments) -> {
+                val borrowerPayment = document as BorrowerPayment
+                borrowerPayment.isSynced = isSyncedValue
+                borrowerPaymentRepository.updateBorrowerPayment(borrowerPayment)
+            }
+
+            getString(R.string.emis) -> {
+                val emi = document as EMI
+                emi.isSynced = isSyncedValue
+                emiRepository.updateEMI(emi)
+            }
+
+            getString(R.string.emiPayments) -> {
+                val emiPayment = document as EMIPayment
+                emiPayment.isSynced = isSyncedValue
+                emiPaymentRepository.updateEMIPayment(emiPayment)
+            }
+
+            else -> stopSelf()
+        }
+
+        if (isSyncedValue) {
+
+            Log.d(
+                TAG,
+                "updateIsSyncedValueOfDocument: upload in collection $collection, was successful"
+            )
+        } else {
+
+            Log.d(
+                TAG,
+                "updateIsSyncedValueOfDocument: upload in collection $collection, was UNSUCCESSFUL"
+            )
+        }
+
+
+    }
 
     override fun onBind(p0: Intent?): IBinder? {
 

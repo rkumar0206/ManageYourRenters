@@ -435,7 +435,6 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                     uploadDocumentToFireStore(
                         requireContext(),
-                        fromBorrowerPaymentToString(receivedBorrowerPayment!!),
                         getString(R.string.borrowerPayments),
                         borrowerPayment.key
                     )
@@ -508,14 +507,13 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                             uploadDocumentToFireStore(
                                 requireContext(),
-                                fromBorrowerToString(borrower),
                                 getString(R.string.borrowers),
                                 borrower.key
                             )
                         }
                     }
 
-                    borrowerViewModel.updateBorrower(borrower)
+                    borrowerViewModel.updateBorrower(requireContext(), borrower)
 
                     isBorrowerUpdateEnabled = false
                 }

@@ -231,7 +231,6 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
             uploadDocumentToFireStore(
                 requireContext(),
-                convertRenterToJSONString(renter),
                 getString(R.string.renters),
                 renter.key!!
             )

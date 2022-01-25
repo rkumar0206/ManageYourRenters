@@ -386,7 +386,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
             uploadDocumentToFireStore(
                 requireContext(),
-                fromBorrowerPaymentToString(borrowerPayment),
                 getString(R.string.borrowerPayments),
                 borrowerPayment.key
             )

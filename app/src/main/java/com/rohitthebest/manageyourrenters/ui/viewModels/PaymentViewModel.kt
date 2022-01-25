@@ -51,15 +51,16 @@ class PaymentViewModel @Inject constructor(
         repository.deleteAllPaymentsByIsSynced(isSynced)
     }
 
-    fun getAllPaymentsList() = repository.getAllPaymentsList()
+    fun getAllPaymentsList() = repository.getAllPaymentsList().asLiveData()
 
     fun getAllPaymentsListOfRenter(renterKey: String) =
-        repository.getAllPaymentsListOfRenter(renterKey)
+        repository.getAllPaymentsListOfRenter(renterKey).asLiveData()
 
     fun getCountOfPaymentsOfRenter(renterKey: String) =
-        repository.getCountOfPaymentsOfRenter(renterKey)
+        repository.getCountOfPaymentsOfRenter(renterKey).asLiveData()
 
-    fun getSumOfDueOrAdvance(renterKey: String) = repository.getSumOfDueOrAdvance(renterKey)
+    fun getSumOfDueOrAdvance(renterKey: String) =
+        repository.getSumOfDueOrAdvance(renterKey).asLiveData()
 
     fun getPaymentByPaymentKey(paymentKey: String) =
         repository.getPaymentByPaymentKey(paymentKey).asLiveData()

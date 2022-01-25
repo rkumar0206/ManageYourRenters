@@ -13,6 +13,8 @@ class RenterRepository @Inject constructor(
 
     suspend fun insertRenters(renters: List<Renter>) = dao.insertRenters(renters)
 
+    suspend fun updateRenter(renter: Renter) = dao.updateRenter(renter)
+
     suspend fun deleteRenter(renter: Renter) = dao.deleteRenter(renter)
 
     suspend fun deleteAllRenter() = dao.deleteAll()

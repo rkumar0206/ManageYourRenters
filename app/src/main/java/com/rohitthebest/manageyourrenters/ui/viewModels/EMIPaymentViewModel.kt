@@ -137,7 +137,6 @@ class EMIPaymentViewModel @Inject constructor(
 
                 uploadDocumentToFireStore(
                     context,
-                    fromEMIToString(emi),
                     context.getString(R.string.emis),
                     emi.key
                 )

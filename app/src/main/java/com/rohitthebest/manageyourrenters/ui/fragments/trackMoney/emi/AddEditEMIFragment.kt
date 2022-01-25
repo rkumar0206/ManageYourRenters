@@ -263,7 +263,6 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
             uploadDocumentToFireStore(
                 requireContext(),
-                fromEMIToString(emi),
                 getString(R.string.emis),
                 emi.key
             )

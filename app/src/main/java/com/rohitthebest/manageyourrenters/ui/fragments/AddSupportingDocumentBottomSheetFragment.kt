@@ -336,8 +336,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
                 emiPayment.isSynced = true
                 uploadDocumentToFireStore(
-                    requireContext(), fromEMIPaymentToString(emiPayment),
-                    receivedCollectionTag, emiPayment.key
+                    requireContext(), receivedCollectionTag, emiPayment.key
                 )
             } else {
 
@@ -374,8 +373,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
                 borrowerPayment.isSynced = true
                 uploadDocumentToFireStore(
-                    requireContext(), fromBorrowerPaymentToString(borrowerPayment),
-                    receivedCollectionTag, borrowerPayment.key
+                    requireContext(), receivedCollectionTag, borrowerPayment.key
                 )
             } else {
 
@@ -414,7 +412,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
                 emi.isSynced = true
                 uploadDocumentToFireStore(
-                    requireContext(), fromEMIToString(emi), receivedCollectionTag, emi.key
+                    requireContext(), receivedCollectionTag, emi.key
                 )
             } else {
 

@@ -18,7 +18,6 @@ import kotlin.random.Random
 
 fun uploadDocumentToFireStore(
     context: Context,
-    uploadData: String,
     collection: String,
     documentKey: String
 ) {
@@ -33,11 +32,6 @@ fun uploadDocumentToFireStore(
     foregroundService.putExtra(
         Constants.DOCUMENT_KEY,
         documentKey
-    )
-
-    foregroundService.putExtra(
-        UPLOAD_DATA_KEY,
-        uploadData
     )
 
     foregroundService.putExtra(

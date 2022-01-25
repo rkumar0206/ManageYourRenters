@@ -177,7 +177,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                 uploadDocumentToFireStore(
                     requireContext(),
-                    convertRenterToJSONString(renter),
                     getString(R.string.renters),
                     renter.key!!
                 )

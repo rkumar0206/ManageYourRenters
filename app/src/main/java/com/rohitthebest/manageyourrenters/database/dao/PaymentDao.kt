@@ -1,6 +1,5 @@
 package com.rohitthebest.manageyourrenters.database.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.rohitthebest.manageyourrenters.database.model.Payment
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +14,9 @@ interface PaymentDao {
     @Insert
     suspend fun insertPayments(payments: List<Payment>)
 
+    @Update
+    suspend fun updatePayment(payment: Payment)
+
     @Delete
     suspend fun deletePayment(payment: Payment)
 
@@ -28,19 +30,19 @@ interface PaymentDao {
     suspend fun deleteAllPaymentsByIsSynced(isSynced: String)
 
     @Query("SELECT * FROM payment_table ORDER BY timeStamp DESC")
-    fun getAllPaymentsList(): LiveData<List<Payment>>
+    fun getAllPaymentsList(): Flow<List<Payment>>
 
     @Query("SELECT * FROM payment_table WHERE renterKey =:renterKey ORDER BY timeStamp DESC")
-    fun getAllPaymentsListOfRenter(renterKey: String): LiveData<List<Payment>>
+    fun getAllPaymentsListOfRenter(renterKey: String): Flow<List<Payment>>
 
     @Query("SELECT * FROM payment_table WHERE `key` =:paymentKey")
     fun getPaymentByPaymentKey(paymentKey: String): Flow<Payment>
 
     @Query("SELECT COUNT(id) FROM payment_table WHERE renterKey =:renterKey")
-    fun getCountOfPaymentsOfRenter(renterKey: String): LiveData<Int>
+    fun getCountOfPaymentsOfRenter(renterKey: String): Flow<Int>
 
     @Query("SELECT SUM(amountPaid - totalRent) FROM payment_table WHERE renterKey =:renterKey")
-    fun getSumOfDueOrAdvance(renterKey: String): LiveData<Double>
+    fun getSumOfDueOrAdvance(renterKey: String): Flow<Double>
 
     @Query("SELECT `key` FROM payment_table WHERE renterKey = :renterKey")
     suspend fun getPaymentKeysByRenterKey(renterKey: String): List<String>

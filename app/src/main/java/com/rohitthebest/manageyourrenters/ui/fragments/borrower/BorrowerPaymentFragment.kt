@@ -15,11 +15,14 @@ import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
-import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.onViewOrDownloadSupportingDocument
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
+import com.rohitthebest.manageyourrenters.utils.isValid
+import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "BorrowerPaymentFragment"
@@ -193,7 +196,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                 uploadDocumentToFireStore(
                     requireContext(),
-                    fromBorrowerPaymentToString(borrowerPayment),
                     getString(R.string.borrowerPayments),
                     borrowerPayment.key
                 )

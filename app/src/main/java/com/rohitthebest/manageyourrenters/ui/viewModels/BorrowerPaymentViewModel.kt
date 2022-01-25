@@ -7,6 +7,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
@@ -40,60 +41,74 @@ class BorrowerPaymentViewModel @Inject constructor(
             updateBorrowerDueAmount(context, borrowerPayment.borrowerKey)
         }
 
+    private var isRefreshEnabled = true
+
     private suspend fun updateBorrowerDueAmount(context: Context, borrowerKey: String) {
 
         borrowerRepository.getBorrowerByKey(borrowerKey).collect { borrower ->
 
-            try {
+            if (isRefreshEnabled) {
 
-                borrowerPaymentRepository.getTotalDueOfTheBorrower(borrowerKey)
-                    .collect { value ->
+                try {
 
-                        borrower.totalDueAmount = value
-                        borrower.modified = System.currentTimeMillis()
+                    borrowerPaymentRepository.getTotalDueOfTheBorrower(borrowerKey)
+                        .collect { value ->
 
-                        if (isInternetAvailable(context)) {
+                            isRefreshEnabled = false
+                            proceedUpdate(context, borrower, value)
 
-                            if (borrower.isSynced) {
-
-                                // if the borrower document was already synced previously then update the document
-                                // or else upload the entire document to the fireStore
-
-                                val map = HashMap<String, Any?>()
-                                map["totalDueAmount"] = value
-
-                                updateDocumentOnFireStore(
-                                    context,
-                                    map = map,
-                                    context.getString(R.string.borrowers),
-                                    borrower.key
-                                )
-                            } else {
-
-                                borrower.isSynced = true
-
-                                uploadDocumentToFireStore(
-                                    context,
-                                    context.getString(R.string.borrowers),
-                                    borrower.key
-                                )
-                            }
-                        } else {
-
-                            borrower.isSynced = false
                         }
+                } catch (e: NullPointerException) {
 
-                        borrowerRepository.update(borrower)
-                    }
-            } catch (e: NullPointerException) {
+                    // The last borrower payment has been deleted and therefore the collect block
+                    // throws null pointer exception
+                    isRefreshEnabled = false
+                    proceedUpdate(context, borrower, 0.0)
 
-                // The last borrower payment has been deleted and therefore the collect block
-                // throws null pointer exception
-
-
-                e.printStackTrace()
+                    e.printStackTrace()
+                }
             }
         }
+
+    }
+
+    private suspend fun proceedUpdate(context: Context, borrower: Borrower, value: Double) {
+
+        borrower.totalDueAmount = value
+        borrower.modified = System.currentTimeMillis()
+
+        if (isInternetAvailable(context)) {
+
+            if (borrower.isSynced) {
+
+                // if the borrower document was already synced previously then update the document
+                // or else upload the entire document to the fireStore
+
+                val map = HashMap<String, Any?>()
+                map["totalDueAmount"] = value
+
+                updateDocumentOnFireStore(
+                    context,
+                    map = map,
+                    context.getString(R.string.borrowers),
+                    borrower.key
+                )
+            } else {
+
+                borrower.isSynced = true
+
+                uploadDocumentToFireStore(
+                    context,
+                    context.getString(R.string.borrowers),
+                    borrower.key
+                )
+            }
+        } else {
+
+            borrower.isSynced = false
+        }
+
+        borrowerRepository.update(borrower)
 
     }
 
@@ -145,6 +160,7 @@ class BorrowerPaymentViewModel @Inject constructor(
             borrowerPaymentRepository.deleteBorrowerPayment(borrowerPayment)
             partialPaymentRepository.deleteAllPartialPaymentByBorrowerPaymentKey(borrowerPayment.key)
 
+            isRefreshEnabled = true
             updateBorrowerDueAmount(context, borrowerPayment.borrowerKey)
         }
 

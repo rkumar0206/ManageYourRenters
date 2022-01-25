@@ -45,11 +45,11 @@ class DeleteAllDocumentsService : Service() {
             stopSelf()
         } else {
 
-            keyList.forEach {
+            keyList.forEach { key ->
 
-                collection?.let { it1 -> db.collection(it1).document(it!!) }?.let { it2 ->
+                collection?.let { collec -> db.collection(collec).document(key!!) }?.let { docRef ->
                     batch.delete(
-                        it2
+                        docRef
                     )
                 }
             }

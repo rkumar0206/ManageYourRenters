@@ -35,6 +35,7 @@ class UpdateService : Service() {
             Constants.NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(R.drawable.ic_baseline_payment_24)
             .setContentTitle("Updating on $collection.")
+            .setProgress(100, 0, true)
             .build()
 
         startForeground(randomId, notification)

@@ -55,6 +55,22 @@ class BorrowerViewModel @Inject constructor(
 
     fun updateBorrower(context: Context, borrower: Borrower) = viewModelScope.launch {
 
+        if (Functions.isInternetAvailable(context)) {
+
+            borrower.isSynced = true
+
+            uploadDocumentToFireStore(
+                context,
+                context.getString(R.string.borrowers),
+                borrower.key
+            )
+        } else {
+
+            borrower.isSynced = false
+        }
+
+        borrowerRepository.update(borrower)
+
         borrowerRepository.update(borrower)
     }
 

@@ -25,7 +25,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:padding="4dp"
-            android:text="From : 22-06-2020\nTo :     16-08-2020"
+            tools:text="From : 22-06-2020\nTo :     16-08-2020"
             android:textColor="@color/primaryTextColor"
             android:textSize="22sp"
             android:textStyle="bold"
@@ -39,14 +39,14 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
             android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="1"
+            android:gravity="start"
+            android:maxLines="2"
             android:padding="4dp"
-            tools:text="Issued On : 24-02-2020"
-            android:textSize="11sp"
-            app:layout_constraintBottom_toBottomOf="@+id/paymentAdapter_billPeriodTV"
+            android:textSize="11.5sp"
+            app:layout_constraintBottom_toBottomOf="@id/divider36"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/paymentAdapter_billPeriodTV" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Issued On : 24-02-2020" />
 
         <View
             android:id="@+id/divider36"
@@ -68,7 +68,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:padding="4dp"
-            android:text="Net demand : 3500"
+            tools:text="Net demand : 3500"
             android:textColor="@color/secondaryTextColor"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -83,6 +83,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/paymentAdapter_MessageBtn"
             app:layout_constraintEnd_toStartOf="@+id/paymentAdapter_MessageBtn"
             app:layout_constraintTop_toTopOf="@+id/paymentAdapter_MessageBtn"
+            android:contentDescription="@string/sync_with_cloud"
             app:srcCompat="@drawable/ic_baseline_sync_24" />
 
         <ImageButton
@@ -94,6 +95,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/paymentAdapter_amountPaidTV"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/paymentAdapter_amountPaidTV"
+            android:contentDescription="@string/_delete"
             app:srcCompat="@drawable/ic_baseline_delete_24" />
 
         <View
@@ -115,7 +117,7 @@
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
             android:padding="4dp"
-            android:text="Amount Paid : 3500"
+            tools:text="Amount Paid : 3500"
             android:textColor="@color/secondaryTextColor"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -131,6 +133,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/paymentAdapter_deleteBtn"
             app:layout_constraintEnd_toStartOf="@+id/paymentAdapter_deleteBtn"
             app:layout_constraintTop_toTopOf="@+id/paymentAdapter_deleteBtn"
+            android:contentDescription="@string/show_message_button"
             app:srcCompat="@drawable/ic_baseline_message_24" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

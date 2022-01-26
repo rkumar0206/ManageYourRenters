@@ -321,10 +321,10 @@ class Functions {
 
         fun generateKey(appendString: String = "", radix: Int = 68): String {
 
-            return "${System.currentTimeMillis().toStringM(radix)}_${
+            return "${UUID.randomUUID()}_${
                 Random.nextLong(
-                    100,
-                    9223372036854775
+                    1000,
+                    9000
                 ).toStringM(radix)
             }$appendString"
         }

@@ -19,111 +19,116 @@ class ShowPaymentAdapter :
     ListAdapter<Payment, ShowPaymentAdapter.ShowPaymentViewHolder>(DiffUtilCallback()) {
 
     private var mListener: OnClickListener? = null
+    private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
 
     inner class ShowPaymentViewHolder(val binding: AdapterShowPaymentBinding) :
         RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
 
         @SuppressLint("SetTextI18n")
-        fun setData(payment: Payment?) {
+        fun setData(payment: Payment) {
+
+            workingWithDateAndTime = WorkingWithDateAndTime()
 
             binding.apply {
 
-                payment?.let {
+                if (absoluteAdapterPosition == 0) {
 
-                    if (absoluteAdapterPosition == 0) {
+                    paymentAdapterDeleteBtn.show()
+                } else {
 
-                        paymentAdapterDeleteBtn.show()
-                    } else {
+                    paymentAdapterDeleteBtn.hide()
+                }
 
-                        paymentAdapterDeleteBtn.hide()
-                    }
+                //Period
+                if (payment.bill?.billPeriodType == binding.root.context.getString(R.string.by_month)) {
 
-                    //Period
-                    if (it.bill?.billPeriodType == binding.root.context.getString(R.string.by_month)) {
+                    paymentAdapterBillPeriodTV.text =
+                        "${payment.bill!!.billMonth}, ${payment.bill!!.billYear}"
+                } else {
+
+                    if (payment.bill?.billDateFrom == payment.bill?.billDateTill) {
 
                         paymentAdapterBillPeriodTV.text =
-                            "${it.bill!!.billMonth}, ${it.bill!!.billYear}"
+                            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                payment.bill?.billDateTill
+                            )
                     } else {
 
-                        if (it.bill?.billDateFrom == it.bill?.billDateTill) {
-
-                            paymentAdapterBillPeriodTV.text =
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                    it.bill?.billDateTill
+                        paymentAdapterBillPeriodTV.textSize = 18.0f
+                        paymentAdapterBillPeriodTV.text =
+                            "From : ${
+                                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                    payment.bill?.billDateFrom
                                 )
-                        } else {
-
-                            paymentAdapterBillPeriodTV.textSize = 18.0f
-                            paymentAdapterBillPeriodTV.text =
-                                "From : ${
-                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                        it.bill?.billDateFrom
-                                    )
-                                }\nTo      : ${
-                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                        it.bill?.billDateTill
-                                    )
-                                }"
-                        }
+                            }\nTo      : ${
+                                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                    payment.bill?.billDateTill
+                                )
+                            }"
                     }
+                }
 
-                    //issue date
-                    paymentAdapterIssueDateTV.text =
-                        "Payment date : ${
-                            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                it.timeStamp
-                            )
-                        }"
+                //issue date
+                paymentAdapterIssueDateTV.text =
+                    "Payment date : ${
+                        workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            payment.timeStamp
+                        )
+                    }\n" +
+                            "Payment time : ${
+                                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                    payment.timeStamp, "hh:mm a"
+                                )
+                            }"
 
-                    //house rent and extra
-                    if ((it.houseRent == "0.0" || it.houseRent == "0") &&
-                        (it.extraAmount != "0.0" || it.extraAmount != "0")
-                    ) {
+                //house rent and extra
+                if ((payment.houseRent == "0.0" || payment.houseRent == "0") &&
+                    (payment.extraAmount != "0.0" || payment.extraAmount != "0")
+                ) {
 
-                        if(it.extraFieldName?.trim()?.isEmpty()!!){
+                    if (payment.extraFieldName?.trim()?.isEmpty()!!) {
 
-                            paymentAdapterNetDemandTV.text =
-                                "Net demand : ${it.currencySymbol} ${it.extraAmount}"
-                        }else {
-
-                            paymentAdapterNetDemandTV.text =
-                                "${it.extraFieldName} : ${it.currencySymbol} ${it.extraAmount}"
-                        }
-
+                        paymentAdapterNetDemandTV.text =
+                            "Net demand : ${payment.currencySymbol} ${payment.extraAmount}"
                     } else {
 
                         paymentAdapterNetDemandTV.text =
-                            "Net demand : ${it.currencySymbol} ${it.totalRent}"
+                            "${payment.extraFieldName} : ${payment.currencySymbol} ${payment.extraAmount}"
                     }
 
-                    //total rent
-                    if (it.amountPaid?.toDouble()!! < it.totalRent.toDouble()) {
+                } else {
 
-                        paymentAdapterAmountPaidTV.changeTextColor(
-                            binding.root.context,
-                            R.color.color_orange
-                        )
-                    } else {
-
-                        paymentAdapterAmountPaidTV.changeTextColor(
-                            binding.root.context,
-                            R.color.color_green
-                        )
-                    }
-
-                    paymentAdapterAmountPaidTV.text =
-                        "Amount paid : ${it.currencySymbol} ${it.amountPaid}"
-
-                    if (it.isSynced == binding.root.context.getString(R.string.t)) {
-
-                        paymentAdapterSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
-                    } else {
-
-                        paymentAdapterSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24)
-                    }
-
+                    paymentAdapterNetDemandTV.text =
+                        "Net demand : ${payment.currencySymbol} ${payment.totalRent}"
                 }
+
+                //total rent
+                if (payment.amountPaid?.toDouble()!! < payment.totalRent.toDouble()) {
+
+                    paymentAdapterAmountPaidTV.changeTextColor(
+                        binding.root.context,
+                        R.color.color_orange
+                    )
+                } else {
+
+                    paymentAdapterAmountPaidTV.changeTextColor(
+                        binding.root.context,
+                        R.color.color_green
+                    )
+                }
+
+                paymentAdapterAmountPaidTV.text =
+                    "Amount paid : ${payment.currencySymbol} ${payment.amountPaid}"
+
+                if (payment.isSynced == binding.root.context.getString(R.string.t)) {
+
+                    paymentAdapterSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                } else {
+
+                    paymentAdapterSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                }
+
             }
         }
 
@@ -167,10 +172,10 @@ class ShowPaymentAdapter :
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
-                        getItem(absoluteAdapterPosition).messageOrNote?.let {
+                        getItem(absoluteAdapterPosition).messageOrNote?.let { message ->
 
                             mListener!!.onMessageBtnClicked(
-                                it
+                                message
                             )
                         }
                     }
@@ -212,7 +217,10 @@ class ShowPaymentAdapter :
 
     override fun onBindViewHolder(holder: ShowPaymentViewHolder, position: Int) {
 
-        holder.setData(getItem(position))
+        getItem(position)?.let { payment ->
+
+            holder.setData(payment)
+        }
     }
 
     interface OnClickListener {

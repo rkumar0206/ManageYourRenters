@@ -25,13 +25,11 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showMobileNu
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
-private const val TAG = "HomeFragment"
+//private const val TAG = "HomeFragment"
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClickListener {
@@ -64,7 +62,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         mAdapter = ShowRentersAdapter()
 
-        showProgressBar()
+        binding.homeProgressBar.show()
 
         setupRecyclerView()
 
@@ -72,10 +70,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             delay(400)
 
-            withContext(Dispatchers.Main) {
-
-                getAllRentersList()
-            }
+            getAllRentersList()
         }
 
         initListeners()
@@ -98,7 +93,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                 mAdapter.submitList(it)
 
-                hideProgressBar()
+                binding.homeProgressBar.hide()
             })
         } catch (e: Exception) {
             e.printStackTrace()
@@ -278,30 +273,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                 findNavController().navigate(R.id.action_homeFragment_to_addRenterFragment)
             }
-        }
-    }
-
-    private fun showProgressBar() {
-
-        try {
-
-            binding.homeProgressBar.show()
-            binding.rentersRV.hide()
-        } catch (e: java.lang.Exception) {
-
-            e.printStackTrace()
-        }
-    }
-
-    private fun hideProgressBar() {
-
-        try {
-
-            binding.homeProgressBar.hide()
-            binding.rentersRV.show()
-        } catch (e: java.lang.Exception) {
-
-            e.printStackTrace()
         }
     }
 

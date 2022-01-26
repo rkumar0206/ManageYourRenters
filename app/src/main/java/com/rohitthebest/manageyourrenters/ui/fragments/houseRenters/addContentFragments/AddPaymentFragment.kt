@@ -31,17 +31,16 @@ import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSA
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
-import kotlin.random.Random
 
 private const val TAG = "AddPaymentFragment"
 
@@ -81,6 +80,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private var isPaymentAdded = false
 
+    private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -95,6 +96,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         super.onViewCreated(view, savedInstanceState)
 
         binding.progressBar.show()
+
+        workingWithDateAndTime = WorkingWithDateAndTime()
 
         includeBinding = binding.include
 
@@ -111,7 +114,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         setUpCurrencySymbolList()
 
         selectedYear =
-            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                 System.currentTimeMillis(),
                 "yyyy"
             )?.toInt()!!
@@ -183,7 +186,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             currentTimestamp = System.currentTimeMillis()
 
-            setDateAndTimeInTextViews(currentTimestamp)
+            setDateAndTimeInTextViews()
 
             periodType = getString(R.string.by_month)
 
@@ -248,17 +251,17 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setDateAndTimeInTextViews(currentTimestamp: Long) {
+    private fun setDateAndTimeInTextViews() {
 
         includeBinding.dateTV.text = "Payment Date : ${
-            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                 currentTimestamp
             )
         }"
 
         includeBinding.timeTV.text = "Time : ${
-            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                System.currentTimeMillis(),
+            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                currentTimestamp,
                 "hh:mm a"
             )
         }"
@@ -477,19 +480,16 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             includeBinding.dateContainer.id -> {
 
-                Functions.showCalendarDialog(
-                    currentTimestamp,
-                    {
-                        requireActivity().supportFragmentManager
-                    },
-                    { timeStamp ->
-
-                        currentTimestamp = timeStamp
-
-                        setDateAndTimeInTextViews(currentTimestamp)
-                    },
+                Functions.showDateAndTimePickerDialog(
+                    requireContext(),
+                    workingWithDateAndTime.convertMillisecondsToCalendarInstance(currentTimestamp),
                     false
-                )
+                ) { calendar ->
+
+                    currentTimestamp = calendar.timeInMillis
+                    setDateAndTimeInTextViews()
+                }
+
             }
 
             binding.backBtn.id -> {
@@ -714,7 +714,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 initializeValues(this.getCustomView())
             }.positiveButton(text = "Add Payment") {
 
-                saveToDatabase()
+                initPayment()
 
             }.negativeButton(text = "Edit") {
 
@@ -852,7 +852,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             "$currencySymbol $totalRent"
     }
 
-    private fun saveToDatabase() {
+    private fun initPayment() {
 
         if (!isPaymentAdded) {
 
@@ -865,7 +865,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 billMonth = ""
                 billMonthNumber = 0
-                selectedYear = WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                selectedYear = workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     fromDateTimestamp,
                     "yyyy"
                 )?.toInt()!!
@@ -919,12 +919,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 includeBinding.addNoteET.text.toString().trim(),
                 totalRent.toString(),
                 getUid()!!,
-                "${System.currentTimeMillis().toStringM(69)}_${
-                    Random.nextLong(
-                        100,
-                        9223372036854775
-                    ).toStringM(69)
-                }_${getUid()}",
+                generateKey(appendString = "_${getUid()}"),
                 getString(R.string.f)
             )
 
@@ -1005,6 +1000,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             val map = HashMap<String, Any?>()
 
+            map["modified"] = renter.modified
             map["dueOrAdvanceAmount"] = renter.dueOrAdvanceAmount
 
             updateDocumentOnFireStore(

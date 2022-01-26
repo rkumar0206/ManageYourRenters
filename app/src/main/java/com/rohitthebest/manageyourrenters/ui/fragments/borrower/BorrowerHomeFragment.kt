@@ -22,7 +22,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
-private const val TAG = "BorrowerHomeFragment"
+//private const val TAG = "BorrowerHomeFragment"
 
 @AndroidEntryPoint
 class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
@@ -215,7 +215,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     private fun showHideProgressBar(isVisible: Boolean) {
 
-        binding.individualRentersRV.isVisible = !isVisible
         binding.progressBar.isVisible = isVisible
     }
 

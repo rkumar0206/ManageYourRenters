@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,6 +44,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private lateinit var mAdapter: ShowRentersAdapter
 
+    private var rvStateParcelable: Parcelable? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -66,6 +69,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         setupRecyclerView()
 
+        getRvState()
+
         lifecycleScope.launch {
 
             delay(320)
@@ -74,6 +79,18 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         }
 
         initListeners()
+    }
+
+    private fun getRvState() {
+
+        renterViewModel.renterRvState.observe(viewLifecycleOwner, { parcelable ->
+
+            parcelable?.let {
+
+                rvStateParcelable = it
+            }
+        })
+
     }
 
     private fun getAllRentersList() {
@@ -92,6 +109,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                 }
 
                 mAdapter.submitList(it)
+                binding.rentersRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
 
                 binding.homeProgressBar.hide()
             })
@@ -168,15 +186,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                 showToast(requireContext(), "Already Synced")
             } else {
 
-                renter.isSynced = getString(R.string.t)
-
-                uploadDocumentToFireStore(
-                    requireContext(),
-                    getString(R.string.renters),
-                    renter.key!!
-                )
-
-                renterViewModel.insertRenter(renter)
+                renterViewModel.updateRenter(requireContext(), renter)
             }
 
         } else {
@@ -191,17 +201,11 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
             requireContext(),
             {
 
-                if (renter.isSynced == getString(R.string.f)) {
+                if (isInternetAvailable(requireContext())) {
 
                     renterViewModel.deleteRenter(requireContext(), renter)
                 } else {
-
-                    if (isInternetAvailable(requireContext())) {
-
-                        renterViewModel.deleteRenter(requireContext(), renter)
-                    } else {
-                        showNoInternetMessage(requireContext())
-                    }
+                    showNoInternetMessage(requireContext())
                 }
 
                 it.dismiss()
@@ -254,10 +258,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         binding.addRenterFAB.setOnClickListener(this)
 
-        binding.rentersRV.changeVisibilityOfFABOnScrolled(
-            binding.addRenterFAB
-        )
-
         binding.houseRentersHomeToolBar.setNavigationOnClickListener {
 
             requireActivity().onBackPressed()
@@ -289,6 +289,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        renterViewModel.saveRenterRvState(binding.rentersRV.layoutManager?.onSaveInstanceState())
 
         hideKeyBoard(requireActivity())
 

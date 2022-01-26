@@ -19,7 +19,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
@@ -188,6 +187,8 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             renter.id = receivedRenter?.id
         }
 
+        renter.modified = System.currentTimeMillis()
+
         renter.apply {
             timeStamp = selectedDate
             name = includeBinding.renterNameET.editText?.text.toString().trim()
@@ -225,30 +226,15 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             isSynced = getString(R.string.f)
         }
 
-        if (isInternetAvailable(requireContext())) {
+        if (isMessageReceivesForEditing) {
 
-            renter.isSynced = getString(R.string.t)
-
-            uploadDocumentToFireStore(
-                requireContext(),
-                getString(R.string.renters),
-                renter.key!!
-            )
-
-            insertToDatabase(renter)
+            renterViewModel.updateRenter(requireContext(), renter)
         } else {
 
-            insertToDatabase(renter)
+            renterViewModel.insertRenter(requireContext(), renter)
         }
 
-    }
-
-    private fun insertToDatabase(renter: Renter) {
-
-        renter.modified = System.currentTimeMillis()
-
-        renterViewModel.insertRenter(renter)
-        showToast(requireContext(), "Renter inserted")
+        showToast(requireContext(), "Renter saved")
         requireActivity().onBackPressed()
     }
 

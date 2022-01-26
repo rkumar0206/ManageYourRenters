@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -46,6 +47,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     private lateinit var paymentAdapter: ShowPaymentAdapter
 
+    private var rvStateParcelable: Parcelable? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -66,7 +69,22 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         getMessage()
         initListener()
         setUpRecyclerView()
+
+        getRvState()
     }
+
+    private fun getRvState() {
+
+        paymentViewModel.renterPaymentRvState.observe(viewLifecycleOwner, { parcelable ->
+
+            parcelable?.let {
+
+                rvStateParcelable = it
+            }
+        })
+
+    }
+
 
     private fun getMessage() {
 
@@ -125,6 +143,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                     }
 
                     paymentAdapter.submitList(paymentList)
+                    binding.paymentRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
+                    rvStateParcelable = null
                     hideProgressBar()
 
                     paymentAdapter.notifyItemChanged(0)
@@ -440,6 +460,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        paymentViewModel.saveRenterPaymentRvState(binding.paymentRV.layoutManager?.onSaveInstanceState())
 
         hideKeyBoard(requireActivity())
 

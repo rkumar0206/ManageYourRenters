@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -309,7 +310,6 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
                         addToPartialPaymentList(dueLeftAmount)
                     }
 
-                    //todo : show the delete payment button
                 } else {
 
                     if (dueLeftAmount <= 0.0) {
@@ -661,9 +661,16 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             includeBinding.addPartialPaymentBtn.setTextColor(
                 ContextCompat.getColor(
                     requireContext(),
-                    R.color.purple_500
+                    R.color.color_white
                 )
             )
+            includeBinding.addPartialPaymentBtn.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.dark_blue
+                )
+            )
+
             includeBinding.noPayemtAddedTV.changeTextColor(
                 requireContext(),
                 R.color.primaryTextColor
@@ -675,7 +682,8 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
                 R.color.colorGrey
             )
             includeBinding.addPartialPaymentAmountET.editText?.setTextColor(colorGrey)
-            includeBinding.addPartialPaymentBtn.setTextColor(colorGrey)
+            includeBinding.addPartialPaymentBtn.setTextColor(Color.BLACK)
+            includeBinding.addPartialPaymentBtn.setBackgroundColor(colorGrey)
             includeBinding.noPayemtAddedTV.changeTextColor(requireContext(), R.color.colorGrey)
 
             //todo : also change the color of recyclerview list items

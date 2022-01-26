@@ -1,9 +1,8 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import android.os.Parcelable
+import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Payment
 import com.rohitthebest.manageyourrenters.database.model.Renter
@@ -19,8 +18,29 @@ import javax.inject.Inject
 @HiltViewModel
 class PaymentViewModel @Inject constructor(
     private val paymentRepository: PaymentRepository,
-    private val renterRepository: RenterRepository
+    private val renterRepository: RenterRepository,
+    private val state: SavedStateHandle
 ) : ViewModel() {
+
+    // ------------------------- UI related ----------------------------
+
+    companion object {
+
+        private const val RENTER_PAYMENT_RV_KEY = "jbkjbajacjhbgaaagyqvgvdqv"
+    }
+
+    fun saveRenterPaymentRvState(rvState: Parcelable?) {
+
+        state.set(RENTER_PAYMENT_RV_KEY, rvState)
+    }
+
+    private val _renterPaymentRvState: MutableLiveData<Parcelable> = state.getLiveData(
+        RENTER_PAYMENT_RV_KEY
+    )
+
+    val renterPaymentRvState: LiveData<Parcelable> get() = _renterPaymentRvState
+
+    // ---------------------------------------------------------------
 
     fun insertPayment(context: Context, payment: Payment) = viewModelScope.launch {
 

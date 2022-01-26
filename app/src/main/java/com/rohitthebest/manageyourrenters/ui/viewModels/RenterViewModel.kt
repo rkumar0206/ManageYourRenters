@@ -1,18 +1,18 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.content.Context
+import android.os.Parcelable
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.repositories.PaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
-import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
 import com.rohitthebest.manageyourrenters.utils.deleteAllDocumentsUsingKeyFromFirestore
 import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,17 +22,68 @@ private const val TAG = "RenterViewModel"
 @HiltViewModel
 class RenterViewModel @Inject constructor(
     private val repo: RenterRepository,
-    private val paymentRepository: PaymentRepository
+    private val paymentRepository: PaymentRepository,
+    private val state: SavedStateHandle
 ) : ViewModel() {
 
-    fun insertRenter(renter: Renter) = viewModelScope.launch {
+    // ------------------------- UI related ----------------------------
+
+    companion object {
+
+        private const val RENTER_RV_KEY = "cabcjnsnksbkajavjsnjdn"
+    }
+
+    fun saveRenterRvState(rvState: Parcelable?) {
+
+        state.set(RENTER_RV_KEY, rvState)
+    }
+
+    private val _renterRvState: MutableLiveData<Parcelable> = state.getLiveData(
+        RENTER_RV_KEY
+    )
+
+    val renterRvState: LiveData<Parcelable> get() = _renterRvState
+
+    // ---------------------------------------------------------------
+
+    fun insertRenter(context: Context, renter: Renter) = viewModelScope.launch {
+
+        if (isInternetAvailable(context)) {
+
+            renter.isSynced = context.getString(R.string.t)
+
+            uploadDocumentToFireStore(
+                context,
+                context.getString(R.string.renters),
+                renter.key!!
+            )
+        } else {
+
+            renter.isSynced = context.getString(R.string.f)
+        }
 
         repo.insertRenter(renter)
     }
 
-    fun updateRenter(renter: Renter) = viewModelScope.launch {
+
+    fun updateRenter(context: Context, renter: Renter) = viewModelScope.launch {
+
+        if (isInternetAvailable(context)) {
+
+            renter.isSynced = context.getString(R.string.t)
+
+            uploadDocumentToFireStore(
+                context,
+                context.getString(R.string.renters),
+                renter.key!!
+            )
+        } else {
+
+            renter.isSynced = context.getString(R.string.f)
+        }
 
         repo.updateRenter(renter)
+
     }
 
     fun insertRenters(renters: List<Renter>) = viewModelScope.launch {
@@ -46,7 +97,7 @@ class RenterViewModel @Inject constructor(
 
         Log.d(TAG, "deleteRenter: PaymentsKeys : $paymentKeys")
 
-        if (Functions.isInternetAvailable(context)) {
+        if (isInternetAvailable(context)) {
 
             deleteDocumentFromFireStore(
                 context,

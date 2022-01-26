@@ -95,7 +95,7 @@ class UploadService : Service() {
 
                 getString(R.string.payments) -> {
 
-                    val payment = borrowerPaymentRepository.getBorrowerPaymentByKey(key).first()
+                    val payment = renterPaymentRepository.getPaymentByPaymentKey(key).first()
 
                     updateIsSyncedValueOfDocument(
                         collection,

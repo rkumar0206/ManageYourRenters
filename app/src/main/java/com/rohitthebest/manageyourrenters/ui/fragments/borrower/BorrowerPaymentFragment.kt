@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -15,15 +16,14 @@ import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.onViewOrDownloadSupportingDocument
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
-import com.rohitthebest.manageyourrenters.utils.isValid
-import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
-import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val TAG = "BorrowerPaymentFragment"
 
@@ -70,11 +70,8 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
         setUpRecyclerView()
 
-        binding.borrowerPaymentRV.changeVisibilityOfFABOnScrolled(
-            binding.addPaymentFAB
-        )
+        binding.progressbar.show()
     }
-
 
     private fun getMessage() {
 
@@ -89,15 +86,19 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                 receivedBorrowerKey = args?.borrowerKeyMessage!!
 
-                getBorrower()
-                getBorrowerPayments()
+                lifecycleScope.launch {
+
+                    delay(200)
+
+                    getBorrower()
+                    getBorrowerPayments()
+                }
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
-
 
     private fun getBorrower() {
 
@@ -117,10 +118,20 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                 borrowerPaymentAdapter.submitList(borrowerPayments)
 
+                if (borrowerPayments.isNotEmpty()) {
+
+                    binding.borrowerPaymentRV.show()
+                    binding.noBorrowerPaymentTV.hide()
+                } else {
+
+                    binding.borrowerPaymentRV.hide()
+                    binding.noBorrowerPaymentTV.show()
+                }
+
+                binding.progressbar.hide()
             })
 
     }
-
 
     private fun setUpRecyclerView() {
 

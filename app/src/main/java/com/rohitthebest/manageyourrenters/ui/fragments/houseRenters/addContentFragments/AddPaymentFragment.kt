@@ -967,29 +967,13 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             payment.isSynced = getString(R.string.t)
             renter.isSynced = getString(R.string.t)
 
-            if (renter.isSynced == getString(R.string.f)) {
+            updateRenterDueOrAdvanceAmount(renter)
 
-                //upload the renter to firestore
-                uploadDocumentToFireStore(
-                    requireContext(),
-                    getString(R.string.renters),
-                    renter.key!!
-                )
-            } else {
-
-                val map = HashMap<String, Any?>()
-
-                map["dueOrAdvanceAmount"] = renter.dueOrAdvanceAmount
-
-                updateDocumentOnFireStore(
-                    requireContext(),
-                    map,
-                    getString(R.string.renters),
-                    renter.key!!
-                )
-            }
-
-            addToFireStore(payment)
+            uploadDocumentToFireStore(
+                requireContext(),
+                getString(R.string.payments),
+                payment.key
+            )
 
             paymentViewModel.insertPayment(payment)
             renterViewModel.insertRenter(renter)
@@ -1007,13 +991,30 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     }
 
-    private fun addToFireStore(payment: Payment) {
+    private fun updateRenterDueOrAdvanceAmount(renter: Renter) {
 
-        uploadDocumentToFireStore(
-            requireContext(),
-            getString(R.string.payments),
-            payment.key
-        )
+        if (renter.isSynced == getString(R.string.f)) {
+
+            //upload the renter to firestore
+            uploadDocumentToFireStore(
+                requireContext(),
+                getString(R.string.renters),
+                renter.key!!
+            )
+        } else {
+
+            val map = HashMap<String, Any?>()
+
+            map["dueOrAdvanceAmount"] = renter.dueOrAdvanceAmount
+
+            updateDocumentOnFireStore(
+                requireContext(),
+                map,
+                getString(R.string.renters),
+                renter.key!!
+            )
+        }
+
     }
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {

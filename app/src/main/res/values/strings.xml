@@ -219,6 +219,7 @@
     <string name="save_screenshot">Save screenshot</string>
     <string name="sign_in_message">To Use this app you must sign-in using your google account.</string>
     <string name="getting_saved_data_from_cloud">Getting saved data from cloud...</string>
+    <string name="no_borrower_payment_added_message">Click (+) button to add payments</string>
 
 
     <string-array name="interest_time_schedule">

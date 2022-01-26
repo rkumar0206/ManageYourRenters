@@ -332,17 +332,6 @@
                 app:layout_constraintStart_toStartOf="@+id/ratePercentET"
                 app:layout_constraintTop_toBottomOf="@+id/ratePercentET" />
 
-            <Spinner
-                android:id="@+id/timeScheduleSpinner2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
-                android:minHeight="48dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/textView10"
-                app:layout_constraintStart_toStartOf="@+id/ratePercentET"
-                app:layout_constraintTop_toBottomOf="@+id/ratePercentET" />
 
             <ImageButton
                 android:id="@+id/calculateInterestBtn"

@@ -976,7 +976,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             )
 
             paymentViewModel.insertPayment(payment)
-            renterViewModel.insertRenter(renter)
+            renterViewModel.updateRenter(renter)
 
             requireActivity().onBackPressed()
         } else {
@@ -985,7 +985,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             renter.isSynced = getString(R.string.f)
 
             paymentViewModel.insertPayment(payment)
-            renterViewModel.insertRenter(renter)
+            renterViewModel.updateRenter(renter)
             requireActivity().onBackPressed()
         }
 

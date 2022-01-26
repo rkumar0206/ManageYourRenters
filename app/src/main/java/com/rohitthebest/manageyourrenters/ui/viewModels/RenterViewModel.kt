@@ -30,6 +30,11 @@ class RenterViewModel @Inject constructor(
         repo.insertRenter(renter)
     }
 
+    fun updateRenter(renter: Renter) = viewModelScope.launch {
+
+        repo.updateRenter(renter)
+    }
+
     fun insertRenters(renters: List<Renter>) = viewModelScope.launch {
 
         repo.insertRenters(renters)

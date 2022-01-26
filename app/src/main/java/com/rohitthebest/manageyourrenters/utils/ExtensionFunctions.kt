@@ -79,6 +79,8 @@ fun RecyclerView.changeVisibilityOfFABOnScrolled(fab: FloatingActionButton) {
     })
 }
 
+fun Double.format(digits: Int) = "%.${digits}f".format(this)
+
 fun TextView.changeTextColor(context: Context, color: Int) {
 
     this.setTextColor(ContextCompat.getColor(context, color))

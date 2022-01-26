@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/color_white"
     android:layout_height="match_parent">
 
     <View
@@ -415,7 +416,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -467,7 +468,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 app:counterEnabled="true"
-                app:counterMaxLength="12"
+                app:counterMaxLength="7"
                 app:errorEnabled="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -481,7 +482,7 @@
                     android:backgroundTint="@color/white"
                     android:hint="@string/house_rent"
                     android:inputType="numberDecimal"
-                    android:maxLength="12" />
+                    android:maxLength="7" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
@@ -496,7 +497,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView2"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -557,6 +558,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:ems="10"
+                android:maxLength="20"
                 android:gravity="center|center_vertical"
                 android:hint="@string/_0_0"
                 android:importantForAutofill="no"
@@ -634,6 +636,7 @@
                 android:ems="10"
                 android:gravity="center|center_vertical"
                 android:hint="@string/_0_0"
+                android:maxLength="20"
                 android:importantForAutofill="no"
                 android:inputType="numberDecimal"
                 android:minHeight="48dp"
@@ -652,6 +655,7 @@
                 android:ems="10"
                 android:gravity="center"
                 android:hint="@string/_0_0"
+                android:maxLength="4"
                 android:importantForAutofill="no"
                 android:inputType="numberDecimal"
                 android:minHeight="48dp"
@@ -866,6 +870,7 @@
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="2dp"
                 android:ems="10"
+                android:maxLength="7"
                 android:gravity="center"
                 android:hint="@string/amount"
                 android:importantForAutofill="no"
@@ -942,6 +947,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
+                app:counterEnabled="true"
+                app:counterMaxLength="7"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider26">
 
@@ -950,6 +957,7 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
                     android:hint="@string/amount_paid"
+                    android:maxLength="7"
                     android:inputType="numberDecimal"
                     android:textColor="@color/color_green" />
             </com.google.android.material.textfield.TextInputLayout>

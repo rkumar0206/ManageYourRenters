@@ -11,10 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Payment
 import com.rohitthebest.manageyourrenters.databinding.AdapterShowPaymentBinding
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
-import com.rohitthebest.manageyourrenters.utils.changeTextColor
-import com.rohitthebest.manageyourrenters.utils.hide
-import com.rohitthebest.manageyourrenters.utils.show
+import com.rohitthebest.manageyourrenters.utils.*
 
 private const val TAG = "ShowPaymentAdapter"
 
@@ -97,7 +94,9 @@ class ShowPaymentAdapter :
                 } else {
 
                     paymentAdapterNetDemandTV.text =
-                        "Net demand : ${payment.currencySymbol} ${payment.totalRent}"
+                        "Net demand : ${payment.currencySymbol} ${
+                            payment.totalRent.toDouble().format(2)
+                        }"
                 }
 
                 //total rent
@@ -116,7 +115,9 @@ class ShowPaymentAdapter :
                 }
 
                 paymentAdapterAmountPaidTV.text =
-                    "Amount paid : ${payment.currencySymbol} ${payment.amountPaid}"
+                    "Amount paid : ${payment.currencySymbol} ${
+                        payment.amountPaid!!.toDouble().format(2)
+                    }"
 
                 if (payment.isSynced == binding.root.context.getString(R.string.t)) {
 

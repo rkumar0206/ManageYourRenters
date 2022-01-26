@@ -143,25 +143,28 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         Log.d(TAG, "updateCurrentDueOrAdvanceTV: ")
 
+        val currentDueOrAdvance =
+            "${receivedRenter?.name} : ${abs(receivedRenter?.dueOrAdvanceAmount!!).format(2)}"
+
         when {
 
             receivedRenter?.dueOrAdvanceAmount!! < 0.0 -> {
 
                 binding.dueOrAdvancedTV.changeTextColor(requireContext(), R.color.color_orange)
                 binding.dueOrAdvancedTV.text =
-                    "Current due of ${receivedRenter?.name} : ${abs(receivedRenter?.dueOrAdvanceAmount!!)}"
+                    "Current due of $currentDueOrAdvance"
             }
             receivedRenter?.dueOrAdvanceAmount!! > 0.0 -> {
 
                 binding.dueOrAdvancedTV.changeTextColor(requireContext(), R.color.color_green)
                 binding.dueOrAdvancedTV.text =
-                    "Current advance of ${receivedRenter?.name} : ${receivedRenter?.dueOrAdvanceAmount}"
+                    "Current advance of $currentDueOrAdvance"
             }
             else -> {
 
                 binding.dueOrAdvancedTV.changeTextColor(requireContext(), R.color.color_green)
                 binding.dueOrAdvancedTV.text =
-                    "There is no due or advance of ${receivedRenter?.name}"
+                    "There is no due / advance of ${receivedRenter?.name}"
             }
         }
     }

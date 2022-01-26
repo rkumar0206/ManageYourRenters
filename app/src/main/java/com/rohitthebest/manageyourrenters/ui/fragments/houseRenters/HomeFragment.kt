@@ -68,7 +68,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         lifecycleScope.launch {
 
-            delay(400)
+            delay(320)
 
             getAllRentersList()
         }

@@ -141,7 +141,7 @@
                 android:textSize="17sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView32" />
+                app:layout_constraintTop_toBottomOf="@+id/showBill_renterName" />
 
             <TextView
                 android:id="@+id/showBill_renterMobile"
@@ -166,29 +166,30 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp"
                 android:padding="2dp"
                 android:text="@string/address_n_n"
                 android:textSize="17sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/showBill_renterAddress"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView34" />
+                app:layout_constraintTop_toBottomOf="@+id/showBill_renterMobile" />
 
             <TextView
                 android:id="@+id/showBill_renterAddress"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:ellipsize="end"
+                android:layout_marginBottom="4dp"
+                android:ellipsize="none"
                 android:padding="2dp"
                 android:text="@string/Null"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView36"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/textView34"
-                app:layout_constraintTop_toTopOf="@+id/textView36" />
+                app:layout_constraintTop_toBottomOf="@+id/textView34" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

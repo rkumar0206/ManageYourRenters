@@ -173,7 +173,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         setElectricFields()
 
-        setDuesOrAdvanceOdLastPayment()
+        setDuesOrAdvanceOfLastPayment()
 
         setExtraFields()
 
@@ -248,11 +248,13 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
                 "${receivedPayment.bill?.currencySymbol} 0.0"
             } else {
 
-                "${receivedPayment.bill?.currencySymbol} ${receivedPayment.extraAmount}"
+                "${receivedPayment.bill?.currencySymbol} ${
+                    receivedPayment.extraAmount?.toDouble()?.format(2)
+                }"
             }
     }
 
-    private fun setDuesOrAdvanceOdLastPayment() {
+    private fun setDuesOrAdvanceOfLastPayment() {
 
         val dueOfLastPayment = getDuesOfLastPayment()
 
@@ -262,10 +264,10 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
                 //due
                 includeBinding.showBillDueOfLastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} $dueOfLastPayment"
+                    "${receivedPayment.bill?.currencySymbol} ${abs(dueOfLastPayment).format(2)}"
 
                 includeBinding.showBillPaidInAdvanceInlastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} 0.0"
+                    "${receivedPayment.bill?.currencySymbol} 0.00"
 
             }
 
@@ -273,18 +275,18 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
                 //advance
                 includeBinding.showBillDueOfLastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} 0.0"
+                    "${receivedPayment.bill?.currencySymbol} 0.00"
 
                 includeBinding.showBillPaidInAdvanceInlastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} $dueOfLastPayment"
+                    "${receivedPayment.bill?.currencySymbol} ${abs(dueOfLastPayment).format(2)}"
             }
 
             else -> {
                 includeBinding.showBillDueOfLastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} 0.0"
+                    "${receivedPayment.bill?.currencySymbol} 0.00"
 
                 includeBinding.showBillPaidInAdvanceInlastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} 0.0"
+                    "${receivedPayment.bill?.currencySymbol} 0.00"
             }
         }
     }
@@ -301,23 +303,18 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
                 dueOrAdvance < 0.0 -> {
 
                     //due
-                    "${receivedPayment.bill?.currencySymbol} ${
-                        String.format(
-                            "%.2f",
-                            abs(dueOrAdvance)
-                        )
-                    }"
+                    "${receivedPayment.bill?.currencySymbol} ${abs(dueOrAdvance).format(2)}"
                 }
 
                 dueOrAdvance > 0.0 -> {
 
                     includeBinding.showBillDueOrArrearTV.text =
                         "Paid in advance"
-                    "${receivedPayment.bill?.currencySymbol} ${String.format("%.2f", dueOrAdvance)}"
+                    "${receivedPayment.bill?.currencySymbol} ${dueOrAdvance.format(2)}"
                 }
                 else -> {
 
-                    "${receivedPayment.bill?.currencySymbol} 0.0"
+                    "${receivedPayment.bill?.currencySymbol} 0.00"
                 }
             }
 
@@ -327,19 +324,29 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         //total rent
         includeBinding.showBillHouseRent.text =
-            "${receivedPayment.bill?.currencySymbol} ${receivedPayment.houseRent}"
+            "${receivedPayment.bill?.currencySymbol} ${
+                receivedPayment.houseRent.toDouble().format(2)
+            }"
 
         includeBinding.showBillParking.text =
-            "${receivedPayment.bill?.currencySymbol} ${receivedPayment.parkingRent}"
+            "${receivedPayment.bill?.currencySymbol} ${
+                receivedPayment.parkingRent?.toDouble()?.format(2)
+            }"
 
         includeBinding.showBillElectricity.text =
-            "${receivedPayment.bill?.currencySymbol} ${receivedPayment.electricBill?.totalElectricBill}"
+            "${receivedPayment.bill?.currencySymbol} ${
+                receivedPayment.electricBill?.totalElectricBill?.toDouble()?.format(2)
+            }"
 
         includeBinding.showBillAmountPaid.text =
-            "${receivedPayment.bill?.currencySymbol} ${receivedPayment.amountPaid}"
+            "${receivedPayment.bill?.currencySymbol} ${
+                receivedPayment.amountPaid?.toDouble()?.format(2)
+            }"
 
         includeBinding.showBillNetDemand.text =
-            "${receivedPayment.bill?.currencySymbol} ${receivedPayment.totalRent}"
+            "${receivedPayment.bill?.currencySymbol} ${
+                receivedPayment.totalRent.toDouble().format(2)
+            }"
     }
 
     //[END of setting fields in bills textViews]

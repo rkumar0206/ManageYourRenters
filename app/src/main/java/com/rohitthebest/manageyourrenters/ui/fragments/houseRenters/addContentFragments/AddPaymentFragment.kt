@@ -34,7 +34,6 @@ import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -126,8 +125,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         getMessage()
         initListeners()
         textWatcher()
-
-        getLastPaymentInfo()
     }
 
     private fun getMessage() {
@@ -141,6 +138,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 }
 
                 receivedRenter = convertJSONtoRenter(args?.renterInfoMessage)
+                getLastPaymentInfo()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -149,23 +147,24 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun getLastPaymentInfo() {
 
-        paymentViewModel.getLastRenterPayment(receivedRenter?.key!!).observe(viewLifecycleOwner, {
+        paymentViewModel.getLastRenterPayment(receivedRenter?.key!!)
+            .observe(viewLifecycleOwner, { payment ->
 
-            if (it.isNotEmpty() && !isPaymentAdded) {
+                if ((payment != null) && !isPaymentAdded) {
 
-                lastPaymentInfo = it.first()
+                    lastPaymentInfo = payment
 
-                Log.d(TAG, "getLastPaymentInfo: $lastPaymentInfo")
+                    Log.d(TAG, "getLastPaymentInfo: $lastPaymentInfo")
 
-                lifecycleScope.launch {
+                    lifecycleScope.launch {
 
-                    delay(100)
+                        delay(100)
 
-                    withContext(Dispatchers.Main) {
+                        withContext(Dispatchers.Main) {
 
-                        initialChanges()
+                            initialChanges()
+                        }
                     }
-                }
 
             } else {
 
@@ -483,7 +482,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 Functions.showDateAndTimePickerDialog(
                     requireContext(),
                     workingWithDateAndTime.convertMillisecondsToCalendarInstance(currentTimestamp),
-                    false
+                    false,
+                    lastPaymentInfo?.timeStamp!!
                 ) { calendar ->
 
                     currentTimestamp = calendar.timeInMillis
@@ -923,95 +923,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 getString(R.string.f)
             )
 
-            //paymentViewModel.insertPayment(payment)
-
-            isPaymentAdded = true
-            updateDuesOfRenter(payment)
-        }
-    }
-
-    private fun updateDuesOfRenter(payment: Payment) {
-
-        Log.d(TAG, "updateDuesOfRenter: ")
-
-        paymentViewModel.getAllPaymentsListOfRenter(receivedRenter?.key!!)
-            .observe(viewLifecycleOwner) {
-
-                if (isPaymentAdded) {
-
-                    receivedRenter?.dueOrAdvanceAmount = amountPaid - totalRent
-
-                    try {
-                        addToDatabase(payment, receivedRenter!!)
-                    } catch (e: Exception) {
-
-                        e.printStackTrace()
-                    }
-                }
-            }
-    }
-
-    private fun addToDatabase(payment: Payment, renter: Renter) {
-
-        Log.d(TAG, "addToDatabase: ")
-
-        renter.modified = System.currentTimeMillis()
-
-        if (isInternetAvailable(requireContext())) {
-
-            payment.isSynced = getString(R.string.t)
-            renter.isSynced = getString(R.string.t)
-
-            updateRenterDueOrAdvanceAmount(renter)
-
-            uploadDocumentToFireStore(
-                requireContext(),
-                getString(R.string.payments),
-                payment.key
-            )
-
-            paymentViewModel.insertPayment(payment)
-            renterViewModel.updateRenter(renter)
+            paymentViewModel.insertPayment(requireContext(), payment)
 
             requireActivity().onBackPressed()
-        } else {
-
-            payment.isSynced = getString(R.string.f)
-            renter.isSynced = getString(R.string.f)
-
-            paymentViewModel.insertPayment(payment)
-            renterViewModel.updateRenter(renter)
-            requireActivity().onBackPressed()
         }
-
     }
 
-    private fun updateRenterDueOrAdvanceAmount(renter: Renter) {
-
-        if (renter.isSynced == getString(R.string.f)) {
-
-            //upload the renter to firestore
-            uploadDocumentToFireStore(
-                requireContext(),
-                getString(R.string.renters),
-                renter.key!!
-            )
-        } else {
-
-            val map = HashMap<String, Any?>()
-
-            map["modified"] = renter.modified
-            map["dueOrAdvanceAmount"] = renter.dueOrAdvanceAmount
-
-            updateDocumentOnFireStore(
-                requireContext(),
-                map,
-                getString(R.string.renters),
-                renter.key!!
-            )
-        }
-
-    }
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
 

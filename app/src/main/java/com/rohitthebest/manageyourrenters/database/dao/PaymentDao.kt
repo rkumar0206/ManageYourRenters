@@ -29,24 +29,16 @@ interface PaymentDao {
     @Query("DELETE FROM payment_table WHERE isSynced =:isSynced")
     suspend fun deleteAllPaymentsByIsSynced(isSynced: String)
 
-    @Query("SELECT * FROM payment_table ORDER BY timeStamp DESC")
-    fun getAllPaymentsList(): Flow<List<Payment>>
-
     @Query("SELECT * FROM payment_table WHERE renterKey =:renterKey ORDER BY timeStamp DESC")
     fun getAllPaymentsListOfRenter(renterKey: String): Flow<List<Payment>>
 
     @Query("SELECT * FROM payment_table WHERE `key` =:paymentKey")
     fun getPaymentByPaymentKey(paymentKey: String): Flow<Payment>
 
-    @Query("SELECT COUNT(id) FROM payment_table WHERE renterKey =:renterKey")
-    fun getCountOfPaymentsOfRenter(renterKey: String): Flow<Int>
-
-    @Query("SELECT SUM(amountPaid - totalRent) FROM payment_table WHERE renterKey =:renterKey")
-    fun getSumOfDueOrAdvance(renterKey: String): Flow<Double>
-
     @Query("SELECT `key` FROM payment_table WHERE renterKey = :renterKey")
     suspend fun getPaymentKeysByRenterKey(renterKey: String): List<String>
 
     @Query("SELECT * FROM payment_table WHERE renterKey = :renterKey ORDER BY timeStamp DESC LIMIT 1")
-    fun getLastRenterPayment(renterKey: String): Flow<List<Payment>>
+    fun getLastRenterPayment(renterKey: String): Flow<Payment>
+
 }

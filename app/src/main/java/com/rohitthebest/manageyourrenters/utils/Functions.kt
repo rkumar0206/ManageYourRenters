@@ -401,6 +401,7 @@ class Functions {
             context: Context,
             selectedDate: Calendar,
             isFutureDatesValid: Boolean = false,
+            minimumDateMilliseconds: Long = 0L,
             crossinline pickedDateListener: (calendar: Calendar) -> Unit
         ) {
 
@@ -429,6 +430,11 @@ class Functions {
             if (!isFutureDatesValid) {
 
                 datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
+            }
+
+            if (minimumDateMilliseconds != 0L) {
+
+                datePickerDialog.datePicker.minDate = minimumDateMilliseconds
             }
 
             datePickerDialog.show()

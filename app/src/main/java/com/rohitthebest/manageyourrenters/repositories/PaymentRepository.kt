@@ -24,15 +24,9 @@ class PaymentRepository @Inject constructor(
     suspend fun deleteAllPaymentsByIsSynced(isSynced: String) =
         dao.deleteAllPaymentsByIsSynced(isSynced)
 
-    fun getAllPaymentsList() = dao.getAllPaymentsList()
-
     fun getAllPaymentsListOfRenter(renterKey: String) = dao.getAllPaymentsListOfRenter(renterKey)
 
     fun getPaymentByPaymentKey(paymentKey: String) = dao.getPaymentByPaymentKey(paymentKey)
-
-    fun getCountOfPaymentsOfRenter(renterKey: String) = dao.getCountOfPaymentsOfRenter(renterKey)
-
-    fun getSumOfDueOrAdvance(renterKey: String) = dao.getSumOfDueOrAdvance(renterKey)
 
     suspend fun getPaymentKeysByRenterKey(renterKey: String) =
         dao.getPaymentKeysByRenterKey(renterKey)

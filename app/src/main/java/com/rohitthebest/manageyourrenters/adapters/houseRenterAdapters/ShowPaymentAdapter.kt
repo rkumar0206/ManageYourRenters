@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,8 @@ import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.show
+
+private const val TAG = "ShowPaymentAdapter"
 
 class ShowPaymentAdapter :
     ListAdapter<Payment, ShowPaymentAdapter.ShowPaymentViewHolder>(DiffUtilCallback()) {
@@ -32,13 +35,7 @@ class ShowPaymentAdapter :
 
             binding.apply {
 
-                if (absoluteAdapterPosition == 0) {
-
-                    paymentAdapterDeleteBtn.show()
-                } else {
-
-                    paymentAdapterDeleteBtn.hide()
-                }
+                Log.d(TAG, "setData: absoluteAdapterPosition : $absoluteAdapterPosition")
 
                 //Period
                 if (payment.bill?.billPeriodType == binding.root.context.getString(R.string.by_month)) {
@@ -129,6 +126,13 @@ class ShowPaymentAdapter :
                     paymentAdapterSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24)
                 }
 
+                if (absoluteAdapterPosition == 0) {
+
+                    paymentAdapterDeleteBtn.show()
+                } else {
+
+                    paymentAdapterDeleteBtn.hide()
+                }
             }
         }
 

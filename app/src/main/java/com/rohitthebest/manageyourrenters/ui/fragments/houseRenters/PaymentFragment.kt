@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,12 +25,9 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.math.abs
 
 private const val TAG = "PaymentFragment"
@@ -46,7 +44,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     private var receivedRenter: Renter? = null
 
-    private lateinit var paymentKeyList: List<String>
     private lateinit var paymentAdapter: ShowPaymentAdapter
 
     override fun onCreateView(
@@ -63,7 +60,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         super.onViewCreated(view, savedInstanceState)
 
         paymentAdapter = ShowPaymentAdapter()
-        paymentKeyList = emptyList()
+
+        showProgressBar()
 
         getMessage()
         initListener()
@@ -80,8 +78,14 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                     PaymentFragmentArgs.fromBundle(it)
                 }
 
-                val renterKey = args?.renterInfoMessage
-                getTheRenter(renterKey)
+                getTheRenter(args?.renterInfoMessage)
+
+                lifecycleScope.launch {
+
+                    delay(300)
+                    getPaymentListOfRenter()
+                }
+
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -92,19 +96,12 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         renterViewModel.getRenterByKey(renterKey!!).observe(viewLifecycleOwner) { renter ->
 
+            Log.d(TAG, "getTheRenter: ")
+
             receivedRenter = renter
 
-            showProgressBar()
+            updateCurrentDueOrAdvanceTV()
 
-            lifecycleScope.launch {
-
-                delay(300)
-
-                withContext(Dispatchers.Main) {
-
-                    getPaymentListOfRenter()
-                }
-            }
         }
     }
 
@@ -115,28 +112,25 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
             paymentViewModel.getAllPaymentsListOfRenter(receivedRenter?.key!!)
                 .observe(viewLifecycleOwner) { paymentList ->
 
+                    Log.d(TAG, "getPaymentListOfRenter: ")
+
                     if (paymentList.isNotEmpty()) {
 
                         hideNoPaymentsTV()
                         initializeSearchView(paymentList)
-
-                        paymentKeyList =
-                            paymentList.filter { payment -> payment.isSynced == getString(R.string.t) }
-                                .map { pay ->
-
-                                    pay.key
-                                }
-
-                        updateCurrentDueOrAdvanceTV()
-
-                        paymentAdapter.submitList(paymentList)
 
                     } else {
 
                         showNoPaymentsTV()
                     }
 
+                    paymentAdapter.submitList(paymentList)
                     hideProgressBar()
+
+                    paymentAdapter.notifyItemChanged(0)
+                    paymentAdapter.notifyItemChanged(1)
+                    paymentAdapter.notifyItemChanged(2)
+
                 }
 
         } catch (e: Exception) {
@@ -146,6 +140,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     @SuppressLint("SetTextI18n")
     private fun updateCurrentDueOrAdvanceTV() {
+
+        Log.d(TAG, "updateCurrentDueOrAdvanceTV: ")
 
         when {
 
@@ -241,8 +237,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     override fun onPaymentClick(payment: Payment) {
 
-        //showToast(requireContext(), payment.id.toString())
-
         val action = PaymentFragmentDirections.actionPaymentFragmentToRenterBillFragment(
             paymentKey = payment.key
         )
@@ -261,14 +255,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
             } else {
 
                 payment.isSynced = getString(R.string.t)
-
-                uploadDocumentToFireStore(
-                    requireContext(),
-                    getString(R.string.renters),
-                    payment.key
-                )
-
-                paymentViewModel.insertPayment(payment)
+                paymentViewModel.updatePayment(requireContext(), payment)
             }
 
         } else {
@@ -278,34 +265,20 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     }
 
-
-    // ===============================================================================================
-    // ===============================================================================================
-    // ===============================================================================================
-    // ===============================================================================================
-    // ==================================================================================================
-    // todo : requires change
-    // lookup the code and make the necessary changes
     override fun onDeleteClicked(payment: Payment) {
 
         showAlertDialogForDeletion(
             requireContext(),
             { dialog ->
 
-                // checking if the payment is synced, if it's not, then deleting it from
-                // only the local database
-                if (payment.isSynced == getString(R.string.f)) {
+                if (isInternetAvailable(requireContext())) {
 
-                    deletePayment(payment)
+                    paymentViewModel.deletePayment(requireContext(), payment)
+
                 } else {
-
-                    if (isInternetAvailable(requireContext())) {
-
-                        deletePayment(payment)
-                    } else {
-                        showNoInternetMessage(requireContext())
-                    }
+                    showNoInternetMessage(requireContext())
                 }
+
                 dialog.dismiss()
 
             },
@@ -314,75 +287,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 dialog.dismiss()
             }
         )
-
-/*
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Are you sure?")
-            .setMessage(getString(R.string.delete_warning_message))
-            .setPositiveButton("Delete") { dialogInterface, _ ->
-
-                if (payment.isSynced == getString(R.string.f)) {
-
-                    deletePayment(payment)
-                } else {
-
-                    if (isInternetAvailable(requireContext())) {
-
-                        deletePayment(payment)
-                    } else {
-                        showNoInternetMessage(requireContext())
-                    }
-                }
-                dialogInterface.dismiss()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-*/
-
     }
-
-    private fun deletePayment(payment: Payment) {
-
-        paymentViewModel.deletePayment(payment)
-        updateRenterDuesOrAdvanceTextView()
-
-        getPaymentListOfRenter()
-
-        var isUndoClicked = false
-
-        binding.paymentCoordL.showSnackbarWithActionAndDismissListener(
-            "Payment deleted",
-            "Undo",
-            {
-                isUndoClicked = true
-
-                paymentViewModel.insertPayment(payment)
-                updateRenterDuesOrAdvanceTextView()
-                getPaymentListOfRenter()
-
-                showToast(requireContext(), "Payment restored...")
-            },
-            {
-                if (!isUndoClicked && payment.isSynced == getString(R.string.t)) {
-
-                    //updateRenterDuesOrAdvance()
-                    updateRenterInDatabase(receivedRenter!!)
-
-                    deleteDocumentFromFireStore(
-                        context = requireContext(),
-                        collection = getString(R.string.payments),
-                        documentKey = payment.key
-                    )
-                }
-
-            }
-        )
-    }
-
 
     override fun onMessageBtnClicked(paymentMessage: String) {
 
@@ -401,70 +306,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
             }
             .create()
             .show()
-    }
-
-    private fun updateRenterDuesOrAdvanceTextView() {
-
-        var dueOrAdvance: Double
-        paymentViewModel.getAllPaymentsListOfRenter(receivedRenter?.key!!).observe(
-            viewLifecycleOwner
-        ) {
-
-            try {
-                val payment = it.first()
-
-                dueOrAdvance = (payment.amountPaid?.toDouble()
-                    ?.minus(payment.totalRent.toDouble())!!)
-
-
-                receivedRenter!!.dueOrAdvanceAmount = dueOrAdvance
-                renterViewModel.insertRenter(receivedRenter!!)
-
-                //editRenterInDatabase(receivedRenter!!)
-
-            } catch (e: java.lang.Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private fun updateRenterInDatabase(renter: Renter) {
-
-        if (isInternetAvailable(requireContext())) {
-
-            if (renter.isSynced == getString(R.string.t)) {
-
-                //update on firestore
-                val map = HashMap<String, Any?>()
-                map["dueOrAdvanceAmount"] = renter.dueOrAdvanceAmount
-
-                updateDocumentOnFireStore(
-                    requireContext(),
-                    map,
-                    getString(R.string.renters),
-                    renter.key!!
-                )
-
-                renterViewModel.insertRenter(renter)
-            } else {
-
-                renter.isSynced = getString(R.string.t)
-
-                //insert on firestore
-                uploadDocumentToFireStore(
-                    requireContext(),
-                    getString(R.string.renters),
-                    renter.key!!
-                )
-
-                renterViewModel.insertRenter(renter)
-            }
-
-        } else {
-
-            renter.isSynced = getString(R.string.f)
-            renterViewModel.insertRenter(renter)
-        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -505,25 +346,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                     showToast(requireContext(), "No Payments added!!!")
                 } else {
 
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Delete all payments?")
-                        .setMessage(getString(R.string.delete_warning_message))
-                        .setPositiveButton("Delete All") { dialogInterface, _ ->
-
-                            if (isInternetAvailable(requireContext())) {
-
-                                deleteAllPayments()
-                            } else {
-                                showNoInternetMessage(requireContext())
-                            }
-                            dialogInterface.dismiss()
-                        }
-                        .setNegativeButton("Cancel") { dialog, _ ->
-
-                            dialog.dismiss()
-                        }
-                        .create()
-                        .show()
+                    deleteAllPaymentsAfterWarningMessage()
                 }
             }
 
@@ -534,29 +357,36 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         }
     }
 
-    private fun deleteAllPayments() {
+    private fun deleteAllPaymentsAfterWarningMessage() {
 
-        deleteFromCloud()
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Delete all payments?")
+            .setMessage(getString(R.string.delete_warning_message))
+            .setPositiveButton("Delete All") { dialogInterface, _ ->
 
-        paymentViewModel.deleteAllPaymentsOfRenter(receivedRenter?.key!!)
+                if (isInternetAvailable(requireContext())) {
 
-        showToast(requireContext(), "Deleted all the payments of ${receivedRenter?.name}")
-    }
+                    paymentViewModel.deleteAllPaymentsOfRenter(
+                        requireContext(),
+                        receivedRenter?.key!!
+                    )
 
-    private fun deleteFromCloud() {
+                    showToast(
+                        requireContext(),
+                        "Deleted all the payments of ${receivedRenter?.name}"
+                    )
+                } else {
+                    showNoInternetMessage(requireContext())
+                }
+                dialogInterface.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
 
-        if (paymentKeyList.isNotEmpty()) {
+                dialog.dismiss()
+            }
+            .create()
+            .show()
 
-            deleteAllDocumentsUsingKeyFromFirestore(
-                requireContext(),
-                getString(R.string.payments),
-                convertStringListToJSON(paymentKeyList)
-            )
-        }
-
-        receivedRenter?.dueOrAdvanceAmount = 0.0
-
-        updateRenterInDatabase(receivedRenter!!)
     }
 
     private fun showNoPaymentsTV() {
@@ -588,7 +418,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         try {
 
             binding.paymentFragProgressBar.show()
-            binding.paymentRV.hide()
         } catch (e: java.lang.Exception) {
 
             e.printStackTrace()
@@ -600,7 +429,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         try {
 
             binding.paymentFragProgressBar.hide()
-            binding.paymentRV.show()
         } catch (e: java.lang.Exception) {
 
             e.printStackTrace()

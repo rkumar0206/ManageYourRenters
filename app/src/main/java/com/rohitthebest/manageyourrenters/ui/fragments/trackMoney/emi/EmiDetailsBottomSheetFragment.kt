@@ -63,11 +63,11 @@ class EmiDetailsBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun getEMI() {
 
-        emiViewModel.getEMIByKey(receivedEMIKey).observe(viewLifecycleOwner, { emi ->
+        emiViewModel.getEMIByKey(receivedEMIKey).observe(viewLifecycleOwner) { emi ->
 
             receivedEMI = emi
             updateUI()
-        })
+        }
     }
 
     @SuppressLint("SetTextI18n")

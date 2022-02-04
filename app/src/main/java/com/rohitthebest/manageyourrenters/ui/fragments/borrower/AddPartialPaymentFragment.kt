@@ -119,7 +119,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
     private fun getBorrowerPayment() {
 
         borrowerPaymentViewModel.getBorrowerPaymentByKey(receivedBorrowerPaymentKey)
-            .observe(viewLifecycleOwner, { borrowerPayment ->
+            .observe(viewLifecycleOwner) { borrowerPayment ->
 
                 receivedBorrowerPayment = borrowerPayment
                 partialPaymentAdapter = PartialPaymentAdapter(borrowerPayment.currencySymbol)
@@ -127,13 +127,13 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                 updateUI()
                 getBorrowerPartialPayments()
-            })
+            }
     }
 
     private fun getBorrowerPartialPayments() {
 
         partialPaymentViewModel.getPartialPaymentByBorrowerPaymentKey(receivedBorrowerPaymentKey)
-            .observe(viewLifecycleOwner, { partialPaymentList ->
+            .observe(viewLifecycleOwner) { partialPaymentList ->
 
                 if (isRefereshEnabled) {
 
@@ -150,7 +150,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                     isRefereshEnabled = false
                 }
-            })
+            }
     }
 
     private fun updateUI() {
@@ -454,7 +454,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         Log.d(TAG, "getAndUpdateTotalDueAmountOfBorrower: ")
 
         borrowerPaymentViewModel.getTotalDueOfTheBorrower(receivedBorrowerPayment?.borrowerKey!!)
-            .observe(viewLifecycleOwner, { totalDue ->
+            .observe(viewLifecycleOwner) { totalDue ->
 
                 Log.d(TAG, "getAndUpdateTotalDueAmountOfBorrower: Total due : $totalDue")
                 if (totalDue == null) {
@@ -464,7 +464,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                     updateBorrowerDueAmount(totalDue)
                 }
-            })
+            }
     }
 
     var isBorrowerUpdateEnabled = true
@@ -474,7 +474,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         Log.d(TAG, "updateBorrowerDueAmount: ")
 
         borrowerViewModel.getBorrowerByKey(receivedBorrowerPayment?.borrowerKey!!)
-            .observe(viewLifecycleOwner, { borrower ->
+            .observe(viewLifecycleOwner) { borrower ->
 
                 if (isBorrowerUpdateEnabled) {
                     Log.d(TAG, "updateBorrowerDueAmount: ${borrower.name}")
@@ -517,7 +517,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                     isBorrowerUpdateEnabled = false
                 }
-            })
+            }
     }
 
     private fun savePartialPaymentsToFireStore() {
@@ -609,10 +609,10 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private fun getTotalPaidAmountFromAllThePartialPayment(): Double {
 
-        val totalPaid = addedPartialPaymentList.fold(0.0, { acc, partialPayment ->
+        val totalPaid = addedPartialPaymentList.fold(0.0) { acc, partialPayment ->
 
             acc + partialPayment.amount
-        })
+        }
 
         Log.d(TAG, "checkTotalDueAmountAndHandleShowingAlertDialog: $totalPaid")
 

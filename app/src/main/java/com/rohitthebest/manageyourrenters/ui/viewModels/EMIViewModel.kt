@@ -1,10 +1,9 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.content.Context
+import android.os.Parcelable
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
@@ -24,8 +23,29 @@ private const val TAG = "EMIViewModel"
 @HiltViewModel
 class EMIViewModel @Inject constructor(
     private val emiRepository: EMIRepository,
-    private val emiPaymentRepository: EMIPaymentRepository
+    private val emiPaymentRepository: EMIPaymentRepository,
+    private val state: SavedStateHandle
 ) : ViewModel() {
+
+    // ------------------------- UI related ----------------------------
+
+    companion object {
+
+        private const val EMI_RV_KEY = "jcabbbcEMI_RV_KEYabjsnjdn"
+    }
+
+    fun saveEmiRvState(rvState: Parcelable?) {
+
+        state.set(EMI_RV_KEY, rvState)
+    }
+
+    private val _emiRvState: MutableLiveData<Parcelable> = state.getLiveData(
+        EMI_RV_KEY
+    )
+
+    val emiRvState: LiveData<Parcelable> get() = _emiRvState
+
+    // ---------------------------------------------------------------
 
     fun insertEMI(emi: EMI) = viewModelScope.launch {
         emiRepository.insertEMI(emi)

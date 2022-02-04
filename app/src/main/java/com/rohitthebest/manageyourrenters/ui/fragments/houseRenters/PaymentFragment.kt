@@ -75,13 +75,13 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     private fun getRvState() {
 
-        paymentViewModel.renterPaymentRvState.observe(viewLifecycleOwner, { parcelable ->
+        paymentViewModel.renterPaymentRvState.observe(viewLifecycleOwner) { parcelable ->
 
             parcelable?.let {
 
                 rvStateParcelable = it
             }
-        })
+        }
 
     }
 

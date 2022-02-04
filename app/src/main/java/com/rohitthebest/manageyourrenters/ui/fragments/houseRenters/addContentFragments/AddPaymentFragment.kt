@@ -29,7 +29,6 @@ import com.rohitthebest.manageyourrenters.databinding.AddPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
-import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
@@ -46,7 +45,6 @@ private const val TAG = "AddPaymentFragment"
 @AndroidEntryPoint
 class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnCheckedChangeListener {
 
-    private val renterViewModel: RenterViewModel by viewModels()
     private val paymentViewModel: PaymentViewModel by viewModels()
 
     private var _binding: FragmentAddPaymentBinding? = null
@@ -148,7 +146,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private fun getLastPaymentInfo() {
 
         paymentViewModel.getLastRenterPayment(receivedRenter?.key!!)
-            .observe(viewLifecycleOwner, { payment ->
+            .observe(viewLifecycleOwner) { payment ->
 
                 if ((payment != null) && !isPaymentAdded) {
 
@@ -166,12 +164,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                         }
                     }
 
-            } else {
+                } else {
 
-                initialChanges()
-                binding.progressBar.hide()
+                    initialChanges()
+                    binding.progressBar.hide()
+                }
             }
-        })
     }
 
 

@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -46,6 +47,8 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
     private lateinit var emiPaymentAdapter: EMIPaymentAdapter
 
+    private var rvStateParcelable: Parcelable? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentEmiPaymentBinding.bind(view)
@@ -59,9 +62,21 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
         initListeners()
 
         setUpRecyclerView()
+
+        getRvState()
     }
 
+    private fun getRvState() {
 
+        emiPaymentViewModel.emiPaymentRvState.observe(viewLifecycleOwner) { parcelable ->
+
+            parcelable?.let {
+
+                rvStateParcelable = it
+            }
+        }
+
+    }
 
     private fun getMessage() {
 
@@ -84,19 +99,19 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
     private fun getEMI() {
 
-        emiViewModel.getEMIByKey(receivedEMIKey).observe(viewLifecycleOwner, { emi ->
+        emiViewModel.getEMIByKey(receivedEMIKey).observe(viewLifecycleOwner) { emi ->
 
             receivedEMI = emi
 
             binding.emiPaymentToolbar.title = emi.emiName
 
             getEMIPayments()
-        })
+        }
     }
 
     private fun getEMIPayments() {
 
-        emiPaymentViewModel.getAllEMIPaymentsByEMIKey(receivedEMIKey).observe(viewLifecycleOwner, {
+        emiPaymentViewModel.getAllEMIPaymentsByEMIKey(receivedEMIKey).observe(viewLifecycleOwner) {
 
             if (it.isEmpty()) {
 
@@ -115,9 +130,10 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
             }
 
             emiPaymentAdapter.submitList(it)
+            binding.emiPaymentsRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
 
             shouldShowProgressBar(false)
-        })
+        }
     }
 
     private fun setUpRecyclerView() {
@@ -405,6 +421,11 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        emiPaymentViewModel.saveEmiPaymentRvState(
+            binding.emiPaymentsRV.layoutManager?.onSaveInstanceState()
+        )
+
         _binding = null
     }
 

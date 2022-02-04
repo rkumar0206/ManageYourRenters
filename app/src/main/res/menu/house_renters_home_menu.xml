@@ -8,5 +8,32 @@
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_total_number_of_renters"
+        android:title="@string/total_number_of_renters"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_renter_revenue"
+        android:title="@string/revenue">
+
+        <menu>
+
+
+            <item
+                android:id="@+id/menu_renter_revenue_this_month"
+                android:title="@string/this_month" />
+            <item
+                android:id="@+id/menu_renter_revenue_previous_month"
+                android:title="@string/previous_month" />
+            <item
+                android:id="@+id/menu_renter_revenue_this_week"
+                android:title="@string/this_week" />
+            <item
+                android:id="@+id/menu_renter_revenue_all_time"
+                android:title="@string/all_time" />
+        </menu>
+
+    </item>
 
 </menu>

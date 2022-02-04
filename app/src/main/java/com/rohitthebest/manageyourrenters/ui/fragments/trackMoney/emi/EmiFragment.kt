@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.SearchView
@@ -43,6 +44,8 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
     private lateinit var emiAdapter: EMIAdapter
 
+    private var rvStateParcelable: Parcelable? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentEmiBinding.bind(view)
@@ -60,6 +63,18 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
         }
 
         setUpRecyclerView()
+        getRvState()
+    }
+
+    private fun getRvState() {
+
+        emiViewModel.emiRvState.observe(viewLifecycleOwner) { parcelable ->
+
+            parcelable?.let {
+
+                rvStateParcelable = it
+            }
+        }
     }
 
     private fun setUpRecyclerView() {
@@ -150,7 +165,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
                 requireContext(),
                 {
 
-                    if (!emiForMenuItems.isSynced) {
+                    if (isInternetAvailable(requireContext())) {
 
                         emiViewModel.deleteEMI(
                             requireContext(),
@@ -158,17 +173,9 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
                         )
                     } else {
 
-                        if (isInternetAvailable(requireContext())) {
-
-                            emiViewModel.deleteEMI(
-                                requireContext(),
-                                emiForMenuItems
-                            )
-                        } else {
-
-                            showNoInternetMessage(requireContext())
-                        }
+                        showNoInternetMessage(requireContext())
                     }
+
                 },
                 { dialog ->
 
@@ -279,7 +286,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
     private fun getEMIs() {
 
-        emiViewModel.getAllEMIs().observe(viewLifecycleOwner, { emiList ->
+        emiViewModel.getAllEMIs().observe(viewLifecycleOwner) { emiList ->
 
             Log.d(TAG, "getEMIs: $emiList")
 
@@ -292,17 +299,18 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
             }
 
             emiAdapter.submitList(emiList)
+            binding.emiRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
 
             setUpSearchView(emiList)
 
             setProgressBarVisibility(false)
-        })
+        }
     }
 
     private fun setUpSearchView(emiList: List<EMI>?) {
 
         val searchView =
-            binding.emiFragmentToolbar.menu.findItem(R.id.menu_search_home).actionView as SearchView
+            binding.emiFragmentToolbar.menu.findItem(R.id.menu_search).actionView as SearchView
 
         searchView.searchText { s ->
 
@@ -356,6 +364,11 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        emiViewModel.saveEmiRvState(
+            binding.emiRV.layoutManager?.onSaveInstanceState()
+        )
+
         _binding = null
     }
 

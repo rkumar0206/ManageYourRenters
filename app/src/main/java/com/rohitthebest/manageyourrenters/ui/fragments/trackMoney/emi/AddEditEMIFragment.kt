@@ -90,12 +90,12 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
     private fun getEmi() {
 
-        emiViewModel.getEMIByKey(receivedEmiKey).observe(viewLifecycleOwner, {
+        emiViewModel.getEMIByKey(receivedEmiKey).observe(viewLifecycleOwner) {
 
             receivedEmi = it
 
             updateUI()
-        })
+        }
     }
 
     private fun updateUI() {

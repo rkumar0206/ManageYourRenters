@@ -385,7 +385,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
 
             expenseCategoryViewModel.getAllExpenseCategories()
-                .observe(viewLifecycleOwner, { expenseCategories ->
+                .observe(viewLifecycleOwner) { expenseCategories ->
 
                     if (expenseCategories.isNotEmpty()) {
 
@@ -437,7 +437,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                         }
 
                     }
-                })
+                }
         }
 
     }
@@ -454,9 +454,8 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                 pie.legend().title("Total expense : $total")
             }
 
-
             expenseCategoryViewModel.getAllExpenseCategories()
-                .observe(viewLifecycleOwner, { expenseCategories ->
+                .observe(viewLifecycleOwner) { expenseCategories ->
 
                     if (expenseCategories.isNotEmpty()) {
 
@@ -508,7 +507,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                         }
 
                     }
-                })
+                }
         }
     }
 

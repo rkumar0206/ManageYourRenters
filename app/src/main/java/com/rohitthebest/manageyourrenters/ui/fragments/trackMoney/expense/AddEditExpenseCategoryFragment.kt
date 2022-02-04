@@ -123,11 +123,11 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
 
     private fun observeUnsplashSearchResult() {
 
-        unsplashViewModel.unsplashSearchResult.observe(viewLifecycleOwner, {
+        unsplashViewModel.unsplashSearchResult.observe(viewLifecycleOwner) {
 
             Log.d(TAG, "observeUnsplashSearchResult: $it")
             unsplashSearchAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-        })
+        }
     }
 
 
@@ -150,12 +150,12 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
     private fun getExpenseCategory() {
 
         expenseCategoryViewModel.getExpenseCategoryByKey(receivedExpenseCategoryKey)
-            .observe(viewLifecycleOwner, { expenseCategory ->
+            .observe(viewLifecycleOwner) { expenseCategory ->
 
                 receivedExpenseCategory = expenseCategory
 
                 updateUI()
-            })
+            }
     }
 
     private fun updateUI() {

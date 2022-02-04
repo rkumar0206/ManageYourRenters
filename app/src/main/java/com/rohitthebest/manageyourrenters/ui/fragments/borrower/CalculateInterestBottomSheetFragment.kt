@@ -120,12 +120,12 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
     private fun getBorrowerPayment() {
 
         borrowerPaymentViewModel.getBorrowerPaymentByKey(receivedBorrowerPaymentKey)
-            .observe(viewLifecycleOwner, { borrowerPayment ->
+            .observe(viewLifecycleOwner) { borrowerPayment ->
 
                 receivedBorrowerPayment = borrowerPayment
 
                 initUI()
-            })
+            }
     }
 
     private fun initUI() {

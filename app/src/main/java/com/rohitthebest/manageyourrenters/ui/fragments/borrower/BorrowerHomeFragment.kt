@@ -65,7 +65,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     private fun getAllBorrowers() {
 
-        borrowerViewModel.getAllBorrower().observe(viewLifecycleOwner, {
+        borrowerViewModel.getAllBorrower().observe(viewLifecycleOwner) {
 
             if (it.isEmpty()) {
 
@@ -80,13 +80,13 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
             initSearchViewMenu(it)
 
             showHideProgressBar(false)
-        })
+        }
     }
 
     private fun initSearchViewMenu(borrowerList: List<Borrower>) {
 
         val searchView =
-            binding.individualRenterToolbar.menu.findItem(R.id.menu_search_home).actionView as SearchView
+            binding.individualRenterToolbar.menu.findItem(R.id.menu_search).actionView as SearchView
 
         searchView.searchText { newText ->
 

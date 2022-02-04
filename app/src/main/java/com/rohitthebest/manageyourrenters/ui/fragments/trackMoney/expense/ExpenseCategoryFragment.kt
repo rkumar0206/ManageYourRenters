@@ -64,13 +64,13 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
     private fun getExpenseCategoryRvState() {
 
-        expenseCategoryViewModel.expenseCategoryRvState.observe(viewLifecycleOwner, { parcelable ->
+        expenseCategoryViewModel.expenseCategoryRvState.observe(viewLifecycleOwner) { parcelable ->
 
             parcelable?.let {
 
                 rvStateParcelable = it
             }
-        })
+        }
     }
 
     private fun setUpRecyclerView() {
@@ -197,7 +197,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
     private fun observeExpenseCategories() {
 
         expenseCategoryViewModel.getAllExpenseCategories()
-            .observe(viewLifecycleOwner, { expenseCategories ->
+            .observe(viewLifecycleOwner) { expenseCategories ->
 
                 if (expenseCategories.isNotEmpty()) {
 
@@ -215,7 +215,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
                 expenseCategoryAdapter.submitList(expenseCategories)
 
                 binding.expenseCategoryRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
-            })
+            }
     }
 
     private fun setUpSearchView(expenseCategories: List<ExpenseCategory>?) {

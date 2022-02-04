@@ -74,13 +74,13 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
 
     private fun getEMI() {
 
-        emiViewModel.getEMIByKey(receivedEMIKey).observe(viewLifecycleOwner, { emi ->
+        emiViewModel.getEMIByKey(receivedEMIKey).observe(viewLifecycleOwner) { emi ->
 
             receivedEMI = emi
 
             binding.addEmiPaymentToolbar.title = "${receivedEMI.emiName} payment"
             getPreviousEMIPayment()
-        })
+        }
     }
 
 

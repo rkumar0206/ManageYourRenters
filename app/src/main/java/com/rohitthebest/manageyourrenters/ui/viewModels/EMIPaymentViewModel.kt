@@ -1,18 +1,20 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.content.Context
+import android.os.Parcelable
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.EMIRepository
-import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
+import com.rohitthebest.manageyourrenters.utils.deleteFileFromFirebaseStorage
+import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -23,8 +25,30 @@ private const val TAG = "EMIPaymentViewModel"
 @HiltViewModel
 class EMIPaymentViewModel @Inject constructor(
     private val emiPaymentRepository: EMIPaymentRepository,
-    private val emiRepository: EMIRepository
+    private val emiRepository: EMIRepository,
+    private val state: SavedStateHandle
 ) : ViewModel() {
+
+    // ------------------------- UI related ----------------------------
+
+    companion object {
+
+        private const val EMI_PAYMENT_RV_KEY = "sscjcbajbbcEMI_PAYMENT_RV_KEmzcnjdn"
+    }
+
+    fun saveEmiPaymentRvState(rvState: Parcelable?) {
+
+        state.set(EMI_PAYMENT_RV_KEY, rvState)
+    }
+
+    private val _emiPaymentRvState: MutableLiveData<Parcelable> = state.getLiveData(
+        EMI_PAYMENT_RV_KEY
+    )
+
+    val emiPaymentRvState: LiveData<Parcelable> get() = _emiPaymentRvState
+
+    // ---------------------------------------------------------------
+
 
     fun insertEMIPayment(context: Context, emiPayment: EMIPayment) = viewModelScope.launch {
 

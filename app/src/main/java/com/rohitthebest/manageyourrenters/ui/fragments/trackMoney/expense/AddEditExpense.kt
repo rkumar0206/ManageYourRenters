@@ -105,12 +105,12 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
     private fun getExpense() {
 
         expenseViewModel.getExpenseByKey(receivedExpenseKey)
-            .observe(viewLifecycleOwner, { expense ->
+            .observe(viewLifecycleOwner) { expense ->
 
                 receivedExpense = expense
 
                 updateUI()
-            })
+            }
     }
 
     private fun updateUI() {
@@ -133,12 +133,12 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
         if (this::receivedExpenseCategoryKey.isInitialized) {
 
             expenseCategoryViewModel.getExpenseCategoryByKey(receivedExpenseCategoryKey)
-                .observe(viewLifecycleOwner, { expenseCategory ->
+                .observe(viewLifecycleOwner) { expenseCategory ->
 
                     receivedExpenseCategory = expenseCategory
 
                     binding.toolbar.title = "Add ${expenseCategory.categoryName} Expenses"
-                })
+                }
         }
     }
 

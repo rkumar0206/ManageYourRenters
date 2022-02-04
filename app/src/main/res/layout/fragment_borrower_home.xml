@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|enterAlways"
             app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-            app:menu="@menu/house_renters_home_menu"
+            app:menu="@menu/search_menu"
             app:title="@string/borrowers" />
 
     </com.google.android.material.appbar.AppBarLayout>

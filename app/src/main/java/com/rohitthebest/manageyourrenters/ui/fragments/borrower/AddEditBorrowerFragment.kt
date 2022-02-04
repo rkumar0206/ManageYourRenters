@@ -87,11 +87,11 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
     private fun getTheBorrower() {
 
         borrowerViewModel.getBorrowerByKey(receivedBorrowerKey)
-            .observe(viewLifecycleOwner, { borrower ->
+            .observe(viewLifecycleOwner) { borrower ->
 
                 receivedBorrower = borrower
                 updateUI()
-            })
+            }
     }
 
     private fun updateUI() {

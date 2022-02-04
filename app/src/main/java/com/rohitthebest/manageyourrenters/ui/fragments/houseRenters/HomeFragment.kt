@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
@@ -11,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -33,7 +35,8 @@ import java.util.*
 //private const val TAG = "HomeFragment"
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClickListener {
+class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClickListener,
+    MenuItem.OnMenuItemClickListener {
 
     private val renterViewModel: RenterViewModel by viewModels()
 
@@ -83,13 +86,13 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private fun getRvState() {
 
-        renterViewModel.renterRvState.observe(viewLifecycleOwner, { parcelable ->
+        renterViewModel.renterRvState.observe(viewLifecycleOwner) { parcelable ->
 
             parcelable?.let {
 
                 rvStateParcelable = it
             }
-        })
+        }
 
     }
 
@@ -97,22 +100,22 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         try {
 
-            renterViewModel.getAllRentersList().observe(viewLifecycleOwner, {
+            renterViewModel.getAllRentersList().observe(viewLifecycleOwner) { renters ->
 
-                if (it.isNotEmpty()) {
+                if (renters.isNotEmpty()) {
 
                     hideNoRentersAddedTV()
-                    setUpSearchEditText(it)
+                    setUpSearchEditText(renters)
                 } else {
 
                     showNoRentersAddedTV()
                 }
 
-                mAdapter.submitList(it)
+                mAdapter.submitList(renters)
                 binding.rentersRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
 
                 binding.homeProgressBar.hide()
-            })
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -263,6 +266,58 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
             requireActivity().onBackPressed()
         }
 
+        handleMenuClickListener()
+
+    }
+
+    private fun handleMenuClickListener() {
+
+        binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_total_number_of_renters)
+            .setOnMenuItemClickListener(this)
+    }
+
+
+    override fun onMenuItemClick(menu: MenuItem?): Boolean {
+
+        return when (menu?.itemId) {
+
+            R.id.menu_total_number_of_renters -> {
+
+                renterViewModel.getRenterCount().observe(viewLifecycleOwner) { count ->
+
+                    showAlertDialogWithTitleAndMessage(
+                        "Total renters",
+                        "You have $count number of renters."
+                    )
+                }
+
+                true
+            }
+
+            R.id.menu_renter_revenue_all_time -> {
+
+                renterViewModel.getRenterCount().observe(viewLifecycleOwner) { count ->
+
+                    showAlertDialogWithTitleAndMessage(
+                        "Total renters",
+                        "You have $count number of renters."
+                    )
+                }
+
+                true
+            }
+
+            else -> false
+        }
+    }
+
+    private fun showAlertDialogWithTitleAndMessage(title: String, message: String) {
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(title)
+            .setMessage(message)
+            .create()
+            .show()
     }
 
     override fun onClick(v: View?) {

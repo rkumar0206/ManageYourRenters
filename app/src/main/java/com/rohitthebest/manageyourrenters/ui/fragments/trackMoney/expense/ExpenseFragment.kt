@@ -120,7 +120,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         if (this::receivedExpenseCategoryKey.isInitialized) {
 
             expenseCategoryViewModel.getExpenseCategoryByKey(receivedExpenseCategoryKey)
-                .observe(viewLifecycleOwner, { expenseCategory ->
+                .observe(viewLifecycleOwner) { expenseCategory ->
 
                     receivedExpenseCategory = expenseCategory
 
@@ -131,7 +131,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                     setUpRecyclerView()
 
                     observeExpenses()
-                })
+                }
         }
     }
 
@@ -147,20 +147,21 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
                     expenseViewModel.getExpensesByExpenseCategoryKey(receivedExpenseCategoryKey)
                         .observe(
-                            viewLifecycleOwner, { expenses ->
+                            viewLifecycleOwner
+                        ) { expenses ->
 
-                                handleExpenseList(expenses)
-                            })
+                            handleExpenseList(expenses)
+                        }
                 } else if (sortBy == SortExpense.BY_DATE_RANGE) {
 
                     // adding number of milliseconds in one day to the endDate for accurate result
 
                     expenseViewModel.getExpenseByDateRangeAndExpenseCategoryKey(
                         receivedExpenseCategoryKey, startDate, (endDate + 86400000L)
-                    ).observe(viewLifecycleOwner, { expenses ->
+                    ).observe(viewLifecycleOwner) { expenses ->
 
                         handleExpenseList(expenses)
-                    })
+                    }
                 }
 
             }
@@ -252,7 +253,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
     override fun onItemClick(expense: Expense) {
 
         expenseCategoryViewModel.getExpenseCategoryByKey(expense.categoryKey)
-            .observe(viewLifecycleOwner, { expenseCategory ->
+            .observe(viewLifecycleOwner) { expenseCategory ->
 
                 val msg =
                     "\nDate : ${
@@ -273,7 +274,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                     }
                     .create()
                     .show()
-            })
+            }
 
     }
 

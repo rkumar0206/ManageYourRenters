@@ -89,14 +89,14 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             .currentBackStackEntry
             ?.savedStateHandle
             ?.getLiveData<Boolean>(Constants.SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY)
-            ?.observe(viewLifecycleOwner, {
+            ?.observe(viewLifecycleOwner) {
 
                 if (it) {
 
                     //todo : call back pressed
                     Log.d(TAG, "observeForSupportingDocumentBottomSheetDismissListener: $it")
                 }
-            })
+            }
     }
 
     private fun getMessage() {
@@ -122,7 +122,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private fun getBorrower() {
 
-        borrowerViewModel.getBorrowerByKey(receivedBorrowerKey).observe(viewLifecycleOwner, {
+        borrowerViewModel.getBorrowerByKey(receivedBorrowerKey).observe(viewLifecycleOwner) {
 
             if (it != null) {
                 receivedBorrower = it
@@ -130,7 +130,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
                 includeBinding.borrowerNameTV.text = receivedBorrower!!.name
             }
-        })
+        }
     }
 
     private fun initUI() {

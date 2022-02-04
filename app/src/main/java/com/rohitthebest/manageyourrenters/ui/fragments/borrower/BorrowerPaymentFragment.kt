@@ -102,19 +102,19 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     private fun getBorrower() {
 
-        borrowerViewModel.getBorrowerByKey(receivedBorrowerKey).observe(viewLifecycleOwner, {
+        borrowerViewModel.getBorrowerByKey(receivedBorrowerKey).observe(viewLifecycleOwner) {
 
             if (it != null) {
                 receivedBorrower = it
                 Log.d(TAG, "getBorrower: received borrower : $receivedBorrower")
             }
-        })
+        }
     }
 
     private fun getBorrowerPayments() {
 
         borrowerPaymentViewModel.getPaymentsByBorrowerKey(receivedBorrowerKey)
-            .observe(viewLifecycleOwner, { borrowerPayments ->
+            .observe(viewLifecycleOwner) { borrowerPayments ->
 
                 borrowerPaymentAdapter.submitList(borrowerPayments)
 
@@ -129,7 +129,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
                 }
 
                 binding.progressbar.hide()
-            })
+            }
 
     }
 

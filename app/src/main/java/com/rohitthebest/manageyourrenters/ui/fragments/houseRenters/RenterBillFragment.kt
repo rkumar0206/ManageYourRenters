@@ -136,18 +136,18 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
     private fun getPaymentFromDatabase() {
 
         paymentViewModel.getPaymentByPaymentKey(receivedPaymentKey)
-            .observe(viewLifecycleOwner, { payment ->
+            .observe(viewLifecycleOwner) { payment ->
 
                 receivedPayment = payment
 
                 getRenterInfoFromDatabase()
-            })
+            }
     }
 
     private fun getRenterInfoFromDatabase() {
 
         renterViewModel.getRenterByKey(receivedPayment.renterKey)
-            .observe(viewLifecycleOwner, { renter ->
+            .observe(viewLifecycleOwner) { renter ->
 
                 receivedRenter = renter
 
@@ -162,7 +162,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
                     )
                 }
                 initializeValuesToBill()
-            })
+            }
     }
 
     private fun initializeValuesToBill() {

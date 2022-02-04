@@ -17,6 +17,7 @@
     <string name="document_number">Document number</string>
     <string name="address">Address</string>
     <string name="payments">Payments</string>
+    <string name="renter_payments">RenterPayments</string>
     <string name="menubtn">Menu Button</string>
     <string name="addpaymentfab">addPaymentFAB</string>
     <string name="renter_name">Renter name</string>

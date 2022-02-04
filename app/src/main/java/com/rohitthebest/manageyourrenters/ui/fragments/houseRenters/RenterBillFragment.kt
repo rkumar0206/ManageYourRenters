@@ -7,11 +7,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.model.Payment
+import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.Renter
+import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentRenterBillBinding
 import com.rohitthebest.manageyourrenters.databinding.ShowBillLayoutBinding
-import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.RenterPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBitmapToCacheDirectoryAndShare
@@ -28,16 +29,19 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
     private var _binding: FragmentRenterBillBinding? = null
     private val binding get() = _binding!!
 
-    private val paymentViewModel: PaymentViewModel by viewModels()
+    private val renterPaymentViewModel: RenterPaymentViewModel by viewModels()
     private val renterViewModel: RenterViewModel by viewModels()
 
     private lateinit var receivedRenter: Renter
-    private lateinit var receivedPayment: Payment
+    private lateinit var receivedPayment: RenterPayment
 
     private var receivedPaymentKey = ""
 
     private lateinit var includeBinding: ShowBillLayoutBinding
     private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
+
+    private var monthList: List<String> = emptyList()
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -45,6 +49,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         includeBinding = binding.include
         workingWithDateAndTime = WorkingWithDateAndTime()
+        monthList = resources.getStringArray(R.array.months).toList()
 
         getMessage()
 
@@ -78,19 +83,19 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
             val bitmap = includeBinding.root.loadBitmap()
 
             val fileName =
-                if (receivedPayment.bill?.billPeriodType == getString(R.string.by_month)) {
+                if (receivedPayment.billPeriodInfo.billPeriodType == BillPeriodType.BY_MONTH) {
 
-                    "${receivedRenter.name}_${receivedPayment.bill?.billMonth}"
+                    "${receivedRenter.name}_${monthList[receivedPayment.billPeriodInfo.renterBillMonthType?.forBillMonth!! - 1]}"
                 } else {
 
                     "${receivedRenter.name}_" + "${
                         workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                            receivedPayment.bill?.billDateFrom
+                            receivedPayment.billPeriodInfo.renterBillDateType?.fromBillDate
                         )
                     }" +
                             "_to_${
                                 workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    receivedPayment.bill?.billDateTill
+                                    receivedPayment.billPeriodInfo.renterBillDateType?.toBillDate
                                 )
                             }"
 
@@ -135,7 +140,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
     private fun getPaymentFromDatabase() {
 
-        paymentViewModel.getPaymentByPaymentKey(receivedPaymentKey)
+        renterPaymentViewModel.getPaymentByPaymentKey(receivedPaymentKey)
             .observe(viewLifecycleOwner) { payment ->
 
                 receivedPayment = payment
@@ -197,19 +202,19 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         //billing parameter
         includeBinding.showBillBillDate
-            .setDateInTextView(receivedPayment.timeStamp)
+            .setDateInTextView(receivedPayment.created)
         includeBinding.showBillBillTime
-            .setDateInTextView(receivedPayment.timeStamp, "hh:mm a")
+            .setDateInTextView(receivedPayment.created, "hh:mm a")
         includeBinding.showBillBillPeriod.text =
-            if (receivedPayment.bill?.billPeriodType == getString(R.string.by_month)) {
+            if (receivedPayment.billPeriodInfo.billPeriodType == BillPeriodType.BY_MONTH) {
 
-                "${receivedPayment.bill!!.billMonth}, ${receivedPayment.bill!!.billYear}"
+                "${monthList[receivedPayment.billPeriodInfo.renterBillMonthType?.forBillMonth!! - 1]}, ${receivedPayment.billPeriodInfo.billYear}"
             } else {
 
-                "${workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(receivedPayment.bill?.billDateFrom)}" +
+                "${workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(receivedPayment.billPeriodInfo.renterBillDateType?.fromBillDate)}" +
                         " to ${
                             workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                receivedPayment.bill?.billDateTill
+                                receivedPayment.billPeriodInfo.renterBillDateType?.toBillDate
                             )
                         }"
             }
@@ -219,15 +224,20 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         //electricity
         includeBinding.showBillPreviousReading.text =
-            "${String.format("%.2f", receivedPayment.electricBill?.previousReading)} unit(s)"
+            "${String.format("%.2f", receivedPayment.electricityBillInfo?.previousReading)} unit(s)"
         includeBinding.showBillCurrentReading.text =
-            "${String.format("%.2f", receivedPayment.electricBill?.currentReading)} unit(s)"
+            "${String.format("%.2f", receivedPayment.electricityBillInfo?.currentReading)} unit(s)"
         includeBinding.showBillRate.text =
-            "${String.format("%.2f", receivedPayment.electricBill?.rate)} per/unit"
+            "${String.format("%.2f", receivedPayment.electricityBillInfo?.rate)} per/unit"
         includeBinding.showBillDifference.text =
-            "${String.format("%.2f", receivedPayment.electricBill?.differenceInReading)} unit(s)"
+            "${
+                String.format(
+                    "%.2f",
+                    receivedPayment.electricityBillInfo?.differenceInReading
+                )
+            } unit(s)"
         includeBinding.showBillElectricityTotal.text =
-            "${receivedPayment.bill?.currencySymbol} ${receivedPayment.electricBill?.totalElectricBill}"
+            "${receivedPayment.currencySymbol} ${receivedPayment.electricityBillInfo?.totalElectricBill}"
 
     }
 
@@ -235,23 +245,15 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         //Extra
         includeBinding.showBillExtraFieldName.text =
-            if (receivedPayment.extraFieldName == "") {
+            if (!receivedPayment.extras?.fieldName.isValid()) {
 
                 "Extra"
             } else {
-                receivedPayment.extraFieldName
+                receivedPayment.extras?.fieldName
             }
 
         includeBinding.showBillExtraFieldAmount.text =
-            if (receivedPayment.extraAmount == "") {
-
-                "${receivedPayment.bill?.currencySymbol} 0.0"
-            } else {
-
-                "${receivedPayment.bill?.currencySymbol} ${
-                    receivedPayment.extraAmount?.toDouble()?.format(2)
-                }"
-            }
+            receivedPayment.extras?.fieldAmount?.format(2)
     }
 
     private fun setDuesOrAdvanceOfLastPayment() {
@@ -264,10 +266,10 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
                 //due
                 includeBinding.showBillDueOfLastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} ${abs(dueOfLastPayment).format(2)}"
+                    "${receivedPayment.currencySymbol} ${abs(dueOfLastPayment).format(2)}"
 
                 includeBinding.showBillPaidInAdvanceInlastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} 0.00"
+                    "${receivedPayment.currencySymbol} 0.00"
 
             }
 
@@ -275,18 +277,18 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
                 //advance
                 includeBinding.showBillDueOfLastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} 0.00"
+                    "${receivedPayment.currencySymbol} 0.00"
 
                 includeBinding.showBillPaidInAdvanceInlastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} ${abs(dueOfLastPayment).format(2)}"
+                    "${receivedPayment.currencySymbol} ${abs(dueOfLastPayment).format(2)}"
             }
 
             else -> {
                 includeBinding.showBillDueOfLastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} 0.00"
+                    "${receivedPayment.currencySymbol} 0.00"
 
                 includeBinding.showBillPaidInAdvanceInlastPayAmount.text =
-                    "${receivedPayment.bill?.currencySymbol} 0.00"
+                    "${receivedPayment.currencySymbol} 0.00"
             }
         }
     }
@@ -294,7 +296,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
     private fun setDuesOrAdvance() {
 
         val dueOrAdvance =
-            receivedPayment.amountPaid?.toDouble()?.minus(receivedPayment.totalRent.toDouble())!!
+            receivedPayment.amountPaid - receivedPayment.netDemand
 
         includeBinding.showBillDueAmount.text =
 
@@ -303,18 +305,18 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
                 dueOrAdvance < 0.0 -> {
 
                     //due
-                    "${receivedPayment.bill?.currencySymbol} ${abs(dueOrAdvance).format(2)}"
+                    "${receivedPayment.currencySymbol} ${abs(dueOrAdvance).format(2)}"
                 }
 
                 dueOrAdvance > 0.0 -> {
 
                     includeBinding.showBillDueOrArrearTV.text =
                         "Paid in advance"
-                    "${receivedPayment.bill?.currencySymbol} ${dueOrAdvance.format(2)}"
+                    "${receivedPayment.currencySymbol} ${dueOrAdvance.format(2)}"
                 }
                 else -> {
 
-                    "${receivedPayment.bill?.currencySymbol} 0.00"
+                    "${receivedPayment.currencySymbol} 0.00"
                 }
             }
 
@@ -324,28 +326,28 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         //total rent
         includeBinding.showBillHouseRent.text =
-            "${receivedPayment.bill?.currencySymbol} ${
-                receivedPayment.houseRent.toDouble().format(2)
+            "${receivedPayment.currencySymbol} ${
+                receivedPayment.houseRent.format(2)
             }"
 
         includeBinding.showBillParking.text =
-            "${receivedPayment.bill?.currencySymbol} ${
-                receivedPayment.parkingRent?.toDouble()?.format(2)
+            "${receivedPayment.currencySymbol} ${
+                receivedPayment.parkingRent.format(2)
             }"
 
         includeBinding.showBillElectricity.text =
-            "${receivedPayment.bill?.currencySymbol} ${
-                receivedPayment.electricBill?.totalElectricBill?.toDouble()?.format(2)
+            "${receivedPayment.currencySymbol} ${
+                receivedPayment.electricityBillInfo?.totalElectricBill?.format(2)
             }"
 
         includeBinding.showBillAmountPaid.text =
-            "${receivedPayment.bill?.currencySymbol} ${
-                receivedPayment.amountPaid?.toDouble()?.format(2)
+            "${receivedPayment.currencySymbol} ${
+                receivedPayment.amountPaid.format(2)
             }"
 
         includeBinding.showBillNetDemand.text =
-            "${receivedPayment.bill?.currencySymbol} ${
-                receivedPayment.totalRent.toDouble().format(2)
+            "${receivedPayment.currencySymbol} ${
+                receivedPayment.netDemand.format(2)
             }"
     }
 
@@ -353,22 +355,22 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
     private fun getDuesOfLastPayment(): Double {
 
-        val houseRent = receivedPayment.houseRent.toDouble()
-        val parking = if (receivedPayment.isTakingParkingBill == getString(R.string.t))
-            receivedPayment.parkingRent?.toDouble()!!
-        else
-            0.0
+        val houseRent = receivedPayment.houseRent
+        val parking = receivedPayment.parkingRent
+
         val electricBill =
-            if (receivedPayment.electricBill?.isTakingElectricBill == getString(R.string.t))
-                receivedPayment.electricBill?.totalElectricBill?.toDouble()!!
+            if (receivedPayment.isElectricityBillIncluded)
+                receivedPayment.electricityBillInfo?.totalElectricBill!!
             else
                 0.0
-        val extra = if (receivedPayment.extraAmount != "")
-            receivedPayment.extraAmount?.toDouble()!!
-        else
-            0.0
+        val extra = if (receivedPayment.extras != null) {
 
-        return receivedPayment.totalRent.toDouble() - (houseRent + parking + electricBill + extra)
+            receivedPayment.extras!!.fieldAmount
+        } else {
+            0.0
+        }
+
+        return receivedPayment.netDemand - (houseRent + parking + electricBill + extra)
     }
 
 

@@ -39,7 +39,7 @@ class UploadService : Service() {
     lateinit var renterRepository: RenterRepository
 
     @Inject
-    lateinit var renterPaymentRepository: PaymentRepository
+    lateinit var renterPaymentRepository: RenterPaymentRepository
 
     @Inject
     lateinit var emiRepository: EMIRepository
@@ -93,7 +93,7 @@ class UploadService : Service() {
                     stopSelf()
                 }
 
-                getString(R.string.payments) -> {
+                getString(R.string.renter_payments) -> {
 
                     val payment = renterPaymentRepository.getPaymentByPaymentKey(key).first()
 
@@ -190,12 +190,11 @@ class UploadService : Service() {
                 renterRepository.updateRenter(renter)
             }
 
-            getString(R.string.payments) -> {
+            getString(R.string.renter_payments) -> {
 
-                val payment = document as Payment
-                payment.isSynced =
-                    if (isSyncedValue) getString(R.string.t) else getString(R.string.f)
-                renterPaymentRepository.updatePayment(payment)
+                val payment = document as RenterPayment
+                payment.isSynced = isSyncedValue
+                renterPaymentRepository.updateRenterPayment(payment)
             }
 
             getString(R.string.borrowers) -> {

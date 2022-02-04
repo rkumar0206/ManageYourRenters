@@ -3,10 +3,7 @@ package com.rohitthebest.manageyourrenters.database.typeConverters
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.rohitthebest.manageyourrenters.data.BillInfo
-import com.rohitthebest.manageyourrenters.data.ElectricityBillInfo
-import com.rohitthebest.manageyourrenters.data.Interest
-import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import com.rohitthebest.manageyourrenters.data.*
 
 class TypeConvertersForDatabase {
 
@@ -24,6 +21,42 @@ class TypeConvertersForDatabase {
         val type = object : TypeToken<BillInfo>() {}.type
 
         return gson.fromJson(billInfoString, type)
+    }
+
+    @TypeConverter
+    fun fromRenterBillPeriodInfoToString(renterBillPeriodInfo: RenterBillPeriodInfo): String {
+
+        return Gson().toJson(renterBillPeriodInfo)
+    }
+
+    @TypeConverter
+    fun fromStringToRenterBillPeriodInfo(str: String): RenterBillPeriodInfo {
+
+        return Gson().fromJson(str, object : TypeToken<RenterBillPeriodInfo>() {}.type)
+    }
+
+    @TypeConverter
+    fun fromRenterElectricityBillInfoToString(renterElectricityBillInfo: RenterElectricityBillInfo): String {
+
+        return Gson().toJson(renterElectricityBillInfo)
+    }
+
+    @TypeConverter
+    fun fromStringToRenterElectricityBillInfo(str: String): RenterElectricityBillInfo {
+
+        return Gson().fromJson(str, object : TypeToken<RenterElectricityBillInfo>() {}.type)
+    }
+
+    @TypeConverter
+    fun fromRenterPaymentExtrasToString(renterPaymentExtras: RenterPaymentExtras): String {
+
+        return Gson().toJson(renterPaymentExtras)
+    }
+
+    @TypeConverter
+    fun fromStringToRenterPaymentExtras(str: String): RenterPaymentExtras {
+
+        return Gson().fromJson(str, object : TypeToken<RenterPaymentExtras>() {}.type)
     }
 
     @TypeConverter

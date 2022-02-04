@@ -187,4 +187,6 @@ class PaymentViewModel @Inject constructor(
 
     fun getLastRenterPayment(renterKey: String) =
         paymentRepository.getLastRenterPayment(renterKey).asLiveData()
+
+    fun getAllPayments() = paymentRepository.getAllPayments().asLiveData()
 }

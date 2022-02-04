@@ -24,37 +24,37 @@ class TypeConvertersForDatabase {
     }
 
     @TypeConverter
-    fun fromRenterBillPeriodInfoToString(renterBillPeriodInfo: RenterBillPeriodInfo): String {
+    fun fromRenterBillPeriodInfoToString(renterBillPeriodInfo: RenterBillPeriodInfo?): String? {
 
         return Gson().toJson(renterBillPeriodInfo)
     }
 
     @TypeConverter
-    fun fromStringToRenterBillPeriodInfo(str: String): RenterBillPeriodInfo {
+    fun fromStringToRenterBillPeriodInfo(str: String): RenterBillPeriodInfo? {
 
         return Gson().fromJson(str, object : TypeToken<RenterBillPeriodInfo>() {}.type)
     }
 
     @TypeConverter
-    fun fromRenterElectricityBillInfoToString(renterElectricityBillInfo: RenterElectricityBillInfo): String {
+    fun fromRenterElectricityBillInfoToString(renterElectricityBillInfo: RenterElectricityBillInfo?): String? {
 
         return Gson().toJson(renterElectricityBillInfo)
     }
 
     @TypeConverter
-    fun fromStringToRenterElectricityBillInfo(str: String): RenterElectricityBillInfo {
+    fun fromStringToRenterElectricityBillInfo(str: String): RenterElectricityBillInfo? {
 
         return Gson().fromJson(str, object : TypeToken<RenterElectricityBillInfo>() {}.type)
     }
 
     @TypeConverter
-    fun fromRenterPaymentExtrasToString(renterPaymentExtras: RenterPaymentExtras): String {
+    fun fromRenterPaymentExtrasToString(renterPaymentExtras: RenterPaymentExtras?): String? {
 
         return Gson().toJson(renterPaymentExtras)
     }
 
     @TypeConverter
-    fun fromStringToRenterPaymentExtras(str: String): RenterPaymentExtras {
+    fun fromStringToRenterPaymentExtras(str: String): RenterPaymentExtras? {
 
         return Gson().fromJson(str, object : TypeToken<RenterPaymentExtras>() {}.type)
     }

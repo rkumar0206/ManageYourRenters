@@ -29,6 +29,9 @@ interface PaymentDao {
     @Query("DELETE FROM payment_table WHERE isSynced =:isSynced")
     suspend fun deleteAllPaymentsByIsSynced(isSynced: String)
 
+    @Query("SELECT * FROM payment_table")
+    fun getAllPayments(): Flow<List<Payment>>
+
     @Query("SELECT * FROM payment_table WHERE renterKey =:renterKey ORDER BY timeStamp DESC")
     fun getAllPaymentsListOfRenter(renterKey: String): Flow<List<Payment>>
 

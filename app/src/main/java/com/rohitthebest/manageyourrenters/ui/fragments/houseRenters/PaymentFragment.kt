@@ -15,10 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowPaymentAdapter
+import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.database.model.Payment
 import com.rohitthebest.manageyourrenters.database.model.Renter
+import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.RenterPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
@@ -39,6 +42,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     private val renterViewModel: RenterViewModel by viewModels()
     private val paymentViewModel: PaymentViewModel by viewModels()
+    private val renterPaymentViewModel: RenterPaymentViewModel by viewModels()
 
     private var _binding: FragmentPaymentBinding? = null
     private val binding get() = _binding!!
@@ -71,6 +75,81 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         setUpRecyclerView()
 
         getRvState()
+
+    }
+
+
+    private fun convertPaymentToRenterPayment(payment: Payment): RenterPayment {
+
+        return RenterPayment(
+            payment.key,
+            payment.timeStamp!!,
+            payment.timeStamp!!,
+            payment.renterKey,
+            payment.bill?.currencySymbol ?: "₹",
+            RenterBillPeriodInfo(
+                if (payment.bill?.billPeriodType == getString(R.string.by_month)) {
+                    BillPeriodType.BY_MONTH
+                } else {
+                    BillPeriodType.BY_DATE
+                },
+                if (payment.bill?.billPeriodType == getString(R.string.by_month)) {
+                    RenterBillMonthType(
+                        payment.bill!!.billMonthNumber!!,
+                        payment.bill!!.billMonthNumber!!,
+                        1
+                    )
+                } else {
+                    null
+                },
+                if (payment.bill?.billPeriodType == getString(R.string.by_date)) {
+                    RenterBillDateType(
+                        payment.bill!!.billDateFrom!!,
+                        payment.bill!!.billDateTill!!,
+                        if (payment.bill!!.numberOfDays != "Same day") {
+                            payment.bill!!.numberOfDays?.toInt()!!
+                        } else {
+                            0
+                        }
+                    )
+                } else {
+                    null
+                },
+                payment.bill?.billYear!!
+            ),
+            payment.electricBill?.isTakingElectricBill == getString(R.string.t),
+            if (payment.electricBill?.isTakingElectricBill == getString(R.string.t)) {
+
+                RenterElectricityBillInfo(
+                    payment.electricBill?.previousReading!!,
+                    payment.electricBill?.currentReading!!,
+                    payment.electricBill?.rate!!,
+                    payment.electricBill?.differenceInReading!!,
+                    payment.electricBill?.totalElectricBill?.toDouble()!!
+                )
+            } else {
+                null
+            },
+            payment.houseRent.toDouble(),
+            if (payment.isTakingParkingBill == getString(R.string.f)) {
+                0.0
+            } else {
+                payment.parkingRent?.toDouble()!!
+            },
+            RenterPaymentExtras(
+                payment.extraFieldName ?: "",
+                payment.extraAmount?.toDouble() ?: 0.0
+            ),
+            payment.totalRent.toDouble(),
+            payment.amountPaid?.toDouble()!!,
+            if (payment.messageOrNote.isValid()) {
+                payment.messageOrNote ?: ""
+            } else {
+                ""
+            },
+            payment.uid,
+            payment.isSynced == getString(R.string.t)
+        )
     }
 
     private fun getRvState() {

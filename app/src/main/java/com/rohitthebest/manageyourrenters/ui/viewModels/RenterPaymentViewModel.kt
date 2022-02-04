@@ -178,6 +178,11 @@ class RenterPaymentViewModel @Inject constructor(
         paymentRepository.deleteAllPaymentsOfRenter(renterKey)
     }
 
+    fun deleteAllRenterPayments() = viewModelScope.launch {
+
+        paymentRepository.deleteAllRenterPayments()
+    }
+
     fun deleteAllPaymentsByIsSynced(isSynced: Boolean) = viewModelScope.launch {
 
         paymentRepository.deleteAllPaymentsByIsSynced(isSynced)
@@ -191,4 +196,6 @@ class RenterPaymentViewModel @Inject constructor(
 
     fun getLastRenterPayment(renterKey: String) =
         paymentRepository.getLastRenterPayment(renterKey).asLiveData()
+
+    fun getAllRenterPayments() = paymentRepository.getAllRenterPayments().asLiveData()
 }

@@ -2,7 +2,7 @@ package com.rohitthebest.manageyourrenters.data
 
 data class RenterBillPeriodInfo(
     var billPeriodType: BillPeriodType,
-    var ranterBillMonthType: RenterBillMonthType?,
+    var renterBillMonthType: RenterBillMonthType?,
     var renterBillDateType: RenterBillDateType?,
     var billYear: Int
 ) {

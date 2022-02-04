@@ -9,14 +9,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.model.Payment
+import com.rohitthebest.manageyourrenters.data.BillPeriodType
+import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterShowPaymentBinding
 import com.rohitthebest.manageyourrenters.utils.*
 
 private const val TAG = "ShowPaymentAdapter"
 
-class ShowPaymentAdapter :
-    ListAdapter<Payment, ShowPaymentAdapter.ShowPaymentViewHolder>(DiffUtilCallback()) {
+class ShowPaymentAdapter(private val monthList: List<String>) :
+    ListAdapter<RenterPayment, ShowPaymentAdapter.ShowPaymentViewHolder>(DiffUtilCallback()) {
 
     private var mListener: OnClickListener? = null
     private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
@@ -26,7 +27,7 @@ class ShowPaymentAdapter :
         View.OnClickListener {
 
         @SuppressLint("SetTextI18n")
-        fun setData(payment: Payment) {
+        fun setData(payment: RenterPayment) {
 
             workingWithDateAndTime = WorkingWithDateAndTime()
 
@@ -35,17 +36,19 @@ class ShowPaymentAdapter :
                 Log.d(TAG, "setData: absoluteAdapterPosition : $absoluteAdapterPosition")
 
                 //Period
-                if (payment.bill?.billPeriodType == binding.root.context.getString(R.string.by_month)) {
+                if (payment.billPeriodInfo.billPeriodType == BillPeriodType.BY_MONTH) {
 
                     paymentAdapterBillPeriodTV.text =
-                        "${payment.bill!!.billMonth}, ${payment.bill!!.billYear}"
+                        "${monthList[payment.billPeriodInfo.renterBillMonthType?.forBillMonth!! - 1]}, ${payment.billPeriodInfo.billYear}"
                 } else {
 
-                    if (payment.bill?.billDateFrom == payment.bill?.billDateTill) {
+                    if (payment.billPeriodInfo.renterBillDateType?.fromBillDate
+                        == payment.billPeriodInfo.renterBillDateType?.toBillDate
+                    ) {
 
                         paymentAdapterBillPeriodTV.text =
                             workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                payment.bill?.billDateTill
+                                payment.billPeriodInfo.renterBillDateType?.toBillDate
                             )
                     } else {
 
@@ -53,11 +56,11 @@ class ShowPaymentAdapter :
                         paymentAdapterBillPeriodTV.text =
                             "From : ${
                                 workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    payment.bill?.billDateFrom
+                                    payment.billPeriodInfo.renterBillDateType?.fromBillDate
                                 )
                             }\nTo      : ${
                                 workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    payment.bill?.billDateTill
+                                    payment.billPeriodInfo.renterBillDateType?.toBillDate
                                 )
                             }"
                     }
@@ -67,40 +70,39 @@ class ShowPaymentAdapter :
                 paymentAdapterIssueDateTV.text =
                     "Payment date : ${
                         workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                            payment.timeStamp
+                            payment.created
                         )
                     }\n" +
                             "Payment time : ${
                                 workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    payment.timeStamp, "hh:mm a"
+                                    payment.created, "hh:mm a"
                                 )
                             }"
 
                 //house rent and extra
-                if ((payment.houseRent == "0.0" || payment.houseRent == "0") &&
-                    (payment.extraAmount != "0.0" || payment.extraAmount != "0")
+                if (payment.houseRent == 0.0 && (payment.extras?.fieldAmount != 0.0)
                 ) {
 
-                    if (payment.extraFieldName?.trim()?.isEmpty()!!) {
+                    if (!payment.extras?.fieldName?.trim().isValid()) {
 
                         paymentAdapterNetDemandTV.text =
-                            "Net demand : ${payment.currencySymbol} ${payment.extraAmount}"
+                            "Net demand : ${payment.currencySymbol} ${payment.extras?.fieldAmount}"
                     } else {
 
                         paymentAdapterNetDemandTV.text =
-                            "${payment.extraFieldName} : ${payment.currencySymbol} ${payment.extraAmount}"
+                            "${payment.extras?.fieldName} : ${payment.currencySymbol} ${payment.extras?.fieldAmount}"
                     }
 
                 } else {
 
                     paymentAdapterNetDemandTV.text =
                         "Net demand : ${payment.currencySymbol} ${
-                            payment.totalRent.toDouble().format(2)
+                            payment.netDemand.format(2)
                         }"
                 }
 
                 //total rent
-                if (payment.amountPaid?.toDouble()!! < payment.totalRent.toDouble()) {
+                if (payment.amountPaid < payment.netDemand) {
 
                     paymentAdapterAmountPaidTV.changeTextColor(
                         binding.root.context,
@@ -116,10 +118,10 @@ class ShowPaymentAdapter :
 
                 paymentAdapterAmountPaidTV.text =
                     "Amount paid : ${payment.currencySymbol} ${
-                        payment.amountPaid!!.toDouble().format(2)
+                        payment.amountPaid.format(2)
                     }"
 
-                if (payment.isSynced == binding.root.context.getString(R.string.t)) {
+                if (payment.isSynced) {
 
                     paymentAdapterSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
                 } else {
@@ -177,12 +179,9 @@ class ShowPaymentAdapter :
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
-                        getItem(absoluteAdapterPosition).messageOrNote?.let { message ->
-
-                            mListener!!.onMessageBtnClicked(
-                                message
-                            )
-                        }
+                        mListener!!.onMessageBtnClicked(
+                            getItem(absoluteAdapterPosition).note
+                        )
                     }
                 }
 
@@ -197,18 +196,16 @@ class ShowPaymentAdapter :
 
     }
 
-    class DiffUtilCallback : DiffUtil.ItemCallback<Payment>() {
+    class DiffUtilCallback : DiffUtil.ItemCallback<RenterPayment>() {
 
-        override fun areItemsTheSame(oldItem: Payment, newItem: Payment): Boolean {
+        override fun areItemsTheSame(oldItem: RenterPayment, newItem: RenterPayment): Boolean {
 
-            return oldItem.id == newItem.id
+            return oldItem.key == newItem.key
         }
 
-        override fun areContentsTheSame(oldItem: Payment, newItem: Payment): Boolean {
+        override fun areContentsTheSame(oldItem: RenterPayment, newItem: RenterPayment): Boolean {
 
-            return oldItem.id == newItem.id
-                    && oldItem.timeStamp == newItem.timeStamp
-                    && oldItem.key == newItem.key
+            return oldItem == newItem
         }
     }
 
@@ -230,9 +227,9 @@ class ShowPaymentAdapter :
 
     interface OnClickListener {
 
-        fun onPaymentClick(payment: Payment)
-        fun onSyncClicked(payment: Payment)
-        fun onDeleteClicked(payment: Payment)
+        fun onPaymentClick(payment: RenterPayment)
+        fun onSyncClicked(payment: RenterPayment)
+        fun onDeleteClicked(payment: RenterPayment)
         fun onMessageBtnClicked(paymentMessage: String)
     }
 

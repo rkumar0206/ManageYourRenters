@@ -15,12 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowPaymentAdapter
-import com.rohitthebest.manageyourrenters.data.*
-import com.rohitthebest.manageyourrenters.database.model.Payment
+import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentBinding
-import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -41,7 +39,6 @@ private const val TAG = "PaymentFragment"
 class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnClickListener {
 
     private val renterViewModel: RenterViewModel by viewModels()
-    private val paymentViewModel: PaymentViewModel by viewModels()
     private val renterPaymentViewModel: RenterPaymentViewModel by viewModels()
 
     private var _binding: FragmentPaymentBinding? = null
@@ -52,6 +49,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     private lateinit var paymentAdapter: ShowPaymentAdapter
 
     private var rvStateParcelable: Parcelable? = null
+
+    private var monthList: List<String> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,7 +65,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        paymentAdapter = ShowPaymentAdapter()
+        monthList = resources.getStringArray(R.array.months).toList()
+        paymentAdapter = ShowPaymentAdapter(monthList)
 
         showProgressBar()
 
@@ -78,83 +78,9 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     }
 
-
-    private fun convertPaymentToRenterPayment(payment: Payment): RenterPayment {
-
-        return RenterPayment(
-            payment.key,
-            payment.timeStamp!!,
-            payment.timeStamp!!,
-            payment.renterKey,
-            payment.bill?.currencySymbol ?: "₹",
-            RenterBillPeriodInfo(
-                if (payment.bill?.billPeriodType == getString(R.string.by_month)) {
-                    BillPeriodType.BY_MONTH
-                } else {
-                    BillPeriodType.BY_DATE
-                },
-                if (payment.bill?.billPeriodType == getString(R.string.by_month)) {
-                    RenterBillMonthType(
-                        payment.bill!!.billMonthNumber!!,
-                        payment.bill!!.billMonthNumber!!,
-                        1
-                    )
-                } else {
-                    null
-                },
-                if (payment.bill?.billPeriodType == getString(R.string.by_date)) {
-                    RenterBillDateType(
-                        payment.bill!!.billDateFrom!!,
-                        payment.bill!!.billDateTill!!,
-                        if (payment.bill!!.numberOfDays != "Same day") {
-                            payment.bill!!.numberOfDays?.toInt()!!
-                        } else {
-                            0
-                        }
-                    )
-                } else {
-                    null
-                },
-                payment.bill?.billYear!!
-            ),
-            payment.electricBill?.isTakingElectricBill == getString(R.string.t),
-            if (payment.electricBill?.isTakingElectricBill == getString(R.string.t)) {
-
-                RenterElectricityBillInfo(
-                    payment.electricBill?.previousReading!!,
-                    payment.electricBill?.currentReading!!,
-                    payment.electricBill?.rate!!,
-                    payment.electricBill?.differenceInReading!!,
-                    payment.electricBill?.totalElectricBill?.toDouble()!!
-                )
-            } else {
-                null
-            },
-            payment.houseRent.toDouble(),
-            if (payment.isTakingParkingBill == getString(R.string.f)) {
-                0.0
-            } else {
-                payment.parkingRent?.toDouble()!!
-            },
-            RenterPaymentExtras(
-                payment.extraFieldName ?: "",
-                payment.extraAmount?.toDouble() ?: 0.0
-            ),
-            payment.totalRent.toDouble(),
-            payment.amountPaid?.toDouble()!!,
-            if (payment.messageOrNote.isValid()) {
-                payment.messageOrNote ?: ""
-            } else {
-                ""
-            },
-            payment.uid,
-            payment.isSynced == getString(R.string.t)
-        )
-    }
-
     private fun getRvState() {
 
-        paymentViewModel.renterPaymentRvState.observe(viewLifecycleOwner) { parcelable ->
+        renterPaymentViewModel.renterPaymentRvState.observe(viewLifecycleOwner) { parcelable ->
 
             parcelable?.let {
 
@@ -206,7 +132,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         try {
 
-            paymentViewModel.getAllPaymentsListOfRenter(receivedRenter?.key!!)
+            renterPaymentViewModel.getAllPaymentsListOfRenter(receivedRenter?.key!!)
                 .observe(viewLifecycleOwner) { paymentList ->
 
                     Log.d(TAG, "getPaymentListOfRenter: ")
@@ -268,7 +194,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         }
     }
 
-    private fun initializeSearchView(paymentList: List<Payment>?) {
+    private fun initializeSearchView(paymentList: List<RenterPayment>?) {
 
         try {
 
@@ -284,24 +210,31 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                         var from: String? = ""
                         var till: String? = ""
+                        var month = ""
 
-                        if (payment.bill?.billPeriodType == getString(R.string.by_date)) {
+                        if (payment.billPeriodInfo.billPeriodType == BillPeriodType.BY_DATE) {
 
                             from =
                                 WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                    payment.bill?.billDateFrom
+                                    payment.billPeriodInfo.renterBillDateType?.fromBillDate
                                 )
 
                             till =
                                 WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                                    payment.bill?.billDateTill
+                                    payment.billPeriodInfo.renterBillDateType?.toBillDate
                                 )
+                        } else {
+
+                            month =
+                                monthList[payment.billPeriodInfo.renterBillMonthType?.forBillMonth?.minus(
+                                    1
+                                )!!]
                         }
 
-                        payment.bill?.billMonth?.lowercase(Locale.ROOT)?.contains(
+                        month.lowercase(Locale.ROOT).contains(
 
                             s.toString().trim().lowercase(Locale.ROOT)
-                        )!! ||
+                        ) ||
                                 from?.contains(s.toString().trim())!!
                                 ||
                                 till?.contains(s.toString().trim())!!
@@ -337,7 +270,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         }
     }
 
-    override fun onPaymentClick(payment: Payment) {
+    override fun onPaymentClick(payment: RenterPayment) {
 
         val action = PaymentFragmentDirections.actionPaymentFragmentToRenterBillFragment(
             paymentKey = payment.key
@@ -347,17 +280,17 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     }
 
-    override fun onSyncClicked(payment: Payment) {
+    override fun onSyncClicked(payment: RenterPayment) {
 
         if (isInternetAvailable(requireContext())) {
 
-            if (payment.isSynced == getString(R.string.t)) {
+            if (payment.isSynced) {
 
                 showToast(requireContext(), "Already Synced")
             } else {
 
-                payment.isSynced = getString(R.string.t)
-                paymentViewModel.updatePayment(requireContext(), payment)
+                payment.isSynced = true
+                renterPaymentViewModel.updatePayment(requireContext(), payment)
             }
 
         } else {
@@ -367,7 +300,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     }
 
-    override fun onDeleteClicked(payment: Payment) {
+    override fun onDeleteClicked(payment: RenterPayment) {
 
         showAlertDialogForDeletion(
             requireContext(),
@@ -375,7 +308,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                 if (isInternetAvailable(requireContext())) {
 
-                    paymentViewModel.deletePayment(requireContext(), payment)
+                    renterPaymentViewModel.deletePayment(requireContext(), payment)
 
                 } else {
                     showNoInternetMessage(requireContext())
@@ -468,7 +401,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                 if (isInternetAvailable(requireContext())) {
 
-                    paymentViewModel.deleteAllPaymentsOfRenter(
+                    renterPaymentViewModel.deleteAllPaymentsOfRenter(
                         requireContext(),
                         receivedRenter?.key!!
                     )
@@ -540,7 +473,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     override fun onDestroyView() {
         super.onDestroyView()
 
-        paymentViewModel.saveRenterPaymentRvState(binding.paymentRV.layoutManager?.onSaveInstanceState())
+        renterPaymentViewModel.saveRenterPaymentRvState(binding.paymentRV.layoutManager?.onSaveInstanceState())
 
         hideKeyBoard(requireActivity())
 

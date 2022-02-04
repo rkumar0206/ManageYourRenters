@@ -17,6 +17,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.MANAGE_YOUR_RENTERS_A
 import com.rohitthebest.manageyourrenters.others.Constants.PARTIAL_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.RENTER_DATABASE_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.RENTER_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.UNSPLASH_BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -83,6 +84,23 @@ object Module {
     @Provides
     @Singleton
     fun providePaymentDao(db: PaymentDatabase) = db.getPaymentDao()
+
+
+//============================== Renter Payment Database========================================
+
+    @Provides
+    @Singleton
+    fun provideRenterPaymentDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(
+        context,
+        RenterPaymentDatabase::class.java,
+        RENTER_PAYMENT_DATABASE_NAME
+    ).build()
+
+    @Provides
+    @Singleton
+    fun provideRenterPaymentDao(db: RenterPaymentDatabase) = db.getRenterPaymentDao()
 
 //============================== Borrower Database========================================
 

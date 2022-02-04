@@ -478,7 +478,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     requireContext(),
                     workingWithDateAndTime.convertMillisecondsToCalendarInstance(currentTimestamp),
                     false,
-                    lastPaymentInfo?.created!!
+                    if (lastPaymentInfo != null) lastPaymentInfo?.created!! else 0L
                 ) { calendar ->
 
                     currentTimestamp = calendar.timeInMillis

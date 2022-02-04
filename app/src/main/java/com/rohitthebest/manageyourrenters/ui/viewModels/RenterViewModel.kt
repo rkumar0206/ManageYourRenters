@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Renter
-import com.rohitthebest.manageyourrenters.repositories.PaymentRepository
+import com.rohitthebest.manageyourrenters.repositories.RenterPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
@@ -22,7 +22,7 @@ private const val TAG = "RenterViewModel"
 @HiltViewModel
 class RenterViewModel @Inject constructor(
     private val repo: RenterRepository,
-    private val paymentRepository: PaymentRepository,
+    private val paymentRepository: RenterPaymentRepository,
     private val state: SavedStateHandle
 ) : ViewModel() {
 
@@ -122,7 +122,7 @@ class RenterViewModel @Inject constructor(
     fun deleteAllRenter() = viewModelScope.launch {
 
         repo.deleteAllRenter()
-        paymentRepository.deleteAllPayments()
+        paymentRepository.deleteAllRenterPayments()
     }
 
     fun deleteRenterByIsSynced(isSynced: String) = viewModelScope.launch {

@@ -36,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
 
     private val renterViewModel by viewModels<RenterViewModel>()
-    private val paymentViewModel by viewModels<PaymentViewModel>()
+    private val paymentViewModel by viewModels<RenterPaymentViewModel>()
     private val borrowerViewModel by viewModels<BorrowerViewModel>()
     private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
     private val partialPaymentViewModel by viewModels<PartialPaymentViewModel>()
@@ -247,7 +247,7 @@ class LoginActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) {
 
             val renterPayments = getDataFromFireStore(
-                getString(R.string.payments),
+                getString(R.string.renter_payments),
                 getUid()!!
             ) {
                 lifecycleScope.launch {
@@ -259,14 +259,13 @@ class LoginActivity : AppCompatActivity() {
 
             renterPayments?.let {
 
-
                 if (renterPayments.size() != 0) {
 
                     withContext(Dispatchers.Main) {
 
-                        paymentViewModel.deleteAllPaymentsByIsSynced(getString(R.string.t))
+                        paymentViewModel.deleteAllPaymentsByIsSynced(true)
                         delay(100)
-                        paymentViewModel.insertPayments(it.toObjects(Payment::class.java))
+                        paymentViewModel.insertPayments(it.toObjects(RenterPayment::class.java))
                         Log.i(TAG, "syncPayments: inserted")
 
                         syncBorrowers()
@@ -276,7 +275,7 @@ class LoginActivity : AppCompatActivity() {
 
                     withContext(Dispatchers.Main) {
 
-                        paymentViewModel.deleteAllPaymentsByIsSynced(getString(R.string.t))
+                        paymentViewModel.deleteAllPaymentsByIsSynced(true)
 
                         syncBorrowers()
                     }

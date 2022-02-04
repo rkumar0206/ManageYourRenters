@@ -222,23 +222,36 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
     private fun setElectricFields() {
 
-        //electricity
-        includeBinding.showBillPreviousReading.text =
-            "${String.format("%.2f", receivedPayment.electricityBillInfo?.previousReading)} unit(s)"
-        includeBinding.showBillCurrentReading.text =
-            "${String.format("%.2f", receivedPayment.electricityBillInfo?.currentReading)} unit(s)"
-        includeBinding.showBillRate.text =
-            "${String.format("%.2f", receivedPayment.electricityBillInfo?.rate)} per/unit"
-        includeBinding.showBillDifference.text =
-            "${
-                String.format(
-                    "%.2f",
-                    receivedPayment.electricityBillInfo?.differenceInReading
-                )
-            } unit(s)"
-        includeBinding.showBillElectricityTotal.text =
-            "${receivedPayment.currencySymbol} ${receivedPayment.electricityBillInfo?.totalElectricBill}"
+        if (receivedPayment.isElectricityBillIncluded) {
 
+            //electricity
+            includeBinding.showBillPreviousReading.text =
+                "${
+                    String.format(
+                        "%.2f",
+                        receivedPayment.electricityBillInfo?.previousReading
+                    )
+                } unit(s)"
+            includeBinding.showBillCurrentReading.text =
+                "${
+                    String.format(
+                        "%.2f",
+                        receivedPayment.electricityBillInfo?.currentReading
+                    )
+                } unit(s)"
+            includeBinding.showBillRate.text =
+                "${String.format("%.2f", receivedPayment.electricityBillInfo?.rate)} per/unit"
+            includeBinding.showBillDifference.text =
+                "${
+                    String.format(
+                        "%.2f",
+                        receivedPayment.electricityBillInfo?.differenceInReading
+                    )
+                } unit(s)"
+            includeBinding.showBillElectricityTotal.text =
+                "${receivedPayment.currencySymbol} ${receivedPayment.electricityBillInfo?.totalElectricBill}"
+
+        }
     }
 
     private fun setExtraFields() {
@@ -253,7 +266,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
             }
 
         includeBinding.showBillExtraFieldAmount.text =
-            receivedPayment.extras?.fieldAmount?.format(2)
+            receivedPayment.currencySymbol + receivedPayment.extras?.fieldAmount?.format(2)
     }
 
     private fun setDuesOrAdvanceOfLastPayment() {
@@ -337,7 +350,11 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         includeBinding.showBillElectricity.text =
             "${receivedPayment.currencySymbol} ${
-                receivedPayment.electricityBillInfo?.totalElectricBill?.format(2)
+                if (receivedPayment.isElectricityBillIncluded) {
+                    receivedPayment.electricityBillInfo?.totalElectricBill?.format(2)
+                } else {
+                    0.0
+                }
             }"
 
         includeBinding.showBillAmountPaid.text =

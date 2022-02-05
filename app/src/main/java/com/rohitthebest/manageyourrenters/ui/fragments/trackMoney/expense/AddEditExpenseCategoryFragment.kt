@@ -295,7 +295,7 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
                 System.currentTimeMillis(),
                 getUid()!!,
                 generateKey("_${getUid()}", 60),
-                false
+                true
             )
 
             saveToDatabase(expenseCategory)
@@ -323,7 +323,7 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
                 expenseCategory.categoryDescription =
                     includeBinding.expenseCatAddDescriptionET.text.toString().trim()
                 expenseCategory.modified = System.currentTimeMillis()
-
+                expenseCategory.isSynced = true
                 saveToDatabase(expenseCategory)
             } else {
 

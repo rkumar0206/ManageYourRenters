@@ -31,6 +31,9 @@ class ExpenseViewModel @Inject constructor(
                     expense.key,
                     context.getString(R.string.post)
                 )
+            } else {
+
+                expense.isSynced = false
             }
 
             expenseRepository.insertExpense(expense)

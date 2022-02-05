@@ -197,7 +197,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
                 getUid()!!,
                 generateKey("_${getUid()}", 60),
                 receivedExpenseCategoryKey,
-                false
+                true
             )
 
             saveExpenseInDatabase(expense)
@@ -237,7 +237,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
                 expense.spentOn = includeBinding.expenseSpentOnET.text.toString().trim()
 
                 expense.modified = System.currentTimeMillis()
-
+                expense.isSynced = true
                 saveExpenseInDatabase(expense)
 
             } else {

@@ -200,6 +200,10 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             if (lastPaymentInfo != null) {
 
+                currencySymbol = lastPaymentInfo!!.currencySymbol
+
+                includeBinding.moneySymbolSpinner.setSelection(currencyList.indexOf(currencySymbol))
+
                 if (lastPaymentInfo!!.billPeriodInfo.billPeriodType == BillPeriodType.BY_MONTH) {
 
                     showByMonthAndHideByDateView()

@@ -15,9 +15,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.EMI_PAYMENT_DATABASE_
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.MANAGE_YOUR_RENTERS_API_BASE_URL
 import com.rohitthebest.manageyourrenters.others.Constants.PARTIAL_PAYMENT_DATABASE_NAME
-import com.rohitthebest.manageyourrenters.others.Constants.PAYMENT_DATABASE_NAME
-import com.rohitthebest.manageyourrenters.others.Constants.RENTER_DATABASE_NAME
-import com.rohitthebest.manageyourrenters.others.Constants.RENTER_PAYMENT_DATABASE_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.RENTER_AND_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.UNSPLASH_BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -44,63 +42,24 @@ object Module {
 
     //==============================Renter Database========================================
 
-    private val migration = object : Migration(123, 124) {
-
-        override fun migrate(database: SupportSQLiteDatabase) {
-
-            database.execSQL("ALTER TABLE 'renter_table' ADD COLUMN 'modified' INTEGER NOT NULL DEFAULT 0")
-        }
-    }
-
-
     @Provides
     @Singleton
     fun provideRenterDatabase(
         @ApplicationContext context: Context
     ) = Room.databaseBuilder(
         context,
-        RenterDatabase::class.java,
-        RENTER_DATABASE_NAME
+        RenterAndPaymentDatabase::class.java,
+        RENTER_AND_PAYMENT_DATABASE_NAME
     )
-        .addMigrations(migration)
         .build()
 
     @Provides
     @Singleton
-    fun provideCategoryDao(db: RenterDatabase) = db.getRenterDao()
-
-//==============================Payment Database========================================
+    fun provideRenterDao(db: RenterAndPaymentDatabase) = db.getRenterDao()
 
     @Provides
     @Singleton
-    fun providePaymentDatabase(
-        @ApplicationContext context: Context
-    ) = Room.databaseBuilder(
-        context,
-        PaymentDatabase::class.java,
-        PAYMENT_DATABASE_NAME
-    ).build()
-
-    @Provides
-    @Singleton
-    fun providePaymentDao(db: PaymentDatabase) = db.getPaymentDao()
-
-
-//============================== Renter Payment Database========================================
-
-    @Provides
-    @Singleton
-    fun provideRenterPaymentDatabase(
-        @ApplicationContext context: Context
-    ) = Room.databaseBuilder(
-        context,
-        RenterPaymentDatabase::class.java,
-        RENTER_PAYMENT_DATABASE_NAME
-    ).build()
-
-    @Provides
-    @Singleton
-    fun provideRenterPaymentDao(db: RenterPaymentDatabase) = db.getRenterPaymentDao()
+    fun provideRenterPaymentDao(db: RenterAndPaymentDatabase) = db.getRenterPaymentDao()
 
 //============================== Borrower Database========================================
 

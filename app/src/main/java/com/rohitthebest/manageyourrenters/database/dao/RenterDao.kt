@@ -37,4 +37,21 @@ interface RenterDao {
     @Query("SELECT * FROM renter_table WHERE `key` =:renterKey")
     fun getRenterByKey(renterKey: String): Flow<Renter>
 
+//    @Query("SELECT * FROM renter_table INNER JOIN renter_payment_table ON renter_table.`key` = renter_payment_table.renterKey")
+//    fun getRenterWithTheirPaymentList(): Flow<Map<Renter, List<RenterPayment>>>
+
+    @MapInfo(keyColumn = "renterName", valueColumn = "amountPaid")
+    @Query(
+        "SELECT renter_table.name AS renterName, renter_payment_table.amountPaid AS amountPaid FROM renter_table INNER JOIN renter_payment_table ON renter_table.`key` = renter_payment_table.renterKey"
+    )
+    fun getRentersWithTheirAmountPaid(): Flow<Map<String, List<Double>>>
+
+    @MapInfo(keyColumn = "renterName", valueColumn = "amountPaid")
+    @Query(
+        "SELECT renter_table.name AS renterName, renter_payment_table.amountPaid AS amountPaid FROM renter_table INNER JOIN renter_payment_table ON renter_table.`key` = renter_payment_table.renterKey WHERE renter_payment_table.created BETWEEN :startDate AND :endDate"
+    )
+    fun getRentersWithTheirAmountPaidByDateCreated(
+        startDate: Long,
+        endDate: Long
+    ): Flow<Map<String, List<Double>>>
 }

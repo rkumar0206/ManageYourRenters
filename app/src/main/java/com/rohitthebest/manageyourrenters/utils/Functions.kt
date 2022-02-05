@@ -728,13 +728,6 @@ class Functions {
 
                     cal.add(Calendar.MONTH, -1)
 
-                    Log.d(
-                        TAG,
-                        "getMillisecondsOfStartAndEndUsingConstants: month ,year ${cal.get(Calendar.MONTH)}, ${
-                            cal.get(Calendar.YEAR)
-                        }"
-                    )
-
                     return workingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonth(cal.timeInMillis)
                 }
 
@@ -772,6 +765,25 @@ class Functions {
                     return Pair(timeInMillis, timeInMillis)
                 }
             }
+        }
+
+        fun getPairOfDateInMillisInStringInDateString(
+            dates: Pair<Long, Long>,
+            pattern: String = "dd-MM-yyyy"
+        ): String {
+
+            val workingWithDateAndTime = WorkingWithDateAndTime()
+
+            return "${
+                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    dates.first, pattern
+                )
+            } - ${
+                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    dates.second,
+                    pattern
+                )
+            }"
         }
 
 

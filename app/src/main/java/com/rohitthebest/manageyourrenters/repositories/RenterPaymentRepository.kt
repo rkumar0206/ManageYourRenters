@@ -35,4 +35,6 @@ class RenterPaymentRepository @Inject constructor(
     fun getLastRenterPayment(renterKey: String) = dao.getLastRenterPayment(renterKey)
 
     fun getAllRenterPayments() = dao.getAllRenterPayments()
+
+    fun getTotalRevenueOfAllTime() = dao.getTotalRevenueOfAllTime()
 }

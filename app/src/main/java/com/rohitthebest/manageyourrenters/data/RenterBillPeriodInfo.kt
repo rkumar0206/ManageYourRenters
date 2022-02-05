@@ -25,10 +25,22 @@ data class RenterBillMonthType(
     var forBillMonth: Int,
     var toBillMonth: Int,
     var numberOfMonths: Int
-)
+) {
+    constructor() : this(
+        0,
+        0,
+        0
+    )
+}
 
 data class RenterBillDateType(
     var fromBillDate: Long,
     var toBillDate: Long,
     var numberOfDays: Int
-)
+) {
+    constructor() : this(
+        0L,
+        0L,
+        0
+    )
+}

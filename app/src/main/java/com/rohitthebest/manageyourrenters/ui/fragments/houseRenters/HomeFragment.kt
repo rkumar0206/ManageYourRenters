@@ -18,12 +18,17 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowRentersAdapter
+import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getMillisecondsOfStartAndEndUsingConstants
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getPairOfDateInMillisInStringInDateString
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showDateRangePickerDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showMobileNumberOptionMenu
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
@@ -49,6 +54,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private var rvStateParcelable: Parcelable? = null
 
+    private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -69,6 +76,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         mAdapter = ShowRentersAdapter()
 
         binding.homeProgressBar.show()
+
+        workingWithDateAndTime = WorkingWithDateAndTime()
 
         setupRecyclerView()
 
@@ -274,8 +283,23 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_total_number_of_renters)
             .setOnMenuItemClickListener(this)
+        binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_renter_revenue_all_time)
+            .setOnMenuItemClickListener(this)
+        binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_renter_revenue_this_month)
+            .setOnMenuItemClickListener(this)
+        binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_renter_revenue_previous_month)
+            .setOnMenuItemClickListener(this)
+        binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_renter_revenue_this_week)
+            .setOnMenuItemClickListener(this)
+        binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_renter_revenue_previous_week)
+            .setOnMenuItemClickListener(this)
+        binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_renter_revenue_custom_range)
+            .setOnMenuItemClickListener(this)
+
     }
 
+    var d1 = System.currentTimeMillis() - (30 * Constants.ONE_DAY_MILLISECONDS)
+    var d2 = System.currentTimeMillis()
 
     override fun onMenuItemClick(menu: MenuItem?): Boolean {
 
@@ -287,23 +311,83 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                     showAlertDialogWithTitleAndMessage(
                         "Total renters",
-                        "You have $count number of renters."
+                        "You have $count renters living in your apartment."
                     )
                 }
 
                 true
             }
 
+            R.id.menu_renter_revenue_this_month -> {
+
+                showRevenueMessageByDateRange(
+                    CustomDateRange.THIS_MONTH,
+                    getMillisecondsOfStartAndEndUsingConstants(CustomDateRange.THIS_MONTH)
+                )
+
+                true
+            }
+
+            R.id.menu_renter_revenue_previous_month -> {
+
+                showRevenueMessageByDateRange(
+                    CustomDateRange.PREVIOUS_MONTH,
+                    getMillisecondsOfStartAndEndUsingConstants(CustomDateRange.PREVIOUS_MONTH)
+                )
+
+                true
+            }
+
+            R.id.menu_renter_revenue_this_week -> {
+
+                showRevenueMessageByDateRange(
+                    CustomDateRange.THIS_WEEK,
+                    getMillisecondsOfStartAndEndUsingConstants(CustomDateRange.THIS_WEEK)
+                )
+
+                true
+            }
+
+            R.id.menu_renter_revenue_previous_week -> {
+
+                showRevenueMessageByDateRange(
+                    CustomDateRange.PREVIOUS_WEEK,
+                    getMillisecondsOfStartAndEndUsingConstants(CustomDateRange.PREVIOUS_WEEK)
+                )
+
+                true
+            }
+
+            R.id.menu_renter_revenue_custom_range -> {
+
+                showDateRangePickerDialog(
+                    d1,
+                    d2,
+                    { requireActivity().supportFragmentManager },
+                    { millis ->
+
+                        d1 = millis.first
+                        d2 = millis.second
+                        showRevenueMessageByDateRange(
+                            CustomDateRange.CUSTOM_DATE_RANGE,
+                            Pair(millis.first, millis.second)
+                        )
+                    }
+                )
+
+                true
+            }
+
             R.id.menu_renter_revenue_all_time -> {
 
-                renterViewModel.getRenterCount().observe(viewLifecycleOwner) { count ->
+                renterViewModel.getRentersWithTheirAmountPaid()
+                    .observe(viewLifecycleOwner) { renterNameWithTheirAmountPaid ->
 
-                    showAlertDialogWithTitleAndMessage(
-                        "Total renters",
-                        "You have $count number of renters."
-                    )
-                }
-
+                        showRevenueMessageInAlertDialogBox(
+                            "Revenue - All Time",
+                            renterNameWithTheirAmountPaid
+                        )
+                    }
                 true
             }
 
@@ -311,11 +395,59 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         }
     }
 
+    private fun showRevenueMessageByDateRange(
+        customDateRange: CustomDateRange,
+        millis: Pair<Long, Long>
+    ) {
+
+        renterViewModel.getRentersWithTheirAmountPaidByDateCreated(
+            millis.first,
+            millis.second
+        ).observe(viewLifecycleOwner) { renterNameWithTheirAmountPaid ->
+
+            showRevenueMessageInAlertDialogBox(
+                "Revenue - $customDateRange (${getPairOfDateInMillisInStringInDateString(millis)})",
+                renterNameWithTheirAmountPaid
+            )
+
+        }
+
+    }
+
+    private fun showRevenueMessageInAlertDialogBox(
+        title: String,
+        renterNameWithTheirAmountPaid: Map<String, List<Double>>
+    ) {
+
+        var totalAmountPaid = 0.0
+
+        val message = StringBuilder()
+
+        renterNameWithTheirAmountPaid.forEach { entry ->
+
+            totalAmountPaid += entry.value.sum()
+
+            message.append("${entry.key}  ===>  ${entry.value.sum().format(2)}\n\n")
+        }
+
+        message.append("----------------------------------------\n\n")
+        message.append("     Total :   ${totalAmountPaid.format(2)}")
+
+        showAlertDialogWithTitleAndMessage(
+            title,
+            message.toString()
+        )
+    }
+
     private fun showAlertDialogWithTitleAndMessage(title: String, message: String) {
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
             .setMessage(message)
+            .setPositiveButton("Ok") { dialog, _ ->
+
+                dialog.dismiss()
+            }
             .create()
             .show()
     }

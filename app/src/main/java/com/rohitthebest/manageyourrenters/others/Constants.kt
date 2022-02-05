@@ -12,7 +12,7 @@ object Constants {
     const val EDIT_TEXT_EMPTY_MESSAGE = "*This is a mandatory field...!!"
 
     // databases name
-    const val RENTER_DATABASE_NAME = "renterdatabase.db"
+    const val RENTER_AND_PAYMENT_DATABASE_NAME = "renter_and_payment_database.db"
     const val PAYMENT_DATABASE_NAME = "paymentdatabase.db"
     const val RENTER_PAYMENT_DATABASE_NAME = "renterpaymentdatabase.db"
     const val BORROWER_DATABASE_NAME = "borrowerdatabase.db"

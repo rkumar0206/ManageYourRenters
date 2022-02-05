@@ -79,12 +79,12 @@ class WorkingWithDateAndTime {
 
     fun convertMillisecondsToDateAndTimePattern(
         timeInMillis: Long? = System.currentTimeMillis(),
-        pattern: String? = "dd-MM-yyyy"
+        pattern: String = "dd-MM-yyyy"
     ): String? {
 
         val timeStamp = timeInMillis?.let { Timestamp(it) }
         return if (pattern != "") {
-            convertTimeStampToDateOrTimePattern(timeStamp, pattern!!)
+            convertTimeStampToDateOrTimePattern(timeStamp, pattern)
         } else {
             null
         }

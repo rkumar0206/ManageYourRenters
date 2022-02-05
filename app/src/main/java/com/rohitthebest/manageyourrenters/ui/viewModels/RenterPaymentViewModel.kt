@@ -198,4 +198,6 @@ class RenterPaymentViewModel @Inject constructor(
         paymentRepository.getLastRenterPayment(renterKey).asLiveData()
 
     fun getAllRenterPayments() = paymentRepository.getAllRenterPayments().asLiveData()
+
+    fun getTotalRevenueOfAllTime() = paymentRepository.getTotalRevenueOfAllTime().asLiveData()
 }

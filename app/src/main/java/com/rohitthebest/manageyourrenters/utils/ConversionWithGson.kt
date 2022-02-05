@@ -17,17 +17,6 @@ fun convertJSONtoRenter(jsonString: String?): Renter {
     return gson.fromJson(jsonString, type)
 }
 
-fun convertPaymentToJSONString(payment: Payment): String {
-
-    return gson.toJson(payment)
-}
-
-fun convertJSONtoPayment(jsonString: String?): Payment {
-
-    val type = object : TypeToken<Payment?>() {}.type
-    return gson.fromJson(jsonString, type)
-}
-
 fun convertStringListToJSON(list: List<String?>): String {
 
     return gson.toJson(list)

@@ -7,22 +7,6 @@ import com.rohitthebest.manageyourrenters.data.*
 
 class TypeConvertersForDatabase {
 
-    val gson = Gson()
-
-    @TypeConverter
-    fun convertFromBillInfoToString(billInfo: BillInfo): String {
-
-        return gson.toJson(billInfo)
-    }
-
-    @TypeConverter
-    fun convertFromStringToBillInfo(billInfoString: String): BillInfo {
-
-        val type = object : TypeToken<BillInfo>() {}.type
-
-        return gson.fromJson(billInfoString, type)
-    }
-
     @TypeConverter
     fun fromRenterBillPeriodInfoToString(renterBillPeriodInfo: RenterBillPeriodInfo?): String? {
 
@@ -57,20 +41,6 @@ class TypeConvertersForDatabase {
     fun fromStringToRenterPaymentExtras(str: String): RenterPaymentExtras? {
 
         return Gson().fromJson(str, object : TypeToken<RenterPaymentExtras>() {}.type)
-    }
-
-    @TypeConverter
-    fun convertFromElectricBillInfoToString(electricBillInfo: ElectricityBillInfo): String {
-
-        return gson.toJson(electricBillInfo)
-    }
-
-    @TypeConverter
-    fun convertFromStringToElectricBillInfo(electricBillInfoString: String): ElectricityBillInfo {
-
-        val type = object : TypeToken<ElectricityBillInfo>() {}.type
-
-        return gson.fromJson(electricBillInfoString, type)
     }
 
     @TypeConverter

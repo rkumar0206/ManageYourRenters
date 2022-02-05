@@ -28,4 +28,11 @@ class RenterRepository @Inject constructor(
     fun getRenterByIsSynced(isSynced: String) = dao.getRenterByIsSynced(isSynced)
 
     fun getRenterByKey(renterKey: String) = dao.getRenterByKey(renterKey)
+
+    fun getRentersWithTheirAmountPaid() = dao.getRentersWithTheirAmountPaid()
+
+    fun getRentersWithTheirAmountPaidByDateCreated(
+        startDate: Long,
+        endDate: Long
+    ) = dao.getRentersWithTheirAmountPaidByDateCreated(startDate, endDate)
 }

@@ -43,4 +43,7 @@ interface RenterPaymentDao {
 
     @Query("SELECT * FROM renter_payment_table WHERE renterKey = :renterKey ORDER BY created DESC LIMIT 1")
     fun getLastRenterPayment(renterKey: String): Flow<RenterPayment>
+
+    @Query("SELECT SUM(amountPaid) FROM renter_payment_table")
+    fun getTotalRevenueOfAllTime(): Flow<Double>
 }

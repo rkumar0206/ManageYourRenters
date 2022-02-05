@@ -30,8 +30,14 @@
                 android:id="@+id/menu_renter_revenue_this_week"
                 android:title="@string/this_week" />
             <item
+                android:id="@+id/menu_renter_revenue_previous_week"
+                android:title="@string/previous_week" />
+            <item
                 android:id="@+id/menu_renter_revenue_all_time"
                 android:title="@string/all_time" />
+            <item
+                android:id="@+id/menu_renter_revenue_custom_range"
+                android:title="@string/custom_range" />
         </menu>
 
     </item>

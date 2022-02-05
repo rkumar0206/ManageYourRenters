@@ -137,4 +137,11 @@ class RenterViewModel @Inject constructor(
     fun getRenterByIsSynced(isSynced: String) = repo.getRenterByIsSynced(isSynced).asLiveData()
 
     fun getRenterByKey(renterKey: String) = repo.getRenterByKey(renterKey).asLiveData()
+
+    fun getRentersWithTheirAmountPaid() = repo.getRentersWithTheirAmountPaid().asLiveData()
+
+    fun getRentersWithTheirAmountPaidByDateCreated(
+        startDate: Long,
+        endDate: Long
+    ) = repo.getRentersWithTheirAmountPaidByDateCreated(startDate, endDate).asLiveData()
 }

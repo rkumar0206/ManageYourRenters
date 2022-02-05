@@ -36,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
 
     private val renterViewModel by viewModels<RenterViewModel>()
-    private val paymentViewModel by viewModels<RenterPaymentViewModel>()
+    private val renterPaymentViewModel by viewModels<RenterPaymentViewModel>()
     private val borrowerViewModel by viewModels<BorrowerViewModel>()
     private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
     private val partialPaymentViewModel by viewModels<PartialPaymentViewModel>()
@@ -263,9 +263,9 @@ class LoginActivity : AppCompatActivity() {
 
                     withContext(Dispatchers.Main) {
 
-                        paymentViewModel.deleteAllPaymentsByIsSynced(true)
+                        renterPaymentViewModel.deleteAllPaymentsByIsSynced(true)
                         delay(100)
-                        paymentViewModel.insertPayments(it.toObjects(RenterPayment::class.java))
+                        renterPaymentViewModel.insertPayments(it.toObjects(RenterPayment::class.java))
                         Log.i(TAG, "syncPayments: inserted")
 
                         syncBorrowers()
@@ -275,7 +275,7 @@ class LoginActivity : AppCompatActivity() {
 
                     withContext(Dispatchers.Main) {
 
-                        paymentViewModel.deleteAllPaymentsByIsSynced(true)
+                        renterPaymentViewModel.deleteAllPaymentsByIsSynced(true)
 
                         syncBorrowers()
                     }

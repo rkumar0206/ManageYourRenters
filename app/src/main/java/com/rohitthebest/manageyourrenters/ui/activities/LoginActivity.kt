@@ -228,10 +228,6 @@ class LoginActivity : AppCompatActivity() {
 
                             renterViewModel.deleteRenterByIsSynced(getString(R.string.t))
 
-                            showToast(
-                                this@LoginActivity,
-                                "You have not added any renters yet!!"
-                            )
                             syncBorrowers()
                         }
                     }

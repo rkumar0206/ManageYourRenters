@@ -80,17 +80,24 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
                             }"
 
                 //house rent and extra
-                if (payment.houseRent == 0.0 && (payment.extras?.fieldAmount != 0.0)
-                ) {
+                if (payment.houseRent == 0.0 && (payment.extras?.fieldAmount != null && payment.extras?.fieldAmount != 0.0)) {
 
                     if (!payment.extras?.fieldName?.trim().isValid()) {
 
                         paymentAdapterNetDemandTV.text =
-                            "Net demand : ${payment.currencySymbol} ${payment.extras?.fieldAmount}"
+                            "Net demand : ${payment.currencySymbol} ${
+                                payment.extras?.fieldAmount?.format(
+                                    2
+                                )
+                            }"
                     } else {
 
                         paymentAdapterNetDemandTV.text =
-                            "${payment.extras?.fieldName} : ${payment.currencySymbol} ${payment.extras?.fieldAmount}"
+                            "${payment.extras?.fieldName} : ${payment.currencySymbol} ${
+                                payment.extras?.fieldAmount?.format(
+                                    2
+                                )
+                            }"
                     }
 
                 } else {

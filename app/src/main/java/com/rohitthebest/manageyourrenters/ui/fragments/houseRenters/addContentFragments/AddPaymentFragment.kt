@@ -226,7 +226,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                     includeBinding.rateET.setText(lastPaymentInfo?.electricityBillInfo?.rate.toString())
 
-                    calculateTotalBill()
                 }
 
                 includeBinding.parkingET.editText?.setText(lastPaymentInfo?.parkingRent.toString())
@@ -237,11 +236,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 currencySymbol = currencyList[0]
 
-                calculateTotalBill()
-
                 includeBinding.duesOfLastPaymentTV.text =
                     getString(R.string.duesOfLastPayment_message)
             }
+
+            amountPaid = calculateTotalBill().toDouble()
+            includeBinding.amountPaidET.editText?.setText("$amountPaid")
         }
 
         binding.progressBar.hide()
@@ -300,9 +300,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     "There are no dues and no money given in advance."
             }
         }
-
-        calculateTotalBill()
-
     }
 
     private fun initialiseByDateField() {
@@ -683,12 +680,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         includeBinding.totalTV.text = "$currencySymbol ${String.format("%.2f", netDemand)}"
 
-        amountPaid = if (includeBinding.amountPaidET.editText?.text.toString().trim() == ""
-            || includeBinding.amountPaidET.editText?.text.toString().trim() == "0.0"
+        amountPaid = if (!includeBinding.amountPaidET.editText?.isTextValid()!!
         ) {
 
-            includeBinding.amountPaidET.editText?.setText(netDemand.toString())
-            netDemand
+            includeBinding.amountPaidET.editText?.setText("0.0")
+            0.0
         } else {
 
             includeBinding.amountPaidET.editText?.text.toString().trim().toDouble()
@@ -918,6 +914,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 getUid()!!,
                 true
             )
+
+            Log.d(TAG, "initPayment: Net demand : $netDemand")
 
             paymentViewModel.insertPayment(requireContext(), payment)
 

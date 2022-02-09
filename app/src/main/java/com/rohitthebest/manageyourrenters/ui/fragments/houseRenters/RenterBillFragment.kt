@@ -257,16 +257,24 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
     private fun setExtraFields() {
 
         //Extra
-        includeBinding.showBillExtraFieldName.text =
-            if (!receivedPayment.extras?.fieldName.isValid()) {
+        includeBinding.showBillExtraFieldName.text = "Extra"
 
-                "Extra"
-            } else {
-                receivedPayment.extras?.fieldName
-            }
+        if (receivedPayment.extras != null) {
 
-        includeBinding.showBillExtraFieldAmount.text =
-            receivedPayment.currencySymbol + receivedPayment.extras?.fieldAmount?.format(2)
+            includeBinding.showBillExtraFieldName.text =
+                if (!receivedPayment.extras?.fieldName.isValid()) {
+
+                    "Extra"
+                } else {
+                    receivedPayment.extras?.fieldName
+                }
+
+            includeBinding.showBillExtraFieldAmount.text =
+                receivedPayment.currencySymbol + receivedPayment.extras?.fieldAmount?.format(2)
+        } else {
+
+            includeBinding.showBillExtraFieldAmount.text = receivedPayment.currencySymbol + " 0.0"
+        }
     }
 
     private fun setDuesOrAdvanceOfLastPayment() {

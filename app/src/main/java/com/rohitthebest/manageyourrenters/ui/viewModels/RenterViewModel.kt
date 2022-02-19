@@ -232,22 +232,21 @@ class RenterViewModel @Inject constructor(
 
             map.putAll(nameWithTheirAmountPaid)
 
-            val deletedRenters = deletedRenterRepository.getAllDeletedRenters().first()
+            deletedRenterRepository.getAllDeletedRenters().first()
+                .forEach { deletedRenter ->
 
-            deletedRenters.forEach { deletedRenter ->
+                    val paymentsBetweenStartAndEndDate =
+                        deletedRenter.paymentHistory.filterKeys { date ->
 
-                val paymentsBetweenStartAndEndDate =
-                    deletedRenter.paymentHistory.filterKeys { date ->
+                            date in startDate..endDate
+                        }
 
-                        date in startDate..endDate
+                    if (paymentsBetweenStartAndEndDate.isNotEmpty()) {
+
+                        val listOfAmountPaid = paymentsBetweenStartAndEndDate.values.toList()
+
+                        map[deletedRenter.renterInfo.name] = listOfAmountPaid
                     }
-
-                if (paymentsBetweenStartAndEndDate.isNotEmpty()) {
-
-                    val listOfAmountPaid = paymentsBetweenStartAndEndDate.values.toList()
-
-                    map[deletedRenter.renterInfo.name] = listOfAmountPaid
-                }
 
             }
 

@@ -219,13 +219,16 @@
     <string name="share_screenshot">Share screenshot</string>
     <string name="save_screenshot">Save screenshot</string>
     <string name="sign_in_message">To Use this app you must sign-in using your google account.</string>
-    <string name="getting_saved_data_from_cloud">Getting saved data from cloud...</string>
+    <string name="getting_saved_data_from_cloud">Getting saved data from cloud…</string>
     <string name="no_borrower_payment_added_message">Click (+) button to add payments</string>
     <string name="show_message_button">show message button</string>
     <string name="revenue">Revenue</string>
     <string name="total_number_of_renters">Total number of renters</string>
     <string name="show_deleted_renters">Show deleted renters</string>
     <string name="no_records_found">No records found!!</string>
+    <string name="due_of_last_payments">Due of last payments</string>
+    <string name="advance_of_last_npayments">Advance of last\npayments</string>
+    <string name="note">Note</string>
 
 
     <string-array name="interest_time_schedule">

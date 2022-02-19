@@ -13,6 +13,7 @@ import com.rohitthebest.manageyourrenters.databinding.AdapterDeletedRenterBindin
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.format
+import com.rohitthebest.manageyourrenters.utils.isValid
 import kotlin.math.abs
 
 
@@ -36,7 +37,13 @@ class DeletedRentersAdapter :
             binding.lastPaymentInfoBtn.setOnClickListener {
                 if (checkForNullability()) {
 
-                    mListener!!.onLastPaymentInfoBtnClicked(getItem(absoluteAdapterPosition).key)
+                    mListener!!.onLastPaymentInfoBtnClicked(
+                        if (getItem(absoluteAdapterPosition).lastPaymentInfo.key.isValid()) {
+                            getItem(absoluteAdapterPosition).key
+                        } else {
+                            ""
+                        }
+                    )
                 }
             }
 
@@ -72,7 +79,11 @@ class DeletedRentersAdapter :
                                 R.color.color_orange
                             )
 
-                            "Due : ${abs(theDeletedRenter.renterInfo.dueOrAdvanceAmount).format(2)}"
+                            "Due : ${theDeletedRenter.lastPaymentInfo.currencySymbol} ${
+                                abs(
+                                    theDeletedRenter.renterInfo.dueOrAdvanceAmount
+                                ).format(2)
+                            }"
                         }
                         theDeletedRenter.renterInfo.dueOrAdvanceAmount > 0.0 -> {
 
@@ -81,7 +92,11 @@ class DeletedRentersAdapter :
                                 R.color.color_green
                             )
 
-                            "Advance : ${theDeletedRenter.renterInfo.dueOrAdvanceAmount.format(2)}"
+                            "Advance : ${theDeletedRenter.lastPaymentInfo.currencySymbol}  ${
+                                theDeletedRenter.renterInfo.dueOrAdvanceAmount.format(
+                                    2
+                                )
+                            }"
                         }
                         else -> {
 

@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +16,7 @@ import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentDeletedRentersBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.DeletedRenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -55,6 +57,51 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
         binding.toolbar.setNavigationOnClickListener {
             requireActivity().onBackPressed()
         }
+
+        binding.toolbar.menu.findItem(R.id.menu_info_deleted_renter_fragment)
+            .setOnMenuItemClickListener {
+
+                MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(
+                        "This history about deleted renters is saved locally and will be deleted " +
+                                "after you uninstall / logout / re-sync the data."
+                    )
+                    .setPositiveButton("Ok") { dialog, _ ->
+
+                        dialog.dismiss()
+                    }
+                    .create()
+                    .show()
+
+                true
+            }
+
+        binding.toolbar.menu.findItem(R.id.menu_delete_all_deleted_renters)
+            .setOnMenuItemClickListener {
+
+                if (!binding.noRecordsFoundTV.isVisible) {
+
+                    showAlertDialogForDeletion(
+                        requireContext(),
+                        {
+
+                            showToast(requireContext(), "All records deleted")
+
+                            deletedRenterViewModel.deleteAllDeletedRenters()
+
+                            it.dismiss()
+                        },
+                        {
+                            it.dismiss()
+                        }
+                    )
+                } else {
+
+                    showToast(requireContext(), "No records available to be deleted.")
+                }
+
+                true
+            }
     }
 
     private fun getAllDeletedRenter() {
@@ -122,12 +169,19 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
 
     override fun onLastPaymentInfoBtnClicked(deletedRenterKey: String) {
 
-        val action =
-            DeletedRentersFragmentDirections.actionDeletedRentersFragmentToRenterBillFragment(
-                deletedRenterKey, true
-            )
+        if (deletedRenterKey.isValid()) {
 
-        findNavController().navigate(action)
+            val action =
+                DeletedRentersFragmentDirections.actionDeletedRentersFragmentToRenterBillFragment(
+                    deletedRenterKey, true
+                )
+
+            findNavController().navigate(action)
+        } else {
+
+            showToast(requireContext(), "No payment added")
+        }
+
     }
 
     override fun onDeleteBtnClicked(deletedRenter: DeletedRenter) {
@@ -136,7 +190,8 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
             requireContext(),
             {
 
-                deletedRenterViewModel.deleteDeletedRenter(deletedRenter)
+
+            deletedRenterViewModel.deleteDeletedRenter(deletedRenter)
 
                 it.dismiss()
             },
@@ -144,6 +199,7 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
                 it.dismiss()
             }
         )
+
     }
 
     override fun onDestroyView() {

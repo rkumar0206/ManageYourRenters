@@ -115,7 +115,7 @@ class RenterViewModel @Inject constructor(
 
                 deleteAllDocumentsUsingKeyFromFirestore(
                     context,
-                    context.getString(R.string.payments),
+                    context.getString(R.string.renter_payments),
                     convertStringListToJSON(paymentKeys)
                 )
             }
@@ -152,16 +152,16 @@ class RenterViewModel @Inject constructor(
 
     private suspend fun saveToDeletedRenterTable(
         renter: Renter,
-        lastPaymentInfo: RenterPayment,
-        paymentHistory: Map<Long, Double>
+        lastPaymentInfo: RenterPayment?,
+        paymentHistory: Map<Long, Double>?
     ) {
 
         val deletedRenter = DeletedRenter(
             renter.key!!,
             System.currentTimeMillis(),
             renter,
-            lastPaymentInfo,
-            paymentHistory
+            lastPaymentInfo ?: RenterPayment(),
+            paymentHistory ?: emptyMap()
         )
 
         deletedRenterRepository.insertDeletedRenter(deletedRenter)

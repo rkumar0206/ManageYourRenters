@@ -790,6 +790,9 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 }"
             }
 
+        customView.findViewById<TextView>(R.id.showBill_AmountPaid)
+            .changeTextColor(requireContext(), R.color.color_green)
+
         customView.findViewById<TextView>(R.id.showBill_AmountPaid).text =
             "$currencySymbol ${String.format("%.2f", amountPaid)}"
 
@@ -825,6 +828,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             when {
                 amountPaid < netDemand -> {
 
+                    customView.findViewById<TextView>(R.id.showBill_AmountPaid)
+                        .changeTextColor(requireContext(), R.color.color_orange)
                     presentDue = netDemand - amountPaid
 
                     "$currencySymbol ${String.format("%.2f", presentDue)}"
@@ -845,6 +850,15 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         customView.findViewById<TextView>(R.id.showBill_netDemand).text =
             "$currencySymbol ${netDemand.format(2)}"
+
+        customView.findViewById<TextView>(R.id.paymentMessageTV).text =
+            if (includeBinding.addNoteET.text.toString().trim().isValid()) {
+
+                includeBinding.addNoteET.text.toString().trim()
+            } else {
+
+                "No message"
+            }
     }
 
     private fun initPayment() {

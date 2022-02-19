@@ -3,6 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_info_deleted_renter_fragment"
+        android:icon="@drawable/ic_outline_info_24"
+        android:title="Info"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/menu_delete_all_deleted_renters"
         android:icon="@drawable/ic_baseline_delete_forever_24"
         android:title="Delete all"

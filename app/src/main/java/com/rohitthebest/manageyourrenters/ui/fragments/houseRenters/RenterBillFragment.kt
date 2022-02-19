@@ -210,6 +210,13 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
         setDuesOrAdvance()
 
         setTotalRent()
+
+        includeBinding.paymentMessageTV.text = if (receivedPayment.note.isValid()) {
+
+            receivedPayment.note
+        } else {
+            "No message"
+        }
     }
 
     //[Start of setting fields in bills textViews]
@@ -344,12 +351,18 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
         val dueOrAdvance =
             receivedPayment.amountPaid - receivedPayment.netDemand
 
+        includeBinding.showBillAmountPaid.changeTextColor(requireContext(), R.color.color_green)
+
         includeBinding.showBillDueAmount.text =
 
             when {
 
                 dueOrAdvance < 0.0 -> {
 
+                    includeBinding.showBillAmountPaid.changeTextColor(
+                        requireContext(),
+                        R.color.color_orange
+                    )
                     //due
                     "${receivedPayment.currencySymbol} ${abs(dueOrAdvance).format(2)}"
                 }

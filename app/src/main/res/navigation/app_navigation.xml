@@ -26,9 +26,15 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
-        <deepLink
-            android:id="@+id/deepLink2"
-            app:uri="http://www.rtb/houserenters/" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_deletedRentersFragment"
+            app:destination="@id/deletedRentersFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/addRenterFragment"
@@ -86,4 +92,9 @@
             app:argType="string"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/deletedRentersFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.DeletedRentersFragment"
+        android:label="DeletedRentersFragment"
+        tools:layout="@layout/fragment_deleted_renters" />
 </navigation>

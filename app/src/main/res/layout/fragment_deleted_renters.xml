@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color_white">
 
@@ -11,23 +11,18 @@
         android:background="@color/color_white">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/add_emi_payment_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:menu="@menu/save_menu"
             app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-            app:title="Add emi payment" />
+            app:title="Deleted renters" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/deletedRentersRV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
-        <include
-            android:id="@+id/include"
-            layout="@layout/add_emi_payment_layout" />
-    </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

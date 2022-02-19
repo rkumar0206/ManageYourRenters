@@ -224,6 +224,7 @@
     <string name="show_message_button">show message button</string>
     <string name="revenue">Revenue</string>
     <string name="total_number_of_renters">Total number of renters</string>
+    <string name="show_deleted_renters">Show deleted renters</string>
 
 
     <string-array name="interest_time_schedule">

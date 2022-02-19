@@ -6,6 +6,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.DeletedRentersAdapter
 import com.rohitthebest.manageyourrenters.database.model.DeletedRenter
@@ -13,7 +14,9 @@ import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentDeletedRentersBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.DeletedRenterViewModel
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.isValid
 import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -81,7 +84,37 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
     }
 
     override fun onRenterInfoBtnClicked(deletedRenter: Renter) {
-        //TODO("Not yet implemented")
+
+        var message = "Name : ${deletedRenter.name}\n" +
+                "Added on : ${
+                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        deletedRenter.timeStamp
+                    )
+                }\n" +
+                "Address : ${deletedRenter.address}\n" +
+                "Room no : ${deletedRenter.roomNumber}\n" +
+                "Mobile no. : ${deletedRenter.mobileNumber}\n"
+
+        if (deletedRenter.emailId.isValid()) {
+            message += "Email id : ${deletedRenter.emailId}\n"
+        }
+
+        if (deletedRenter.otherDocumentName.isValid()) {
+
+            message += "${deletedRenter.otherDocumentName} : ${deletedRenter.otherDocumentNumber}\n"
+        }
+
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Renter information")
+            .setMessage(message)
+            .setPositiveButton("Ok") { dialog, _ ->
+
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+
     }
 
     override fun onLastPaymentInfoBtnClicked(deletedRenter: RenterPayment) {

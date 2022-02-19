@@ -4,6 +4,8 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.data.*
+import com.rohitthebest.manageyourrenters.database.model.Renter
+import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 
 class TypeConvertersForDatabase {
 
@@ -65,5 +67,29 @@ class TypeConvertersForDatabase {
     fun fromStringToSupportingDocument(str: String): SupportingDocument? {
 
         return Gson().fromJson(str, object : TypeToken<SupportingDocument?>() {}.type)
+    }
+
+    @TypeConverter
+    fun fromRenterToString(renter: Renter): String {
+
+        return Gson().toJson(renter)
+    }
+
+    @TypeConverter
+    fun fromStringToRenter(str: String): Renter {
+
+        return Gson().fromJson(str, object : TypeToken<Renter>() {}.type)
+    }
+
+    @TypeConverter
+    fun fromRenterPaymentToString(renterPayment: RenterPayment): String {
+
+        return Gson().toJson(renterPayment)
+    }
+
+    @TypeConverter
+    fun fromStringToRenterPayment(str: String): RenterPayment {
+
+        return Gson().fromJson(str, object : TypeToken<RenterPayment>() {}.type)
     }
 }

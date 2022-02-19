@@ -61,6 +61,10 @@ object Module {
     @Singleton
     fun provideRenterPaymentDao(db: RenterAndPaymentDatabase) = db.getRenterPaymentDao()
 
+    @Provides
+    @Singleton
+    fun provideDeletedRenterDao(db: RenterAndPaymentDatabase) = db.getDeletedRenterDao()
+
 //============================== Borrower Database========================================
 
     @Provides

@@ -56,6 +56,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
 
+    private var isRevenueObserveEnabled = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -91,6 +93,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         }
 
         initListeners()
+
+        observeRevenueGenerated()
     }
 
     private fun getRvState() {
@@ -300,8 +304,9 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     }
 
-    var d1 = System.currentTimeMillis() - (30 * Constants.ONE_DAY_MILLISECONDS)
-    var d2 = System.currentTimeMillis()
+    private var d1 = System.currentTimeMillis() - (30 * Constants.ONE_DAY_MILLISECONDS)
+    private var d2 = System.currentTimeMillis()
+    private var revenueTitle = ""
 
     override fun onMenuItemClick(menu: MenuItem?): Boolean {
 
@@ -387,14 +392,10 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             R.id.menu_renter_revenue_all_time -> {
 
+                isRevenueObserveEnabled = true
+                revenueTitle = "Revenue - All Time"
                 renterViewModel.getRentersWithTheirAmountPaid()
-                    .observe(viewLifecycleOwner) { renterNameWithTheirAmountPaid ->
 
-                        showRevenueMessageInAlertDialogBox(
-                            "Revenue - All Time",
-                            renterNameWithTheirAmountPaid
-                        )
-                    }
                 true
             }
 
@@ -407,19 +408,40 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         millis: Pair<Long, Long>
     ) {
 
+        isRevenueObserveEnabled = true
+
+        revenueTitle = if (customDateRange == CustomDateRange.CUSTOM_DATE_RANGE) {
+
+            "Revenue - Custom\n(${getPairOfDateInMillisInStringInDateString(millis)})"
+        } else {
+
+            "Revenue - $customDateRange (${getPairOfDateInMillisInStringInDateString(millis)})"
+        }
+
         renterViewModel.getRentersWithTheirAmountPaidByDateCreated(
             millis.first,
             millis.second
-        ).observe(viewLifecycleOwner) { renterNameWithTheirAmountPaid ->
-
-            showRevenueMessageInAlertDialogBox(
-                "Revenue - $customDateRange (${getPairOfDateInMillisInStringInDateString(millis)})",
-                renterNameWithTheirAmountPaid
-            )
-
-        }
+        )
 
     }
+
+    private fun observeRevenueGenerated() {
+
+        renterViewModel.renterNameWithTheirAmountPaid
+            .observe(viewLifecycleOwner) { renterNameWithTheirAmountPaid ->
+
+                if (isRevenueObserveEnabled) {
+
+                    showRevenueMessageInAlertDialogBox(
+                        revenueTitle,
+                        renterNameWithTheirAmountPaid
+                    )
+
+                    isRevenueObserveEnabled = false
+                }
+            }
+    }
+
 
     private fun showRevenueMessageInAlertDialogBox(
         title: String,

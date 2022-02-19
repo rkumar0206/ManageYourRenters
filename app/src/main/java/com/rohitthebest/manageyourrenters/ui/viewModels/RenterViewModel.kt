@@ -187,10 +187,71 @@ class RenterViewModel @Inject constructor(
 
     fun getRenterByKey(renterKey: String) = repo.getRenterByKey(renterKey).asLiveData()
 
-    fun getRentersWithTheirAmountPaid() = repo.getRentersWithTheirAmountPaid().asLiveData()
+    private val _renterNameWithTheirAmountPaid = MutableLiveData<Map<String, List<Double>>>()
+
+    val renterNameWithTheirAmountPaid: LiveData<Map<String, List<Double>>> get() = _renterNameWithTheirAmountPaid
+
+    fun getRentersWithTheirAmountPaid() {
+
+        viewModelScope.launch {
+
+            val nameWithTheirAmountPaid = repo.getRentersWithTheirAmountPaid().first()
+
+            val map = HashMap<String, List<Double>>()
+
+            map.putAll(nameWithTheirAmountPaid)
+
+            val deletedRenters = deletedRenterRepository.getAllDeletedRenters().first()
+
+            if (deletedRenters.isNotEmpty()) {
+
+                deletedRenters.forEach { deletedRenter ->
+
+                    val listOfAmountPaid = deletedRenter.paymentHistory.values.toList()
+
+                    map[deletedRenter.renterInfo.name] = listOfAmountPaid
+                }
+
+            }
+
+            _renterNameWithTheirAmountPaid.value = map
+        }
+    }
 
     fun getRentersWithTheirAmountPaidByDateCreated(
         startDate: Long,
         endDate: Long
-    ) = repo.getRentersWithTheirAmountPaidByDateCreated(startDate, endDate).asLiveData()
+    ) {
+
+        viewModelScope.launch {
+
+            val nameWithTheirAmountPaid =
+                repo.getRentersWithTheirAmountPaidByDateCreated(startDate, endDate).first()
+
+            val map = HashMap<String, List<Double>>()
+
+            map.putAll(nameWithTheirAmountPaid)
+
+            val deletedRenters = deletedRenterRepository.getAllDeletedRenters().first()
+
+            deletedRenters.forEach { deletedRenter ->
+
+                val paymentsBetweenStartAndEndDate =
+                    deletedRenter.paymentHistory.filterKeys { date ->
+
+                        date in startDate..endDate
+                    }
+
+                if (paymentsBetweenStartAndEndDate.isNotEmpty()) {
+
+                    val listOfAmountPaid = paymentsBetweenStartAndEndDate.values.toList()
+
+                    map[deletedRenter.renterInfo.name] = listOfAmountPaid
+                }
+
+            }
+
+            _renterNameWithTheirAmountPaid.value = map
+        }
+    }
 }

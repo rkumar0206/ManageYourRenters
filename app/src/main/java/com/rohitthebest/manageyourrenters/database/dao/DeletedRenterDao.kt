@@ -22,7 +22,7 @@ interface DeletedRenterDao {
     @Query("DELETE FROM deleted_renter_table")
     suspend fun deleteAllDeletedRenters()
 
-    @Query("SELECT * FROM deleted_renter_table")
+    @Query("SELECT * FROM deleted_renter_table ORDER BY created DESC")
     fun getAllDeletedRenters(): Flow<List<DeletedRenter>>
 
     @Query("SELECT * FROM deleted_renter_table WHERE `key` = :deletedRenterKey")

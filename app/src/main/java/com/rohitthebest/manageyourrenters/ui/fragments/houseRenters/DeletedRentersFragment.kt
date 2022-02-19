@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -15,8 +16,10 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentDeletedRentersBind
 import com.rohitthebest.manageyourrenters.ui.viewModels.DeletedRenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-private const val TAG = "DeletedRentersFragment"
+//private const val TAG = "DeletedRentersFragment"
 
 @AndroidEntryPoint
 class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
@@ -37,7 +40,11 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
 
         setUpRecyclerView()
 
-        getAllDeletedRenter()
+        lifecycleScope.launch {
+
+            delay(200)
+            getAllDeletedRenter()
+        }
 
         initListeners()
 
@@ -81,18 +88,18 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
 
     override fun onRenterInfoBtnClicked(deletedRenter: Renter) {
 
-        var message = "Name : ${deletedRenter.name}\n" +
+        var message = "Name : ${deletedRenter.name}\n\n" +
                 "Added on : ${
                     WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                         deletedRenter.timeStamp
                     )
-                }\n" +
-                "Address : ${deletedRenter.address}\n" +
-                "Room no : ${deletedRenter.roomNumber}\n" +
-                "Mobile no. : ${deletedRenter.mobileNumber}\n"
+                }\n\n" +
+                "Address : ${deletedRenter.address}\n\n" +
+                "Room no : ${deletedRenter.roomNumber}\n\n" +
+                "Mobile no. : ${deletedRenter.mobileNumber}\n\n"
 
         if (deletedRenter.emailId.isValid()) {
-            message += "Email id : ${deletedRenter.emailId}\n"
+            message += "Email id : ${deletedRenter.emailId}\n\n"
         }
 
         if (deletedRenter.otherDocumentName.isValid()) {

@@ -5,7 +5,10 @@ import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.database.model.DeletedRenter
 import com.rohitthebest.manageyourrenters.database.model.Renter
+import com.rohitthebest.manageyourrenters.database.model.RenterPayment
+import com.rohitthebest.manageyourrenters.repositories.DeletedRenterRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -14,6 +17,8 @@ import com.rohitthebest.manageyourrenters.utils.deleteAllDocumentsUsingKeyFromFi
 import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
 import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,6 +28,7 @@ private const val TAG = "RenterViewModel"
 class RenterViewModel @Inject constructor(
     private val repo: RenterRepository,
     private val paymentRepository: RenterPaymentRepository,
+    private val deletedRenterRepository: DeletedRenterRepository,
     private val state: SavedStateHandle
 ) : ViewModel() {
 
@@ -115,14 +121,40 @@ class RenterViewModel @Inject constructor(
             }
         }
 
+        // ----------
+        // save the renter and last payment info to deleted renter database
+
+        val lastPaymentInfo = paymentRepository.getLastRenterPayment(renter.key!!).first()
+
+        saveToDeletedRenterTable(renter, lastPaymentInfo)
+        // -----------------
+
+        delay(100)
+
         repo.deleteRenter(renter)
         paymentRepository.deleteAllPaymentsOfRenter(renterKey = renter.key!!)
+    }
+
+    private suspend fun saveToDeletedRenterTable(
+        renter: Renter,
+        lastPaymentInfo: RenterPayment
+    ) {
+
+        val deletedRenter = DeletedRenter(
+            renter.key!!,
+            System.currentTimeMillis(),
+            renter,
+            lastPaymentInfo
+        )
+
+        deletedRenterRepository.insertDeletedRenter(deletedRenter)
     }
 
     fun deleteAllRenter() = viewModelScope.launch {
 
         repo.deleteAllRenter()
         paymentRepository.deleteAllRenterPayments()
+        deletedRenterRepository.deleteAllDeletedRenters()
     }
 
     fun deleteRenterByIsSynced(isSynced: String) = viewModelScope.launch {

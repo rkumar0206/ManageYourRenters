@@ -1,4 +1,4 @@
-# ManageYourRenters - [Click for latest release](https://github.com/rkumar0206/ManageYourRenters/releases/tag/2.6.0)
+# ManageYourRenters - [Click for latest release](https://github.com/rkumar0206/ManageYourRenters/releases/tag/3.5.0)
 
 ## Key Features 👇
 

@@ -283,6 +283,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_total_number_of_renters)
             .setOnMenuItemClickListener(this)
+        binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_show_deleted_renters)
+            .setOnMenuItemClickListener(this)
         binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_renter_revenue_all_time)
             .setOnMenuItemClickListener(this)
         binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_renter_revenue_this_month)
@@ -315,6 +317,11 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     )
                 }
 
+                true
+            }
+            R.id.menu_show_deleted_renters -> {
+
+                findNavController().navigate(R.id.action_homeFragment_to_deletedRentersFragment)
                 true
             }
 

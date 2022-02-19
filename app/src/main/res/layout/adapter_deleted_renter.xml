@@ -18,11 +18,104 @@
                 android:id="@+id/renterNameTV"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:maxLines="2"
+                android:padding="3dp"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toStartOf="@+id/deletedOnTV"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Renter name" />
+
+            <TextView
+                android:id="@+id/roomNoTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:maxLines="2"
+                android:padding="3dp"
+                android:textColor="@color/dark_blue"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/deleteBtn"
+                app:layout_constraintEnd_toStartOf="@+id/deleteBtn"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/deleteBtn"
+                tools:text="S2" />
+
+            <TextView
+                android:id="@+id/deletedOnTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:maxLines="1"
+                android:padding="3dp"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@+id/renterNameTV"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/renterNameTV"
+                tools:text="Deleted On : 02-06-2000" />
+
+            <View
+                android:id="@+id/divider73"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="2dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="@+id/deletedOnTV"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@+id/renterNameTV"
+                app:layout_constraintTop_toBottomOf="@+id/renterNameTV" />
+
+            <View
+                android:id="@+id/divider74"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="@+id/deletedOnTV"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@+id/renterNameTV"
+                app:layout_constraintTop_toBottomOf="@+id/deleteBtn" />
+
+            <ImageButton
+                android:id="@+id/deleteBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/color_white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider73"
+                app:srcCompat="@drawable/ic_baseline_delete_24" />
+
+            <Button
+                android:id="@+id/renterInfoBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="5dp"
+                android:text="Renter info"
+                android:textAllCaps="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/lastPaymentInfoBtn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider74" />
+
+            <Button
+                android:id="@+id/lastPaymentInfoBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="Last payment info"
+                android:textAllCaps="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/renterInfoBtn"
+                app:layout_constraintTop_toBottomOf="@+id/divider74" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

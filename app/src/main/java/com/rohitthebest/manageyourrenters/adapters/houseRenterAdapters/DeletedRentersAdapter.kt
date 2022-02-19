@@ -6,11 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.DeletedRenter
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterDeletedRenterBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.changeTextColor
 
 
 class DeletedRentersAdapter :
@@ -58,7 +60,38 @@ class DeletedRentersAdapter :
                             theDeletedRenter.created
                         )
                     }"
+
                     roomNoTV.text = theDeletedRenter.renterInfo.roomNumber
+
+                    dueOrAdvanceTV.text = when {
+                        theDeletedRenter.renterInfo.dueOrAdvanceAmount < 0.0 -> {
+
+                            dueOrAdvanceTV.changeTextColor(
+                                binding.root.context,
+                                R.color.color_orange
+                            )
+
+                            "Due : ${theDeletedRenter.renterInfo.dueOrAdvanceAmount}"
+                        }
+                        theDeletedRenter.renterInfo.dueOrAdvanceAmount > 0.0 -> {
+
+                            dueOrAdvanceTV.changeTextColor(
+                                binding.root.context,
+                                R.color.color_green
+                            )
+
+                            "Advance : ${theDeletedRenter.renterInfo.dueOrAdvanceAmount}"
+                        }
+                        else -> {
+
+                            dueOrAdvanceTV.changeTextColor(
+                                binding.root.context,
+                                R.color.color_green
+                            )
+                            "No Due / Advance"
+                        }
+                    }
+
                 }
             }
         }

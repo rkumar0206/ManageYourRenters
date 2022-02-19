@@ -7,12 +7,16 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.DeletedRentersAdapter
+import com.rohitthebest.manageyourrenters.database.model.DeletedRenter
+import com.rohitthebest.manageyourrenters.database.model.Renter
+import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentDeletedRentersBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.DeletedRenterViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters) {
+class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
+    DeletedRentersAdapter.OnClickListener {
 
     private var _binding: FragmentDeletedRentersBinding? = null
     private val binding get() = _binding!!
@@ -31,6 +35,15 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters) {
 
         getAllDeletedRenter()
 
+        initListeners()
+
+    }
+
+    private fun initListeners() {
+
+        binding.toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressed()
+        }
     }
 
     private fun getAllDeletedRenter() {
@@ -50,6 +63,20 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())
         }
+
+        deletedRentersAdapter.setOnClickListener(this)
+    }
+
+    override fun onRenterInfoBtnClicked(deletedRenter: Renter) {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onLastPaymentInfoBtnClicked(deletedRenter: RenterPayment) {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDeleteBtnClicked(deletedRenter: DeletedRenter) {
+        //TODO("Not yet implemented")
     }
 
     override fun onDestroyView() {

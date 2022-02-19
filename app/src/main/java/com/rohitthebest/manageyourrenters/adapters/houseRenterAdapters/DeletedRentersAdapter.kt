@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.DeletedRenter
 import com.rohitthebest.manageyourrenters.database.model.Renter
-import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterDeletedRenterBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
@@ -37,7 +36,7 @@ class DeletedRentersAdapter :
             binding.lastPaymentInfoBtn.setOnClickListener {
                 if (checkForNullability()) {
 
-                    mListener!!.onLastPaymentInfoBtnClicked(getItem(absoluteAdapterPosition).lastPaymentInfo)
+                    mListener!!.onLastPaymentInfoBtnClicked(getItem(absoluteAdapterPosition).key)
                 }
             }
 
@@ -137,7 +136,7 @@ class DeletedRentersAdapter :
     interface OnClickListener {
 
         fun onRenterInfoBtnClicked(deletedRenter: Renter)
-        fun onLastPaymentInfoBtnClicked(deletedRenter: RenterPayment)
+        fun onLastPaymentInfoBtnClicked(deletedRenterKey: String)
         fun onDeleteBtnClicked(deletedRenter: DeletedRenter)
     }
 

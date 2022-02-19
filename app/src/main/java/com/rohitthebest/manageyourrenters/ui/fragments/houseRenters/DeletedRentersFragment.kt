@@ -5,13 +5,13 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.DeletedRentersAdapter
 import com.rohitthebest.manageyourrenters.database.model.DeletedRenter
 import com.rohitthebest.manageyourrenters.database.model.Renter
-import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentDeletedRentersBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.DeletedRenterViewModel
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
@@ -117,8 +117,14 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
 
     }
 
-    override fun onLastPaymentInfoBtnClicked(deletedRenter: RenterPayment) {
-        //TODO("Not yet implemented")
+    override fun onLastPaymentInfoBtnClicked(deletedRenterKey: String) {
+
+        val action =
+            DeletedRentersFragmentDirections.actionDeletedRentersFragmentToRenterBillFragment(
+                deletedRenterKey, true
+            )
+
+        findNavController().navigate(action)
     }
 
     override fun onDeleteBtnClicked(deletedRenter: DeletedRenter) {

@@ -91,10 +91,22 @@
             android:name="payment_key"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="isReceivedFromDeletedRenterFragment"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/deletedRentersFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.DeletedRentersFragment"
         android:label="DeletedRentersFragment"
-        tools:layout="@layout/fragment_deleted_renters" />
+        tools:layout="@layout/fragment_deleted_renters">
+        <action
+            android:id="@+id/action_deletedRentersFragment_to_renterBillFragment"
+            app:destination="@id/renterBillFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
 </navigation>

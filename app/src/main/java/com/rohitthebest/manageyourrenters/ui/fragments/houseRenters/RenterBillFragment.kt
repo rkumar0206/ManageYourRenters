@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentRenterBillBinding
 import com.rohitthebest.manageyourrenters.databinding.ShowBillLayoutBinding
+import com.rohitthebest.manageyourrenters.ui.viewModels.DeletedRenterViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -31,6 +32,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
     private val renterPaymentViewModel: RenterPaymentViewModel by viewModels()
     private val renterViewModel: RenterViewModel by viewModels()
+    private val deletedRenterViewModel: DeletedRenterViewModel by viewModels()
 
     private lateinit var receivedRenter: Renter
     private lateinit var receivedPayment: RenterPayment
@@ -122,20 +124,43 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
                 receivedPaymentKey = arg.paymentKey!!
 
-                if (receivedPaymentKey.isValid()) {
+                if (arg.isReceivedFromDeletedRenterFragment) {
 
-                    getPaymentFromDatabase()
+                    // received key is the deletedRenter key
+                    // therefore get the deletedRenter from the deletedRenter table
+
+                    getDeletedRenterFromDatabase()
+
 
                 } else {
 
-                    showToast(requireContext(), "Something went wrong...")
-                    requireActivity().onBackPressed()
-                }
+                    if (receivedPaymentKey.isValid()) {
 
+                        getPaymentFromDatabase()
+
+                    } else {
+
+                        showToast(requireContext(), "Something went wrong...")
+                        requireActivity().onBackPressed()
+                    }
+
+                }
             }
 
         }
 
+    }
+
+    private fun getDeletedRenterFromDatabase() {
+
+        deletedRenterViewModel.getDeletedRenterByKey(receivedPaymentKey)
+            .observe(viewLifecycleOwner) { deletedRenter ->
+
+                receivedRenter = deletedRenter.renterInfo
+                receivedPayment = deletedRenter.lastPaymentInfo
+
+                initializeValuesToBill()
+            }
     }
 
     private fun getPaymentFromDatabase() {

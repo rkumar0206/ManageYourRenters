@@ -121,13 +121,28 @@ class RenterViewModel @Inject constructor(
             }
         }
 
-        // ----------
-        // save the renter and last payment info to deleted renter database
+        // ---------- save the renter and last payment info to deleted renter database --------
 
-        val lastPaymentInfo = paymentRepository.getLastRenterPayment(renter.key!!).first()
+        try {
 
-        saveToDeletedRenterTable(renter, lastPaymentInfo)
-        // -----------------
+            val lastPaymentInfo = paymentRepository.getLastRenterPayment(renter.key!!).first()
+
+            val paymentHistory = HashMap<Long, Double>()
+
+            paymentRepository.getAllPaymentsListOfRenter(renter.key!!).first()
+                .forEach { renterPayment ->
+
+                    paymentHistory[renterPayment.created] = renterPayment.amountPaid
+                }
+
+            saveToDeletedRenterTable(renter, lastPaymentInfo, paymentHistory)
+
+        } catch (e: NullPointerException) {
+
+            e.printStackTrace()
+        }
+
+        // --------------------------------------------------------------------------------------
 
         delay(100)
 
@@ -137,14 +152,16 @@ class RenterViewModel @Inject constructor(
 
     private suspend fun saveToDeletedRenterTable(
         renter: Renter,
-        lastPaymentInfo: RenterPayment
+        lastPaymentInfo: RenterPayment,
+        paymentHistory: Map<Long, Double>
     ) {
 
         val deletedRenter = DeletedRenter(
             renter.key!!,
             System.currentTimeMillis(),
             renter,
-            lastPaymentInfo
+            lastPaymentInfo,
+            paymentHistory
         )
 
         deletedRenterRepository.insertDeletedRenter(deletedRenter)

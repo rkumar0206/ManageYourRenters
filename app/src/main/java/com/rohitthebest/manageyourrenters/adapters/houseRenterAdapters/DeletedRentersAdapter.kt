@@ -13,6 +13,8 @@ import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterDeletedRenterBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
+import com.rohitthebest.manageyourrenters.utils.format
+import kotlin.math.abs
 
 
 class DeletedRentersAdapter :
@@ -71,7 +73,7 @@ class DeletedRentersAdapter :
                                 R.color.color_orange
                             )
 
-                            "Due : ${theDeletedRenter.renterInfo.dueOrAdvanceAmount}"
+                            "Due : ${abs(theDeletedRenter.renterInfo.dueOrAdvanceAmount).format(2)}"
                         }
                         theDeletedRenter.renterInfo.dueOrAdvanceAmount > 0.0 -> {
 
@@ -80,7 +82,7 @@ class DeletedRentersAdapter :
                                 R.color.color_green
                             )
 
-                            "Advance : ${theDeletedRenter.renterInfo.dueOrAdvanceAmount}"
+                            "Advance : ${theDeletedRenter.renterInfo.dueOrAdvanceAmount.format(2)}"
                         }
                         else -> {
 

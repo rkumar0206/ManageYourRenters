@@ -10,13 +10,15 @@ data class DeletedRenter(
     @PrimaryKey(autoGenerate = false) val key: String,
     var created: Long,
     var renterInfo: Renter,
-    var lastPaymentInfo: RenterPayment
+    var lastPaymentInfo: RenterPayment,
+    var paymentHistory: Map<Long, Double>
 ) {
 
     constructor() : this(
         "",
         System.currentTimeMillis(),
         Renter(),
-        RenterPayment()
+        RenterPayment(),
+        HashMap<Long, Double>()
     )
 }

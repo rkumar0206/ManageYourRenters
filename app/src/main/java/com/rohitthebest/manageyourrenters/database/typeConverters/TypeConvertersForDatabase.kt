@@ -92,4 +92,16 @@ class TypeConvertersForDatabase {
 
         return Gson().fromJson(str, object : TypeToken<RenterPayment>() {}.type)
     }
+
+    @TypeConverter
+    fun fromMapOfLongDoubleToString(map: Map<Long, Double>): String {
+
+        return Gson().toJson(map)
+    }
+
+    @TypeConverter
+    fun fromStringToMapOfLongDouble(str: String): Map<Long, Double> {
+
+        return Gson().fromJson(str, object : TypeToken<Map<Long, Double>>() {}.type)
+    }
 }

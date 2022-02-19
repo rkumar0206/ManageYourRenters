@@ -1,7 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,10 +13,7 @@ import com.rohitthebest.manageyourrenters.database.model.DeletedRenter
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentDeletedRentersBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.DeletedRenterViewModel
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
-import com.rohitthebest.manageyourrenters.utils.hide
-import com.rohitthebest.manageyourrenters.utils.isValid
-import com.rohitthebest.manageyourrenters.utils.show
+import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "DeletedRentersFragment"
@@ -129,9 +125,18 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
 
     override fun onDeleteBtnClicked(deletedRenter: DeletedRenter) {
 
-        // todo : show dialog
-        // todo : delete the renter
-        Log.d(TAG, "onDeleteBtnClicked: ${deletedRenter.paymentHistory}")
+        showAlertDialogForDeletion(
+            requireContext(),
+            {
+
+                deletedRenterViewModel.deleteDeletedRenter(deletedRenter)
+
+                it.dismiss()
+            },
+            {
+                it.dismiss()
+            }
+        )
     }
 
     override fun onDestroyView() {

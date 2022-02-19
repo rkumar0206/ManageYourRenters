@@ -25,4 +25,7 @@ interface DeletedRenterDao {
     @Query("SELECT * FROM deleted_renter_table")
     fun getAllDeletedRenters(): Flow<List<DeletedRenter>>
 
+    @Query("SELECT * FROM deleted_renter_table WHERE `key` = :deletedRenterKey")
+    fun getDeletedRenterByKey(deletedRenterKey: String): Flow<DeletedRenter>
+
 }

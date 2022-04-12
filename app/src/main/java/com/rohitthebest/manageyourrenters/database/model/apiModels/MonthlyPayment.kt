@@ -1,12 +1,30 @@
 package com.rohitthebest.manageyourrenters.database.model.apiModels
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "monthly_payment_table")
 data class MonthlyPayment(
-    val amount: Double,
-    val categoryKey: String,
-    val created: Long,
-    val id: Int,
-    val key: String,
-    val message: Any,
-    val modified: Long,
-    val uid: String
-)
+    @PrimaryKey(autoGenerate = false) var key: String,
+    var amount: Double,
+    var categoryKey: String,
+    var created: Long,
+    var id: Int,
+    var message: String = "",
+    var modified: Long,
+    var uid: String,
+    var isSynced: Boolean = true
+) {
+
+    constructor() : this(
+        "",
+        0.0,
+        "",
+        0L,
+        0,
+        "",
+        0L,
+        "",
+        true
+    )
+}

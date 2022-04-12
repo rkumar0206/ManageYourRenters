@@ -5,9 +5,13 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_CATEGORY_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.MONTHLY_PAYMENT_CATEGORY_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.MONTHLY_PAYMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.REQUEST_METHOD_KEY
 import com.rohitthebest.manageyourrenters.services.ExpenseCategoryService
 import com.rohitthebest.manageyourrenters.services.ExpenseService
+import com.rohitthebest.manageyourrenters.services.MonthlyPaymentCategoryService
+import com.rohitthebest.manageyourrenters.services.MonthlyPaymentService
 
 fun expenseCategoryServiceHelper(
     context: Context,
@@ -49,4 +53,42 @@ fun expenseServiceHelper(
     )
 
     ContextCompat.startForegroundService(context, foregroundService)
+}
+
+fun monthlyPaymentCategoryServiceHelper(
+    context: Context,
+    monthlyPaymentCategoryKey: String,
+    requestMethod: String
+) {
+
+    val foregroundService = Intent(context, MonthlyPaymentCategoryService::class.java)
+
+    foregroundService.putExtra(
+        REQUEST_METHOD_KEY,
+        requestMethod
+    )
+
+    foregroundService.putExtra(
+        MONTHLY_PAYMENT_CATEGORY_KEY,
+        monthlyPaymentCategoryKey
+    )
+}
+
+fun monthlyPaymentServiceHelper(
+    context: Context,
+    monthlyPaymentKey: String,
+    requestMethod: String
+) {
+
+    val foregroundService = Intent(context, MonthlyPaymentService::class.java)
+
+    foregroundService.putExtra(
+        REQUEST_METHOD_KEY,
+        requestMethod
+    )
+
+    foregroundService.putExtra(
+        MONTHLY_PAYMENT_KEY,
+        monthlyPaymentKey
+    )
 }

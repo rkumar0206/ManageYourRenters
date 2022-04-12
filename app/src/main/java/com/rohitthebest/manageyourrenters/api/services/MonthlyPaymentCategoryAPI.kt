@@ -27,7 +27,8 @@ interface MonthlyPaymentCategoryAPI {
     @PUT("/api/{uid}/monthlyPaymentCategories/key/{key}")
     suspend fun updateCategoryByKey(
         @Path("uid") uid: String,
-        @Path("key") key: String
+        @Path("key") key: String,
+        @Body monthlyPaymentCategory: MonthlyPaymentCategory
     ): Response<MonthlyPaymentCategory>
 
     @DELETE("/api/{uid}/monthlyPaymentCategories/key/{key}")

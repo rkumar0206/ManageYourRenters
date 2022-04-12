@@ -23,6 +23,9 @@ class MonthlyPaymentRepository @Inject constructor(
     suspend fun deleteAllMonthlyPaymentByIsSynced(isSynced: Boolean) =
         dao.deleteAllMonthlyPaymentByIsSynced(isSynced)
 
+    suspend fun deleteAllMonthlyPaymentsByCategoryKey(categoryKey: String) =
+        dao.deleteAllMonthlyPaymentsByCategoryKey(categoryKey)
+
     suspend fun deleteAllMonthlyPayments() = dao.deleteAllMonthlyPayments()
 
     fun getAllMonthlyPayments() = dao.getAllMonthlyPayments()

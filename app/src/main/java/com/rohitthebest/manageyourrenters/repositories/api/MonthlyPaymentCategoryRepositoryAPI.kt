@@ -21,8 +21,12 @@ class MonthlyPaymentCategoryRepositoryAPI @Inject constructor(
     suspend fun getMonthlyPaymentCategories(uid: String) =
         monthlyPaymentCategoryAPI.getMonthlyPaymentCategories(uid)
 
-    suspend fun updateMonthlyPaymentCategory(uid: String, key: String) =
-        monthlyPaymentCategoryAPI.updateCategoryByKey(uid, key)
+    suspend fun updateMonthlyPaymentCategory(
+        uid: String,
+        key: String,
+        monthlyPaymentCategory: MonthlyPaymentCategory
+    ) =
+        monthlyPaymentCategoryAPI.updateCategoryByKey(uid, key, monthlyPaymentCategory)
 
     suspend fun deleteMonthlyPaymentCategory(uid: String, key: String) =
         monthlyPaymentCategoryAPI.deleteCategoryByKey(uid, key)

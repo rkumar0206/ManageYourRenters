@@ -22,6 +22,9 @@ interface MonthlyPaymentDao {
     @Query("DELETE FROM monthly_payment_table WHERE isSynced = :isSynced")
     suspend fun deleteAllMonthlyPaymentByIsSynced(isSynced: Boolean)
 
+    @Query("DELETE FROM monthly_payment_table WHERE categoryKey = :categoryKey")
+    suspend fun deleteAllMonthlyPaymentsByCategoryKey(categoryKey: String)
+
     @Query("DELETE FROM monthly_payment_table")
     suspend fun deleteAllMonthlyPayments()
 

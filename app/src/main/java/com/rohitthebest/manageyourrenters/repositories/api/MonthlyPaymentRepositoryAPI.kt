@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.repositories.api
 
 import com.rohitthebest.manageyourrenters.api.services.MonthlyPaymentAPI
+import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,8 +22,13 @@ class MonthlyPaymentRepositoryAPI @Inject constructor(
     suspend fun getMonthlyPaymentsByUid(uid: String) =
         monthlyPaymentAPI.getMonthlyPaymentsByUid(uid)
 
-    suspend fun updateMonthlyPaymentsKey(uid: String, key: String, categoryKey: String) =
-        monthlyPaymentAPI.updateMonthPaymentByKey(uid, key, categoryKey)
+    suspend fun updateMonthlyPaymentsKey(
+        uid: String,
+        key: String,
+        categoryKey: String,
+        monthlyPayment: MonthlyPayment
+    ) =
+        monthlyPaymentAPI.updateMonthPaymentByKey(uid, key, categoryKey, monthlyPayment)
 
     suspend fun deleteMonthlyPaymentByKey(uid: String, key: String) =
         monthlyPaymentAPI.deleteMonthlyPaymentByKey(uid, key)

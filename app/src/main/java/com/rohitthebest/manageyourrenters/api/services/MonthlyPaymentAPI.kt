@@ -35,7 +35,8 @@ interface MonthlyPaymentAPI {
     suspend fun updateMonthPaymentByKey(
         @Path("uid") uid: String,
         @Path("key") key: String,
-        @Path("categoryKey") categoryKey: String
+        @Path("categoryKey") categoryKey: String,
+        @Body monthlyPayment: MonthlyPayment
     ): Response<MonthlyPayment>
 
     @DELETE("/api/{uid}/monthlyPayments/key/{key}")

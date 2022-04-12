@@ -11,7 +11,8 @@ interface MonthlyPaymentAPI {
     @POST("/api/{uid}/monthlyPayments/category/key/{categoryKey}")
     suspend fun postMonthlyPaymentUsingCategoryKey(
         @Path("uid") uid: String,
-        @Path("categoryKey") categoryKey: String
+        @Path("categoryKey") categoryKey: String,
+        @Body monthlyPayment: MonthlyPayment
     ): Response<MonthlyPayment>
 
     @GET("/api/{uid}/monthlyPayments/key/{key}")

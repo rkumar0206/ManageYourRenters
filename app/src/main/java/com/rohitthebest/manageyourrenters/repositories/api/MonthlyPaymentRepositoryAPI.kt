@@ -10,8 +10,11 @@ class MonthlyPaymentRepositoryAPI @Inject constructor(
     private val monthlyPaymentAPI: MonthlyPaymentAPI
 ) {
 
-    suspend fun insertMonthlyPayment(uid: String, categoryKey: String) =
-        monthlyPaymentAPI.postMonthlyPaymentUsingCategoryKey(uid, categoryKey)
+    suspend fun insertMonthlyPayment(
+        uid: String,
+        categoryKey: String,
+        monthlyPayment: MonthlyPayment
+    ) = monthlyPaymentAPI.postMonthlyPaymentUsingCategoryKey(uid, categoryKey, monthlyPayment)
 
     suspend fun getMonthlyPaymentByKey(uid: String, key: String) =
         monthlyPaymentAPI.getMonthlyPaymentByKey(uid, key)

@@ -21,6 +21,7 @@ object Constants {
     const val EMI_DATABASE_NAME = "emidatabase.db"
     const val EMI_PAYMENT_DATABASE_NAME = "emi_paymentdatabase.db"
     const val EXPENSE_DATABASE_NAME = "expense_database.db"
+    const val MONTHLY_PAYMENT_DATABASE_NAME = "monthly_payment_db"
 
     const val NOTIFICATION_CHANNEL_ID = "NotificationChannelID"
 

@@ -16,6 +16,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.EMI_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EMI_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.MANAGE_YOUR_RENTERS_API_BASE_URL
+import com.rohitthebest.manageyourrenters.others.Constants.MONTHLY_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.PARTIAL_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.RENTER_AND_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.UNSPLASH_BASE_URL
@@ -193,6 +194,31 @@ object Module {
         db: ExpenseDatabase
     ) = db.getExpenseDAO()
 
+
+    // =========================================================================================
+
+    // ------------------------------ Monthly Payment Database -----------------------------
+
+    @Provides
+    @Singleton
+    fun providesMonthlyPaymentDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(
+        context,
+        MonthlyPaymentDatabase::class.java,
+        MONTHLY_PAYMENT_DATABASE_NAME
+    )
+        .build()
+
+    @Provides
+    @Singleton
+    fun providesMonthlyPaymentCategoryDao(
+        db: MonthlyPaymentDatabase
+    ) = db.getMonthlyPaymentCategoryDao()
+
+    @Provides
+    @Singleton
+    fun providesMonthlyPaymentDao(db: MonthlyPaymentDatabase) = db.getMonthlyPaymentDao()
 
     // =========================================================================================
 

@@ -29,6 +29,14 @@
             android:name="shortcutFragmentNameKey"
             app:argType="string"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_trackMoneyHomeFragment_to_monthlyPaymentCategoryFragment"
+            app:destination="@id/monthlyPaymentCategoryFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/emiFragment"
@@ -196,4 +204,9 @@
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.DeepAnalyzeExpenseFragment"
         android:label="DeepAnalyzeExpenseFragment"
         tools:layout="@layout/fragment_deep_analyze_expense" />
+    <fragment
+        android:id="@+id/monthlyPaymentCategoryFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPayment.MonthlyPaymentCategoryFragment"
+        android:label="MonthlyPaymentCategoryFragment"
+        tools:layout="@layout/fragment_monthly_payment_category" />
 </navigation>

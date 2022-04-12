@@ -73,6 +73,11 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
                         findNavController().navigate(R.id.action_trackMoneyHomeFragment_to_emiFragment)
                     }
 
+                    getString(R.string.monthly_payments) -> {
+
+                        findNavController().navigate(R.id.action_trackMoneyHomeFragment_to_monthlyPaymentCategoryFragment)
+                    }
+
                     else -> {
 
                         Log.d(TAG, "getMessage: Not mapped")
@@ -160,6 +165,11 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
             4 -> {
 
                 findNavController().navigate(R.id.action_trackMoneyHomeFragment_to_expenseCategoryFragment)
+            }
+
+            5 -> {
+
+                findNavController().navigate(R.id.action_trackMoneyHomeFragment_to_monthlyPaymentCategoryFragment)
             }
 
             else -> {

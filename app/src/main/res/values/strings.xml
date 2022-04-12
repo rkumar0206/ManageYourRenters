@@ -229,6 +229,8 @@
     <string name="due_of_last_payments">Due of last payments</string>
     <string name="advance_of_last_npayments">Advance of last\npayments</string>
     <string name="note">Note</string>
+    <string name="add_monthly_payment_category">Add monthly Payment category</string>
+    <string name="no_monthly_payment_category_added_message">Click (+) button to add Monthly Payments Category.\nExample : Rent, Wifi, Recharge, etc…</string>
 
 
     <string-array name="interest_time_schedule">

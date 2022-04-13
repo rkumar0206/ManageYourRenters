@@ -208,5 +208,19 @@
         android:id="@+id/monthlyPaymentCategoryFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPayment.MonthlyPaymentCategoryFragment"
         android:label="MonthlyPaymentCategoryFragment"
-        tools:layout="@layout/fragment_monthly_payment_category" />
+        tools:layout="@layout/fragment_monthly_payment_category">
+        <action
+            android:id="@+id/action_monthlyPaymentCategoryFragment_to_addEditMonthlyPaymentCategory"
+            app:destination="@id/addEditMonthlyPaymentCategory"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/addEditMonthlyPaymentCategory"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPayment.AddEditMonthlyPaymentCategory"
+        android:label="AddEditMonthlyPaymentCategory"
+        tools:layout="@layout/fragment_add_edit_monthly_payment_category" />
 </navigation>

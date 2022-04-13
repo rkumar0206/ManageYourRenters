@@ -231,6 +231,11 @@
     <string name="note">Note</string>
     <string name="add_monthly_payment_category">Add monthly Payment category</string>
     <string name="no_monthly_payment_category_added_message">Click (+) button to add Monthly Payments Category.\nExample : Rent, Wifi, Recharge, etc…</string>
+    <string name="add_category">Add category</string>
+    <string name="monthlyPayment_category_image">Monthly payment category image</string>
+    <string name="monthlyPayment_category_name">Monthly Payment category name</string>
+    <string name="description_optional">Description (optional)</string>
+    <string name="category_description">Add category description</string>
 
 
     <string-array name="interest_time_schedule">

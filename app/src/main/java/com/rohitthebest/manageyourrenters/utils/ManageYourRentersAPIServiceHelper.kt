@@ -72,6 +72,8 @@ fun monthlyPaymentCategoryServiceHelper(
         MONTHLY_PAYMENT_CATEGORY_KEY,
         monthlyPaymentCategoryKey
     )
+
+    ContextCompat.startForegroundService(context, foregroundService)
 }
 
 fun monthlyPaymentServiceHelper(
@@ -91,4 +93,6 @@ fun monthlyPaymentServiceHelper(
         MONTHLY_PAYMENT_KEY,
         monthlyPaymentKey
     )
+
+    ContextCompat.startForegroundService(context, foregroundService)
 }

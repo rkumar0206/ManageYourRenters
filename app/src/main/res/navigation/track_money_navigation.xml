@@ -222,5 +222,10 @@
         android:id="@+id/addEditMonthlyPaymentCategory"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPayment.AddEditMonthlyPaymentCategory"
         android:label="AddEditMonthlyPaymentCategory"
-        tools:layout="@layout/fragment_add_edit_monthly_payment_category" />
+        tools:layout="@layout/fragment_add_edit_monthly_payment_category">
+        <argument
+            android:name="monthlyPaymentCategoryKey"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 </navigation>

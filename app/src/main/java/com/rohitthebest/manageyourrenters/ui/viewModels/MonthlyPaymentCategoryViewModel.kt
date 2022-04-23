@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -17,6 +18,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val TAG = "MonthlyPaymentCategoryViewModel"
+
 @HiltViewModel
 class MonthlyPaymentCategoryViewModel @Inject constructor(
     private val repository: MonthlyPaymentCategoryRepository,
@@ -31,6 +34,8 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
         if (isInternetAvailable(context)) {
 
             monthlyPaymentCategory.isSynced = true
+
+            Log.d(TAG, "insertMonthlyPaymentCategory: ")
 
             monthlyPaymentCategoryServiceHelper(
                 context,

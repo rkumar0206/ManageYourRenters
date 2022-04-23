@@ -91,6 +91,7 @@ class MonthlyPaymentCategoryService : Service() {
 
                             updateMonthlyPaymentIsSyncedValue(monthlyPaymentCategory, true)
 
+                            stopSelf()
                         } else {
 
                             Log.i(TAG, "Error occurred")
@@ -100,12 +101,9 @@ class MonthlyPaymentCategoryService : Service() {
                     } catch (e: Exception) {
 
                         e.printStackTrace()
+                        stopSelf()
                     }
-
-
-                    stopSelf()
                 }
-
 
                 //[PUT - update]
                 getString(R.string.put) -> {
@@ -129,12 +127,13 @@ class MonthlyPaymentCategoryService : Service() {
                             Log.i(TAG, "Error occurred")
                             updateMonthlyPaymentIsSyncedValue(monthlyPaymentCategory, false)
                         }
+
+                        stopSelf()
                     } catch (e: Exception) {
 
                         e.printStackTrace()
+                        stopSelf()
                     }
-
-                    stopSelf()
                 }
 
                 //[DELETE]

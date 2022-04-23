@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    app:cardBackgroundColor="@color/color_green"
+    app:cardCornerRadius="2dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/rootL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="2.8dp"
+        app:cardCornerRadius="2dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/monthlyPaymentCategoryIV"
+                android:layout_width="match_parent"
+                android:layout_height="210dp"
+                android:contentDescription="@string/monthlyPayment_category_image"
+                android:scaleType="centerCrop"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/gradient_blue"
+                tools:srcCompat="@drawable/ic_house_renters" />
+
+
+            <ImageButton
+                android:id="@+id/monthlyPaymentCategoryMenuBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#8FFFFFFF"
+                android:contentDescription="@string/menubtn"
+                android:minHeight="48dp"
+                app:layout_constraintEnd_toEndOf="@+id/monthlyPaymentCategoryIV"
+                app:layout_constraintTop_toTopOf="@+id/monthlyPaymentCategoryIV"
+                app:srcCompat="@drawable/ic_baseline_more_vert_24" />
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:background="#5C444444"
+                app:layout_constraintBottom_toBottomOf="@+id/monthlyPaymentCategoryIV"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@id/monthlyPaymentCategoryIV"
+                app:layout_constraintTop_toTopOf="@id/monthlyPaymentCategoryIV" />
+
+            <TextView
+                android:id="@+id/monthlyPaymentCategoryNameTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:padding="5dp"
+                android:text="@string/monthlyPayment_category_name"
+                android:textColor="#E6DFDF"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/monthlyPaymentCategoryDescriptionTV"
+                app:layout_constraintEnd_toEndOf="@id/monthlyPaymentCategoryIV"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@id/monthlyPaymentCategoryIV"
+                app:layout_constraintTop_toTopOf="@+id/monthlyPaymentCategoryIV" />
+
+            <TextView
+                android:id="@+id/monthlyPaymentCategoryDescriptionTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="3"
+                android:padding="3dp"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/monthlyPaymentCategoryIV"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/monthlyPaymentCategoryIV"
+                tools:text="This is the monthlyPayment category description" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.cardview.widget.CardView>

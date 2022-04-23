@@ -38,7 +38,10 @@ class ExpenseCategoryAdapter :
 
                 if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
 
-                    mListener!!.onMenuBtnClicked(getItem(absoluteAdapterPosition))
+                    mListener!!.onMenuBtnClicked(
+                        getItem(absoluteAdapterPosition),
+                        absoluteAdapterPosition
+                    )
                 }
             }
         }
@@ -134,7 +137,7 @@ class ExpenseCategoryAdapter :
     interface OnClickListener {
 
         fun onItemClick(expenseCategory: ExpenseCategory)
-        fun onMenuBtnClicked(expenseCategory: ExpenseCategory)
+        fun onMenuBtnClicked(expenseCategory: ExpenseCategory, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

@@ -40,7 +40,10 @@ class MonthlyPaymentCategoryAdapter :
 
                 if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
 
-                    mListener!!.onMenuBtnClicked(getItem(absoluteAdapterPosition))
+                    mListener!!.onMenuBtnClicked(
+                        getItem(absoluteAdapterPosition),
+                        absoluteAdapterPosition
+                    )
                 }
             }
         }
@@ -143,7 +146,7 @@ class MonthlyPaymentCategoryAdapter :
     interface OnClickListener {
 
         fun onItemClick(monthlyPaymentCategory: MonthlyPaymentCategory)
-        fun onMenuBtnClicked(monthlyPaymentCategory: MonthlyPaymentCategory)
+        fun onMenuBtnClicked(monthlyPaymentCategory: MonthlyPaymentCategory, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

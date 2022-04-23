@@ -1,10 +1,9 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.content.Context
+import android.os.Parcelable
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentCategoryRepository
@@ -23,8 +22,30 @@ private const val TAG = "MonthlyPaymentCategoryViewModel"
 @HiltViewModel
 class MonthlyPaymentCategoryViewModel @Inject constructor(
     private val repository: MonthlyPaymentCategoryRepository,
-    private val monthlyPaymentRepository: MonthlyPaymentRepository
+    private val monthlyPaymentRepository: MonthlyPaymentRepository,
+    private val state: SavedStateHandle
 ) : ViewModel() {
+
+    // ------------------------- UI related ----------------------------
+
+    companion object {
+
+        private const val MONTHLY_PAYMENT_CATEGORY_RV_KEY = "dccabjbdfknjsbhve_d14fn"
+    }
+
+    fun saveMonthlyPaymentCategoryRvState(rvState: Parcelable?) {
+
+        state.set(MONTHLY_PAYMENT_CATEGORY_RV_KEY, rvState)
+    }
+
+    private val _monthlyPaymentCategoryRvState: MutableLiveData<Parcelable> = state.getLiveData(
+        MONTHLY_PAYMENT_CATEGORY_RV_KEY
+    )
+
+    val monthlyPaymentCategoryRvState: LiveData<Parcelable> get() = _monthlyPaymentCategoryRvState
+
+    // ---------------------------------------------------------------
+
 
     fun insertMonthlyPaymentCategory(
         context: Context,

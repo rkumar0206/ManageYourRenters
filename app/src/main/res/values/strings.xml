@@ -236,6 +236,8 @@
     <string name="monthlyPayment_category_name">Monthly Payment category name</string>
     <string name="description_optional">Description (optional)</string>
     <string name="category_description">Add category description</string>
+    <string name="no_monthly_payment_added_message">Click (+) button to add payments in this category</string>
+    <string name="add_monthly_payment">Add monthly payment</string>
 
 
     <string-array name="interest_time_schedule">

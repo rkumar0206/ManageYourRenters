@@ -65,9 +65,15 @@ class MonthlyPaymentCategoryFragment : Fragment(R.layout.fragment_monthly_paymen
         monthlyPaymentCategoryAdapter.setOnClickListener(this)
     }
 
-
     override fun onItemClick(monthlyPaymentCategory: MonthlyPaymentCategory) {
-        // todo
+
+        val action =
+            MonthlyPaymentCategoryFragmentDirections.actionMonthlyPaymentCategoryFragmentToMonthlyPaymentFragment(
+                monthlyPaymentCategory.key
+            )
+
+        findNavController().navigate(action)
+
     }
 
     private lateinit var monthlyPaymentCategoryForMenus: MonthlyPaymentCategory

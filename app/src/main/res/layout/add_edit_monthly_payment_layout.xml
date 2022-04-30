@@ -56,6 +56,430 @@
         app:layout_constraintTop_toBottomOf="@+id/monthlyPaymentDateTV" />
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider60"
+        tools:visibility="visible">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:id="@+id/divider5"
+                android:layout_width="377dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="1dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:padding="4dp"
+                android:text="@string/select_period"
+                android:textColor="@color/textColor1"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider5" />
+
+            <View
+                android:id="@+id/divider6"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="2dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+            <RadioGroup
+                android:id="@+id/periodTypeRG"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:checkedButton="@id/byMonthRB"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider6">
+
+                <RadioButton
+                    android:id="@+id/byMonthRB"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="18dp"
+                    android:text="@string/by_month" />
+
+                <RadioButton
+                    android:id="@+id/byDateRB"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:text="@string/by_date" />
+            </RadioGroup>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/byMonthCL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/periodTypeRG"
+                app:layout_constraintVertical_bias="0.0"
+                tools:visibility="visible">
+
+                <Spinner
+                    android:id="@+id/fromMonthSelectSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:alpha="1"
+                    android:contentDescription="@string/select_from_month"
+                    android:minHeight="48dp"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toStartOf="@+id/fromYearSpinner"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider76"
+                    tools:visibility="visible" />
+
+                <Spinner
+                    android:id="@+id/toMonthSelectSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:alpha="1"
+                    android:contentDescription="@string/select_to_month"
+                    android:minHeight="48dp"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toStartOf="@+id/toYearSpinner"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider78"
+                    tools:visibility="visible" />
+
+                <Spinner
+                    android:id="@+id/fromYearSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/select_from_year"
+                    android:minHeight="48dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/fromMonthSelectSpinner"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/fromMonthSelectSpinner"
+                    app:layout_constraintTop_toTopOf="@+id/fromMonthSelectSpinner"
+                    tools:visibility="visible" />
+
+                <Spinner
+                    android:id="@+id/toYearSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/select_to_year"
+                    android:minHeight="48dp"
+                    app:layout_constraintBottom_toBottomOf="@id/toMonthSelectSpinner"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/toMonthSelectSpinner"
+                    app:layout_constraintTop_toTopOf="@+id/toMonthSelectSpinner"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/textView74"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/from_month"
+                    android:textColor="@color/primaryTextColor"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="@+id/divider75"
+                    app:layout_constraintTop_toBottomOf="@+id/divider75" />
+
+                <TextView
+                    android:id="@+id/textView82"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/to_month"
+                    android:textColor="@color/primaryTextColor"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="@+id/textView74"
+                    app:layout_constraintTop_toBottomOf="@+id/divider77" />
+
+                <View
+                    android:id="@+id/divider75"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:id="@+id/divider76"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="@+id/divider75"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@+id/divider75"
+                    app:layout_constraintTop_toBottomOf="@+id/textView74" />
+
+                <View
+                    android:id="@+id/divider77"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="@+id/divider75"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@+id/divider75"
+                    app:layout_constraintTop_toBottomOf="@+id/fromMonthSelectSpinner" />
+
+                <View
+                    android:id="@+id/divider78"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="@+id/divider75"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@+id/divider75"
+                    app:layout_constraintTop_toBottomOf="@+id/textView82" />
+
+                <View
+                    android:id="@+id/divider79"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/divider75"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@+id/divider75"
+                    app:layout_constraintTop_toBottomOf="@+id/toMonthSelectSpinner" />
+
+                <View
+                    android:id="@+id/divider82"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toTopOf="@+id/divider79"
+                    app:layout_constraintEnd_toStartOf="@+id/textView82"
+                    app:layout_constraintTop_toBottomOf="@+id/divider75" />
+
+                <View
+                    android:id="@+id/divider84"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toTopOf="@+id/divider79"
+                    app:layout_constraintStart_toEndOf="@id/divider77"
+                    app:layout_constraintTop_toBottomOf="@+id/divider75" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/byDateCL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:alpha="1"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/periodTypeRG"
+                app:layout_constraintVertical_bias="0.0"
+                tools:alpha="1"
+                tools:visibility="gone">
+
+                <View
+                    android:id="@+id/divider17"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toStartOf="@+id/divider33"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/divider8"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:padding="4dp"
+                    android:text="@string/from"
+                    android:textColor="@color/textColor1"
+                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintStart_toEndOf="@+id/divider8"
+                    app:layout_constraintTop_toBottomOf="@+id/divider17" />
+
+                <TextView
+                    android:id="@+id/textView8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/till"
+                    android:textColor="@color/textColor1"
+                    app:layout_constraintEnd_toStartOf="@+id/divider33"
+                    app:layout_constraintStart_toEndOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintTop_toTopOf="@+id/textView7" />
+
+                <View
+                    android:id="@+id/divider7"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="4dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toStartOf="@+id/divider33"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/divider8"
+                    app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+                <TextView
+                    android:id="@+id/fromDateTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:padding="4dp"
+                    android:text="@string/nul"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintEnd_toStartOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintStart_toEndOf="@+id/divider8"
+                    app:layout_constraintTop_toTopOf="@+id/dateRangePickerBtn" />
+
+                <View
+                    android:id="@+id/divider9"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toTopOf="@+id/divider16"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/textView7"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:id="@+id/divider8"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toTopOf="@+id/divider16"
+                    app:layout_constraintStart_toEndOf="@+id/textView7"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tillDateTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:padding="4dp"
+                    android:text="@string/nul"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintEnd_toStartOf="@+id/divider33"
+                    app:layout_constraintStart_toEndOf="@+id/dateRangePickerBtn"
+                    app:layout_constraintTop_toTopOf="@+id/dateRangePickerBtn" />
+
+                <ImageButton
+                    android:id="@+id/dateRangePickerBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="2dp"
+                    android:backgroundTint="@color/color_white"
+                    android:contentDescription="@string/imagebutton"
+                    android:minHeight="48dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider7"
+                    app:srcCompat="@drawable/ic_baseline_date_range_24" />
+
+                <TextView
+                    android:id="@+id/byDateErrorMessageTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:padding="2dp"
+                    android:text="@string/enter_a_valid_date"
+                    android:textColor="@color/color_green"
+                    android:textSize="12sp"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/tillDateTV"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/fromDateTV"
+                    app:layout_constraintTop_toBottomOf="@id/divider16"
+                    tools:visibility="visible" />
+
+                <View
+                    android:id="@+id/divider16"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/divider33"
+                    app:layout_constraintStart_toEndOf="@+id/divider8"
+                    app:layout_constraintTop_toBottomOf="@+id/dateRangePickerBtn" />
+
+                <View
+                    android:id="@+id/divider33"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toBottomOf="@+id/divider9"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
         android:id="@+id/cardView21"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -65,7 +489,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider60">
+        app:layout_constraintTop_toBottomOf="@id/cardView">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

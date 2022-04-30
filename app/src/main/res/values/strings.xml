@@ -155,6 +155,7 @@
     <string name="for_the_month_s">For the month(s)</string>
     <string name="current_status">Current status :</string>
     <string name="from_month">From month</string>
+    <string name="to_month">To month</string>
     <string name="amount_paying">Amount Paying</string>
     <string name="emiPayments">EMI_Payments</string>
     <string name="delete_this_payment">Delete This Payment</string>
@@ -238,6 +239,10 @@
     <string name="category_description">Add category description</string>
     <string name="no_monthly_payment_added_message">Click (+) button to add payments in this category</string>
     <string name="add_monthly_payment">Add monthly payment</string>
+    <string name="select_from_month">Select from month</string>
+    <string name="select_from_year">Select from Year</string>
+    <string name="select_to_month">Select to month</string>
+    <string name="select_to_year">Select to year</string>
 
 
     <string-array name="interest_time_schedule">

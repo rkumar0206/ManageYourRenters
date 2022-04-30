@@ -137,7 +137,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
                     receivedExpenseCategory = expenseCategory
 
-                    binding.toolbar.title = "Add ${expenseCategory.categoryName} Expenses"
+                    binding.toolbar.title = "Add ${expenseCategory.categoryName} Expense"
                 }
         }
     }

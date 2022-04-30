@@ -217,6 +217,14 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_monthlyPaymentCategoryFragment_to_monthlyPaymentFragment"
+            app:destination="@id/monthlyPaymentFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/addEditMonthlyPaymentCategory"
@@ -227,5 +235,33 @@
             android:name="monthlyPaymentCategoryKey"
             app:argType="string"
             app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/addEditMonthlyPaymentFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPayment.AddEditMonthlyPaymentFragment"
+        android:label="AddEditMonthlyPaymentFragment"
+        tools:layout="@layout/fragment_add_edit_monthly_payment">
+        <argument
+            android:name="monthlyPaymentCategoryKey"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="monthlyPaymentKey"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/monthlyPaymentFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPayment.MonthlyPaymentFragment"
+        android:label="MonthlyPaymentFragment"
+        tools:layout="@layout/fragment_monthly_payment">
+        <action
+            android:id="@+id/action_monthlyPaymentFragment_to_addEditMonthlyPaymentFragment"
+            app:destination="@id/addEditMonthlyPaymentFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
 </navigation>

@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
+import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentDateTimeInfo
 
 class TypeConvertersForDatabase {
 
@@ -103,5 +104,17 @@ class TypeConvertersForDatabase {
     fun fromStringToMapOfLongDouble(str: String): Map<Long, Double> {
 
         return Gson().fromJson(str, object : TypeToken<Map<Long, Double>>() {}.type)
+    }
+
+    @TypeConverter
+    fun fromMonthlyPaymentDateTimeInfoToString(monthlyPaymentDateTimeInfo: MonthlyPaymentDateTimeInfo?): String? {
+
+        return Gson().toJson(monthlyPaymentDateTimeInfo)
+    }
+
+    @TypeConverter
+    fun fromStringToMonthlyPaymentDateTimeInfo(str: String?): MonthlyPaymentDateTimeInfo? {
+
+        return Gson().fromJson(str, object : TypeToken<MonthlyPaymentDateTimeInfo?>() {}.type)
     }
 }

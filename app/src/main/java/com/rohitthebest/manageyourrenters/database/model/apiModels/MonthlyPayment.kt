@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.database.model.apiModels
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.rohitthebest.manageyourrenters.data.BillPeriodType
 
 @Entity(tableName = "monthly_payment_table")
 data class MonthlyPayment(
@@ -12,6 +13,7 @@ data class MonthlyPayment(
     var id: Int,
     var message: String = "",
     var modified: Long,
+    var monthlyPaymentDateTimeInfo: MonthlyPaymentDateTimeInfo? = null,
     var uid: String,
     var isSynced: Boolean = true
 ) {
@@ -24,7 +26,38 @@ data class MonthlyPayment(
         0,
         "",
         0L,
+        null,
         "",
         true
+    )
+}
+
+data class MonthlyPaymentDateTimeInfo(
+    var id: Int,
+    var paymentPeriodType: BillPeriodType,
+    var paymentYear: Int,
+    var forBillMonth: Int,
+    var forBillYear: Int,
+    var toBillMonth: Int,
+    var toBillYear: Int,
+    var numberOfMonths: Int,
+    var fromBillDate: Long,
+    var toBillDate: Long,
+    var numberOfDays: Int
+
+) {
+
+    constructor() : this(
+        0,
+        BillPeriodType.BY_MONTH,
+        2022,
+        1,
+        2022,
+        1,
+        2022,
+        1,
+        0L,
+        0L,
+        0
     )
 }

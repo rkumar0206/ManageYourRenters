@@ -199,6 +199,13 @@ object Module {
 
     // ------------------------------ Monthly Payment Database -----------------------------
 
+    private val monthly_payment_database_migration_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+            database.execSQL("ALTER TABLE 'monthly_payment_table' ADD COLUMN 'monthlyPaymentDateTimeInfo' VARCHAR2  DEFAULT ''")
+        }
+    }
+
     @Provides
     @Singleton
     fun providesMonthlyPaymentDatabase(
@@ -208,6 +215,7 @@ object Module {
         MonthlyPaymentDatabase::class.java,
         MONTHLY_PAYMENT_DATABASE_NAME
     )
+        .addMigrations(monthly_payment_database_migration_1_2)
         .build()
 
     @Provides

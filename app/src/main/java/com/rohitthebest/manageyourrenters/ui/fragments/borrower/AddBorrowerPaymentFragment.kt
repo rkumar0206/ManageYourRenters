@@ -3,7 +3,9 @@ package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.*
+import android.widget.CompoundButton
+import android.widget.RadioGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -146,51 +148,28 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private fun setUpTimeScheduleSpinner() {
 
-        includeBinding.timeScheduleSpinner.apply {
+        includeBinding.timeScheduleSpinner.setListToSpinner(
+            requireContext(),
+            interestTimeSchedules,
+            { position ->
+                selectedInterestTimeSchedule = when (position) {
 
-            adapter = ArrayAdapter(
-                requireContext(),
-                R.layout.support_simple_spinner_dropdown_item,
-                interestTimeSchedules
-            )
+                    0 -> InterestTimeSchedule.ANNUALLY
 
-            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    1 -> InterestTimeSchedule.MONTHLY
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                    selectedInterestTimeSchedule = InterestTimeSchedule.ANNUALLY
+                    else -> InterestTimeSchedule.DAILY
                 }
-
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-
-                    setSelection(position)
-                    selectedInterestTimeSchedule = when (position) {
-
-                        0 -> InterestTimeSchedule.ANNUALLY
-
-                        1 -> InterestTimeSchedule.MONTHLY
-
-                        else -> InterestTimeSchedule.DAILY
-                    }
-                }
-            }
-
-        }
+            }, {}
+        )
     }
 
     private fun setUpCurrencySymbolSpinner() {
 
-        includeBinding.moneySymbolSpinner.setCurrencySymbol(
-            requireContext()
-        ) { position ->
-
-            selectedCurrencySymbol = currencySymbols[position]
-        }
+        includeBinding.moneySymbolSpinner.setListToSpinner(
+            requireContext(), currencySymbols,
+            { position -> selectedCurrencySymbol = currencySymbols[position] }, {}
+        )
     }
 
     private fun initListeners() {

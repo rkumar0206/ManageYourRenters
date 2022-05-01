@@ -327,13 +327,13 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
     private fun setUpCurrencySymbolSpinner() {
 
-        includeBinding.moneySymbolSpinner.setCurrencySymbol(
-            requireContext()
-        ) { position ->
-
-            selectedCurrencySymbol = currencySymbolList[position]
-            calculateTotalEmiAmount()
-        }
+        includeBinding.moneySymbolSpinner.setListToSpinner(
+            requireContext(), currencySymbolList,
+            { position ->
+                selectedCurrencySymbol = currencySymbolList[position]
+                calculateTotalEmiAmount()
+            }, {}
+        )
     }
 
     private fun textWatcher() {

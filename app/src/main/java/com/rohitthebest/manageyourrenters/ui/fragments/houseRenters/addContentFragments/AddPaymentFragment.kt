@@ -8,8 +8,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -109,11 +107,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         setUpSpinnerMonth() //Setting the from(month) and till(month) spinners
         setUpCurrencySymbolList()
 
-        selectedYear =
-            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                System.currentTimeMillis(),
-                "yyyy"
-            )?.toInt()!!
+        selectedYear = workingWithDateAndTime.getCurrentYear()
 
         yearList = populateYearList(selectedYear)
 
@@ -342,71 +336,22 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun setUpSpinnerMonth() {
 
-        includeBinding.monthSelectSpinner.let { spinner ->
-
-            spinner.adapter = ArrayAdapter(
-                requireContext(),
-                R.layout.support_simple_spinner_dropdown_item,
-                monthList
-            )
-
-            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                    spinner.setSelection(0)
-                    billMonth = monthList[0]
-                    billMonthNumber = 1
-                }
-
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-
-                    spinner.setSelection(position)
-                    billMonth = monthList[position]
-                    billMonthNumber = position + 1
-                }
-            }
-        }
-
+        includeBinding.monthSelectSpinner.setListToSpinner(
+            requireContext(),
+            monthList,
+            { position ->
+                billMonth = monthList[position]
+                billMonthNumber = position + 1
+            }, {}
+        )
     }
 
     private fun setUpSpinnerYear() {
 
-        includeBinding.selectYearSpinner.apply {
-
-            adapter = ArrayAdapter(
-                requireContext(),
-                R.layout.support_simple_spinner_dropdown_item,
-                yearList
-            )
-
-            onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
-
-                        setSelection(position)
-                        selectedYear = yearList[position]
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                        setSelection(0)
-                        selectedYear = yearList[0]
-                    }
-                }
-
-        }
+        includeBinding.selectYearSpinner.setListToSpinner(
+            requireContext(), yearList,
+            { position -> selectedYear = yearList[position] }, {}
+        )
     }
 
     private fun populateYearList(selectedYear: Int): ArrayList<Int> {
@@ -423,14 +368,14 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun setUpCurrencySymbolList() {
 
-        includeBinding.moneySymbolSpinner.setCurrencySymbol(
-
+        includeBinding.moneySymbolSpinner.setListToSpinner(
             requireContext(),
-        ) { position ->
-
-            currencySymbol = currencyList[position]
-            calculateTotalBill()
-        }
+            currencyList,
+            { position ->
+                currencySymbol = currencyList[position]
+                calculateTotalBill()
+            }, {}
+        )
     }
 
     private fun initListeners() {

@@ -65,6 +65,11 @@ class WorkingWithDateAndTime {
     }
 */
 
+    fun getCurrentYear(): Int {
+
+        return Calendar.getInstance().get(Calendar.YEAR)
+    }
+
     /**
      * converts milliseconds in any date pattern
      *

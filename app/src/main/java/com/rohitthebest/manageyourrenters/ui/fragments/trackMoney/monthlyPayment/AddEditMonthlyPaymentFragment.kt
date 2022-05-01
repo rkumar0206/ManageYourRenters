@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPaymen
 
 import android.os.Bundle
 import android.view.View
+import android.widget.RadioGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -12,14 +13,15 @@ import com.rohitthebest.manageyourrenters.databinding.AddEditMonthlyPaymentLayou
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditMonthlyPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentViewModel
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
 @AndroidEntryPoint
-class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthly_payment) {
+class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthly_payment),
+    View.OnClickListener, RadioGroup.OnCheckedChangeListener {
 
     private var _binding: FragmentAddEditMonthlyPaymentBinding? = null
     private val binding get() = _binding!!
@@ -32,11 +34,19 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
     private lateinit var receivedMonthlyPaymentCategoryKey: String
     private lateinit var receivedMonthlyPaymentCategory: MonthlyPaymentCategory
 
-    private lateinit var selectedDate: Calendar
+    private lateinit var paymentDate: Calendar
+    private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
 
     private var receivedMonthlyPaymentKey = ""
     private lateinit var receivedMonthlyPayment: MonthlyPayment
     private var isMessageReceivedForEditing = false
+
+    private lateinit var yearList: ArrayList<Int>
+
+    private var selectedFromMonth: String = ""
+    private var selectedToMonth: String = ""
+    private var selectedFromYear: Int = 0
+    private var selectedToYear: Int = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,22 +54,116 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
         includeBinding = binding.includeLayout
 
-        selectedDate = Calendar.getInstance()
+        workingWithDateAndTime = WorkingWithDateAndTime()
+
+        paymentDate = Calendar.getInstance()
 
         updateSelectedDateTextView()
 
+        populateYearList(workingWithDateAndTime.getCurrentYear())
+        setUpMonthSpinners()
+        setUpYearSpinners()
+
+        // todo : populate by date for and till textViews
+        // todo : pre-populate all the fields based on the last payment
+
         getMessage()
 
-        //initListeners()
+        initListeners()
 
         //textWatchers()
+    }
+
+    private fun populateYearList(selectedYear: Int) {
+
+        yearList = ArrayList()
+
+        for (year in selectedYear downTo selectedYear - 5) {
+
+            yearList.add(year)
+        }
+    }
+
+    private fun setUpYearSpinners() {
+
+        includeBinding.fromYearSpinner.setListToSpinner(
+            requireContext(), yearList, { position -> selectedFromYear = yearList[position] }, {}
+        )
+        includeBinding.toYearSpinner.setListToSpinner(
+            requireContext(), yearList, { position -> selectedToYear = yearList[position] }, {}
+        )
+    }
+
+    private fun setUpMonthSpinners() {
+
+        val monthList = resources.getStringArray(R.array.months).toList()
+
+        includeBinding.fromMonthSelectSpinner.setListToSpinner(
+            requireContext(), monthList, {},
+            { month -> selectedFromMonth = month as String }
+        )
+
+        includeBinding.toMonthSelectSpinner.setListToSpinner(
+            requireContext(), monthList, {},
+            { month -> selectedToMonth = month as String }
+        )
+    }
+
+    private fun initListeners() {
+
+        binding.toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressed()
+        }
+
+        // todo :  on save menu click validate and save the monthly payment
+
+        includeBinding.monthlyPaymentDateTV.setOnClickListener(this)
+        includeBinding.monthlyPaymentDateIB.setOnClickListener(this)
+
+        // todo : handle hiding and showing of by month and by date on the change of radio button
+        includeBinding.periodTypeRG.setOnCheckedChangeListener(this)
+    }
+
+    override fun onClick(v: View?) {
+
+        if (includeBinding.monthlyPaymentDateTV.id == v?.id || includeBinding.monthlyPaymentDateIB.id == v?.id) {
+
+            Functions.showDateAndTimePickerDialog(
+                requireContext(),
+                paymentDate,
+                false
+            ) { paymentDate ->
+
+                this.paymentDate = paymentDate
+                updateSelectedDateTextView()
+            }
+        }
+    }
+
+    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+
+        when (checkedId) {
+
+            includeBinding.byDateRB.id -> {
+
+                includeBinding.byDateCL.show()
+                includeBinding.byMonthCL.hide()
+            }
+
+            includeBinding.byMonthRB.id -> {
+
+                includeBinding.byMonthCL.show()
+                includeBinding.byDateCL.hide()
+            }
+        }
+
     }
 
     private fun updateSelectedDateTextView() {
 
         includeBinding.monthlyPaymentDateTV.text =
-            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                selectedDate.timeInMillis, "dd-MM-yyyy hh:mm a"
+            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                paymentDate.timeInMillis, "dd-MM-yyyy hh:mm a"
             )
     }
 
@@ -109,7 +213,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
             includeBinding.apply {
 
-                selectedDate =
+                paymentDate =
                     WorkingWithDateAndTime().convertMillisecondsToCalendarInstance(
                         receivedMonthlyPayment.created
                     )

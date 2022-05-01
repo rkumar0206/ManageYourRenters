@@ -230,30 +230,23 @@ fun TextView.strikeThrough() {
     this.text = spannableStringBuilder
 }
 
-
-inline fun Spinner.setCurrencySymbol(
+inline fun Spinner.setListToSpinner(
     context: Context,
-    crossinline position: (Int) -> Unit
+    list: List<Any>,
+    crossinline position: (Int) -> Unit,
+    crossinline selectedValue: (Any) -> Unit
 ) {
 
-    val currencySymbolList = resources.getStringArray(R.array.currency_symbol)
 
     this.apply {
 
         adapter = ArrayAdapter(
             context,
             R.layout.support_simple_spinner_dropdown_item,
-            currencySymbolList
+            list
         )
 
         onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                setSelection(0)
-                position(0)
-            }
-
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -263,9 +256,16 @@ inline fun Spinner.setCurrencySymbol(
 
                 setSelection(position)
                 position(position)
+                selectedValue(list[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                setSelection(0)
+                position(0)
+                selectedValue(list[0])
             }
         }
-
     }
 }
 

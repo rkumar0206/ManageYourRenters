@@ -186,7 +186,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             fromDateTimestamp = currentTimestamp
             tillDateTimeStamp = currentTimestamp
             numberOfDays = 0
-            includeBinding.byDateErrorMessageTV.text = numberOfDays.toString()
+            setNumberOfDays()
 
             includeBinding.fromDateTV.setDateInTextView(fromDateTimestamp)
 
@@ -305,7 +305,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
 
-        numberOfDays = calculateNumberOfDays(fromDateTimestamp, tillDateTimeStamp)
+        numberOfDays =
+            workingWithDateAndTime.calculateNumberOfDays(fromDateTimestamp, tillDateTimeStamp)
 
         setNumberOfDays()
     }
@@ -400,7 +401,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             binding.saveBtn.id -> {
 
-
                 if (validateForm()) {
 
                     calculateTotalBill()
@@ -482,7 +482,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 includeBinding.fromDateTV.setDateInTextView(dates.first)
                 includeBinding.tillDateTV.setDateInTextView(dates.second)
 
-                numberOfDays = calculateNumberOfDays(dates.first!!, dates.second!!)
+                numberOfDays =
+                    workingWithDateAndTime.calculateNumberOfDays(dates.first!!, dates.second!!)
 
                 setNumberOfDays()
             },
@@ -522,12 +523,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 getString(R.string.same_day)
             }
         }
-
-    }
-
-    private fun calculateNumberOfDays(startDate: Long, endDate: Long): Int {
-
-        return ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt()
 
     }
 

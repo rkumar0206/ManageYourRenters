@@ -44,4 +44,7 @@ class MonthlyPaymentViewModel @Inject constructor(
         repository.getAllMonthlyPaymentsByCategoryKey(categoryKey).asLiveData()
 
     fun getMonthlyPaymentByKey(key: String) = repository.getMonthlyPaymentByKey(key).asLiveData()
+
+    fun getLastMonthlyPayment(monthlyPaymentCategoryKey: String) =
+        repository.getLastMonthlyPayment(monthlyPaymentCategoryKey).asLiveData()
 }

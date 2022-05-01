@@ -70,6 +70,12 @@ class WorkingWithDateAndTime {
         return Calendar.getInstance().get(Calendar.YEAR)
     }
 
+    fun calculateNumberOfDays(startDate: Long, endDate: Long): Int {
+
+        return ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt()
+
+    }
+
     /**
      * converts milliseconds in any date pattern
      *

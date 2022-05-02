@@ -70,10 +70,36 @@ class WorkingWithDateAndTime {
         return Calendar.getInstance().get(Calendar.YEAR)
     }
 
+    fun getCurrentMonth(): Int {
+
+        return Calendar.getInstance().get(Calendar.MONTH)
+    }
+
     fun calculateNumberOfDays(startDate: Long, endDate: Long): Int {
 
         return ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt()
 
+    }
+
+    /**
+     * @param startMonthYear : pair of starting month and year ex : Pair(7, 2022)
+     * @param endMonthYear : pair of ending month and year ex : Pair(8, 2022)
+     * @return numberOfMonths : ex : 1
+     */
+    fun calculateNumberOfMonthsInBetween(
+        startMonthYear: Pair<Int, Int>,
+        endMonthYear: Pair<Int, Int>
+    ): Int {
+
+        val start = Calendar.getInstance()
+        start.set(startMonthYear.second, startMonthYear.first, 1)
+        val end = Calendar.getInstance()
+        end.set(endMonthYear.second, endMonthYear.first, 1)
+
+        val yearsInBetween = end.get(Calendar.YEAR) - start.get(Calendar.YEAR)
+        val monthDiff = end.get(Calendar.MONTH) - start.get(Calendar.MONTH)
+
+        return yearsInBetween * 12 + monthDiff + 1
     }
 
     /**

@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymen
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
 import com.rohitthebest.manageyourrenters.databinding.AddEditMonthlyPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditMonthlyPaymentBinding
+import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -53,6 +54,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
     private var fromDateTimestamp: Long = 0L
     private var tillDateTimeStamp: Long = 0L
     private var numberOfDays: Int = 0
+    private var numberOfMonths: Int = 1
 
     private var lastPaymentInfo: MonthlyPayment? = null
 
@@ -68,23 +70,18 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
         updateSelectedDateTextView()
 
-        setUpMonthSpinners()
         populateYearList(workingWithDateAndTime.getCurrentYear())
-        setUpYearSpinners()
-
-        fromDateTimestamp = System.currentTimeMillis()
-        tillDateTimeStamp = System.currentTimeMillis()
-        numberOfDays = 0
+        setUpFromMonthAndYearSpinners()
+        setUpToMonthAndYearSpinners()
 
         populateByDateLayoutFields()
-
-        // todo : populate by date for and till textViews
+        populateByMonthLayoutFields()
 
         getMessage()
 
         initListeners()
 
-        //textWatchers()
+        textWatchers()
     }
 
     private fun populateYearList(selectedYear: Int) {
@@ -97,26 +94,41 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         }
     }
 
-    private fun setUpYearSpinners() {
+    private fun setUpToMonthAndYearSpinners() {
 
         includeBinding.fromYearSpinner.setListToSpinner(
-            requireContext(), yearList, { position -> selectedFromYear = yearList[position] }, {}
+            requireContext(), yearList, { position ->
+                selectedFromYear = yearList[position]
+                setNumberOfMonthsInTextView()
+            }, {}
         )
         includeBinding.toYearSpinner.setListToSpinner(
-            requireContext(), yearList, { position -> selectedToYear = yearList[position] }, {}
+            requireContext(), yearList, { position ->
+                selectedToYear = yearList[position]
+                setNumberOfMonthsInTextView()
+            }, {}
         )
     }
 
-    private fun setUpMonthSpinners() {
+    private fun setUpFromMonthAndYearSpinners() {
 
         val monthList = resources.getStringArray(R.array.months).toList()
 
         includeBinding.fromMonthSelectSpinner.setListToSpinner(
-            requireContext(), monthList, { position -> selectedFromMonthNumber = position + 1 }, {}
+            requireContext(), monthList,
+            { position ->
+                selectedFromMonthNumber = position + 1
+                setNumberOfMonthsInTextView()
+            }, {}
         )
 
         includeBinding.toMonthSelectSpinner.setListToSpinner(
-            requireContext(), monthList, { position -> selectedToMonthNumber = position + 1 }, {}
+            requireContext(), monthList,
+            { position ->
+                selectedToMonthNumber = position + 1
+                setNumberOfMonthsInTextView()
+            },
+            {}
         )
     }
 
@@ -166,11 +178,13 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
             includeBinding.byDateRB.id -> {
 
+                periodType = BillPeriodType.BY_DATE
                 showByDateLayout()
             }
 
             includeBinding.byMonthRB.id -> {
 
+                periodType = BillPeriodType.BY_MONTH
                 showByMonthLayout()
             }
         }
@@ -260,8 +274,6 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
     private fun initialUIChangesBasedOnLastPayment() {
 
-        // todo : pre-populate all the fields based on the last payment
-
         monthlyPaymentViewModel.getLastMonthlyPayment(receivedMonthlyPaymentCategoryKey)
             .observe(viewLifecycleOwner) { payment ->
 
@@ -273,10 +285,12 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
                         if (dateTimeInfo.paymentPeriodType == BillPeriodType.BY_MONTH) {
 
+                            periodType = BillPeriodType.BY_MONTH
                             showByMonthLayout()
                             populateByMonthLayoutFields()
 
                         } else {
+                            periodType = BillPeriodType.BY_DATE
                             showByDateLayout()
                             populateByDateLayoutFields()
                         }
@@ -290,13 +304,31 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
     private fun populateByDateLayoutFields() {
 
-        if (lastPaymentInfo != null) {
+        when {
+            lastPaymentInfo != null -> {
 
-            fromDateTimestamp = lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillDate!!
-            tillDateTimeStamp = System.currentTimeMillis()
-            numberOfDays =
-                workingWithDateAndTime.calculateNumberOfDays(fromDateTimestamp, tillDateTimeStamp)
+                fromDateTimestamp = lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillDate!!
+                tillDateTimeStamp = System.currentTimeMillis()
+            }
+            isMessageReceivedForEditing -> {
+
+                if (this::receivedMonthlyPayment.isInitialized) {
+
+                    fromDateTimestamp =
+                        receivedMonthlyPayment.monthlyPaymentDateTimeInfo?.fromBillDate!!
+                    tillDateTimeStamp =
+                        receivedMonthlyPayment.monthlyPaymentDateTimeInfo?.toBillDate!!
+                }
+            }
+            else -> {
+
+                fromDateTimestamp = System.currentTimeMillis()
+                tillDateTimeStamp = System.currentTimeMillis()
+            }
         }
+
+        numberOfDays =
+            workingWithDateAndTime.calculateNumberOfDays(fromDateTimestamp, tillDateTimeStamp)
 
         includeBinding.fromDateTV.setDateInTextView(fromDateTimestamp)
         includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
@@ -305,29 +337,53 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
     private fun populateByMonthLayoutFields() {
 
-        if (lastPaymentInfo != null) {
-            // from
-            selectedFromMonthNumber =
-                if (lastPaymentInfo?.monthlyPaymentDateTimeInfo?.forBillMonth == 12) {
-                    1
-                } else {
-                    lastPaymentInfo?.monthlyPaymentDateTimeInfo?.forBillMonth!! + 1
+        when {
+            lastPaymentInfo != null -> {
+                // from
+                selectedFromMonthNumber =
+                    if (lastPaymentInfo?.monthlyPaymentDateTimeInfo?.forBillMonth == 12) {
+                        1
+                    } else {
+                        lastPaymentInfo?.monthlyPaymentDateTimeInfo?.forBillMonth!! + 1
+                    }
+                if (selectedFromMonthNumber == 12) {
+
+                    selectedFromMonthNumber =
+                        lastPaymentInfo?.monthlyPaymentDateTimeInfo?.forBillYear!!
+                    includeBinding.fromYearSpinner.setSelection(1)
                 }
-            includeBinding.fromMonthSelectSpinner.setSelection(selectedToMonthNumber - 1)
 
-            if (selectedFromMonthNumber == 12) {
+                // to
+                selectedToMonthNumber = selectedFromMonthNumber
+                selectedToYear = selectedFromYear
 
-                selectedFromMonthNumber = lastPaymentInfo?.monthlyPaymentDateTimeInfo?.forBillYear!!
-                includeBinding.fromYearSpinner.setSelection(1)
             }
+            isMessageReceivedForEditing -> {
 
-            // to
-            selectedToMonthNumber = selectedFromMonthNumber
-            includeBinding.toMonthSelectSpinner.setSelection(selectedToMonthNumber - 1)
-            selectedToYear = selectedFromYear
+                if (this::receivedMonthlyPayment.isInitialized) {
+
+                    selectedFromMonthNumber =
+                        receivedMonthlyPayment.monthlyPaymentDateTimeInfo?.forBillMonth!!
+                    selectedToMonthNumber =
+                        receivedMonthlyPayment.monthlyPaymentDateTimeInfo?.toBillMonth!!
+                    selectedFromYear =
+                        receivedMonthlyPayment.monthlyPaymentDateTimeInfo?.forBillYear!!
+                    selectedToYear = receivedMonthlyPayment.monthlyPaymentDateTimeInfo?.toBillYear!!
+                }
+            }
+            else -> {
+
+                selectedFromMonthNumber = workingWithDateAndTime.getCurrentMonth() + 1
+                selectedToMonthNumber = selectedFromMonthNumber
+                selectedFromYear = workingWithDateAndTime.getCurrentYear()
+                selectedToYear = workingWithDateAndTime.getCurrentYear()
+            }
         }
-    }
 
+        includeBinding.fromMonthSelectSpinner.setSelection(selectedToMonthNumber - 1)
+        includeBinding.toMonthSelectSpinner.setSelection(selectedToMonthNumber - 1)
+        setNumberOfMonthsInTextView()
+    }
 
     private fun getMonthlyPayment() {
 
@@ -338,7 +394,6 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                 updateUI()
             }
     }
-
 
     private fun updateUI() {
 
@@ -354,7 +409,12 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                 monthlyPaymentAmountET.editText?.setText(receivedMonthlyPayment.amount.toString())
                 monthlyPaymentNoteET.setText(receivedMonthlyPayment.message)
 
-                // todo : populate the by date or by month cl fields
+                if (receivedMonthlyPayment.monthlyPaymentDateTimeInfo?.paymentPeriodType == BillPeriodType.BY_MONTH) {
+                    populateByMonthLayoutFields()
+                } else {
+                    populateByDateLayoutFields()
+                }
+
             }
         }
     }
@@ -407,7 +467,37 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                 getString(R.string.same_day)
             }
         }
+    }
 
+    private fun setNumberOfMonthsInTextView() {
+
+        numberOfMonths = workingWithDateAndTime.calculateNumberOfMonthsInBetween(
+            Pair(selectedFromMonthNumber, selectedFromYear),
+            Pair(selectedToMonthNumber, selectedToYear)
+        )
+
+        includeBinding.byMonthErrorTV.text = if (numberOfMonths <= 0) {
+
+            includeBinding.byMonthErrorTV.changeTextColor(requireContext(), R.color.color_orange)
+            "Please enter a valid month range"
+        } else {
+            includeBinding.byMonthErrorTV.changeTextColor(requireContext(), R.color.color_green)
+            "Number of months : $numberOfMonths"
+        }
+    }
+
+    private fun textWatchers() {
+
+        includeBinding.monthlyPaymentAmountET.editText?.onTextChangedListener { s ->
+
+            if (!s?.toString().isValid()) {
+
+                includeBinding.monthlyPaymentAmountET.error = EDIT_TEXT_EMPTY_MESSAGE
+            } else {
+
+                includeBinding.monthlyPaymentAmountET.error = null
+            }
+        }
     }
 
 

@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPayment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.RadioGroup
 import androidx.fragment.app.Fragment
@@ -10,16 +11,21 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentDateTimeInfo
 import com.rohitthebest.manageyourrenters.databinding.AddEditMonthlyPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditMonthlyPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
+
+private const val TAG = "AddEditMonthlyPaymentFragment"
 
 @AndroidEntryPoint
 class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthly_payment),
@@ -68,11 +74,11 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
         paymentDate = Calendar.getInstance()
 
-        updateSelectedDateTextView()
+        updateSelectedPaymentDateTextView()
 
         populateYearList(workingWithDateAndTime.getCurrentYear())
-        setUpFromMonthAndYearSpinners()
-        setUpToMonthAndYearSpinners()
+        setUpFromMonthSpinners()
+        setUpToYearSpinners()
 
         populateByDateLayoutFields()
         populateByMonthLayoutFields()
@@ -94,7 +100,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         }
     }
 
-    private fun setUpToMonthAndYearSpinners() {
+    private fun setUpToYearSpinners() {
 
         includeBinding.fromYearSpinner.setListToSpinner(
             requireContext(), yearList, { position ->
@@ -110,7 +116,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         )
     }
 
-    private fun setUpFromMonthAndYearSpinners() {
+    private fun setUpFromMonthSpinners() {
 
         val monthList = resources.getStringArray(R.array.months).toList()
 
@@ -138,7 +144,15 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
             requireActivity().onBackPressed()
         }
 
-        // todo :  on save menu click validate and save the monthly payment
+        binding.toolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
+
+            if (validateForm()) {
+
+                initMonthlyPayment()
+            }
+
+            true
+        }
 
         includeBinding.monthlyPaymentDateTV.setOnClickListener(this)
         includeBinding.monthlyPaymentDateIB.setOnClickListener(this)
@@ -147,6 +161,96 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         includeBinding.tillDateTV.setOnClickListener(this)
 
         includeBinding.periodTypeRG.setOnCheckedChangeListener(this)
+    }
+
+    private fun initMonthlyPayment() {
+
+        val monthlyPaymentDateTimeInfo: MonthlyPaymentDateTimeInfo
+
+        val monthlyPayment: MonthlyPayment = if (!isMessageReceivedForEditing) {
+
+            monthlyPaymentDateTimeInfo = MonthlyPaymentDateTimeInfo()
+
+            // create
+            MonthlyPayment().apply {
+                key = Functions.generateKey("_${getUid()}", 50)
+                categoryKey = receivedMonthlyPaymentCategoryKey
+                id = 0
+                uid = getUid()!!
+            }
+
+        } else {
+
+            // update
+            monthlyPaymentDateTimeInfo = receivedMonthlyPayment.monthlyPaymentDateTimeInfo!!
+            receivedMonthlyPayment
+        }
+
+        monthlyPaymentDateTimeInfo.apply {
+
+            this.paymentPeriodType = periodType
+            if (periodType == BillPeriodType.BY_MONTH) {
+
+                this.forBillMonth = selectedFromMonthNumber
+                this.forBillYear = selectedFromYear
+                this.toBillMonth = selectedToMonthNumber
+                this.toBillYear = selectedToYear
+                this.numberOfMonths = this@AddEditMonthlyPaymentFragment.numberOfMonths
+            } else {
+
+                this.fromBillDate = fromDateTimestamp
+                this.toBillDate = tillDateTimeStamp
+                this.numberOfDays = this@AddEditMonthlyPaymentFragment.numberOfDays
+            }
+        }
+
+        monthlyPayment.amount =
+            includeBinding.monthlyPaymentAmountET.editText?.text.toString().toDouble()
+        monthlyPayment.created = paymentDate.timeInMillis
+        monthlyPayment.message = includeBinding.monthlyPaymentNoteET.text.toString().trim()
+        monthlyPayment.modified = System.currentTimeMillis()
+        monthlyPayment.monthlyPaymentDateTimeInfo = monthlyPaymentDateTimeInfo
+
+        monthlyPayment.isSynced = isInternetAvailable(requireContext())
+        saveMonthlyPaymentToDatabase(monthlyPayment)
+    }
+
+    private fun saveMonthlyPaymentToDatabase(monthlyPayment: MonthlyPayment) {
+
+        if (!isMessageReceivedForEditing) {
+
+            monthlyPaymentViewModel.insertMonthlyPayment(requireContext(), monthlyPayment)
+        } else {
+
+            monthlyPaymentViewModel.updateMonthlyPayment(requireContext(), monthlyPayment)
+        }
+
+        Log.d(TAG, "saveMonthlyPaymentToDatabase: $monthlyPayment")
+
+        requireActivity().onBackPressed()
+    }
+
+    private fun validateForm(): Boolean {
+
+        if (!includeBinding.monthlyPaymentAmountET.editText.isTextValid()) {
+
+            includeBinding.monthlyPaymentAmountET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
+        if (numberOfDays < 0) {
+
+            setNumberOfDaysInTextView()
+            return false
+        }
+
+        if (numberOfMonths <= 0) {
+
+            setNumberOfMonthsInTextView()
+            return false
+        }
+
+        return true
     }
 
     override fun onClick(v: View?) {
@@ -160,7 +264,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
             ) { paymentDate ->
 
                 this.paymentDate = paymentDate
-                updateSelectedDateTextView()
+                updateSelectedPaymentDateTextView()
             }
         }
 
@@ -233,7 +337,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         includeBinding.byMonthCL.hide()
     }
 
-    private fun updateSelectedDateTextView() {
+    private fun updateSelectedPaymentDateTextView() {
 
         includeBinding.monthlyPaymentDateTV.text =
             workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
@@ -286,12 +390,12 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                         if (dateTimeInfo.paymentPeriodType == BillPeriodType.BY_MONTH) {
 
                             periodType = BillPeriodType.BY_MONTH
-                            showByMonthLayout()
+                            includeBinding.periodTypeRG.check(includeBinding.byMonthRB.id)
                             populateByMonthLayoutFields()
 
                         } else {
                             periodType = BillPeriodType.BY_DATE
-                            showByDateLayout()
+                            includeBinding.periodTypeRG.check(includeBinding.byDateRB.id)
                             populateByDateLayoutFields()
                         }
 
@@ -350,7 +454,8 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
                     selectedFromMonthNumber =
                         lastPaymentInfo?.monthlyPaymentDateTimeInfo?.forBillYear!!
-                    includeBinding.fromYearSpinner.setSelection(1)
+
+                    selectedFromYear = yearList[1] // previous year
                 }
 
                 // to
@@ -373,15 +478,19 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
             }
             else -> {
 
+                Log.d(TAG, "populateByMonthLayoutFields: No Last payment or for editing")
+
                 selectedFromMonthNumber = workingWithDateAndTime.getCurrentMonth() + 1
-                selectedToMonthNumber = selectedFromMonthNumber
+                selectedToMonthNumber = workingWithDateAndTime.getCurrentMonth() + 1
                 selectedFromYear = workingWithDateAndTime.getCurrentYear()
                 selectedToYear = workingWithDateAndTime.getCurrentYear()
             }
         }
 
-        includeBinding.fromMonthSelectSpinner.setSelection(selectedToMonthNumber - 1)
+        includeBinding.fromMonthSelectSpinner.setSelection(selectedFromMonthNumber - 1)
         includeBinding.toMonthSelectSpinner.setSelection(selectedToMonthNumber - 1)
+        includeBinding.fromYearSpinner.setSelection(yearList.indexOf(selectedFromYear))
+        includeBinding.toYearSpinner.setSelection(yearList.indexOf(selectedToYear))
         setNumberOfMonthsInTextView()
     }
 
@@ -405,7 +514,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                     workingWithDateAndTime.convertMillisecondsToCalendarInstance(
                         receivedMonthlyPayment.created
                     )
-                updateSelectedDateTextView()
+                updateSelectedPaymentDateTextView()
                 monthlyPaymentAmountET.editText?.setText(receivedMonthlyPayment.amount.toString())
                 monthlyPaymentNoteET.setText(receivedMonthlyPayment.message)
 

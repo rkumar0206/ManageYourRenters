@@ -35,7 +35,6 @@ data class MonthlyPayment(
 data class MonthlyPaymentDateTimeInfo(
     var id: Int,
     var paymentPeriodType: BillPeriodType,
-    var paymentYear: Int,
     var forBillMonth: Int,
     var forBillYear: Int,
     var toBillMonth: Int,
@@ -50,7 +49,6 @@ data class MonthlyPaymentDateTimeInfo(
     constructor() : this(
         0,
         BillPeriodType.BY_MONTH,
-        2022,
         1,
         2022,
         1,

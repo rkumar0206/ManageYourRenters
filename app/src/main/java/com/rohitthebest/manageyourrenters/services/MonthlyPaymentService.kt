@@ -66,7 +66,7 @@ class MonthlyPaymentService : Service() {
                     getString(R.string.post) -> "Saving to cloud"
                     getString(R.string.put) -> "Updating on cloud"
                     getString(R.string.delete_one) -> "Deleting from cloud"
-                    else -> "Expense category"
+                    else -> "Monthly payment"
                 }
             )
             .setProgress(100, 0, true)

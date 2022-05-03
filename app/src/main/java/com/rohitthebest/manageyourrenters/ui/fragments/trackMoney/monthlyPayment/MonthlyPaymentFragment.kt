@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentMonthlyPaymentBind
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.isValid
 import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,6 +40,17 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment) {
 
         initListeners()
 
+        setUpRecyclerView()
+
+    }
+
+    private fun setUpRecyclerView() {
+
+//        binding.monthlyPaymentRV.apply {
+//
+//            setHasFixedSize(true)
+//
+//        }
     }
 
     private fun initListeners() {
@@ -94,6 +106,25 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment) {
 
                 receivedMonthlyPaymentCategory = category
                 binding.toolbar.title = "${category.categoryName} payments"
+
+                observeMonthlyPayments()
+            }
+    }
+
+    private fun observeMonthlyPayments() {
+
+        monthlyPaymentViewModel.getAllMonthlyPaymentsByCategoryKey(receivedMonthlyPaymentCategoryKey)
+            .observe(viewLifecycleOwner) { payments ->
+
+                if (payments.isNotEmpty()) {
+                    binding.noMonthlyPaymentCategoryTV.hide()
+                    // todo : submit list to adapter
+                } else {
+
+                    binding.noMonthlyPaymentCategoryTV.show()
+                }
+
+                binding.progressbar.hide()
             }
     }
 

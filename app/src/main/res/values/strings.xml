@@ -244,6 +244,7 @@
     <string name="select_to_month">Select to month</string>
     <string name="select_to_year">Select to year</string>
     <string name="message_button">message button</string>
+    <string name="amount_paid_with_value">Amount paid : %1$s</string>
 
 
     <string-array name="interest_time_schedule">

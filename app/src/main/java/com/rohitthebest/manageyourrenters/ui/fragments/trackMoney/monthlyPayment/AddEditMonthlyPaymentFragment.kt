@@ -217,6 +217,14 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
     private fun saveMonthlyPaymentToDatabase(monthlyPayment: MonthlyPayment) {
 
+        receivedMonthlyPaymentCategory.modified = System.currentTimeMillis()
+
+        monthlyPaymentCategoryViewModel.updateMonthlyPaymentCategory(
+            requireContext(),
+            receivedMonthlyPaymentCategory,
+            false
+        )
+
         if (!isMessageReceivedForEditing) {
 
             monthlyPaymentViewModel.insertMonthlyPayment(requireContext(), monthlyPayment)

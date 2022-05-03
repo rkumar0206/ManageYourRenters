@@ -77,8 +77,8 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         updateSelectedPaymentDateTextView()
 
         populateYearList(workingWithDateAndTime.getCurrentYear())
-        setUpFromMonthSpinners()
-        setUpToYearSpinners()
+        setUpMonthSpinners()
+        setUpYearSpinners()
 
         populateByDateLayoutFields()
         populateByMonthLayoutFields()
@@ -100,7 +100,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         }
     }
 
-    private fun setUpToYearSpinners() {
+    private fun setUpYearSpinners() {
 
         includeBinding.fromYearSpinner.setListToSpinner(
             requireContext(), yearList, { position ->
@@ -116,7 +116,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         )
     }
 
-    private fun setUpFromMonthSpinners() {
+    private fun setUpMonthSpinners() {
 
         val monthList = resources.getStringArray(R.array.months).toList()
 
@@ -453,23 +453,37 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
             lastPaymentInfo != null -> {
                 // from
                 selectedFromMonthNumber =
-                    if (lastPaymentInfo?.monthlyPaymentDateTimeInfo?.forBillMonth == 12) {
+                    if (lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillMonth == 12) {
+
+                        if (lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillYear!! + 1
+                            != workingWithDateAndTime.getCurrentYear()
+                        ) {
+
+                            // increase year by 1
+                            selectedFromYear =
+                                lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillYear!! + 1
+                            populateYearList(selectedFromYear)
+                            setUpYearSpinners()
+                        }
+
                         1
                     } else {
-                        lastPaymentInfo?.monthlyPaymentDateTimeInfo?.forBillMonth!! + 1
+
+                        selectedFromYear = lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillYear!!
+                        lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillMonth!! + 1
                     }
+
                 if (selectedFromMonthNumber == 12) {
 
-                    selectedFromMonthNumber =
-                        lastPaymentInfo?.monthlyPaymentDateTimeInfo?.forBillYear!!
+                    if (lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillYear != workingWithDateAndTime.getCurrentYear()) {
 
-                    selectedFromYear = yearList[1] // previous year
+                        selectedFromYear = yearList[1] // previous year
+                    }
                 }
 
                 // to
                 selectedToMonthNumber = selectedFromMonthNumber
                 selectedToYear = selectedFromYear
-
             }
             isMessageReceivedForEditing -> {
 

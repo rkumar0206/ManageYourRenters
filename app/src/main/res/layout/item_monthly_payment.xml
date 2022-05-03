@@ -68,11 +68,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="5dp"
+                android:layout_marginBottom="4dp"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:padding="4dp"
                 android:textColor="@color/color_green"
                 android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/monthlyPayment_messageBtn"
                 app:layout_constraintStart_toStartOf="@+id/monthlyPayment_paymentForTV"
                 app:layout_constraintTop_toBottomOf="@+id/divider80"
@@ -103,18 +105,6 @@
                 app:layout_constraintTop_toTopOf="@+id/monthlyPayment_amountPaidTV"
                 app:srcCompat="@drawable/ic_baseline_message_24" />
 
-            <View
-                android:id="@+id/divider81"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:background="?android:attr/listDivider"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/monthlyPayment_paymentDateAndTimeTV"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="@+id/monthlyPayment_paymentForTV"
-                app:layout_constraintTop_toBottomOf="@+id/monthlyPayment_amountPaidTV" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>

@@ -1,26 +1,30 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPayment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.monthlyPaymentAdapters.MonthlyPaymentAdapter
+import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentMonthlyPaymentBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentViewModel
-import com.rohitthebest.manageyourrenters.utils.Functions
-import com.rohitthebest.manageyourrenters.utils.hide
-import com.rohitthebest.manageyourrenters.utils.isValid
-import com.rohitthebest.manageyourrenters.utils.show
+import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private const val TAG = "MonthlyPaymentFragment"
+
 @AndroidEntryPoint
-class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment) {
+class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
+    MonthlyPaymentAdapter.OnClickListener {
 
     private var _binding: FragmentMonthlyPaymentBinding? = null
     private val binding get() = _binding!!
@@ -31,6 +35,8 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment) {
     private lateinit var receivedMonthlyPaymentCategoryKey: String
     private lateinit var receivedMonthlyPaymentCategory: MonthlyPaymentCategory
 
+    private lateinit var monthlyPaymentAdapter: MonthlyPaymentAdapter
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMonthlyPaymentBinding.bind(view)
@@ -39,6 +45,7 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment) {
         getMessage()
 
         initListeners()
+        monthlyPaymentAdapter = MonthlyPaymentAdapter()
 
         setUpRecyclerView()
 
@@ -46,11 +53,21 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment) {
 
     private fun setUpRecyclerView() {
 
-//        binding.monthlyPaymentRV.apply {
-//
-//            setHasFixedSize(true)
-//
-//        }
+        binding.monthlyPaymentRV.apply {
+
+            setHasFixedSize(true)
+            adapter = monthlyPaymentAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            changeVisibilityOfFABOnScrolled(binding.addMonthlyPaymentsFAB)
+        }
+
+        monthlyPaymentAdapter.setOnClickListener(this)
+    }
+
+
+    override fun onItemClick(monthlyPayment: MonthlyPayment) {
+
+        Log.d(TAG, "onItemClick: $monthlyPayment")
     }
 
     private fun initListeners() {
@@ -118,7 +135,7 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment) {
 
                 if (payments.isNotEmpty()) {
                     binding.noMonthlyPaymentCategoryTV.hide()
-                    // todo : submit list to adapter
+                    monthlyPaymentAdapter.submitList(payments)
                 } else {
 
                     binding.noMonthlyPaymentCategoryTV.show()

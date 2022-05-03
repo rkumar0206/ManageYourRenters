@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.utils.MDUtil.getStringArray
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
@@ -17,6 +18,7 @@ class MonthlyPaymentAdapter :
 
     private var mListener: OnClickListener? = null
     private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
+    private lateinit var monthList: List<String>
 
     inner class MonthlyPaymentViewHolder(val binding: ItemMonthlyPaymentBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -24,6 +26,8 @@ class MonthlyPaymentAdapter :
         init {
 
             workingWithDateAndTime = WorkingWithDateAndTime()
+
+            monthList = binding.root.context.getStringArray(R.array.months).toList()
 
             binding.rootL.setOnClickListener {
                 if (checkForNullability(absoluteAdapterPosition)) {
@@ -60,11 +64,24 @@ class MonthlyPaymentAdapter :
 
                     if (payment.monthlyPaymentDateTimeInfo?.paymentPeriodType == BillPeriodType.BY_MONTH) {
 
-                        monthlyPaymentPaymentForTV.text =
-                            "From : ${payment.monthlyPaymentDateTimeInfo?.forBillMonth}, " +
-                                    "${payment.monthlyPaymentDateTimeInfo?.forBillYear}" +
-                                    "\nTo      : ${payment.monthlyPaymentDateTimeInfo?.toBillMonth}," +
-                                    " ${payment.monthlyPaymentDateTimeInfo?.toBillYear}"
+                        val fromMonthYear =
+                            "${monthList[payment.monthlyPaymentDateTimeInfo?.forBillMonth!! - 1]}, " +
+                                    "${payment.monthlyPaymentDateTimeInfo?.forBillYear}"
+
+                        val toMonthYear =
+                            "${monthList[payment.monthlyPaymentDateTimeInfo?.toBillMonth!! - 1]}, " +
+                                    "${payment.monthlyPaymentDateTimeInfo?.toBillYear}"
+
+                        if (fromMonthYear == toMonthYear) {
+
+                            monthlyPaymentPaymentForTV.text =
+                                "For : $fromMonthYear"
+                        } else {
+
+                            monthlyPaymentPaymentForTV.text =
+                                "From : $fromMonthYear" +
+                                        "\nTo      : $toMonthYear"
+                        }
 
                     } else {
 

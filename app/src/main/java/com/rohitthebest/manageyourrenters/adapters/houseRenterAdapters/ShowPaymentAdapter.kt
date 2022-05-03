@@ -26,10 +26,18 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
         RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
 
-        @SuppressLint("SetTextI18n")
-        fun setData(payment: RenterPayment) {
+        init {
 
             workingWithDateAndTime = WorkingWithDateAndTime()
+
+            binding.root.setOnClickListener(this)
+            binding.paymentAdapterSyncBtn.setOnClickListener(this)
+            binding.paymentAdapterDeleteBtn.setOnClickListener(this)
+            binding.paymentAdapterMessageBtn.setOnClickListener(this)
+        }
+
+        @SuppressLint("SetTextI18n")
+        fun setData(payment: RenterPayment) {
 
             binding.apply {
 
@@ -144,14 +152,6 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
                     paymentAdapterDeleteBtn.hide()
                 }
             }
-        }
-
-        init {
-
-            binding.root.setOnClickListener(this)
-            binding.paymentAdapterSyncBtn.setOnClickListener(this)
-            binding.paymentAdapterDeleteBtn.setOnClickListener(this)
-            binding.paymentAdapterMessageBtn.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {

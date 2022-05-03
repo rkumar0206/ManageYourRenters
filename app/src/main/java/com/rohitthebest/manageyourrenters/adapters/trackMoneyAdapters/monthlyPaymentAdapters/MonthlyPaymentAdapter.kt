@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.monthlyPa
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -30,9 +31,26 @@ class MonthlyPaymentAdapter :
             monthList = binding.root.context.getStringArray(R.array.months).toList()
 
             binding.rootL.setOnClickListener {
-                if (checkForNullability(absoluteAdapterPosition)) {
+                if (checkForNullability()) {
 
                     mListener!!.onItemClick(getItem(absoluteAdapterPosition))
+                }
+            }
+
+            binding.monthlyPaymentMessageBtn.setOnClickListener {
+                if (checkForNullability()) {
+
+                    mListener!!.onMessageBtnClicked(getItem(absoluteAdapterPosition).message)
+                }
+            }
+
+            binding.monthlyPaymentMenuBtn.setOnClickListener {
+                if (checkForNullability()) {
+
+                    mListener!!.onMenuBtnClicked(
+                        getItem(absoluteAdapterPosition),
+                        absoluteAdapterPosition
+                    )
                 }
             }
         }
@@ -79,8 +97,7 @@ class MonthlyPaymentAdapter :
                         } else {
 
                             monthlyPaymentPaymentForTV.text =
-                                "From : $fromMonthYear" +
-                                        "\nTo      : $toMonthYear"
+                                "From : $fromMonthYear\nTo      : $toMonthYear"
                         }
 
                     } else {
@@ -96,13 +113,31 @@ class MonthlyPaymentAdapter :
                                 )
                             }"
                     }
+                    if (payment.isSynced) {
+
+                        binding.root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_green
+                            )
+                        )
+                    } else {
+
+                        binding.root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_orange
+                            )
+                        )
+                    }
+
                 }
             }
         }
 
-        private fun checkForNullability(position: Int): Boolean {
+        private fun checkForNullability(): Boolean {
 
-            return position != RecyclerView.NO_POSITION &&
+            return absoluteAdapterPosition != RecyclerView.NO_POSITION &&
                     mListener != null
         }
 
@@ -142,6 +177,8 @@ class MonthlyPaymentAdapter :
     interface OnClickListener {
 
         fun onItemClick(monthlyPayment: MonthlyPayment)
+        fun onMessageBtnClicked(message: String)
+        fun onMenuBtnClicked(monthlyPayment: MonthlyPayment, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

@@ -366,6 +366,13 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                         expenseForMenuItems
                     )
                     expenseAdapter.notifyItemChanged(expenseForMenuPosition)
+
+                    receivedExpenseCategory.modified = System.currentTimeMillis()
+
+                    expenseCategoryViewModel.updateExpenseCategory(
+                        requireContext(), receivedExpenseCategory, false
+                    )
+
                 } else {
 
                     showNoInternetMessage(requireContext())

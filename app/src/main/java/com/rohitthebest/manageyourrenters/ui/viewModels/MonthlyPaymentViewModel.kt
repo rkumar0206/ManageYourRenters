@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
+import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
-import com.rohitthebest.manageyourrenters.utils.expenseServiceHelper
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.isValid
 import com.rohitthebest.manageyourrenters.utils.monthlyPaymentServiceHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -68,7 +71,7 @@ class MonthlyPaymentViewModel @Inject constructor(
 
             if (Functions.isInternetAvailable(context)) {
 
-                expenseServiceHelper(
+                monthlyPaymentServiceHelper(
                     context,
                     monthlyPayment.key,
                     context.getString(R.string.delete_one)
@@ -96,4 +99,75 @@ class MonthlyPaymentViewModel @Inject constructor(
 
     fun getLastMonthlyPayment(monthlyPaymentCategoryKey: String) =
         repository.getLastMonthlyPayment(monthlyPaymentCategoryKey).asLiveData()
+
+    fun buildMonthlyPaymentInfoStringForAlertDialogMessage(
+        monthlyPayment: MonthlyPayment,
+        monthlyPaymentCategory: MonthlyPaymentCategory,
+        monthList: List<String>
+    ): String {
+
+        val workingWithDateAndTime = WorkingWithDateAndTime()
+        val message = StringBuilder()
+        message.append(
+            "\nModified On : ${
+                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    monthlyPayment.modified,
+                    "dd-MM-yyyy hh:mm a"
+                )
+            }\n\n"
+        )
+        message.append(
+            "Created On : ${
+                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    monthlyPayment.created,
+                    "dd-MM-yyyy hh:mm a"
+                )
+            }\n\n---------------------------\n\n"
+        )
+        message.append("Period : ${buildMonthlyPaymentPeriodString(monthlyPayment, monthList)}\n\n")
+        if (monthlyPayment.monthlyPaymentDateTimeInfo?.paymentPeriodType == BillPeriodType.BY_MONTH) {
+            message.append("Number of months : ${monthlyPayment.monthlyPaymentDateTimeInfo?.numberOfMonths}")
+        } else {
+            message.append("Number of days : ${monthlyPayment.monthlyPaymentDateTimeInfo?.numberOfDays}")
+        }
+        message.append("\n\n")
+        message.append("Amount : ${monthlyPayment.amount}\n\n")
+        if (monthlyPayment.message.isValid()) {
+            message.append("Message : ${monthlyPayment.message}\n\n")
+        }
+        message.append("Category : ${monthlyPaymentCategory.categoryName}")
+        return message.toString()
+    }
+
+    private fun buildMonthlyPaymentPeriodString(
+        monthlyPayment: MonthlyPayment,
+        monthList: List<String>
+    ): String {
+
+        val workingWithDateAndTime = WorkingWithDateAndTime()
+
+        return if (monthlyPayment.monthlyPaymentDateTimeInfo?.paymentPeriodType == BillPeriodType.BY_MONTH) {
+            val fromMonthYear =
+                "${monthList[monthlyPayment.monthlyPaymentDateTimeInfo?.forBillMonth!! - 1]}, " +
+                        "${monthlyPayment.monthlyPaymentDateTimeInfo?.forBillYear}"
+            val toMonthYear =
+                "${monthList[monthlyPayment.monthlyPaymentDateTimeInfo?.toBillMonth!! - 1]}, " +
+                        "${monthlyPayment.monthlyPaymentDateTimeInfo?.toBillYear}"
+            if (fromMonthYear == toMonthYear) {
+                fromMonthYear
+            } else {
+                "$fromMonthYear to $toMonthYear"
+            }
+        } else {
+            "${
+                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    monthlyPayment.monthlyPaymentDateTimeInfo?.fromBillDate
+                )
+            } to ${
+                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    monthlyPayment.monthlyPaymentDateTimeInfo?.toBillDate
+                )
+            }"
+        }
+    }
 }

@@ -246,18 +246,21 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
             return false
         }
 
-        if (numberOfDays < 0) {
+        if (periodType == BillPeriodType.BY_MONTH) {
 
-            setNumberOfDaysInTextView()
-            return false
+            if (numberOfMonths <= 0) {
+
+                setNumberOfMonthsInTextView()
+                return false
+            }
+        } else {
+
+            if (numberOfDays < 0) {
+
+                setNumberOfDaysInTextView()
+                return false
+            }
         }
-
-        if (numberOfMonths <= 0) {
-
-            setNumberOfMonthsInTextView()
-            return false
-        }
-
         return true
     }
 
@@ -390,6 +393,8 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
             .observe(viewLifecycleOwner) { payment ->
 
                 lastPaymentInfo = payment
+
+                Log.d(TAG, "LastPayment: $lastPaymentInfo")
 
                 if (lastPaymentInfo != null) {
 
@@ -541,8 +546,14 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                 monthlyPaymentNoteET.setText(receivedMonthlyPayment.message)
 
                 if (receivedMonthlyPayment.monthlyPaymentDateTimeInfo?.paymentPeriodType == BillPeriodType.BY_MONTH) {
+
+                    periodType = BillPeriodType.BY_MONTH
+                    includeBinding.periodTypeRG.check(includeBinding.byMonthRB.id)
                     populateByMonthLayoutFields()
+
                 } else {
+                    periodType = BillPeriodType.BY_DATE
+                    includeBinding.periodTypeRG.check(includeBinding.byDateRB.id)
                     populateByDateLayoutFields()
                 }
 

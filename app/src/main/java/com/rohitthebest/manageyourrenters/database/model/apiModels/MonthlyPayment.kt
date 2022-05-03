@@ -49,11 +49,11 @@ data class MonthlyPaymentDateTimeInfo(
     constructor() : this(
         0,
         BillPeriodType.BY_MONTH,
-        1,
-        2022,
-        1,
-        2022,
-        1,
+        0,
+        0,
+        0,
+        0,
+        0,
         0L,
         0L,
         0

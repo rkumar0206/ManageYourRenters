@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    app:cardBackgroundColor="@color/color_green"
+    app:cardCornerRadius="2dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/rootL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="1.8dp"
+        app:cardCornerRadius="2dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <TextView
+                android:id="@+id/monthlyPayment_paymentForTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:padding="4dp"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/monthlyPayment_paymentDateAndTimeTV"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="From : 22-06-2020\nTo :     16-08-2020" />
+
+            <TextView
+                android:id="@+id/monthlyPayment_paymentDateAndTimeTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:lineSpacingMultiplier="1.2"
+                android:padding="3dp"
+                android:textSize="11.5sp"
+                app:layout_constraintBottom_toBottomOf="@+id/monthlyPayment_paymentForTV"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/monthlyPayment_paymentForTV"
+                tools:text="Payment date : 02-06-2000 \nPayment time : 12:45pm" />
+
+            <View
+                android:id="@+id/divider80"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="2dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="@+id/monthlyPayment_paymentDateAndTimeTV"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@+id/monthlyPayment_paymentForTV"
+                app:layout_constraintTop_toBottomOf="@+id/monthlyPayment_paymentForTV" />
+
+            <TextView
+                android:id="@+id/monthlyPayment_amountPaidTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="5dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:padding="4dp"
+                android:textColor="@color/color_green"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toStartOf="@+id/monthlyPayment_messageBtn"
+                app:layout_constraintStart_toStartOf="@+id/monthlyPayment_paymentForTV"
+                app:layout_constraintTop_toBottomOf="@+id/divider80"
+                tools:text="Amount Paid : 1300" />
+
+            <ImageButton
+                android:id="@+id/monthlyPayment_menuBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/color_white"
+                android:contentDescription="@string/menubtn"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/monthlyPayment_amountPaidTV"
+                app:layout_constraintEnd_toEndOf="@+id/monthlyPayment_paymentDateAndTimeTV"
+                app:layout_constraintTop_toTopOf="@+id/monthlyPayment_amountPaidTV"
+                app:srcCompat="@drawable/ic_baseline_more_vert_24" />
+
+            <ImageButton
+                android:id="@+id/monthlyPayment_messageBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="2dp"
+                android:backgroundTint="@color/color_white"
+                android:contentDescription="@string/message_button"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/monthlyPayment_amountPaidTV"
+                app:layout_constraintEnd_toStartOf="@+id/monthlyPayment_menuBtn"
+                app:layout_constraintTop_toTopOf="@+id/monthlyPayment_amountPaidTV"
+                app:srcCompat="@drawable/ic_baseline_message_24" />
+
+            <View
+                android:id="@+id/divider81"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/monthlyPayment_paymentDateAndTimeTV"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@+id/monthlyPayment_paymentForTV"
+                app:layout_constraintTop_toBottomOf="@+id/monthlyPayment_amountPaidTV" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+</androidx.cardview.widget.CardView>

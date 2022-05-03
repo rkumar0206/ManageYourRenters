@@ -243,6 +243,7 @@
     <string name="select_from_year">Select from Year</string>
     <string name="select_to_month">Select to month</string>
     <string name="select_to_year">Select to year</string>
+    <string name="message_button">message button</string>
 
 
     <string-array name="interest_time_schedule">

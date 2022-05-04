@@ -249,6 +249,8 @@ class MonthlyPaymentCategoryFragment : Fragment(R.layout.fragment_monthly_paymen
             binding.monthlyPaymentCategoryRV.layoutManager?.onSaveInstanceState()
         )
 
+        Functions.hideKeyBoard(requireActivity())
+
         _binding = null
     }
 }

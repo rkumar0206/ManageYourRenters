@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPaymen
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -19,11 +20,13 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentCategoryVi
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getMonthList
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 
 private const val TAG = "MonthlyPaymentFragment"
 
@@ -54,6 +57,8 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
 
         setUpRecyclerView()
 
+        // todo : save recycler view position
+        // todo : in expense graph fragment save the sort type used by the user
     }
 
     private fun setUpRecyclerView() {
@@ -90,9 +95,11 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
 
     override fun onMessageBtnClicked(message: String) {
 
+        val msg = if (message.isValid()) message else "No message added for this payment"
+
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Payment message")
-            .setMessage(message)
+            .setMessage(msg)
             .setPositiveButton("Ok") { dialogInterface, _ ->
 
                 dialogInterface.dismiss()
@@ -103,12 +110,12 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
     }
 
     private lateinit var monthlyPaymentForMenus: MonthlyPayment
-    private var monthlyPaymentAdapterPosition: Int = 0
+    private var monthlyPaymentForMenusAdapterPosition: Int = 0
 
     override fun onMenuBtnClicked(monthlyPayment: MonthlyPayment, position: Int) {
 
         monthlyPaymentForMenus = monthlyPayment
-        monthlyPaymentAdapterPosition = position
+        monthlyPaymentForMenusAdapterPosition = position
 
         requireActivity().supportFragmentManager.let { fm ->
 
@@ -178,7 +185,7 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
                 monthlyPaymentViewModel.insertMonthlyPayment(
                     requireContext(), monthlyPaymentForMenus
                 )
-                monthlyPaymentAdapter.notifyItemChanged(monthlyPaymentAdapterPosition)
+                monthlyPaymentAdapter.notifyItemChanged(monthlyPaymentForMenusAdapterPosition)
 
                 receivedMonthlyPaymentCategory.modified = System.currentTimeMillis()
 
@@ -264,18 +271,57 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
 
                 if (payments.isNotEmpty()) {
                     binding.noMonthlyPaymentCategoryTV.hide()
-                    monthlyPaymentAdapter.submitList(payments)
+                    setUpSearchView(payments)
                 } else {
 
                     binding.noMonthlyPaymentCategoryTV.show()
                 }
 
+                monthlyPaymentAdapter.submitList(payments)
+
                 binding.progressbar.hide()
             }
     }
 
+    private fun setUpSearchView(payments: List<MonthlyPayment>?) {
+
+        val searchView = binding.toolbar.menu.findItem(R.id.menu_search).actionView as SearchView
+
+        searchView.clearFocus()
+        searchView.setQuery("", true)
+
+        searchView.searchText { s ->
+
+            if (s?.isEmpty()!!) {
+
+                binding.monthlyPaymentRV.scrollToPosition(0)
+                monthlyPaymentAdapter.submitList(payments)
+            } else {
+
+                val filteredList = payments?.filter { monthlyPayment ->
+
+                    val periodString =
+                        monthlyPaymentViewModel.buildMonthlyPaymentPeriodString(
+                            monthlyPayment.monthlyPaymentDateTimeInfo,
+                            getMonthList(requireContext())
+                        )
+
+                    periodString.lowercase(Locale.ROOT).contains(
+                        s.toString().trim().lowercase(Locale.ROOT)
+                    ) || monthlyPayment.amount.toString().contains(s.toString().trim())
+                }
+
+                monthlyPaymentAdapter.submitList(filteredList)
+            }
+        }
+
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+
+        hideKeyBoard(requireActivity())
+
         _binding = null
     }
 }

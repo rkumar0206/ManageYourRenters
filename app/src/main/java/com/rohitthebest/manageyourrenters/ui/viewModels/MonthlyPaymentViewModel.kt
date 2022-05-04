@@ -8,6 +8,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentDateTimeInfo
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
@@ -124,7 +125,14 @@ class MonthlyPaymentViewModel @Inject constructor(
                 )
             }\n\n---------------------------\n\n"
         )
-        message.append("Period : ${buildMonthlyPaymentPeriodString(monthlyPayment, monthList)}\n\n")
+        message.append(
+            "Period : ${
+                buildMonthlyPaymentPeriodString(
+                    monthlyPayment.monthlyPaymentDateTimeInfo,
+                    monthList
+                )
+            }\n\n"
+        )
         if (monthlyPayment.monthlyPaymentDateTimeInfo?.paymentPeriodType == BillPeriodType.BY_MONTH) {
             message.append("Number of months : ${monthlyPayment.monthlyPaymentDateTimeInfo?.numberOfMonths}")
         } else {
@@ -139,20 +147,20 @@ class MonthlyPaymentViewModel @Inject constructor(
         return message.toString()
     }
 
-    private fun buildMonthlyPaymentPeriodString(
-        monthlyPayment: MonthlyPayment,
+    fun buildMonthlyPaymentPeriodString(
+        monthlyPaymentDateTimeInfo: MonthlyPaymentDateTimeInfo?,
         monthList: List<String>
     ): String {
 
         val workingWithDateAndTime = WorkingWithDateAndTime()
 
-        return if (monthlyPayment.monthlyPaymentDateTimeInfo?.paymentPeriodType == BillPeriodType.BY_MONTH) {
+        return if (monthlyPaymentDateTimeInfo?.paymentPeriodType == BillPeriodType.BY_MONTH) {
             val fromMonthYear =
-                "${monthList[monthlyPayment.monthlyPaymentDateTimeInfo?.forBillMonth!! - 1]}, " +
-                        "${monthlyPayment.monthlyPaymentDateTimeInfo?.forBillYear}"
+                "${monthList[monthlyPaymentDateTimeInfo.forBillMonth - 1]}, " +
+                        "${monthlyPaymentDateTimeInfo.forBillYear}"
             val toMonthYear =
-                "${monthList[monthlyPayment.monthlyPaymentDateTimeInfo?.toBillMonth!! - 1]}, " +
-                        "${monthlyPayment.monthlyPaymentDateTimeInfo?.toBillYear}"
+                "${monthList[monthlyPaymentDateTimeInfo.toBillMonth - 1]}, " +
+                        "${monthlyPaymentDateTimeInfo.toBillYear}"
             if (fromMonthYear == toMonthYear) {
                 fromMonthYear
             } else {
@@ -161,11 +169,11 @@ class MonthlyPaymentViewModel @Inject constructor(
         } else {
             "${
                 workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                    monthlyPayment.monthlyPaymentDateTimeInfo?.fromBillDate
+                    monthlyPaymentDateTimeInfo?.fromBillDate
                 )
             } to ${
                 workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                    monthlyPayment.monthlyPaymentDateTimeInfo?.toBillDate
+                    monthlyPaymentDateTimeInfo?.toBillDate
                 )
             }"
         }

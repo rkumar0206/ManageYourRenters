@@ -19,6 +19,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentCategoryVi
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -645,6 +646,9 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        hideKeyBoard(requireActivity())
+
         _binding = null
     }
 }

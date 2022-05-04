@@ -339,6 +339,9 @@ class AddEditMonthlyPaymentCategory :
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        Functions.hideKeyBoard(requireActivity())
+
         _binding = null
     }
 }

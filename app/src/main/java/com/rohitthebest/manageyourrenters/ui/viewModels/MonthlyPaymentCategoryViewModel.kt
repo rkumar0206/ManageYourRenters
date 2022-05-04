@@ -143,6 +143,7 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
     }
 
     fun deleteAllMonthlyPaymentCategoriesByIsSynced(isSynced: Boolean) = viewModelScope.launch {
+        monthlyPaymentRepository.deleteAllMonthlyPaymentByIsSynced(isSynced)
         repository.deleteAllMonthlyPaymentCategoriesByIsSynced(isSynced)
     }
 

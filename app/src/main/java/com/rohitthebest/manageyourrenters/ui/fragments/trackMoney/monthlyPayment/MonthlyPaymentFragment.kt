@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPayment
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -45,6 +46,8 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
 
     private lateinit var monthlyPaymentAdapter: MonthlyPaymentAdapter
 
+    private var rvStateParcelable: Parcelable? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMonthlyPaymentBinding.bind(view)
@@ -55,10 +58,23 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
         initListeners()
         monthlyPaymentAdapter = MonthlyPaymentAdapter()
 
+        getMonthlyPaymentRvState()
+
         setUpRecyclerView()
 
-        // todo : save recycler view position
+        // todo : add service class for syncing the monthly payments when user logged in
         // todo : in expense graph fragment save the sort type used by the user
+    }
+
+    private fun getMonthlyPaymentRvState() {
+
+        monthlyPaymentViewModel.monthlyPaymentRvState.observe(viewLifecycleOwner) { rvStateParcelable ->
+
+            rvStateParcelable?.let {
+
+                this.rvStateParcelable = it
+            }
+        }
     }
 
     private fun setUpRecyclerView() {
@@ -278,6 +294,7 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
                 }
 
                 monthlyPaymentAdapter.submitList(payments)
+                binding.monthlyPaymentRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
 
                 binding.progressbar.hide()
             }
@@ -314,11 +331,14 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
                 monthlyPaymentAdapter.submitList(filteredList)
             }
         }
-
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        monthlyPaymentViewModel.saveMonthlyPaymentRvState(
+            binding.monthlyPaymentRV.layoutManager?.onSaveInstanceState()
+        )
 
         hideKeyBoard(requireActivity())
 

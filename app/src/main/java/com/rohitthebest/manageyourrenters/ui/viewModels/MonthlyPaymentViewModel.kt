@@ -1,9 +1,8 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import android.os.Parcelable
+import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
@@ -20,8 +19,30 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MonthlyPaymentViewModel @Inject constructor(
-    private val repository: MonthlyPaymentRepository
+    private val repository: MonthlyPaymentRepository,
+    private val state: SavedStateHandle
 ) : ViewModel() {
+
+    // ------------------------- UI related ----------------------------
+
+    companion object {
+
+        private const val MONTHLY_PAYMENT_RV_KEY = "fccdbshanajbjsbhve_d64fn"
+    }
+
+    fun saveMonthlyPaymentRvState(rvState: Parcelable?) {
+
+        state.set(MONTHLY_PAYMENT_RV_KEY, rvState)
+    }
+
+    private val _monthlyPaymentRvState: MutableLiveData<Parcelable> = state.getLiveData(
+        MONTHLY_PAYMENT_RV_KEY
+    )
+
+    val monthlyPaymentRvState: LiveData<Parcelable> get() = _monthlyPaymentRvState
+
+    // ---------------------------------------------------------------
+
 
     fun insertMonthlyPayment(context: Context, monthlyPayment: MonthlyPayment) =
         viewModelScope.launch {
@@ -82,16 +103,6 @@ class MonthlyPaymentViewModel @Inject constructor(
             repository.deleteMonthlyPayment(monthlyPayment)
             Functions.showToast(context, "Payment deleted")
         }
-
-    fun deleteAllMonthlyPaymentByIsSynced(isSynced: Boolean) = viewModelScope.launch {
-        repository.deleteAllMonthlyPaymentByIsSynced(isSynced)
-    }
-
-    fun deleteAllMonthlyPayments() = viewModelScope.launch {
-        repository.deleteAllMonthlyPayments()
-    }
-
-    fun getAllMonthlyPayments() = repository.getAllMonthlyPayments().asLiveData()
 
     fun getAllMonthlyPaymentsByCategoryKey(categoryKey: String) =
         repository.getAllMonthlyPaymentsByCategoryKey(categoryKey).asLiveData()

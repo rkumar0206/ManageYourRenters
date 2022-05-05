@@ -46,6 +46,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
     private val borrowerViewModel: BorrowerViewModel by viewModels()
     private val emiViewModel: EMIViewModel by viewModels()
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
+    private val monthlyPaymentCategoryViewModel by viewModels<MonthlyPaymentCategoryViewModel>()
 
     private lateinit var renterTypeList: ArrayList<RenterTypes>
     private lateinit var renterTypeAdapter: RenterTypeAdapter
@@ -146,7 +147,6 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         startActivity(intent)
     }
 
-
     private fun populateRenterTypeList() {
 
         renterTypeList = ArrayList()
@@ -222,15 +222,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
                 if (isInternetAvailable(this)) {
 
-                    Functions.saveBooleanToSharedPreference(
-                        this,
-                        Constants.IS_SYNCED_SHARED_PREF_NAME,
-                        Constants.IS_SYNCED_SHARED_PREF_KEY,
-                        false
-                    )
-
-                    navigateToLoginActivity()
-
+                    changeIsSyncedValue()
                     d.dismiss()
                 } else {
 
@@ -323,6 +315,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
             borrowerViewModel.deleteAllBorrower()
             emiViewModel.deleteAllEMIs()
             expenseCategoryViewModel.deleteAllExpenseCategories()
+            monthlyPaymentCategoryViewModel.deleteAllMonthlyPaymentCategories()
             changeIsSyncedValue()
 
         } catch (e: Exception) {

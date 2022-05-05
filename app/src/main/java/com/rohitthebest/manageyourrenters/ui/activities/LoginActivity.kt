@@ -20,6 +20,7 @@ import com.rohitthebest.manageyourrenters.database.model.*
 import com.rohitthebest.manageyourrenters.databinding.ActivityLoginBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.services.GetAllExpenseAndExpenseCategoryService
+import com.rohitthebest.manageyourrenters.services.SyncAllMonthlyPaymentsAndCategoriesService
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
@@ -74,7 +75,8 @@ class LoginActivity : AppCompatActivity() {
 
         if (mAuth.currentUser != null && !isSynced) {
 
-            syncExpenseCategoryAndExpense()
+            syncMonthlyPayments()
+            syncExpenses()
         }
 
         initListeners()
@@ -149,7 +151,8 @@ class LoginActivity : AppCompatActivity() {
 
                         showToast(this, "SignIn successful")
 
-                        syncExpenseCategoryAndExpense()
+                        syncMonthlyPayments()
+                        syncExpenses()
 
                     } else {
                         // If sign in fails, display a message to the user.
@@ -168,7 +171,18 @@ class LoginActivity : AppCompatActivity() {
 
     //[START OF SYNC]
 
-    private fun syncExpenseCategoryAndExpense() {
+    private fun syncMonthlyPayments() {
+
+        if (isInternetAvailable(this)) {
+
+            val intent =
+                Intent(applicationContext, SyncAllMonthlyPaymentsAndCategoriesService::class.java)
+
+            this.startService(intent)
+        }
+    }
+
+    private fun syncExpenses() {
 
         if (isInternetAvailable(this)) {
 

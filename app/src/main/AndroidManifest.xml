@@ -57,6 +57,7 @@
         <service android:name=".services.GetAllExpenseAndExpenseCategoryService" />
         <service android:name=".services.MonthlyPaymentCategoryService" />
         <service android:name=".services.MonthlyPaymentService" />
+        <service android:name=".services.SyncAllMonthlyPaymentsAndCategoriesService" />
 
         <meta-data
             android:name="io.sentry.dsn"

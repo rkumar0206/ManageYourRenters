@@ -247,6 +247,7 @@
     <string name="amount_paid_with_value">Amount paid : %1$s</string>
     <string name="monthly_payments_diabled_message">monthly payments shortcut is disabled</string>
     <string name="borrowers_disabled_message">borrowers shotcut is disabled</string>
+    <string name="coming_soon">Coming soon…</string>
 
 
     <string-array name="interest_time_schedule">

@@ -105,22 +105,6 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
         trackMoneyTypeList.add(
             RenterTypes(
                 id = 2,
-                renterType = getString(R.string.loan),
-                image = R.drawable.ic_loan
-            )
-        )
-
-        trackMoneyTypeList.add(
-            RenterTypes(
-                id = 3,
-                renterType = getString(R.string.contract_deals),
-                image = R.drawable.ic_deal_contract
-            )
-        )
-
-        trackMoneyTypeList.add(
-            RenterTypes(
-                id = 4,
                 renterType = getString(R.string.expenses),
                 image = R.drawable.ic_expense
             )
@@ -128,11 +112,28 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
 
         trackMoneyTypeList.add(
             RenterTypes(
-                id = 5,
+                id = 3,
                 renterType = getString(R.string.monthly_payments),
                 image = R.drawable.ic_monthly_payments
             )
         )
+
+        trackMoneyTypeList.add(
+            RenterTypes(
+                id = 4,
+                renterType = getString(R.string.loan),
+                image = R.drawable.ic_loan
+            )
+        )
+
+        trackMoneyTypeList.add(
+            RenterTypes(
+                id = 5,
+                renterType = getString(R.string.contract_deals),
+                image = R.drawable.ic_deal_contract
+            )
+        )
+
     }
 
     private fun setUpRecyclerView() {
@@ -150,31 +151,26 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
 
     override fun onItemClick(renterType: RenterTypes) {
 
-        when (renterType.id) {
+        when (renterType.renterType) {
 
-            1 -> {
+            getString(R.string.emi) -> {
 
                 findNavController().navigate(R.id.action_trackMoneyHomeFragment_to_emiFragment)
             }
 
-            2 -> {
-
-                showToast(requireContext(), renterType.renterType)
-            }
-
-            4 -> {
+            getString(R.string.expenses) -> {
 
                 findNavController().navigate(R.id.action_trackMoneyHomeFragment_to_expenseCategoryFragment)
             }
 
-            5 -> {
+            getString(R.string.monthly_payments) -> {
 
                 findNavController().navigate(R.id.action_trackMoneyHomeFragment_to_monthlyPaymentCategoryFragment)
             }
 
             else -> {
 
-                showToast(requireContext(), renterType.renterType)
+                showToast(requireContext(), getString(R.string.coming_soon))
             }
 
         }

@@ -10,6 +10,22 @@ plugins {
 
 }
 
+String getUnsplashClientId() {
+
+    def propFile = project.rootProject.file("local.properties")
+    def properties = new Properties()
+    properties.load(propFile.newDataInputStream())
+    return properties['UNSPLASH_CLIENT_ID']
+}
+
+String getManageYourRentersBaseUrl() {
+
+    def propFile = project.rootProject.file("local.properties")
+    def properties = new Properties()
+    properties.load(propFile.newDataInputStream())
+    return properties['MANAGE_YOUR_RENTERS_BASE_URL']
+}
+
 android {
     compileSdkVersion 31
     buildToolsVersion "31.0.0"
@@ -45,23 +61,6 @@ android {
 
         viewBinding true
     }
-}
-
-
-String getUnsplashClientId() {
-
-    def propFile = project.rootProject.file("local.properties")
-    def properties = new Properties()
-    properties.load(propFile.newDataInputStream())
-    return properties['UNSPLASH_CLIENT_ID']
-}
-
-String getManageYourRentersBaseUrl() {
-
-    def propFile = project.rootProject.file("local.properties")
-    def properties = new Properties()
-    properties.load(propFile.newDataInputStream())
-    return properties['MANAGE_YOUR_RENTERS_BASE_URL']
 }
 
 dependencies {

@@ -84,4 +84,3 @@ As the name suggests here you can add your daily expenses and keep track of it.
 ### Monthly_Payments
 - First you need to add a category with a beautiful image using unsplash.
 - Inside the category you can add your payments on monthly basis or by selecting a date range.
-

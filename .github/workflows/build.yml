@@ -24,7 +24,7 @@ jobs:
       run: chmod +x gradlew
     - name: Access UNSPLASH_CLIENT_ID
       env: 
-        UNSPLASH_CLIENT_ID: R5zQRmmiR1mgSUpnANw1q--1kKuSaQ9cp_ZibGsBpGk
+        UNSPLASH_CLIENT_ID: $
       run: echo UNSPLASH_CLIENT_ID=\"$UNSPLASH_CLIENT_ID\" > ./local.properties
     - name: Access MANAGE_YOUR_RENTERS_BASE_URL
       env:

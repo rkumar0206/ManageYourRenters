@@ -22,6 +22,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField ("String", "UNSPLASH_CLIENT_ID", getUnsplashClientId())
+        buildConfigField ("String", "MANAGE_YOUR_RENTERS_BASE_URL", getManageYourRentersBaseUrl())
     }
 
     buildTypes {
@@ -42,6 +45,20 @@ android {
 
         viewBinding true
     }
+}
+
+String getUnsplashClientId() {
+    def propFile = rootProject.file("./local.properties")
+    def properties = new Properties()
+    properties.load(new FileInputStream(propFile))
+    return properties['UNSPLASH_CLIENT_ID']
+}
+
+String getManageYourRentersBaseUrl() {
+    def propFile = rootProject.file("./local.properties")
+    def properties = new Properties()
+    properties.load(new FileInputStream(propFile))
+    return properties['MANAGE_YOUR_RENTERS_BASE_URL']
 }
 
 dependencies {

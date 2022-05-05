@@ -241,6 +241,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         ) { selectedMenu ->
 
             selectedCustomDateRangeMenu = selectedMenu
+            saveCustomDateRangeValueInSharedPreference()
             handleDateRangeSelectionMenu(selectedMenu)
 
         }

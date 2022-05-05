@@ -201,8 +201,8 @@
     <string name="show_more">show more</string>
     <string name="call">Call</string>
     <string name="show_all_expenses">Show All Expenses</string>
-    <string name="expense_disabled_message">expense fragment is disabled for now</string>
-    <string name="house_renters_disabled_message">house renters fragment is disabled</string>
+    <string name="expense_disabled_message">expense shortcut is disabled for now</string>
+    <string name="house_renters_disabled_message">house renters shortcut is disabled</string>
     <string name="deep_analyze_mode">Deep analyze mode</string>
     <string name="add_remove_expense_category_selection">Add Remove Expense category selection</string>
     <string name="clear_selection_fab">clear selection fab</string>
@@ -245,6 +245,8 @@
     <string name="select_to_year">Select to year</string>
     <string name="message_button">message button</string>
     <string name="amount_paid_with_value">Amount paid : %1$s</string>
+    <string name="monthly_payments_diabled_message">monthly payments shortcut is disabled</string>
+    <string name="borrowers_disabled_message">borrowers shotcut is disabled</string>
 
 
     <string-array name="interest_time_schedule">

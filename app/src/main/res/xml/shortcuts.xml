@@ -9,9 +9,9 @@
         android:shortcutShortLabel="@string/expenses"
         tools:targetApi="n_mr1">
         <intent
-            android:action="android.intent.action.VIEW"
+            android:action="com.rohitthebest.manageyourrenters.expense"
             android:data="http://www.rtb/expense/"
-            android:targetClass="com.rohitthebest.manageyourrenters.ui.activities.TrackMoneyActivity"
+            android:targetClass="com.rohitthebest.manageyourrenters.ui.activities.HomeActivity"
             android:targetPackage="com.rohitthebest.manageyourrenters"
 
             />
@@ -33,9 +33,55 @@
         android:shortcutShortLabel="@string/house_renters"
         tools:targetApi="n_mr1">
         <intent
-            android:action="android.intent.action.VIEW"
+            android:action="com.rohitthebest.manageyourrenters.house_renters"
             android:data="http://www.rtb/houserenters/"
-            android:targetClass="com.rohitthebest.manageyourrenters.ui.activities.HouseRentersActivity"
+            android:targetClass="com.rohitthebest.manageyourrenters.ui.activities.HomeActivity"
+            android:targetPackage="com.rohitthebest.manageyourrenters"
+
+            />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+
+        <categories android:name="android.shortcut.conversation" />
+        <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_monthly_payments"
+        android:shortcutDisabledMessage="@string/monthly_payments_diabled_message"
+        android:shortcutId="compose3"
+        android:shortcutLongLabel="@string/monthly_payments"
+        android:shortcutShortLabel="@string/monthly_payments"
+        tools:targetApi="n_mr1">
+        <intent
+            android:action="com.rohitthebest.manageyourrenters.monthly_payments"
+            android:data="http://www.rtb/monthly_payments/"
+            android:targetClass="com.rohitthebest.manageyourrenters.ui.activities.HomeActivity"
+            android:targetPackage="com.rohitthebest.manageyourrenters"
+
+            />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+
+        <categories android:name="android.shortcut.conversation" />
+        <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_borrower"
+        android:shortcutDisabledMessage="@string/borrowers_disabled_message"
+        android:shortcutId="compose4"
+        android:shortcutLongLabel="@string/borrowers"
+        android:shortcutShortLabel="@string/borrowers"
+        tools:targetApi="n_mr1">
+        <intent
+            android:action="com.rohitthebest.manageyourrenters.borrowers"
+            android:data="http://www.rtb/borrowers/"
+            android:targetClass="com.rohitthebest.manageyourrenters.ui.activities.HomeActivity"
             android:targetPackage="com.rohitthebest.manageyourrenters"
 
             />

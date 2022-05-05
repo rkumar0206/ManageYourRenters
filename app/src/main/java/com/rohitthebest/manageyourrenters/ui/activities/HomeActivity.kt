@@ -76,6 +76,29 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         setUpRecyclerView()
         renterTypeAdapter.submitList(renterTypeList)
 
+        handleShortcuts()
+
+
+    }
+
+    private fun handleShortcuts() {
+
+        when (intent.action) { // we can also use intent.data for the same purpose
+
+            Constants.SHORTCUT_EXPENSE -> {
+                onClick(binding.shortcutExpenses)
+            }
+            Constants.SHORTCUT_MONTHLY_PAYMENTS -> {
+                onClick(binding.shortcutMonthlyPayments)
+            }
+            Constants.SHORTCUT_HOUSE_RENTERS -> {
+                onItemClick(RenterTypes(1, "", 0))
+            }
+            Constants.SHORTCUT_BORROWERS -> {
+                onItemClick(RenterTypes(2, "", 0))
+            }
+        }
+
     }
 
     private fun initListeners() {

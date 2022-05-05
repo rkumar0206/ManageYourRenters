@@ -64,6 +64,7 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
 
         // todo : add service class for syncing the monthly payments when user logged in
         // todo : in expense graph fragment save the sort type used by the user
+        // todo : do something for the shortcuts (when back button pressed the application is closed, it should navigate to back
     }
 
     private fun getMonthlyPaymentRvState() {

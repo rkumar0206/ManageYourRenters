@@ -59,4 +59,9 @@ object Constants {
     const val ONE_DAY_MILLISECONDS = 86400000L
 
     const val FILE_PROVIDER_AUTHORITY = "com.rohitthebest.manageyourrenters.provider"
+
+    const val SHORTCUT_EXPENSE = "com.rohitthebest.manageyourrenters.expense"
+    const val SHORTCUT_BORROWERS = "com.rohitthebest.manageyourrenters.borrowers"
+    const val SHORTCUT_HOUSE_RENTERS = "com.rohitthebest.manageyourrenters.house_renters"
+    const val SHORTCUT_MONTHLY_PAYMENTS = "com.rohitthebest.manageyourrenters.monthly_payments"
 }

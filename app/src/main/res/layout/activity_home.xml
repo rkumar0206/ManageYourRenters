@@ -152,7 +152,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
-                        app:srcCompat="@drawable/ic_other_track_money" />
+                        app:srcCompat="@drawable/ic_monthly_payments" />
 
                 </com.google.android.material.card.MaterialCardView>
 

@@ -130,7 +130,7 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
             RenterTypes(
                 id = 5,
                 renterType = getString(R.string.monthly_payments),
-                image = R.drawable.ic_other_track_money
+                image = R.drawable.ic_monthly_payments
             )
         )
     }

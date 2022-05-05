@@ -1,4 +1,4 @@
-# ManageYourRenters - [Click for latest release](https://github.com/rkumar0206/ManageYourRenters/releases/tag/3.5.0)
+# ManageYourRenters - [Click for latest release](https://github.com/rkumar0206/ManageYourRenters/releases/tag/3.6.0)
 
 ## Key Features 👇
 
@@ -63,8 +63,8 @@ In this category you can keep track of the borrowers (the person to whom you hav
  
  In this category you can track your money based on other sub categories like :
  * [Expenses](#expenses)
- * EMIs
- * Monthly Payments
+ * [EMIs](#emis)
+ * [Monthly Payments](#monthly_payments)
  * Loans
  * Contracts / Deals
 
@@ -75,3 +75,12 @@ As the name suggests here you can add your daily expenses and keep track of it.
 - Then inside this category you can add your expenses related to this category.
 - You can also track your expenses using the graph.
 - You can compare the expeses based on categories.
+
+### EMIs
+- First you need to add the details about the EMI and make a category.
+- Inside that EMI category you can add the amounts with various details.
+- You can also add the supporting document for your payment.
+
+### Monthly_Payments
+- First you need to add a category with a beautiful image using unsplash.
+- Inside the category you can add your payments on monthly basis or by selecting a date range.

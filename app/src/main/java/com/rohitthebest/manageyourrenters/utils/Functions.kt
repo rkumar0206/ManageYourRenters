@@ -201,7 +201,6 @@ class Functions {
             } catch (e: Exception) {
                 Log.e(TAG, "saveData: ${e.message}")
             }
-
         }
 
         fun loadBooleanFromSharedPreference(

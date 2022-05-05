@@ -13,8 +13,6 @@ object Constants {
 
     // databases name
     const val RENTER_AND_PAYMENT_DATABASE_NAME = "renter_and_payment_database.db"
-    const val PAYMENT_DATABASE_NAME = "paymentdatabase.db"
-    const val RENTER_PAYMENT_DATABASE_NAME = "renterpaymentdatabase.db"
     const val BORROWER_DATABASE_NAME = "borrowerdatabase.db"
     const val BORROWER_PAYMENT_DATABASE_NAME = "borrowerpaymentdatabase.db"
     const val PARTIAL_PAYMENT_DATABASE_NAME = "partialpaymentdatabase.db"
@@ -39,6 +37,8 @@ object Constants {
 
     const val IS_SYNCED_SHARED_PREF_NAME = "IS_SYNCED_SHARED_PREF_NAME_fdkdnf"
     const val IS_SYNCED_SHARED_PREF_KEY = "IS_SYNCED_SHARED_PREF_KEY_fkjdvkjdbdnf"
+    const val CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_NAME = "djbbbwebhbBKJBJBSHBHBJbbsjb"
+    const val CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_KEY = "sbjsbbhjsbhbyguqyJBABBHJBkbnd"
 
     const val SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY = "dcsnckjkscn"
 

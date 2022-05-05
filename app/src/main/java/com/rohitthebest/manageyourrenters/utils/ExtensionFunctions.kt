@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.utils
 
+import android.app.Activity
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
@@ -24,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.rohitthebest.manageyourrenters.R
 import java.io.ByteArrayOutputStream
 
@@ -54,6 +56,52 @@ fun View.invisible() {
 
     } catch (e: Exception) {
         e.printStackTrace()
+    }
+}
+
+fun <T> Activity.saveAnyObjectToSharedPreference(
+    sharedPrefName: String,
+    key: String,
+    value: T
+) {
+
+    try {
+        val sharedPreference =
+            this.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
+        val edit = sharedPreference.edit()
+
+        val valueToGsonString = if (value is String) {
+            value
+        } else {
+            Gson().toJson(value)
+        }
+
+        edit.putString(key, valueToGsonString)
+        edit.apply()
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+fun <T> Activity.loadAnyValueFromSharedPreference(
+    type: Class<T>,
+    sharedPrefName: String,
+    key: String
+): T? {
+
+    return try {
+
+        val sharedPreference =
+            this.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
+
+        val valueString = sharedPreference.getString(key, "")
+
+        Gson().fromJson(valueString, type)
+
+    } catch (e: Exception) {
+
+        e.printStackTrace()
+        null
     }
 }
 

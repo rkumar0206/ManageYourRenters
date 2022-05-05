@@ -22,6 +22,8 @@ import com.anychart.enums.LegendLayout
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.databinding.FragmentGraphBinding
+import com.rohitthebest.manageyourrenters.others.Constants.CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.ONE_DAY_MILLISECONDS
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
@@ -50,6 +52,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
     private var isAllTimeSelected = false
 
+    private var selectedCustomDateRangeMenu: CustomDateRange? = CustomDateRange.ALL_TIME
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -59,8 +62,26 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         changeSelectionUI()
         setUpPieChart()
 
-        handleDateRangeSelectionMenu(CustomDateRange.ALL_TIME)
+        loadCustomDateRangeValueFromSharedPreference()
+
+        handleDateRangeSelectionMenu(selectedCustomDateRangeMenu ?: CustomDateRange.ALL_TIME)
         initListeners()
+    }
+
+    private fun loadCustomDateRangeValueFromSharedPreference() {
+
+        selectedCustomDateRangeMenu =
+            requireActivity().loadAnyValueFromSharedPreference(
+                CustomDateRange::class.java,
+                CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_NAME,
+                CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_KEY
+            )
+
+        if (selectedCustomDateRangeMenu == null) {
+
+            selectedCustomDateRangeMenu = CustomDateRange.ALL_TIME
+        }
+
     }
 
 
@@ -219,7 +240,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             view
         ) { selectedMenu ->
 
-
+            selectedCustomDateRangeMenu = selectedMenu
             handleDateRangeSelectionMenu(selectedMenu)
 
         }
@@ -513,6 +534,21 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        saveCustomDateRangeValueInSharedPreference()
+
         _binding = null
+    }
+
+    private fun saveCustomDateRangeValueInSharedPreference() {
+
+        if (selectedCustomDateRangeMenu != CustomDateRange.CUSTOM_DATE_RANGE) {
+
+            requireActivity().saveAnyObjectToSharedPreference(
+                CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_NAME,
+                CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_KEY,
+                selectedCustomDateRangeMenu
+            )
+        }
     }
 }

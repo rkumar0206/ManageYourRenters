@@ -61,9 +61,6 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
         getMonthlyPaymentRvState()
 
         setUpRecyclerView()
-
-        // todo : in expense graph fragment save the sort type used by the user
-        // todo : do something for the shortcuts (when back button pressed the application is closed, it should navigate to back
     }
 
     private fun getMonthlyPaymentRvState() {

@@ -47,17 +47,20 @@ android {
     }
 }
 
+
 String getUnsplashClientId() {
-    def propFile = rootProject.file("./local.properties")
+
+    def propFile = project.rootProject.file("local.properties")
     def properties = new Properties()
-    properties.load(new FileInputStream(propFile))
+    properties.load(propFile.newDataInputStream())
     return properties['UNSPLASH_CLIENT_ID']
 }
 
 String getManageYourRentersBaseUrl() {
-    def propFile = rootProject.file("./local.properties")
+
+    def propFile = project.rootProject.file("local.properties")
     def properties = new Properties()
-    properties.load(new FileInputStream(propFile))
+    properties.load(propFile.newDataInputStream())
     return properties['MANAGE_YOUR_RENTERS_BASE_URL']
 }
 

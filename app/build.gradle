@@ -12,17 +12,17 @@ plugins {
 
 String getUnsplashClientId() {
 
-    def propFile = project.rootProject.file("local.properties")
+    def propFile = project.rootProject.file("./local.properties")
     def properties = new Properties()
-    properties.load(propFile.newDataInputStream())
+    properties.load(new FileInputStream(propFile))
     return properties['UNSPLASH_CLIENT_ID']
 }
 
 String getManageYourRentersBaseUrl() {
 
-    def propFile = project.rootProject.file("local.properties")
+    def propFile = project.rootProject.file("./local.properties")
     def properties = new Properties()
-    properties.load(propFile.newDataInputStream())
+    properties.load(new FileInputStream(propFile))
     return properties['MANAGE_YOUR_RENTERS_BASE_URL']
 }
 

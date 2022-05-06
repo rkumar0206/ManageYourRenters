@@ -22,13 +22,10 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Access MANAGE_YOUR_RENTERS_BASE_URL
+    - name: Access MANAGE_YOUR_RENTERS_BASE_URL and UNSPLASH_CLIENT_ID
       env:
         MANAGE_YOUR_RENTERS_BASE_URL: ${{secrets.MANAGE_YOUR_RENTERS_BASE_URL}}
-      run: echo MANAGE_YOUR_RENTERS_BASE_URL=\"$MANAGE_YOUR_RENTERS_BASE_URL\" > ./local.properties
-    - name: Access UNSPLASH_CLIENT_ID
-      env: 
         UNSPLASH_CLIENT_ID: ${{secrets.UNSPLASH_CLIENT_ID}}
-      run: echo UNSPLASH_CLIENT_ID=\"$UNSPLASH_CLIENT_ID\" > ./local.properties
+      run: echo MANAGE_YOUR_RENTERS_BASE_URL=\"$MANAGE_YOUR_RENTERS_BASE_URL\"\nUNSPLASH_CLIENT_ID=\"$UNSPLASH_CLIENT_ID\" > ./local.properties
     - name: Build with Gradle
       run: ./gradlew build

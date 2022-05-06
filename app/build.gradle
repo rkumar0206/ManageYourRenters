@@ -39,7 +39,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        //buildConfigField ("String", "UNSPLASH_CLIENT_ID", "\"http://dev.myserver.com\"")
+        buildConfigField ("String", "UNSPLASH_CLIENT_ID", getUnsplashClientId())
         buildConfigField ("String", "MANAGE_YOUR_RENTERS_BASE_URL", getManageYourRentersBaseUrl())
     }
 

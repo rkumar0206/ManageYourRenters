@@ -89,7 +89,7 @@
         android:label="CalculateInterestBottomSheetFragment"
         tools:layout="@layout/fragment_calculate_interest">
         <argument
-            android:name="paymentKey"
+            android:name="interestCalcualatorFields"
             app:argType="string"
             app:nullable="true" />
     </dialog>

@@ -73,7 +73,7 @@ fun <T> Activity.saveAnyObjectToSharedPreference(
         val valueToGsonString = if (value is String) {
             value
         } else {
-            Gson().toJson(value)
+            value.convertToJsonString()
         }
 
         edit.putString(key, valueToGsonString)
@@ -96,7 +96,7 @@ fun <T> Activity.loadAnyValueFromSharedPreference(
 
         val valueString = sharedPreference.getString(key, "")
 
-        Gson().fromJson(valueString, type)
+        valueString?.convertJsonToObject(type)
 
     } catch (e: Exception) {
 
@@ -104,6 +104,29 @@ fun <T> Activity.loadAnyValueFromSharedPreference(
         null
     }
 }
+
+fun <T> T.convertToJsonString(): String? {
+
+    return try {
+
+        Gson().toJson(this)
+
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+
+fun <T> String.convertJsonToObject(clazz: Class<T>): T? {
+
+    return try {
+        Gson().fromJson(this, clazz)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+
 
 fun RecyclerView.changeVisibilityOfFABOnScrolled(fab: FloatingActionButton) {
 

@@ -6,25 +6,22 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.RadioGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
 import com.rohitthebest.manageyourrenters.data.InterestTimeSchedule
 import com.rohitthebest.manageyourrenters.data.InterestType
-import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.CalculateInterestBottomSheetLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentCalculateInterestBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateNumberOfDays
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showDateRangePickerDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.isTextValid
-import com.rohitthebest.manageyourrenters.utils.setDateInTextView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.pow
 
@@ -40,12 +37,11 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
 
     private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
 
-    private var receivedBorrowerPaymentKey = ""
-    private lateinit var receivedBorrowerPayment: BorrowerPayment
+    private var receivedInterestCalculatorField: InterestCalculatorFields? = null
     private lateinit var numberOfTimeTypeList: List<String>
     private var selectedNumberOfTimeType = ""
     private var numberOfDays = 0
-    private var fromDate: Long = 0L
+    private var fromDate = 0L
     private var tillDate = 0L
 
     override fun onCreateView(
@@ -72,35 +68,14 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
 
     private fun setUpNumberOfTimeTypeSpinner() {
 
-        includeBinding.numberOfSpinner.apply {
-
-            adapter = ArrayAdapter(
-                requireContext(),
-                R.layout.support_simple_spinner_dropdown_item,
-                numberOfTimeTypeList
-            )
-
-            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                    setSelection(0)
-                    selectedNumberOfTimeType = numberOfTimeTypeList[0]
-                }
-
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-
-                    setSelection(position)
-                    selectedNumberOfTimeType = numberOfTimeTypeList[position]
-                }
-            }
-
-        }
+        includeBinding.numberOfSpinner.setListToSpinner(
+            requireContext(),
+            numberOfTimeTypeList,
+            { position ->
+                selectedNumberOfTimeType = numberOfTimeTypeList[position]
+            },
+            {}
+        )
     }
 
     private fun getMessage() {
@@ -111,28 +86,23 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
                 CalculateInterestBottomSheetFragmentArgs.fromBundle(it)
             }
 
-            receivedBorrowerPaymentKey = args?.paymentKey!!
+            receivedInterestCalculatorField =
+                args?.interestCalcualatorFields!!.convertJsonToObject(InterestCalculatorFields::class.java)
 
-            getBorrowerPayment()
-        }
-    }
+            if (receivedInterestCalculatorField == null) {
 
-    private fun getBorrowerPayment() {
-
-        borrowerPaymentViewModel.getBorrowerPaymentByKey(receivedBorrowerPaymentKey)
-            .observe(viewLifecycleOwner) { borrowerPayment ->
-
-                receivedBorrowerPayment = borrowerPayment
-
-                initUI()
+                dismiss()
             }
+
+            initUI()
+        }
     }
 
     private fun initUI() {
 
-        if (this::receivedBorrowerPayment.isInitialized) {
+        if (receivedInterestCalculatorField != null) {
 
-            val interest = receivedBorrowerPayment.interest!!
+            val interest = receivedInterestCalculatorField?.interest!!
 
             Log.d(TAG, "initUI: interest : $interest")
 
@@ -145,7 +115,7 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
             }
 
             includeBinding.intRateET.setText(interest.ratePercent.toString())
-            includeBinding.intPrincipalET.setText(receivedBorrowerPayment.amountTakenOnRent.toString())
+            includeBinding.intPrincipalET.setText(receivedInterestCalculatorField?.principalAmount.toString())
 
             when (interest.timeSchedule) {
 
@@ -187,7 +157,7 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
                 calculateInterest()
             }
 
-            fromDate = receivedBorrowerPayment.created
+            fromDate = receivedInterestCalculatorField?.startDate!!
             tillDate = System.currentTimeMillis()
             numberOfDays = calculateNumberOfDays(fromDate, tillDate)
 
@@ -318,11 +288,9 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
                 principal * ((1 + rate / 100).pow(timeInYear))
             }
 
-        includeBinding.intCalcInterestTV.text =
-            String.format("${receivedBorrowerPayment.currencySymbol} %.3f", interest)
+        includeBinding.intCalcInterestTV.text = interest.format(3)
 
-        includeBinding.intCalcTotalTV.text =
-            String.format("${receivedBorrowerPayment.currencySymbol} %.3f", (principal + interest))
+        includeBinding.intCalcTotalTV.text = (principal + interest).format(3)
 
         Log.d(
             TAG,

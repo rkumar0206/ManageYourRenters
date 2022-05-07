@@ -188,6 +188,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/calculate"
         android:textAllCaps="false"
+        android:backgroundTint="@color/dark_blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

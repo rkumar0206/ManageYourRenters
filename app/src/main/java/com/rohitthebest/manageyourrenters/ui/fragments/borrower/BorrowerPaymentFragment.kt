@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.BorrowerPaymentAdapter
+import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
@@ -265,9 +266,15 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
             showToast(requireContext(), "No interest added!!!")
         } else {
 
+            val interestCalculatorFields = InterestCalculatorFields(
+                borrowerPayment.created,
+                borrowerPayment.amountTakenOnRent,
+                borrowerPayment.interest!!
+            )
+
             val action =
                 BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToCalculateInterestBottomSheetFragment(
-                    borrowerPayment.key
+                    interestCalcualatorFields = interestCalculatorFields.convertToJsonString()
                 )
 
             findNavController().navigate(action)

@@ -7,91 +7,93 @@ import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentDateTimeInfo
+import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
+import com.rohitthebest.manageyourrenters.utils.convertToJsonString
 
 class TypeConvertersForDatabase {
 
     @TypeConverter
     fun fromRenterBillPeriodInfoToString(renterBillPeriodInfo: RenterBillPeriodInfo?): String? {
 
-        return Gson().toJson(renterBillPeriodInfo)
+        return renterBillPeriodInfo.convertToJsonString()
     }
 
     @TypeConverter
     fun fromStringToRenterBillPeriodInfo(str: String): RenterBillPeriodInfo? {
 
-        return Gson().fromJson(str, object : TypeToken<RenterBillPeriodInfo>() {}.type)
+        return str.convertJsonToObject(RenterBillPeriodInfo::class.java)
     }
 
     @TypeConverter
     fun fromRenterElectricityBillInfoToString(renterElectricityBillInfo: RenterElectricityBillInfo?): String? {
 
-        return Gson().toJson(renterElectricityBillInfo)
+        return renterElectricityBillInfo.convertToJsonString()
     }
 
     @TypeConverter
     fun fromStringToRenterElectricityBillInfo(str: String): RenterElectricityBillInfo? {
 
-        return Gson().fromJson(str, object : TypeToken<RenterElectricityBillInfo>() {}.type)
+        return str.convertJsonToObject(RenterElectricityBillInfo::class.java)
     }
 
     @TypeConverter
     fun fromRenterPaymentExtrasToString(renterPaymentExtras: RenterPaymentExtras?): String? {
 
-        return Gson().toJson(renterPaymentExtras)
+        return renterPaymentExtras.convertToJsonString()
     }
 
     @TypeConverter
     fun fromStringToRenterPaymentExtras(str: String): RenterPaymentExtras? {
 
-        return Gson().fromJson(str, object : TypeToken<RenterPaymentExtras>() {}.type)
+        return str.convertJsonToObject(RenterPaymentExtras::class.java)
     }
 
     @TypeConverter
     fun fromInterestToString(interest: Interest?): String? {
 
-        return Gson().toJson(interest)
+        return interest.convertToJsonString()
     }
 
     @TypeConverter
     fun fromStringToInterest(str: String): Interest? {
 
-        return Gson().fromJson(str, object : TypeToken<Interest?>() {}.type)
+        return str.convertJsonToObject(Interest::class.java)
     }
 
     @TypeConverter
     fun fromSupportingDocumentToString(supportingDocument: SupportingDocument?): String? {
 
-        return Gson().toJson(supportingDocument)
+        return supportingDocument.convertToJsonString()
     }
 
     @TypeConverter
     fun fromStringToSupportingDocument(str: String): SupportingDocument? {
 
-        return Gson().fromJson(str, object : TypeToken<SupportingDocument?>() {}.type)
+        return str.convertJsonToObject(SupportingDocument::class.java)
     }
 
     @TypeConverter
     fun fromRenterToString(renter: Renter): String {
 
-        return Gson().toJson(renter)
+        return renter.convertToJsonString()!!
     }
 
     @TypeConverter
     fun fromStringToRenter(str: String): Renter {
 
-        return Gson().fromJson(str, object : TypeToken<Renter>() {}.type)
+        return str.convertJsonToObject(Renter::class.java)!!
     }
 
     @TypeConverter
     fun fromRenterPaymentToString(renterPayment: RenterPayment): String {
 
-        return Gson().toJson(renterPayment)
+        return renterPayment.convertToJsonString()!!
     }
 
     @TypeConverter
     fun fromStringToRenterPayment(str: String): RenterPayment {
 
-        return Gson().fromJson(str, object : TypeToken<RenterPayment>() {}.type)
+        return str.convertJsonToObject(RenterPayment::class.java)!!
     }
 
     @TypeConverter
@@ -109,12 +111,12 @@ class TypeConvertersForDatabase {
     @TypeConverter
     fun fromMonthlyPaymentDateTimeInfoToString(monthlyPaymentDateTimeInfo: MonthlyPaymentDateTimeInfo?): String? {
 
-        return Gson().toJson(monthlyPaymentDateTimeInfo)
+        return monthlyPaymentDateTimeInfo.convertToJsonString()
     }
 
     @TypeConverter
     fun fromStringToMonthlyPaymentDateTimeInfo(str: String?): MonthlyPaymentDateTimeInfo? {
 
-        return Gson().fromJson(str, object : TypeToken<MonthlyPaymentDateTimeInfo?>() {}.type)
+        return str?.convertJsonToObject(MonthlyPaymentDateTimeInfo::class.java)
     }
 }

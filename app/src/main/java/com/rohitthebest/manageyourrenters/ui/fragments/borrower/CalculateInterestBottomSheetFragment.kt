@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioGroup
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
@@ -16,13 +16,14 @@ import com.rohitthebest.manageyourrenters.data.InterestTimeSchedule
 import com.rohitthebest.manageyourrenters.data.InterestType
 import com.rohitthebest.manageyourrenters.databinding.CalculateInterestBottomSheetLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentCalculateInterestBinding
-import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateNumberOfDays
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showDateRangePickerDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.pow
 
 private const val TAG = "CalculateInterestBottom"
@@ -35,11 +36,9 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
     private val binding get() = _binding!!
     private lateinit var includeBinding: CalculateInterestBottomSheetLayoutBinding
 
-    private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
-
     private var receivedInterestCalculatorField: InterestCalculatorFields? = null
     private lateinit var numberOfTimeTypeList: List<String>
-    private var selectedNumberOfTimeType = ""
+    private var selectedNumberOfTimeType = "days"
     private var numberOfDays = 0
     private var fromDate = 0L
     private var tillDate = 0L
@@ -61,9 +60,37 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
 
         numberOfTimeTypeList = resources.getStringArray(R.array.time).asList()
 
-        initListener()
-        getMessage()
         setUpNumberOfTimeTypeSpinner()
+
+        getMessage()
+
+        lifecycleScope.launch {
+            delay(150)
+            initListener()
+            textWatchers()
+        }
+    }
+
+    private fun textWatchers() {
+
+        includeBinding.intRateET.onTextChangedListener { s ->
+            if (s?.isNotBlank()!!) {
+                if (validateForm()) calculateInterest()
+            }
+        }
+
+        includeBinding.intPrincipalET.onTextChangedListener { s ->
+
+            if (s?.isNotBlank()!!) {
+                if (validateForm()) calculateInterest()
+            }
+        }
+
+        includeBinding.numberOfET.onTextChangedListener { s ->
+            if (s?.isNotBlank()!!) {
+                if (validateForm()) calculateInterest()
+            }
+        }
     }
 
     private fun setUpNumberOfTimeTypeSpinner() {
@@ -72,7 +99,13 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
             requireContext(),
             numberOfTimeTypeList,
             { position ->
+
+                Log.d(TAG, "setUpNumberOfTimeTypeSpinner: ")
+
                 selectedNumberOfTimeType = numberOfTimeTypeList[position]
+                if (validateForm()) {
+                    calculateInterest()
+                }
             },
             {}
         )
@@ -152,6 +185,8 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
                 }
             }
 
+            Log.d(TAG, "initUI: timeType : $selectedNumberOfTimeType")
+
             if (validateForm()) {
 
                 calculateInterest()
@@ -167,27 +202,32 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
 
-        if (group?.id == includeBinding.intTimeTypeRG.id) {
+        when (group?.id) {
 
-            if (checkedId == R.id.numbeOfRB) {
+            includeBinding.intTimeTypeRG.id -> {
+                if (checkedId == R.id.numbeOfRB) {
 
-                showNumberOfLinearLayout(true)
-            } else {
+                    showNumberOfLinearLayout(true)
+                } else {
 
-                showNumberOfLinearLayout(false)
+                    showNumberOfLinearLayout(false)
+                }
             }
 
-            if (validateForm()) {
+            includeBinding.intTypeRG.id -> {
 
-                calculateInterest()
+                if (validateForm()) calculateInterest()
             }
         }
+
     }
 
     private fun showNumberOfLinearLayout(isVisible: Boolean) {
 
         includeBinding.intTimeTypeNumberOfLL.isVisible = isVisible
         includeBinding.intTimeTypeRangeCL.isVisible = !isVisible
+
+        if (validateForm()) calculateInterest()
     }
 
 
@@ -199,6 +239,7 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
         }
 
         includeBinding.intTimeTypeRG.setOnCheckedChangeListener(this)
+        includeBinding.intTypeRG.setOnCheckedChangeListener(this)
 
         includeBinding.intCalculateBtn.setOnClickListener(this)
         includeBinding.intSelectDateRangeIB.setOnClickListener(this)
@@ -230,13 +271,15 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
                         numberOfDays = calculateNumberOfDays(fromDate, tillDate)
 
                         setDateInFromAndTillTextView()
-                    }
+
+                        if (validateForm()) calculateInterest()
+                    },
+                    true
                 )
             }
         }
 
         hideKeyBoard(requireActivity())
-
     }
 
     @SuppressLint("SetTextI18n")
@@ -285,7 +328,7 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
             } else {
 
                 //compound interest
-                principal * ((1 + rate / 100).pow(timeInYear))
+                (principal * ((1 + rate / 100).pow(timeInYear))) - principal
             }
 
         includeBinding.intCalcInterestTV.text = interest.format(3)

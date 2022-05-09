@@ -399,6 +399,8 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
                 if (lastPaymentInfo != null) {
 
+                    var amount = lastPaymentInfo?.amount!!
+
                     lastPaymentInfo?.monthlyPaymentDateTimeInfo?.let { dateTimeInfo ->
 
                         if (dateTimeInfo.paymentPeriodType == BillPeriodType.BY_MONTH) {
@@ -407,15 +409,15 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                             includeBinding.periodTypeRG.check(includeBinding.byMonthRB.id)
                             populateByMonthLayoutFields()
 
+                            amount /= lastPaymentInfo?.monthlyPaymentDateTimeInfo?.numberOfMonths!!
+
                         } else {
                             periodType = BillPeriodType.BY_DATE
                             includeBinding.periodTypeRG.check(includeBinding.byDateRB.id)
                             populateByDateLayoutFields()
                         }
-
                     }
-
-                    includeBinding.monthlyPaymentAmountET.editText?.setText(lastPaymentInfo?.amount.toString())
+                    includeBinding.monthlyPaymentAmountET.editText?.setText(amount.toString())
                 }
             }
     }

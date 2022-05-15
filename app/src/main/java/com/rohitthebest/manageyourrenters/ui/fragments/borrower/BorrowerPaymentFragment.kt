@@ -11,7 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.BorrowerPaymentAdapter
+import com.rohitthebest.manageyourrenters.data.Interest
 import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
+import com.rohitthebest.manageyourrenters.data.InterestTimeSchedule
+import com.rohitthebest.manageyourrenters.data.InterestType
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
@@ -263,22 +266,23 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
         if (!borrowerPayment.isInterestAdded) {
 
+            borrowerPayment.interest =
+                Interest(InterestType.SIMPLE_INTEREST, 0.0, InterestTimeSchedule.ANNUALLY)
             showToast(requireContext(), "No interest added!!!")
-        } else {
+        }
 
-            val interestCalculatorFields = InterestCalculatorFields(
-                borrowerPayment.created,
-                borrowerPayment.amountTakenOnRent,
-                borrowerPayment.interest!!
+        val interestCalculatorFields = InterestCalculatorFields(
+            borrowerPayment.created,
+            borrowerPayment.amountTakenOnRent,
+            borrowerPayment.interest!!
+        )
+
+        val action =
+            BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToCalculateInterestBottomSheetFragment(
+                interestCalcualatorFields = interestCalculatorFields.convertToJsonString()
             )
 
-            val action =
-                BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToCalculateInterestBottomSheetFragment(
-                    interestCalcualatorFields = interestCalculatorFields.convertToJsonString()
-                )
-
-            findNavController().navigate(action)
-        }
+        findNavController().navigate(action)
     }
 
     override fun onEditBtnClick(borrowerPaymentKey: String) {

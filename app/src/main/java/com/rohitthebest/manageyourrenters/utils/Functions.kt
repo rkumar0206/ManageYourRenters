@@ -35,9 +35,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.data.CustomDateRange
-import com.rohitthebest.manageyourrenters.data.DocumentType
-import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
 import kotlinx.coroutines.CoroutineScope
@@ -48,6 +46,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
+import kotlin.math.pow
 import kotlin.random.Random
 
 private const val TAG = "Functions"
@@ -443,7 +442,7 @@ class Functions {
 
         fun calculateNumberOfDays(startDate: Long, endDate: Long): Int {
 
-            return ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt()
+            return ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt() + 1
 
         }
 
@@ -875,6 +874,50 @@ class Functions {
             shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
             activity.startActivity(Intent.createChooser(shareIntent, "Share Via"))
 
+        }
+
+        fun calculateInterestAndAmount(interestCalculatorFields: InterestCalculatorFields): Pair<Double, Double> {
+
+            val principal = interestCalculatorFields.principalAmount
+            val rate = interestCalculatorFields.interest.ratePercent
+            val timeSchedule = interestCalculatorFields.interest.timeSchedule
+            val forTime = interestCalculatorFields.forTime   // in days
+            val interestType = interestCalculatorFields.interest.type
+
+            val time: Int = when (timeSchedule) {
+
+                InterestTimeSchedule.ANNUALLY -> forTime / 365
+
+                InterestTimeSchedule.MONTHLY -> forTime / 30
+
+                InterestTimeSchedule.DAILY -> forTime
+            }
+
+            val interest = if (interestType == InterestType.SIMPLE_INTEREST) {
+
+                (principal * rate * time) / 100;
+            } else {
+
+                // compound interest
+                (principal * ((1 + rate / 100).pow(time))) - principal
+            }
+
+            val amount = principal + interest
+
+            Log.d(
+                TAG, "calculateInterestAndAmount: " +
+                        "\nprincipal : $principal" +
+                        "\nrate : $rate" +
+                        "\ntimeSchedule : $timeSchedule" +
+                        "\nforTime : $forTime" +
+                        "\ntime : $time" +
+                        "\ninterestType : $interestType" +
+                        "\ninterest : $interest" +
+                        "\nAmount : $amount"
+            )
+
+
+            return Pair(interest, amount)
         }
 
     }

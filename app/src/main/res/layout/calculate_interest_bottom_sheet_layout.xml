@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <TextView
         android:id="@+id/textView28"
@@ -13,9 +14,9 @@
         android:padding="5dp"
         android:text="@string/type"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/intTypeRG"
+        app:layout_constraintBottom_toBottomOf="@+id/interestTypeRG"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/intTypeRG" />
+        app:layout_constraintTop_toTopOf="@+id/interestTypeRG" />
 
     <TextView
         android:id="@+id/textView35"
@@ -40,7 +41,7 @@
         app:layout_constraintTop_toTopOf="@+id/intPrincipalET" />
 
     <RadioGroup
-        android:id="@+id/intTypeRG"
+        android:id="@+id/interestTypeRG"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -77,12 +78,24 @@
         android:inputType="numberDecimal"
         android:maxLength="5"
         android:maxLines="1"
-        app:layout_constraintStart_toStartOf="@+id/intTypeRG"
-        app:layout_constraintTop_toBottomOf="@+id/intTypeRG" />
+        android:minHeight="48dp"
+        app:layout_constraintStart_toStartOf="@+id/interestTypeRG"
+        app:layout_constraintTop_toBottomOf="@+id/interestTypeRG" />
+
+    <Spinner
+        android:id="@+id/interestTimeSheduleSpinner"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/intRateET"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView33"
+        app:layout_constraintTop_toTopOf="@+id/intRateET" />
 
     <EditText
         android:id="@+id/intPrincipalET"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ems="6"
@@ -91,7 +104,9 @@
         android:inputType="numberDecimal"
         android:maxLength="10"
         android:maxLines="1"
-        app:layout_constraintStart_toStartOf="@+id/intTypeRG"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="@+id/interestTimeSheduleSpinner"
+        app:layout_constraintStart_toStartOf="@+id/interestTypeRG"
         app:layout_constraintTop_toBottomOf="@+id/intRateET" />
 
     <TextView
@@ -115,7 +130,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/intTimeTypeCL">
+        app:layout_constraintTop_toBottomOf="@+id/numberOfDaysTV">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -141,7 +156,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:ellipsize="end"
-                android:maxLines="4"
+                android:maxLines="2"
                 android:padding="5dp"
                 android:text="@string/_0_0"
                 android:textSize="20sp"
@@ -158,7 +173,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:ellipsize="end"
-                android:maxLines="4"
+                android:maxLines="2"
                 android:padding="5dp"
                 android:text="@string/_0_0"
                 android:textSize="20sp"
@@ -182,14 +197,14 @@
     </androidx.cardview.widget.CardView>
 
     <Button
-        android:id="@+id/intCalculateBtn"
+        android:id="@+id/interestCalculateBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:backgroundTint="@color/dark_blue"
         android:text="@string/calculate"
         android:textAllCaps="false"
         android:textColor="@color/white"
-        android:backgroundTint="@color/dark_blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -199,63 +214,34 @@
         android:id="@+id/divider45"
         android:layout_width="409dp"
         android:layout_height="1dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="55dp"
         android:background="?android:attr/listDivider"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/intCalculateBtn" />
-
-    <RadioGroup
-        android:id="@+id/intTimeTypeRG"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:checkedButton="@id/numbeOfRB"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/intPrincipalET">
-
-        <RadioButton
-            android:id="@+id/numbeOfRB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Enter number" />
-
-        <RadioButton
-            android:id="@+id/rangeRB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Select range" />
-    </RadioGroup>
+        app:layout_constraintTop_toBottomOf="@+id/textView83" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/intTimeTypeCL"
         android:layout_width="0dp"
         android:layout_height="120dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/intTimeTypeRG">
+        app:layout_constraintTop_toBottomOf="@+id/intPrincipalET">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/intTimeTypeRangeCL"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
             <View
                 android:id="@+id/divider46"
@@ -328,6 +314,7 @@
                 android:layout_marginTop="16dp"
                 android:backgroundTint="@color/color_white"
                 android:contentDescription="@string/imagebutton"
+                android:minHeight="48dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
@@ -359,42 +346,39 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-        <LinearLayout
-            android:id="@+id/intTimeTypeNumberOfLL"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible">
-
-            <EditText
-                android:id="@+id/numberOfET"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="20dp"
-                android:ems="5"
-                android:gravity="center"
-                android:hint="number of "
-                android:inputType="number"
-                android:maxLength="5"
-                android:maxLines="1"
-                tools:text="1" />
-
-            <Spinner
-                android:id="@+id/numberOfSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-
-        </LinearLayout>
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/textView83"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/calculate_interest_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/interestCalculateBtn" />
+
+    <TextView
+        android:id="@+id/numberOfDaysTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:inputType="number"
+        android:maxLines="1"
+        android:padding="3dp"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/intTimeTypeCL"
+        tools:text="Number of days : 30" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -116,6 +116,7 @@
     <string name="downloading_file">downloading file…</string>
     <string name="_02_06_2000">02–06–2000</string>
     <string name="calculate_interest">Calculate Interest</string>
+    <string name="calculate_interest_message">Note : \nInterest is calculated on below assumptions: \n\n* 1 month = 30 days\n* 1 year = 365 days\n\nBased on these assumptions the calculated result may not be accurate.</string>
     <string name="principal">Principal</string>
     <string name="interest_">Interest :</string>
     <string name="calculate">Calculate</string>
@@ -245,10 +246,11 @@
     <string name="select_to_year">Select to year</string>
     <string name="message_button">message button</string>
     <string name="amount_paid_with_value">Amount paid : %1$s</string>
-    <string name="monthly_payments_diabled_message">monthly payments shortcut is disabled</string>
-    <string name="borrowers_disabled_message">borrowers shotcut is disabled</string>
+    <string name="monthly_payments_disabled_message">monthly payments shortcut is disabled</string>
+    <string name="borrowers_disabled_message">borrowers shortcut is disabled</string>
     <string name="coming_soon">Coming soon…</string>
-
+    <string name="enter_number">Enter number</string>
+    <string name="number_of_days_with_value">Number of days : %1$s</string>
 
     <string-array name="interest_time_schedule">
 

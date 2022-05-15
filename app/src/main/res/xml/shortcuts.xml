@@ -50,7 +50,7 @@
     <shortcut
         android:enabled="true"
         android:icon="@drawable/ic_monthly_payments"
-        android:shortcutDisabledMessage="@string/monthly_payments_diabled_message"
+        android:shortcutDisabledMessage="@string/monthly_payments_disabled_message"
         android:shortcutId="compose3"
         android:shortcutLongLabel="@string/monthly_payments"
         android:shortcutShortLabel="@string/monthly_payments"

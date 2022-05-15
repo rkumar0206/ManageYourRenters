@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.Interest
+import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
 import com.rohitthebest.manageyourrenters.data.InterestTimeSchedule
 import com.rohitthebest.manageyourrenters.data.InterestType
 import com.rohitthebest.manageyourrenters.database.model.Borrower
@@ -29,6 +30,7 @@ import com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBott
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateNumberOfDays
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
@@ -218,7 +220,32 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         when (v?.id) {
 
             includeBinding.calculateInterestBtn.id -> {
-                //todo : handle this button
+
+                if (isFormValid()) {
+
+                    val interestCalculatorFields = InterestCalculatorFields(
+                        selectedDate,
+                        includeBinding.borrowerPaymentET.editText?.text.toString().toDouble(),
+                        Interest(
+                            if (includeBinding.interestTypeRG.checkedRadioButtonId == includeBinding.simpleIntRB.id) {
+
+                                InterestType.SIMPLE_INTEREST
+                            } else {
+                                InterestType.COMPOUND_INTEREST
+                            },
+                            includeBinding.ratePercentET.text.toString().toDouble(),
+                            selectedInterestTimeSchedule
+                        ),
+                        calculateNumberOfDays(selectedDate, System.currentTimeMillis())
+                    )
+
+                    val action =
+                        AddBorrowerPaymentFragmentDirections.actionAddBorrowerPaymentFragmentToCalculateInterestBottomSheetFragment(
+                            interestCalculatorFields.convertToJsonString()
+                        )
+
+                    findNavController().navigate(action)
+                }
             }
         }
     }

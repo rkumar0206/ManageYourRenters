@@ -8,13 +8,12 @@ private val gson = Gson()
 
 fun convertRenterToJSONString(renter: Renter): String {
 
-    return gson.toJson(renter)
+    return renter.convertToJsonString() ?: ""
 }
 
 fun convertJSONtoRenter(jsonString: String?): Renter {
 
-    val type = object : TypeToken<Renter?>() {}.type
-    return gson.fromJson(jsonString, type)
+    return jsonString?.convertJsonToObject(Renter::class.java)!!
 }
 
 fun convertStringListToJSON(list: List<String?>): String {
@@ -30,22 +29,22 @@ fun convertJSONToStringList(jsonString: String?): List<String?> {
 
 fun fromBorrowerToString(borrower: Borrower): String {
 
-    return gson.toJson(borrower)
+    return borrower.convertToJsonString() ?: ""
 }
 
 fun fromStringToBorrower(str: String): Borrower {
 
-    return gson.fromJson(str, object : TypeToken<Borrower>() {}.type)
+    return str.convertJsonToObject(Borrower::class.java)!!
 }
 
 fun fromBorrowerPaymentToString(borrowerPayment: BorrowerPayment): String {
 
-    return Gson().toJson(borrowerPayment)
+    return borrowerPayment.convertToJsonString() ?: ""
 }
 
 fun fromStringToBorrowerPayment(str: String): BorrowerPayment {
 
-    return Gson().fromJson(str, object : TypeToken<BorrowerPayment>() {}.type)
+    return str.convertJsonToObject(BorrowerPayment::class.java)!!
 }
 
 fun fromPartialPaymentListToString(list: List<PartialPayment>): String {
@@ -61,20 +60,20 @@ fun fromStringToPartialPaymentList(jsonString: String): List<PartialPayment> {
 
 fun fromEMIToString(emi: EMI): String {
 
-    return Gson().toJson(emi)
+    return emi.convertToJsonString() ?: ""
 }
 
 fun fromStringToEMI(str: String): EMI {
 
-    return Gson().fromJson(str, object : TypeToken<EMI>() {}.type)
+    return str.convertJsonToObject(EMI::class.java)!!
 }
 
 fun fromEMIPaymentToString(emiPayment: EMIPayment): String {
 
-    return Gson().toJson(emiPayment)
+    return emiPayment.convertToJsonString() ?: ""
 }
 
 fun fromStringToEMIPayment(str: String): EMIPayment {
 
-    return Gson().fromJson(str, object : TypeToken<EMIPayment>() {}.type)
+    return str.convertJsonToObject(EMIPayment::class.java)!!
 }

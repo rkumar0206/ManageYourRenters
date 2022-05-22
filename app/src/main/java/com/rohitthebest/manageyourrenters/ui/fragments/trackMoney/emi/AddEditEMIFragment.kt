@@ -219,7 +219,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
                     showToast(
                         requireContext(),
-                        "Internet connection is needed for uploading supporting document.",
+                        getString(R.string.internet_required_message_for_uploading_doc),
                         Toast.LENGTH_LONG
                     )
                 }

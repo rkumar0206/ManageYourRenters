@@ -18,6 +18,8 @@ import com.rohitthebest.manageyourrenters.data.InterestType
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
+import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -33,7 +35,7 @@ private const val TAG = "BorrowerPaymentFragment"
 
 @AndroidEntryPoint
 class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
-    BorrowerPaymentAdapter.OnClickListener {
+    BorrowerPaymentAdapter.OnClickListener, CustomMenuItems.OnItemClickListener {
 
     private var _binding: FragmentBorrowerPaymentBinding? = null
     private val binding get() = _binding!!
@@ -162,42 +164,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         findNavController().navigate(action)
     }
 
-    override fun onDeleteBtnClick(borrowerPayment: BorrowerPayment) {
-
-        showAlertDialogForDeletion(
-            requireContext(),
-            {
-
-                if (!borrowerPayment.isSynced) {
-
-                    borrowerPaymentViewModel.deleteBorrowerPayment(
-                        requireContext(),
-                        borrowerPayment
-                    )
-
-                } else {
-
-                    if (isInternetAvailable(requireContext())) {
-
-                        borrowerPaymentViewModel.deleteBorrowerPayment(
-                            requireContext(),
-                            borrowerPayment
-                        )
-
-                    } else {
-
-                        showNoInternetMessage(requireContext())
-                    }
-                }
-
-                it.dismiss()
-            },
-            {
-                it.dismiss()
-            }
-        )
-    }
-
     override fun onSyncBtnClick(borrowerPayment: BorrowerPayment, position: Int) {
 
         if (borrowerPayment.isSynced) {
@@ -245,23 +211,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
             .show()
     }
 
-    override fun onShowDocumentBtnClick(borrowerPayment: BorrowerPayment) {
-
-        if (!borrowerPayment.isSupportingDocAdded) {
-
-            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
-        } else {
-
-            borrowerPayment.supportingDocument?.let { supportingDoc ->
-
-                onViewOrDownloadSupportingDocument(
-                    requireActivity(),
-                    supportingDoc
-                )
-            }
-        }
-    }
-
     override fun onInterestBtnClick(borrowerPayment: BorrowerPayment) {
 
         if (!borrowerPayment.isInterestAdded) {
@@ -285,10 +234,102 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         findNavController().navigate(action)
     }
 
-    override fun onEditBtnClick(borrowerPaymentKey: String) {
+    private var borrowerPaymentForMenus: BorrowerPayment? = null
+    private var adapterItemPosition = 0
 
-        //todo : not yet implemented
+    override fun onMenuBtnClick(borrowerPayment: BorrowerPayment, position: Int) {
+
+        borrowerPaymentForMenus = borrowerPayment
+        adapterItemPosition = position
+
+        requireActivity().supportFragmentManager.let {
+
+            val bundle = Bundle()
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
+
+            CustomMenuItems.newInstance(
+                bundle
+            ).apply {
+                show(it, TAG)
+            }.setOnClickListener(this)
+        }
+
     }
+
+    override fun onEditMenuClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDeleteMenuClick() {
+
+        showAlertDialogForDeletion(
+            requireContext(),
+            {
+
+                if (borrowerPaymentForMenus != null) {
+
+                    if (!borrowerPaymentForMenus!!.isSynced) {
+
+                        borrowerPaymentViewModel.deleteBorrowerPayment(
+                            requireContext(),
+                            borrowerPaymentForMenus!!
+                        )
+
+                    } else {
+
+                        if (isInternetAvailable(requireContext())) {
+
+                            borrowerPaymentViewModel.deleteBorrowerPayment(
+                                requireContext(),
+                                borrowerPaymentForMenus!!
+                            )
+
+                        } else {
+
+                            showNoInternetMessage(requireContext())
+                        }
+                    }
+                }
+
+                it.dismiss()
+            },
+            {
+                it.dismiss()
+            }
+        )
+
+    }
+
+    override fun onViewSupportingDocumentMenuClick() {
+
+        if (borrowerPaymentForMenus != null) {
+            if (!borrowerPaymentForMenus!!.isSupportingDocAdded) {
+
+                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            } else {
+
+                borrowerPaymentForMenus!!.supportingDocument?.let { supportingDoc ->
+
+                    onViewOrDownloadSupportingDocument(
+                        requireActivity(),
+                        supportingDoc
+                    )
+                }
+            }
+        }
+
+    }
+
+    override fun onReplaceSupportingDocumentClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDeleteSupportingDocumentClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onSyncMenuClick() {}
+
     //[END OF ADAPTER CLICK LISTENER]
 
     override fun onDestroyView() {

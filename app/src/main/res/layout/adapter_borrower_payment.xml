@@ -116,11 +116,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:layout_marginBottom="4dp"
+                android:layout_marginBottom="3dp"
                 android:backgroundTint="@color/color_white"
+                android:minHeight="48dp"
                 android:tooltipText="@string/interest"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/showDocumentBtn"
+                app:layout_constraintEnd_toStartOf="@+id/messageBtn"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider40"
@@ -128,45 +129,18 @@
                 tools:targetApi="o" />
 
             <ImageButton
-                android:id="@+id/showDocumentBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/color_white"
-                android:tooltipText="show document"
-                app:layout_constraintBottom_toBottomOf="@+id/interestBtn"
-                app:layout_constraintEnd_toStartOf="@+id/messageBtn"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/interestBtn"
-                app:layout_constraintTop_toTopOf="@+id/interestBtn"
-                app:srcCompat="@drawable/ic_document"
-                tools:targetApi="o" />
-
-            <ImageButton
                 android:id="@+id/messageBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/color_white"
+                android:minHeight="48dp"
                 android:tooltipText="show message"
-                app:layout_constraintBottom_toBottomOf="@+id/showDocumentBtn"
+                app:layout_constraintBottom_toBottomOf="@+id/interestBtn"
                 app:layout_constraintEnd_toStartOf="@+id/syncBtn"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/showDocumentBtn"
-                app:layout_constraintTop_toTopOf="@+id/showDocumentBtn"
+                app:layout_constraintStart_toEndOf="@+id/interestBtn"
+                app:layout_constraintTop_toTopOf="@+id/interestBtn"
                 app:srcCompat="@drawable/ic_baseline_message_24"
-                tools:targetApi="o" />
-
-            <ImageButton
-                android:id="@+id/deleteBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/color_white"
-                android:tooltipText="delete"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/editBorrowerPaymentBtn"
-                app:layout_constraintTop_toTopOf="@+id/editBorrowerPaymentBtn"
-                app:srcCompat="@drawable/ic_baseline_delete_24"
                 tools:targetApi="o" />
 
             <ImageButton
@@ -174,9 +148,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/color_white"
+                android:minHeight="48dp"
                 android:tooltipText="sync with cloud"
                 app:layout_constraintBottom_toBottomOf="@+id/messageBtn"
-                app:layout_constraintEnd_toStartOf="@+id/editBorrowerPaymentBtn"
+                app:layout_constraintEnd_toStartOf="@+id/menuBtnForBorrowerPayment"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/messageBtn"
                 app:layout_constraintTop_toTopOf="@+id/messageBtn"
@@ -184,16 +159,17 @@
                 tools:targetApi="o" />
 
             <ImageButton
-                android:id="@+id/editBorrowerPaymentBtn"
+                android:id="@+id/menuBtnForBorrowerPayment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/color_white"
+                android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="@+id/syncBtn"
-                app:layout_constraintEnd_toStartOf="@+id/deleteBtn"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/syncBtn"
                 app:layout_constraintTop_toTopOf="@+id/syncBtn"
-                app:srcCompat="@drawable/ic_baseline_edit_24" />
+                app:srcCompat="@drawable/ic_baseline_more_vert_24" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

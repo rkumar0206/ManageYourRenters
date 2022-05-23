@@ -26,12 +26,10 @@ class BorrowerPaymentAdapter :
         init {
 
             binding.adapterBorrowerPaymentMCV.setOnClickListener(this)
-            binding.deleteBtn.setOnClickListener(this)
             binding.syncBtn.setOnClickListener(this)
             binding.messageBtn.setOnClickListener(this)
-            binding.showDocumentBtn.setOnClickListener(this)
             binding.interestBtn.setOnClickListener(this)
-            binding.editBorrowerPaymentBtn.setOnClickListener(this)
+            binding.menuBtnForBorrowerPayment.setOnClickListener(this)
         }
 
         @SuppressLint("SetTextI18n")
@@ -105,10 +103,7 @@ class BorrowerPaymentAdapter :
                         mListener!!.onItemClick(getItem(absoluteAdapterPosition))
                     }
 
-                    binding.deleteBtn.id -> {
 
-                        mListener!!.onDeleteBtnClick(getItem(absoluteAdapterPosition))
-                    }
                     binding.syncBtn.id -> {
 
                         mListener!!.onSyncBtnClick(
@@ -117,10 +112,6 @@ class BorrowerPaymentAdapter :
                         )
                     }
 
-                    binding.showDocumentBtn.id -> {
-
-                        mListener!!.onShowDocumentBtnClick(getItem(absoluteAdapterPosition))
-                    }
                     binding.messageBtn.id -> {
 
                         mListener!!.onShowMessageBtnClick(getItem(absoluteAdapterPosition).messageOrNote)
@@ -129,9 +120,12 @@ class BorrowerPaymentAdapter :
 
                         mListener!!.onInterestBtnClick(getItem(absoluteAdapterPosition))
                     }
-                    binding.editBorrowerPaymentBtn.id -> {
+                    binding.menuBtnForBorrowerPayment.id -> {
 
-                        mListener!!.onEditBtnClick(getItem(absoluteAdapterPosition).key)
+                        mListener!!.onMenuBtnClick(
+                            getItem(absoluteAdapterPosition),
+                            absoluteAdapterPosition
+                        )
                     }
                 }
             }
@@ -178,12 +172,10 @@ class BorrowerPaymentAdapter :
     interface OnClickListener {
 
         fun onItemClick(borrowerPayment: BorrowerPayment)
-        fun onDeleteBtnClick(borrowerPayment: BorrowerPayment)
         fun onSyncBtnClick(borrowerPayment: BorrowerPayment, position: Int)
         fun onShowMessageBtnClick(message: String)
-        fun onShowDocumentBtnClick(borrowerPayment: BorrowerPayment)
         fun onInterestBtnClick(borrowerPayment: BorrowerPayment)
-        fun onEditBtnClick(borrowerPaymentKey: String)
+        fun onMenuBtnClick(borrowerPayment: BorrowerPayment, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.database.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.firebase.firestore.IgnoreExtraProperties
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 
 @IgnoreExtraProperties
 @Entity(tableName = "borrower_table")
@@ -18,6 +19,8 @@ data class Borrower(
     var emailId: String?,
     var otherDocumentName: String?,
     var otherDocumentNumber: String?,
+    var isSupportingDocAdded: Boolean = false,
+    var supportingDocument: SupportingDocument? = null,
     var isSynced: Boolean = false,
     var totalDueAmount: Double = 0.0,
     var uid: String
@@ -35,6 +38,8 @@ data class Borrower(
         "",
         "",
         "",
+        false,
+        null,
         false,
         0.0,
         ""

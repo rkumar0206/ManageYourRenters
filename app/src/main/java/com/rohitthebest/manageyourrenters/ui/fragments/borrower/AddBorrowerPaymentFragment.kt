@@ -288,7 +288,6 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         borrowerPayment.currencySymbol = selectedCurrencySymbol
 
         borrowerPayment.apply {
-
             created = selectedDate
             borrowerId = receivedBorrower?.borrowerId!!
             borrowerKey = receivedBorrowerKey

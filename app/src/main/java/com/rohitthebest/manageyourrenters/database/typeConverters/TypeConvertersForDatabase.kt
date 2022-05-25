@@ -67,9 +67,9 @@ class TypeConvertersForDatabase {
     }
 
     @TypeConverter
-    fun fromStringToSupportingDocument(str: String): SupportingDocument? {
+    fun fromStringToSupportingDocument(str: String?): SupportingDocument? {
 
-        return str.convertJsonToObject(SupportingDocument::class.java)
+        return str?.convertJsonToObject(SupportingDocument::class.java)
     }
 
     @TypeConverter

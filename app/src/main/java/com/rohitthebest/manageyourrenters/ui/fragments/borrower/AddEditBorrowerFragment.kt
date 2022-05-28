@@ -138,6 +138,9 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
 
             selectedDate = b.created
         }
+
+        includeBinding.addSupportingDocCB.hide()
+        includeBinding.viewEditSupportingDoc.hide()
     }
 
     private fun initListeners() {
@@ -277,7 +280,17 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
             totalDueAmount =
                 if (!isMessageReceivedForEditing) 0.0 else receivedBorrower?.totalDueAmount!!
             isSynced = false
+
+            if (includeBinding.addSupportingDocCB.isChecked) {
+
+                if (!isMessageReceivedForEditing) {
+
+                    isSupportingDocAdded = true
+                }
+            }
         }
+
+        // todo : think how to upload the supporting document to the cloud
 
         insertToDatabase(borrower)
     }

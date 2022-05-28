@@ -2,14 +2,18 @@ package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditRenterBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY
+import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
@@ -21,8 +25,12 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
 import dagger.hilt.android.AndroidEntryPoint
 
+private const val TAG = "AddEditBorrowerFragment"
+
 @AndroidEntryPoint
-class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), View.OnClickListener {
+class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), View.OnClickListener,
+    CompoundButton.OnCheckedChangeListener,
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
     private var _binding: FragmentAddEditRenterBinding? = null
     private val binding get() = _binding!!
@@ -32,6 +40,8 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
     private var isMessageReceivedForEditing = false
     private var receivedBorrower: Borrower? = null
     private var receivedBorrowerKey: String = ""
+
+    private lateinit var supportingDocmtHelperModel: SupportingDocumentHelperModel
 
     private val borrowerViewModel by viewModels<BorrowerViewModel>()
 
@@ -46,6 +56,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
             WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                 selectedDate
             )
+        supportingDocmtHelperModel = SupportingDocumentHelperModel()
 
         // removing the views that is not required here
         includeBinding.renterRoomNumberET.hide()
@@ -131,6 +142,8 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
 
     private fun initListeners() {
 
+        includeBinding.addSupportingDocCB.isChecked = false
+
         binding.addRenterToolbar.setNavigationOnClickListener {
 
             requireActivity().onBackPressed()
@@ -148,7 +161,58 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
 
         includeBinding.dateAddedCalendarPickBtn.setOnClickListener(this)
         includeBinding.mobileNumCodePicker.registerCarrierNumberEditText(includeBinding.renterMobileNumberET)
+        includeBinding.addSupportingDocCB.setOnCheckedChangeListener(this)
+        includeBinding.viewEditSupportingDoc.setOnClickListener(this)
+    }
 
+    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+
+        when (buttonView?.id) {
+
+            includeBinding.addSupportingDocCB.id -> {
+
+                if (isChecked) {
+
+                    supportingDocmtHelperModel = SupportingDocumentHelperModel()
+                    showSupportDocumentBottomSheetDialog()
+
+                    includeBinding.viewEditSupportingDoc.show()
+                } else {
+
+                    includeBinding.viewEditSupportingDoc.hide()
+                }
+            }
+        }
+    }
+
+    private fun showSupportDocumentBottomSheetDialog() {
+
+        val bundle = Bundle()
+        bundle.putString(
+            SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+            supportingDocmtHelperModel.convertToJsonString()
+        )
+
+        requireActivity().supportFragmentManager.let {
+
+            SupportingDocumentDialogFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
+
+    override fun onBottomSheetDismissed(
+        isDocumentAdded: Boolean,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel
+    ) {
+
+        if (!isDocumentAdded) {
+            includeBinding.addSupportingDocCB.isChecked = false
+        } else {
+
+            supportingDocmtHelperModel = supportingDocumentHelperModel
+        }
     }
 
     override fun onClick(v: View?) {
@@ -172,6 +236,10 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
                 )
             }
 
+            includeBinding.viewEditSupportingDoc.id -> {
+
+                showSupportDocumentBottomSheetDialog()
+            }
         }
 
     }

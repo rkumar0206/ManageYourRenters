@@ -254,6 +254,8 @@
     <string name="internet_required_message_for_uploading_doc">Internet connection is needed for uploading the supporting the document</string>
     <string name="added_on">Added On :</string>
     <string name="show_calendar_button">show calendar button</string>
+    <string name="view_edit">View / Edit</string>
+    <string name="cancelled">Cancelled</string>
 
     <string-array name="interest_time_schedule">
 

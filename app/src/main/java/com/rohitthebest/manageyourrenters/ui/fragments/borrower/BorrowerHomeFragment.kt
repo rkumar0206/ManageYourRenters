@@ -13,20 +13,23 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.BorrowerAdapter
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerHomeBinding
+import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
-//private const val TAG = "BorrowerHomeFragment"
+private const val TAG = "BorrowerHomeFragment"
 
 @AndroidEntryPoint
 class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
-    BorrowerAdapter.OnClickListener {
+    BorrowerAdapter.OnClickListener, CustomMenuItems.OnItemClickListener {
 
     private var _binding: FragmentBorrowerHomeBinding? = null
     private val binding get() = _binding!!
@@ -131,13 +134,13 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         findNavController().navigate(action)
     }
 
-    override fun onSyncButtonClicked(borrower: Borrower?, position: Int) {
+    override fun onSyncButtonClicked(borrower: Borrower, position: Int) {
 
         if (isInternetAvailable(requireContext())) {
 
-            if (borrower?.isSynced!!) {
+            if (borrower.isSynced) {
 
-                Functions.showToast(requireContext(), "Already Synced")
+                showToast(requireContext(), "Already Synced")
             } else {
 
                 borrower.isSynced = true
@@ -160,13 +163,13 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     }
 
-    override fun onDeleteClicked(borrower: Borrower?) {
+    override fun onDeleteClicked(borrower: Borrower) {
 
         showAlertDialogForDeletion(
             requireContext(),
             positiveButtonListener = {
 
-                if (!borrower?.isSynced!!) {
+                if (!borrower.isSynced) {
 
                     borrowerViewModel.deleteBorrower(
                         requireContext(),
@@ -195,14 +198,78 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         )
     }
 
-    override fun onEditClicked(borrowerKey: String) {
+    private lateinit var borrowerForMenus: Borrower
 
-        val action = BorrowerHomeFragmentDirections.actionBorrowerHomeFragmentToAddBorrowerFragment(
-            borrowerKey
-        )
+    override fun onEditClicked(borrower: Borrower) {
 
-        findNavController().navigate(action)
+        borrowerForMenus = borrower
+
+        requireActivity().supportFragmentManager.let {
+
+            val bundle = Bundle()
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
+            bundle.putBoolean(Constants.SHOW_DELETE_MENU, false)
+            bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
+            bundle.putBoolean(Constants.SHOW_EDIT_MENU, true)
+
+            CustomMenuItems.newInstance(
+                bundle
+            ).apply {
+                show(it, TAG)
+            }.setOnClickListener(this)
+        }
     }
+
+    //[START OF MENU CLICK LISTENERS]
+
+    override fun onEditMenuClick() {
+
+        if (::borrowerForMenus.isInitialized) {
+            val action =
+                BorrowerHomeFragmentDirections.actionBorrowerHomeFragmentToAddBorrowerFragment(
+                    borrowerForMenus.key
+                )
+
+            findNavController().navigate(action)
+        }
+    }
+
+    override fun onDeleteMenuClick() {}
+
+    override fun onViewSupportingDocumentMenuClick() {
+
+        if (::borrowerForMenus.isInitialized) {
+
+            if (!borrowerForMenus.isSupportingDocAdded) {
+
+                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            } else if (borrowerForMenus.isSupportingDocAdded && borrowerForMenus.supportingDocument == null) {
+
+                showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
+            } else {
+                borrowerForMenus.supportingDocument?.let { supportingDoc ->
+
+                    Functions.onViewOrDownloadSupportingDocument(
+                        requireActivity(),
+                        supportingDoc
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onReplaceSupportingDocumentClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDeleteSupportingDocumentClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onSyncMenuClick() {}
+
+
+    //[END OF MENU CLICK LISTENERS]
 
     override fun onMobileNumberClicked(mobileNumber: String, view: View) {
 

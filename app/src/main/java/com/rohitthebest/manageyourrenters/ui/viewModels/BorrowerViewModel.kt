@@ -86,8 +86,14 @@ class BorrowerViewModel @Inject constructor(
         }
 
         borrowerRepository.update(borrower)
+    }
 
-        borrowerRepository.update(borrower)
+    fun addOrReplaceBorrowerSupportingDocument(
+        borrower: Borrower,
+        supportDocumentHelper: SupportingDocumentHelperModel?
+    ) {
+
+
     }
 
     fun deleteBorrower(context: Context, borrower: Borrower) = viewModelScope.launch {

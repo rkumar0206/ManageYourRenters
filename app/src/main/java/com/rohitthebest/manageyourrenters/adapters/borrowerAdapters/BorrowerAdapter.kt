@@ -58,7 +58,7 @@ class BorrowerAdapter :
 
                     binding.adapterRenterEditBtn.id -> {
 
-                        mListener!!.onEditClicked(getItem(absoluteAdapterPosition).key)
+                        mListener!!.onEditClicked(getItem(absoluteAdapterPosition))
                     }
 
                     binding.adapterRenterMobileTV.id -> {
@@ -175,9 +175,9 @@ class BorrowerAdapter :
     interface OnClickListener {
 
         fun onBorrowerClicked(borrowerKey: String)
-        fun onSyncButtonClicked(borrower: Borrower?, position: Int)
-        fun onDeleteClicked(borrower: Borrower?)
-        fun onEditClicked(borrowerKey: String)
+        fun onSyncButtonClicked(borrower: Borrower, position: Int)
+        fun onDeleteClicked(borrower: Borrower)
+        fun onEditClicked(borrower: Borrower)
         fun onMobileNumberClicked(mobileNumber: String, view: View)
     }
 

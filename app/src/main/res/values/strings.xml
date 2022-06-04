@@ -256,6 +256,7 @@
     <string name="show_calendar_button">show calendar button</string>
     <string name="view_edit">View / Edit</string>
     <string name="cancelled">Cancelled</string>
+    <string name="uploading_doc_progress_message">Uploading document to cloud is in progress…</string>
 
     <string-array name="interest_time_schedule">
 

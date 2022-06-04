@@ -7,6 +7,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
@@ -20,6 +22,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
@@ -177,6 +180,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
                 if (isChecked) {
 
                     supportingDocmtHelperModel = SupportingDocumentHelperModel()
+                    supportingDocmtHelperModel.modelName = getString(R.string.borrowers)
                     showSupportDocumentBottomSheetDialog()
                     includeBinding.viewEditSupportingDoc.show()
                 } else {
@@ -258,8 +262,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
         borrower.apply {
 
             created = selectedDate
-            modified =
-                if (!isMessageReceivedForEditing) selectedDate else System.currentTimeMillis()
+            modified = System.currentTimeMillis()
 
             name = includeBinding.renterNameET.editText?.text.toString().trim()
             mobileNumber = includeBinding.mobileNumCodePicker.fullNumberWithPlus
@@ -281,16 +284,36 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
                 if (!isMessageReceivedForEditing) 0.0 else receivedBorrower?.totalDueAmount!!
             isSynced = false
 
-            if (includeBinding.addSupportingDocCB.isChecked) {
+            if (!isMessageReceivedForEditing && includeBinding.addSupportingDocCB.isChecked) {
 
-                if (!isMessageReceivedForEditing) {
+                isSupportingDocAdded = true
 
-                    isSupportingDocAdded = true
+                if (supportingDocmtHelperModel.documentType == DocumentType.URL) {
+
+                    supportingDocument = SupportingDocument(
+                        supportingDocmtHelperModel.documentName,
+                        supportingDocmtHelperModel.documentUrl,
+                        supportingDocmtHelperModel.documentType
+                    )
                 }
             }
         }
 
-        // todo : think how to upload the supporting document to the cloud
+        if (!isMessageReceivedForEditing
+            && borrower.isSupportingDocAdded
+            && supportingDocmtHelperModel.documentType != DocumentType.URL
+        ) {
+
+            // if the document type is not URL, then we need internet connection to upload the uri
+            if (!isInternetAvailable(requireContext())) {
+                showToast(
+                    requireContext(),
+                    getString(R.string.internet_required_message_for_uploading_doc),
+                    Toast.LENGTH_LONG
+                )
+                return
+            }
+        }
 
         insertToDatabase(borrower)
     }
@@ -300,7 +323,15 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
         if (!isMessageReceivedForEditing) {
 
             // insert
-            borrowerViewModel.insertBorrower(requireContext(), borrower)
+            if (borrower.isSupportingDocAdded && borrower.supportingDocument?.documentType != DocumentType.URL)
+                borrowerViewModel.insertBorrower(
+                    requireContext(),
+                    borrower,
+                    supportingDocmtHelperModel
+                )
+            else
+                borrowerViewModel.insertBorrower(requireContext(), borrower)
+
             showToast(requireContext(), "Borrower added")
         } else {
             // update

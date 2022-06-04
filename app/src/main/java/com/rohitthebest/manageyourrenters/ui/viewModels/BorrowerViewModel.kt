@@ -7,6 +7,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
@@ -28,8 +29,11 @@ class BorrowerViewModel @Inject constructor(
     private val partialPaymentRepository: PartialPaymentRepository
 ) : ViewModel() {
 
-
-    fun insertBorrower(context: Context, borrower: Borrower) = viewModelScope.launch {
+    fun insertBorrower(
+        context: Context,
+        borrower: Borrower,
+        supportDocumentHelper: SupportingDocumentHelperModel? = null
+    ) = viewModelScope.launch {
 
         if (Functions.isInternetAvailable(context)) {
 
@@ -40,6 +44,18 @@ class BorrowerViewModel @Inject constructor(
                 context.getString(R.string.borrowers),
                 borrower.key
             )
+
+            if (supportDocumentHelper != null
+                && borrower.isSupportingDocAdded
+                && borrower.supportingDocument?.documentType != DocumentType.URL
+            ) {
+
+                supportDocumentHelper.modelName = context.getString(R.string.borrowers)
+                uploadFileToFirebaseCloudStorage(
+                    context, supportDocumentHelper, borrower.key
+                )
+            }
+
         } else {
 
             borrower.isSynced = false
@@ -91,6 +107,17 @@ class BorrowerViewModel @Inject constructor(
                 context.getString(R.string.borrowers),
                 borrower.key
             )
+
+            if (borrower.isSupportingDocAdded
+                && borrower.supportingDocument != null
+                && borrower.supportingDocument?.documentType != DocumentType.URL
+            ) {
+
+                deleteFileFromFirebaseStorage(
+                    context,
+                    borrower.supportingDocument?.documentUrl!!
+                )
+            }
 
             if (borrowerPaymentKeys.isNotEmpty()) {
 

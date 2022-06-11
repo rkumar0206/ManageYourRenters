@@ -7,6 +7,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
@@ -46,8 +47,7 @@ class BorrowerViewModel @Inject constructor(
             )
 
             if (supportDocumentHelper != null
-                && borrower.isSupportingDocAdded
-                && borrower.supportingDocument?.documentType != DocumentType.URL
+                && supportDocumentHelper.documentType != DocumentType.URL
             ) {
 
                 supportDocumentHelper.modelName = context.getString(R.string.borrowers)
@@ -89,11 +89,45 @@ class BorrowerViewModel @Inject constructor(
     }
 
     fun addOrReplaceBorrowerSupportingDocument(
+        context: Context,
         borrower: Borrower,
-        supportDocumentHelper: SupportingDocumentHelperModel?
+        supportDocumentHelper: SupportingDocumentHelperModel
     ) {
 
+        if (borrower.supportingDocument != null && borrower.supportingDocument?.documentType != DocumentType.URL) {
 
+            // if borrower contains supporting document previously, then call delete service also
+
+            deleteFileFromFirebaseStorage(
+                context,
+                borrower.supportingDocument?.documentUrl!!
+            )
+        }
+
+        if (supportDocumentHelper.documentType == DocumentType.URL) {
+
+            val supportingDoc = SupportingDocument(
+                supportDocumentHelper.documentName,
+                supportDocumentHelper.documentUrl,
+                supportDocumentHelper.documentType
+            )
+
+            borrower.isSupportingDocAdded = true
+            borrower.supportingDocument = supportingDoc
+
+            updateBorrower(context, borrower)
+        } else {
+
+            if (!borrower.isSynced) {
+                insertBorrower(context, borrower, supportDocumentHelper)
+                return
+            }
+
+            supportDocumentHelper.modelName = context.getString(R.string.borrowers)
+            uploadFileToFirebaseCloudStorage(
+                context, supportDocumentHelper, borrower.key
+            )
+        }
     }
 
     fun deleteBorrower(context: Context, borrower: Borrower) = viewModelScope.launch {
@@ -114,8 +148,7 @@ class BorrowerViewModel @Inject constructor(
                 borrower.key
             )
 
-            if (borrower.isSupportingDocAdded
-                && borrower.supportingDocument != null
+            if (borrower.supportingDocument != null
                 && borrower.supportingDocument?.documentType != DocumentType.URL
             ) {
 

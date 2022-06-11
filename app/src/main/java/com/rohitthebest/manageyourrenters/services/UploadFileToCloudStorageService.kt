@@ -63,7 +63,12 @@ class UploadFileToCloudStorageService : Service() {
 
         val pendingIntent: PendingIntent =
             Intent(this, HomeActivity::class.java).let { notificationIntent ->
-                notificationIntent.action = SHORTCUT_BORROWERS
+                notificationIntent.action = when (supportingDocumentHelperModel.modelName) {
+
+                    getString(R.string.borrowers) -> SHORTCUT_BORROWERS
+
+                    else -> ""
+                }
                 PendingIntent.getActivity(this, 0, notificationIntent, 0)
             }
 
@@ -141,6 +146,7 @@ class UploadFileToCloudStorageService : Service() {
                 )
 
                 val map = HashMap<String, Any?>()
+                map["supportingDocAdded"] = true
                 map["supportingDocument"] = supportingDocument
 
                 val docRef = FirebaseFirestore.getInstance()
@@ -159,6 +165,7 @@ class UploadFileToCloudStorageService : Service() {
                                 val borrower =
                                     borrowerRepository.getBorrowerByKey(documentKey).first()
 
+                                borrower.isSupportingDocAdded = true
                                 borrower.supportingDocument = supportingDocument
 
                                 borrowerRepository.update(borrower)

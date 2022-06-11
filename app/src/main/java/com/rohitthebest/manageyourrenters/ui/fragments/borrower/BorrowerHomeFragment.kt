@@ -11,9 +11,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.BorrowerAdapter
+import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -29,7 +32,8 @@ private const val TAG = "BorrowerHomeFragment"
 
 @AndroidEntryPoint
 class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
-    BorrowerAdapter.OnClickListener, CustomMenuItems.OnItemClickListener {
+    BorrowerAdapter.OnClickListener, CustomMenuItems.OnItemClickListener,
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
     private var _binding: FragmentBorrowerHomeBinding? = null
     private val binding get() = _binding!!
@@ -259,11 +263,92 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
     }
 
     override fun onReplaceSupportingDocumentClick() {
-        //TODO("Not yet implemented")
+
+        if (isInternetAvailable(requireContext())) {
+            if (::borrowerForMenus.isInitialized) {
+
+                val supportingDocumentHelperModel = SupportingDocumentHelperModel()
+                supportingDocumentHelperModel.modelName = getString(R.string.borrowers)
+
+                showSupportDocumentBottomSheetDialog(supportingDocumentHelperModel)
+            }
+        } else {
+
+            showNoInternetMessage(requireContext())
+        }
+
+    }
+
+    private fun showSupportDocumentBottomSheetDialog(supportingDocmtHelperModel: SupportingDocumentHelperModel) {
+
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+            supportingDocmtHelperModel.convertToJsonString()
+        )
+
+        requireActivity().supportFragmentManager.let {
+
+            SupportingDocumentDialogFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
+
+    override fun onBottomSheetDismissed(
+        isDocumentAdded: Boolean,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel
+    ) {
+
+        if (isInternetAvailable(requireContext())) {
+            if (isDocumentAdded) {
+
+                // call the viewmodel method for adding or replacing the document
+                borrowerViewModel.addOrReplaceBorrowerSupportingDocument(
+                    requireContext(),
+                    borrowerForMenus,
+                    supportingDocumentHelperModel
+                )
+            }
+        } else {
+
+            showNoInternetMessage(requireContext())
+        }
     }
 
     override fun onDeleteSupportingDocumentClick() {
-        //TODO("Not yet implemented")
+
+        if (::borrowerForMenus.isInitialized
+            && borrowerForMenus.isSupportingDocAdded
+            && borrowerForMenus.supportingDocument != null
+        ) {
+
+            if (borrowerForMenus.supportingDocument?.documentType != DocumentType.URL) {
+
+                if (!isInternetAvailable(requireContext())) {
+
+                    showToast(
+                        requireContext(),
+                        "Network connection required to delete the document from cloud"
+                    )
+                    return
+                } else {
+
+                    deleteFileFromFirebaseStorage(
+                        requireContext(),
+                        borrowerForMenus.supportingDocument?.documentUrl!!
+                    )
+                }
+            }
+            borrowerForMenus.supportingDocument = null
+            borrowerForMenus.isSupportingDocAdded = false
+            borrowerViewModel.updateBorrower(requireContext(), borrowerForMenus)
+            showToast(requireContext(), "Supporting Document deleted")
+
+        } else {
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+        }
     }
 
     override fun onSyncMenuClick() {}
@@ -295,4 +380,5 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         super.onDestroyView()
         _binding = null
     }
+
 }

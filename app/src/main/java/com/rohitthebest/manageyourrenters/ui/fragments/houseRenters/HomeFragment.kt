@@ -198,57 +198,22 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         findNavController().navigate(action)
     }
 
-    override fun onSyncButtonClicked(renter: Renter) {
-
-        if (isInternetAvailable(requireContext())) {
-
-            if (renter.isSynced == getString(R.string.t)) {
-
-                showToast(requireContext(), "Already Synced")
-            } else {
-
-                renterViewModel.updateRenter(requireContext(), renter)
-            }
-
-        } else {
-
-            showNoInternetMessage(requireContext())
-        }
-    }
-
-    override fun onDeleteClicked(renter: Renter) {
-
-        showAlertDialogForDeletion(
-            requireContext(),
-            {
-
-                if (isInternetAvailable(requireContext())) {
-
-                    renterViewModel.deleteRenter(requireContext(), renter)
-                } else {
-                    showNoInternetMessage(requireContext())
-                }
-
-                it.dismiss()
-            },
-            {
-
-                it.dismiss()
-            }
-        )
-    }
-
     private lateinit var renterForMenus: Renter
+    private var currentAdapterPosition = -1
 
-    override fun onEditClicked(renter: Renter) {
+    override fun onMenuButtonClicked(renter: Renter, position: Int) {
 
         renterForMenus = renter
+        currentAdapterPosition = position
 
         requireActivity().supportFragmentManager.let {
 
             val bundle = Bundle()
-            bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
-            bundle.putBoolean(Constants.SHOW_DELETE_MENU, false)
+            bundle.putBoolean(
+                Constants.SHOW_SYNC_MENU,
+                renterForMenus.isSynced == getString(R.string.t)
+            )
+            bundle.putBoolean(Constants.SHOW_DELETE_MENU, true)
             bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
             bundle.putBoolean(Constants.SHOW_EDIT_MENU, true)
 
@@ -274,7 +239,30 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     }
 
-    override fun onDeleteMenuClick() {}
+    override fun onDeleteMenuClick() {
+
+        if (::renterForMenus.isInitialized) {
+            showAlertDialogForDeletion(
+                requireContext(),
+                {
+
+                    if (isInternetAvailable(requireContext())) {
+
+                        renterViewModel.deleteRenter(requireContext(), renterForMenus)
+                    } else {
+                        showNoInternetMessage(requireContext())
+                    }
+
+                    it.dismiss()
+                },
+                {
+
+                    it.dismiss()
+                }
+            )
+        }
+
+    }
 
     override fun onViewSupportingDocumentMenuClick() {
 
@@ -385,7 +373,27 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     }
 
-    override fun onSyncMenuClick() {}
+    override fun onSyncMenuClick() {
+
+        if (::renterForMenus.isInitialized) {
+            if (isInternetAvailable(requireContext())) {
+
+                if (renterForMenus.isSynced == getString(R.string.t)) {
+
+                    showToast(requireContext(), "Already Synced")
+                } else {
+
+                    renterViewModel.updateRenter(requireContext(), renterForMenus)
+                    mAdapter.notifyItemChanged(currentAdapterPosition)
+                }
+
+            } else {
+
+                showNoInternetMessage(requireContext())
+            }
+        }
+
+    }
 
     //[END OF MENU CLICK LISTENERS]
 

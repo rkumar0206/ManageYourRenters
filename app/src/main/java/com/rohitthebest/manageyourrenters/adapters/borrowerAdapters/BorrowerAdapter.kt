@@ -25,9 +25,7 @@ class BorrowerAdapter :
 
         init {
 
-            binding.root.setOnClickListener(this)
-            binding.adapterIsSyncedBtn.setOnClickListener(this)
-            binding.adapterRenterDeleteBtn.setOnClickListener(this)
+            binding.renterAdapterCV.setOnClickListener(this)
             binding.adapterRenterEditBtn.setOnClickListener(this)
             binding.adapterRenterMobileTV.setOnClickListener(this)
         }
@@ -38,27 +36,17 @@ class BorrowerAdapter :
 
                 when (v?.id) {
 
-                    binding.root.id -> {
+                    binding.renterAdapterCV.id -> {
 
                         mListener!!.onBorrowerClicked(getItem(absoluteAdapterPosition).key)
                     }
 
-                    binding.adapterIsSyncedBtn.id -> {
+                    binding.adapterRenterEditBtn.id -> {
 
-                        mListener!!.onSyncButtonClicked(
+                        mListener!!.onMenuButtonClicked(
                             getItem(absoluteAdapterPosition),
                             absoluteAdapterPosition
                         )
-                    }
-
-                    binding.adapterRenterDeleteBtn.id -> {
-
-                        mListener!!.onDeleteClicked(getItem(absoluteAdapterPosition))
-                    }
-
-                    binding.adapterRenterEditBtn.id -> {
-
-                        mListener!!.onEditClicked(getItem(absoluteAdapterPosition))
                     }
 
                     binding.adapterRenterMobileTV.id -> {
@@ -85,6 +73,7 @@ class BorrowerAdapter :
 
                     if (b.totalDueAmount > 0) {
 
+                        // using room num tv for showing total due
                         adapterRoomNumTV.changeTextColor(
                             binding.root.context,
                             R.color.color_orange
@@ -118,22 +107,22 @@ class BorrowerAdapter :
                         )
                     }"
 
-                    if (b.totalDueAmount > 0.0) {
-
-                        root.strokeColor =
-                            ContextCompat.getColor(root.context, R.color.color_orange)
-                    } else {
-
-                        root.strokeColor =
-                            ContextCompat.getColor(root.context, R.color.colorGrey)
-                    }
-
                     if (b.isSynced) {
 
-                        binding.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                        binding.root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_green
+                            )
+                        )
                     } else {
 
-                        binding.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                        binding.root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_orange
+                            )
+                        )
                     }
                 }
             }
@@ -175,9 +164,7 @@ class BorrowerAdapter :
     interface OnClickListener {
 
         fun onBorrowerClicked(borrowerKey: String)
-        fun onSyncButtonClicked(borrower: Borrower, position: Int)
-        fun onDeleteClicked(borrower: Borrower)
-        fun onEditClicked(borrower: Borrower)
+        fun onMenuButtonClicked(borrower: Borrower, position: Int)
         fun onMobileNumberClicked(mobileNumber: String, view: View)
     }
 

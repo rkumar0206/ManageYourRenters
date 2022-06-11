@@ -106,6 +106,24 @@
             motion:layout_constraintHorizontal_bias="0.5"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintTop_toBottomOf="@+id/divider30" />
+        <Constraint
+            android:id="@+id/adapterRenterEditBtn"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="16dp"
+            motion:layout_constraintBottom_toBottomOf="@+id/adapterRoomNumTV"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/adapterRenterTimeTV"
+            motion:layout_constraintTop_toTopOf="@+id/adapterRoomNumTV" />
+        <Constraint
+            android:id="@+id/adapterRenterEditBtn"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="16dp"
+            motion:layout_constraintBottom_toBottomOf="@+id/adapterRoomNumTV"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/adapterRenterTimeTV"
+            motion:layout_constraintTop_toTopOf="@+id/adapterRoomNumTV" />
 
 
     </ConstraintSet>

@@ -138,81 +138,19 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         findNavController().navigate(action)
     }
 
-    override fun onSyncButtonClicked(borrower: Borrower, position: Int) {
-
-        if (isInternetAvailable(requireContext())) {
-
-            if (borrower.isSynced) {
-
-                showToast(requireContext(), "Already Synced")
-            } else {
-
-                borrower.isSynced = true
-
-                uploadDocumentToFireStore(
-                    requireContext(),
-                    getString(R.string.borrowers),
-                    borrower.key
-                )
-
-                borrowerViewModel.updateBorrower(requireContext(), borrower)
-
-                borrowerAdapter.notifyItemChanged(position)
-            }
-
-        } else {
-
-            showNoInternetMessage(requireContext())
-        }
-
-    }
-
-    override fun onDeleteClicked(borrower: Borrower) {
-
-        showAlertDialogForDeletion(
-            requireContext(),
-            positiveButtonListener = {
-
-                if (!borrower.isSynced) {
-
-                    borrowerViewModel.deleteBorrower(
-                        requireContext(),
-                        borrower
-                    )
-                } else {
-
-                    if (isInternetAvailable(requireContext())) {
-
-                        borrowerViewModel.deleteBorrower(
-                            requireContext(),
-                            borrower
-                        )
-                    } else {
-                        showNoInternetMessage(requireContext())
-                    }
-                }
-
-                it.dismiss()
-
-            },
-            negativeButtonListener = {
-
-                it.dismiss()
-            }
-        )
-    }
-
     private lateinit var borrowerForMenus: Borrower
+    private var currentAdapterPosition = -1
 
-    override fun onEditClicked(borrower: Borrower) {
+    override fun onMenuButtonClicked(borrower: Borrower, position: Int) {
 
         borrowerForMenus = borrower
+        currentAdapterPosition = position
 
         requireActivity().supportFragmentManager.let {
 
             val bundle = Bundle()
-            bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
-            bundle.putBoolean(Constants.SHOW_DELETE_MENU, false)
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, borrowerForMenus.isSynced)
+            bundle.putBoolean(Constants.SHOW_DELETE_MENU, true)
             bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
             bundle.putBoolean(Constants.SHOW_EDIT_MENU, true)
 
@@ -238,7 +176,41 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         }
     }
 
-    override fun onDeleteMenuClick() {}
+    override fun onDeleteMenuClick() {
+
+        showAlertDialogForDeletion(
+            requireContext(),
+            positiveButtonListener = {
+
+                if (!borrowerForMenus.isSynced) {
+
+                    borrowerViewModel.deleteBorrower(
+                        requireContext(),
+                        borrowerForMenus
+                    )
+                } else {
+
+                    if (isInternetAvailable(requireContext())) {
+
+                        borrowerViewModel.deleteBorrower(
+                            requireContext(),
+                            borrowerForMenus
+                        )
+                    } else {
+                        showNoInternetMessage(requireContext())
+                    }
+                }
+
+                it.dismiss()
+
+            },
+            negativeButtonListener = {
+
+                it.dismiss()
+            }
+        )
+
+    }
 
     override fun onViewSupportingDocumentMenuClick() {
 
@@ -351,7 +323,36 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         }
     }
 
-    override fun onSyncMenuClick() {}
+    override fun onSyncMenuClick() {
+
+        if (::borrowerForMenus.isInitialized) {
+            if (isInternetAvailable(requireContext())) {
+
+                if (borrowerForMenus.isSynced) {
+
+                    showToast(requireContext(), "Already Synced")
+                } else {
+
+                    borrowerForMenus.isSynced = true
+
+                    uploadDocumentToFireStore(
+                        requireContext(),
+                        getString(R.string.borrowers),
+                        borrowerForMenus.key
+                    )
+
+                    borrowerViewModel.updateBorrower(requireContext(), borrowerForMenus)
+
+                    borrowerAdapter.notifyItemChanged(currentAdapterPosition)
+                }
+
+            } else {
+
+                showNoInternetMessage(requireContext())
+            }
+        }
+
+    }
 
 
     //[END OF MENU CLICK LISTENERS]

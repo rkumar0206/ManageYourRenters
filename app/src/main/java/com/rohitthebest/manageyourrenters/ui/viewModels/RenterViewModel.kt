@@ -5,17 +5,17 @@ import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.DeletedRenter
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.repositories.DeletedRenterRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
-import com.rohitthebest.manageyourrenters.utils.deleteAllDocumentsUsingKeyFromFirestore
-import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
-import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -52,7 +52,11 @@ class RenterViewModel @Inject constructor(
 
     // ---------------------------------------------------------------
 
-    fun insertRenter(context: Context, renter: Renter) = viewModelScope.launch {
+    fun insertRenter(
+        context: Context,
+        renter: Renter,
+        supportDocumentHelper: SupportingDocumentHelperModel? = null
+    ) = viewModelScope.launch {
 
         if (isInternetAvailable(context)) {
 
@@ -63,6 +67,16 @@ class RenterViewModel @Inject constructor(
                 context.getString(R.string.renters),
                 renter.key!!
             )
+
+            if (supportDocumentHelper != null
+                && supportDocumentHelper.documentType != DocumentType.URL
+            ) {
+
+                supportDocumentHelper.modelName = context.getString(R.string.renters)
+                uploadFileToFirebaseCloudStorage(
+                    context, supportDocumentHelper, renter.key!!
+                )
+            }
         } else {
 
             renter.isSynced = context.getString(R.string.f)
@@ -97,6 +111,49 @@ class RenterViewModel @Inject constructor(
         repo.insertRenters(renters)
     }
 
+    fun addOrReplaceBorrowerSupportingDocument(
+        context: Context,
+        renter: Renter,
+        supportDocumentHelper: SupportingDocumentHelperModel
+    ) {
+
+        if (renter.supportingDocument != null && renter.supportingDocument?.documentType != DocumentType.URL) {
+
+            // if borrower contains supporting document previously, then call delete service also
+
+            deleteFileFromFirebaseStorage(
+                context,
+                renter.supportingDocument?.documentUrl!!
+            )
+        }
+
+        if (supportDocumentHelper.documentType == DocumentType.URL) {
+
+            val supportingDoc = SupportingDocument(
+                supportDocumentHelper.documentName,
+                supportDocumentHelper.documentUrl,
+                supportDocumentHelper.documentType
+            )
+
+            renter.isSupportingDocAdded = true
+            renter.supportingDocument = supportingDoc
+
+            updateRenter(context, renter)
+        } else {
+
+            if (renter.isSynced != context.getString(R.string.t)) {
+                insertRenter(context, renter, supportDocumentHelper)
+                return
+            }
+
+            supportDocumentHelper.modelName = context.getString(R.string.renters)
+            uploadFileToFirebaseCloudStorage(
+                context, supportDocumentHelper, renter.key!!
+            )
+        }
+    }
+
+
     fun deleteRenter(context: Context, renter: Renter) = viewModelScope.launch {
 
         val paymentKeys = paymentRepository.getPaymentKeysByRenterKey(renter.key!!)
@@ -110,6 +167,17 @@ class RenterViewModel @Inject constructor(
                 context.getString(R.string.renters),
                 renter.key!!
             )
+
+            if (renter.supportingDocument != null
+                && renter.supportingDocument?.documentType != DocumentType.URL
+            ) {
+
+                deleteFileFromFirebaseStorage(
+                    context,
+                    renter.supportingDocument?.documentUrl!!
+                )
+            }
+
 
             if (paymentKeys.isNotEmpty()) {
 

@@ -17,6 +17,7 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_BORROWERS
+import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_HOUSE_RENTERS
 import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY
 import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
@@ -66,6 +67,8 @@ class UploadFileToCloudStorageService : Service() {
                 notificationIntent.action = when (supportingDocumentHelperModel.modelName) {
 
                     getString(R.string.borrowers) -> SHORTCUT_BORROWERS
+
+                    getString(R.string.renters) -> SHORTCUT_HOUSE_RENTERS
 
                     else -> ""
                 }
@@ -157,22 +160,7 @@ class UploadFileToCloudStorageService : Service() {
 
                     if (updateDocumentOnFireStore(docRef, map)) {
 
-                        // insert to local database
-                        when (supportingDocumentHelperModel.modelName) {
-
-                            getString(R.string.borrowers) -> {
-
-                                val borrower =
-                                    borrowerRepository.getBorrowerByKey(documentKey).first()
-
-                                borrower.isSupportingDocAdded = true
-                                borrower.supportingDocument = supportingDocument
-
-                                borrowerRepository.update(borrower)
-
-                                updateFinalNotificationAndStopService()
-                            }
-                        }
+                        addSupportingDocumentDetailToLocalDb(supportingDocument)
                     }
                 }
 
@@ -195,6 +183,37 @@ class UploadFileToCloudStorageService : Service() {
             }
         )
 
+    }
+
+    private suspend fun addSupportingDocumentDetailToLocalDb(supportingDocument: SupportingDocument) {
+
+        // insert to local database
+        when (supportingDocumentHelperModel.modelName) {
+
+            getString(R.string.borrowers) -> {
+
+                val borrower =
+                    borrowerRepository.getBorrowerByKey(documentKey).first()
+
+                borrower.isSupportingDocAdded = true
+                borrower.supportingDocument = supportingDocument
+
+                borrowerRepository.update(borrower)
+
+                updateFinalNotificationAndStopService()
+            }
+
+            getString(R.string.renters) -> {
+
+                val renter = renterRepository.getRenterByKey(documentKey).first()
+
+                renter.isSupportingDocAdded = true
+                renter.supportingDocument = supportingDocument
+
+                renterRepository.updateRenter(renter)
+                updateFinalNotificationAndStopService()
+            }
+        }
     }
 
     private fun updateFinalNotificationAndStopService() {

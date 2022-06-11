@@ -118,12 +118,12 @@ class BorrowerViewModel @Inject constructor(
             updateBorrower(context, borrower)
         } else {
 
+            supportDocumentHelper.modelName = context.getString(R.string.borrowers)
+
             if (!borrower.isSynced) {
                 insertBorrower(context, borrower, supportDocumentHelper)
                 return
             }
-
-            supportDocumentHelper.modelName = context.getString(R.string.borrowers)
             uploadFileToFirebaseCloudStorage(
                 context, supportDocumentHelper, borrower.key
             )

@@ -22,6 +22,15 @@ class ShowRentersAdapter :
         RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
 
+        init {
+
+            binding.root.setOnClickListener(this)
+            binding.adapterIsSyncedBtn.setOnClickListener(this)
+            binding.adapterRenterEditBtn.setOnClickListener(this)
+            binding.adapterRenterDeleteBtn.setOnClickListener(this)
+            binding.adapterRenterMobileTV.setOnClickListener(this)
+        }
+
         @SuppressLint("SetTextI18n")
         fun setData(renter: Renter) {
 
@@ -64,15 +73,6 @@ class ShowRentersAdapter :
                     binding.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24)
                 }
             }
-        }
-
-        init {
-
-            binding.root.setOnClickListener(this)
-            binding.adapterIsSyncedBtn.setOnClickListener(this)
-            binding.adapterRenterEditBtn.setOnClickListener(this)
-            binding.adapterRenterDeleteBtn.setOnClickListener(this)
-            binding.adapterRenterMobileTV.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {

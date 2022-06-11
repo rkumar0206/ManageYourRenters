@@ -141,12 +141,12 @@ class RenterViewModel @Inject constructor(
             updateRenter(context, renter)
         } else {
 
+            supportDocumentHelper.modelName = context.getString(R.string.renters)
             if (renter.isSynced != context.getString(R.string.t)) {
                 insertRenter(context, renter, supportDocumentHelper)
                 return
             }
 
-            supportDocumentHelper.modelName = context.getString(R.string.renters)
             uploadFileToFirebaseCloudStorage(
                 context, supportDocumentHelper, renter.key!!
             )

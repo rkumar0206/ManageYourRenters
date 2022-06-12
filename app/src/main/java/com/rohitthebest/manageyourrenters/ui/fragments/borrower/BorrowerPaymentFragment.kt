@@ -1,7 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -112,7 +111,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
             if (it != null) {
                 receivedBorrower = it
-                Log.d(TAG, "getBorrower: received borrower : $receivedBorrower")
+                binding.borrowerPaymentToolbar.title = it.name
             }
         }
     }

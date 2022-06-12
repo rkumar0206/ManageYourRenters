@@ -6,9 +6,11 @@ import android.net.Uri
 import androidx.core.content.ContextCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DELETE_FILE_FROM_FIREBASE_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.FILE_NAME_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.FILE_URI_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
@@ -182,6 +184,23 @@ fun uploadFileToFirebaseStorage(
     foregroundServiceIntent.putExtra(FILE_NAME_KEY, fileInfo.second)
     foregroundServiceIntent.putExtra(UPLOAD_DATA_KEY, uploadDataInfo.first)
     foregroundServiceIntent.putExtra(COLLECTION_KEY, uploadDataInfo.second)
+
+    ContextCompat.startForegroundService(context, foregroundServiceIntent)
+}
+
+fun uploadFileToFirebaseCloudStorage(
+    context: Context,
+    supportingDocumentHelperModel: SupportingDocumentHelperModel,
+    documentKey: String
+) {
+
+    val foregroundServiceIntent = Intent(context, UploadFileToCloudStorageService::class.java)
+
+    foregroundServiceIntent.putExtra(
+        Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+        supportingDocumentHelperModel.convertToJsonString()
+    )
+    foregroundServiceIntent.putExtra(DOCUMENT_KEY, documentKey)
 
     ContextCompat.startForegroundService(context, foregroundServiceIntent)
 }

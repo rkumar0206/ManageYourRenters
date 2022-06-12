@@ -381,8 +381,10 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun initListeners() {
 
-        binding.backBtn.setOnClickListener(this)
-        binding.saveBtn.setOnClickListener(this)
+        binding.toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressed()
+        }
+
         includeBinding.seeTotalBtn.setOnClickListener(this)
         includeBinding.calculateElectrictyBtn.setOnClickListener(this)
 
@@ -392,21 +394,23 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         includeBinding.periodTypeRG.setOnCheckedChangeListener(this)
         includeBinding.dateContainer.setOnClickListener(this)
+
+        binding.toolbar.menu.findItem(R.id.menuSaveRenterPayment).setOnMenuItemClickListener {
+
+            if (validateForm()) {
+
+                calculateTotalBill()
+                showBillInBottomSheet()
+            }
+
+            true
+        }
     }
 
     @SuppressLint("SetTextI18n")
     override fun onClick(v: View?) {
 
         when (v?.id) {
-
-            binding.saveBtn.id -> {
-
-                if (validateForm()) {
-
-                    calculateTotalBill()
-                    showBillInBottomSheet()
-                }
-            }
 
             includeBinding.seeTotalBtn.id -> {
 
@@ -432,12 +436,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 }
 
             }
-
-            binding.backBtn.id -> {
-
-                requireActivity().onBackPressed()
-            }
-
         }
 
         if (v?.id == includeBinding.dateRangePickerBtn.id || v?.id == includeBinding.fromDateTV.id

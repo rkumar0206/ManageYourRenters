@@ -149,7 +149,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         requireActivity().supportFragmentManager.let {
 
             val bundle = Bundle()
-            bundle.putBoolean(Constants.SHOW_SYNC_MENU, borrowerForMenus.isSynced)
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !borrowerForMenus.isSynced)
             bundle.putBoolean(Constants.SHOW_DELETE_MENU, true)
             bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
             bundle.putBoolean(Constants.SHOW_EDIT_MENU, true)

@@ -211,7 +211,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
             val bundle = Bundle()
             bundle.putBoolean(
                 Constants.SHOW_SYNC_MENU,
-                renterForMenus.isSynced == getString(R.string.t)
+                renterForMenus.isSynced == getString(R.string.f)
             )
             bundle.putBoolean(Constants.SHOW_DELETE_MENU, true)
             bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, true)

@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <View
         android:id="@+id/divider2"
@@ -355,14 +356,14 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="16dp"
         android:padding="5dp"
         app:cardBackgroundColor="#F0F0F0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/interestCV"
+        app:layout_constraintTop_toBottomOf="@+id/addSupportingDocCB"
         app:strokeColor="@color/sky_blue"
         app:strokeWidth="1dp"
         tools:visibility="visible">
@@ -400,6 +401,30 @@
         android:text="@string/add_interest"
         app:layout_constraintStart_toStartOf="@+id/cardView6"
         app:layout_constraintTop_toBottomOf="@+id/cardView6" />
+
+    <CheckBox
+        android:id="@+id/addSupportingDocCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:padding="3dp"
+        android:text="@string/add_supporting_document"
+        app:layout_constraintStart_toStartOf="@+id/addInterestCB"
+        app:layout_constraintTop_toBottomOf="@+id/interestCV" />
+
+    <TextView
+        android:id="@+id/viewEditSupportingDoc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/view_edit"
+        android:textColor="@color/blue_text_color"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/addSupportingDocCB"
+        app:layout_constraintEnd_toEndOf="@+id/interestCV"
+        app:layout_constraintStart_toEndOf="@+id/addSupportingDocCB"
+        app:layout_constraintTop_toTopOf="@+id/addSupportingDocCB"
+        tools:visibility="visible" />
 
     <View
         android:id="@+id/divider37"

@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/color_white"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/color_white">
 
     <View
         android:id="@+id/divider2"
@@ -140,7 +140,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider4"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -416,7 +416,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -558,11 +558,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:ems="10"
-                android:maxLength="20"
                 android:gravity="center|center_vertical"
                 android:hint="@string/_0_0"
                 android:importantForAutofill="no"
                 android:inputType="numberDecimal"
+                android:maxLength="20"
                 android:minHeight="48dp"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="@+id/textView14"
@@ -636,9 +636,9 @@
                 android:ems="10"
                 android:gravity="center|center_vertical"
                 android:hint="@string/_0_0"
-                android:maxLength="20"
                 android:importantForAutofill="no"
                 android:inputType="numberDecimal"
+                android:maxLength="20"
                 android:minHeight="48dp"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/previousReadingET"
@@ -655,9 +655,9 @@
                 android:ems="10"
                 android:gravity="center"
                 android:hint="@string/_0_0"
-                android:maxLength="4"
                 android:importantForAutofill="no"
                 android:inputType="numberDecimal"
+                android:maxLength="4"
                 android:minHeight="48dp"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/currentReadingET"
@@ -794,7 +794,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView4">
+        app:layout_constraintTop_toBottomOf="@+id/cardView4"
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -870,11 +871,11 @@
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="2dp"
                 android:ems="10"
-                android:maxLength="7"
                 android:gravity="center"
                 android:hint="@string/amount"
                 android:importantForAutofill="no"
                 android:inputType="numberDecimal"
+                android:maxLength="7"
                 android:minHeight="48dp"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/extraFieldNameET"
@@ -894,7 +895,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider28">
+        app:layout_constraintTop_toBottomOf="@+id/divider28"
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -943,12 +945,12 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="2dp"
+                app:counterEnabled="true"
+                app:counterMaxLength="7"
                 app:errorEnabled="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:counterEnabled="true"
-                app:counterMaxLength="7"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider26">
 
@@ -957,8 +959,8 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
                     android:hint="@string/amount_paid"
-                    android:maxLength="7"
                     android:inputType="numberDecimal"
+                    android:maxLength="7"
                     android:textColor="@color/color_green" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -976,7 +978,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView6"
+        app:layout_constraintTop_toBottomOf="@+id/addSupportingDocCB"
         app:strokeColor="@color/sky_blue"
         app:strokeWidth="1dp">
 
@@ -992,10 +994,10 @@
                 android:ems="10"
                 android:gravity="start|top"
                 android:hint="@string/add_a_note_optional_n_n_n_n_n_n_n"
+                android:importantForAutofill="no"
                 android:inputType="textMultiLine"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:importantForAutofill="no"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -1018,7 +1020,8 @@
         android:layout_marginEnd="16dp"
         android:text="@string/see_total"
         app:layout_constraintEnd_toStartOf="@+id/totalTV"
-        app:layout_constraintTop_toBottomOf="@+id/divider27" />
+        app:layout_constraintTop_toBottomOf="@+id/divider27"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/totalTV"
@@ -1042,6 +1045,30 @@
         app:layout_constraintStart_toStartOf="@+id/seeTotalBtn"
         app:layout_constraintTop_toBottomOf="@+id/seeTotalBtn" />
 
+    <CheckBox
+        android:id="@+id/addSupportingDocCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:padding="3dp"
+        android:text="@string/add_supporting_document"
+        app:layout_constraintStart_toStartOf="@+id/cardView3"
+        app:layout_constraintTop_toBottomOf="@+id/cardView6" />
+
+    <TextView
+        android:id="@+id/viewEditSupportingDoc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/view_edit"
+        android:textColor="@color/blue_text_color"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/addSupportingDocCB"
+        app:layout_constraintEnd_toEndOf="@+id/cardView6"
+        app:layout_constraintStart_toEndOf="@+id/addSupportingDocCB"
+        app:layout_constraintTop_toTopOf="@+id/addSupportingDocCB"
+        tools:visibility="visible" />
+
     <View
         android:id="@+id/divider29"
         android:layout_width="match_parent"
@@ -1060,11 +1087,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:padding="4dp"
-        tools:text="Dues of last payments : +50"
         android:textSize="17sp"
         app:layout_constraintEnd_toEndOf="@+id/cardView5"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/cardView5"
-        app:layout_constraintTop_toBottomOf="@+id/cardView5" />
+        app:layout_constraintTop_toBottomOf="@+id/cardView5"
+        tools:text="Dues of last payments : +50"
+        tools:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

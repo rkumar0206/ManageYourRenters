@@ -302,7 +302,8 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         if (!includeBinding.totalEmiMonthsET.isTextValid()) {
 
-            includeBinding.emiNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+            includeBinding.totalEmiMonthsET.requestFocus()
+            includeBinding.totalEmiMonthsET.error = EDIT_TEXT_EMPTY_MESSAGE
             return false
         }
 

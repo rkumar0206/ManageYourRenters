@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.AdapterShowRenterBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.changeTextColor
 
 class ShowRentersAdapter :
     ListAdapter<Renter, ShowRentersAdapter.RenterViewHolder>(DiffUtilCallback()) {
@@ -22,6 +23,13 @@ class ShowRentersAdapter :
         RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
 
+        init {
+
+            binding.renterAdapterCV.setOnClickListener(this)
+            binding.adapterRenterEditBtn.setOnClickListener(this)
+            binding.adapterRenterMobileTV.setOnClickListener(this)
+        }
+
         @SuppressLint("SetTextI18n")
         fun setData(renter: Renter) {
 
@@ -29,12 +37,17 @@ class ShowRentersAdapter :
 
                 if (renter.dueOrAdvanceAmount < 0.0) {
 
-                    binding.renterAdapterCV.strokeColor =
-                        ContextCompat.getColor(binding.root.context, R.color.color_orange)
+                    binding.adapterRenterNameTV.changeTextColor(
+                        binding.root.context,
+                        R.color.color_orange
+                    )
+
                 } else {
 
-                    binding.renterAdapterCV.strokeColor =
-                        ContextCompat.getColor(binding.root.context, R.color.colorGrey)
+                    binding.adapterRenterNameTV.changeTextColor(
+                        binding.root.context,
+                        R.color.primaryTextColor
+                    )
                 }
 
                 binding.adapterRenterNameTV.text = renter.name
@@ -58,28 +71,29 @@ class ShowRentersAdapter :
 
                 if (renter.isSynced == binding.root.context.getString(R.string.t)) {
 
-                    binding.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                    binding.root.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            binding.root.context,
+                            R.color.color_green
+                        )
+                    )
                 } else {
 
-                    binding.adapterIsSyncedBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                    binding.root.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            binding.root.context,
+                            R.color.color_orange
+                        )
+                    )
                 }
             }
-        }
-
-        init {
-
-            binding.root.setOnClickListener(this)
-            binding.adapterIsSyncedBtn.setOnClickListener(this)
-            binding.adapterRenterEditBtn.setOnClickListener(this)
-            binding.adapterRenterDeleteBtn.setOnClickListener(this)
-            binding.adapterRenterMobileTV.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {
 
             when (v?.id) {
 
-                binding.root.id -> {
+                binding.renterAdapterCV.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
@@ -91,25 +105,12 @@ class ShowRentersAdapter :
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
-                        mListener!!.onEditClicked(getItem(absoluteAdapterPosition))
+                        mListener!!.onMenuButtonClicked(
+                            getItem(absoluteAdapterPosition),
+                            absoluteAdapterPosition
+                        )
                     }
 
-                }
-
-                binding.adapterRenterDeleteBtn.id -> {
-
-                    if (checkForNullability(absoluteAdapterPosition)) {
-
-                        mListener!!.onDeleteClicked(getItem(absoluteAdapterPosition))
-                    }
-                }
-
-                binding.adapterIsSyncedBtn.id -> {
-
-                    if (checkForNullability(absoluteAdapterPosition)) {
-
-                        mListener!!.onSyncButtonClicked(getItem(absoluteAdapterPosition))
-                    }
                 }
 
                 binding.adapterRenterMobileTV.id -> {
@@ -168,11 +169,7 @@ class ShowRentersAdapter :
     interface OnClickListener {
 
         fun onRenterClicked(renter: Renter)
-        fun onSyncButtonClicked(renter: Renter)
-
-        //fun onExtendInfoButtonClicked(renter : Renter)
-        fun onDeleteClicked(renter: Renter)
-        fun onEditClicked(renter: Renter)
+        fun onMenuButtonClicked(renter: Renter, position: Int)
         fun onMobileNumberClicked(mobileNumber: String, view: View)
     }
 

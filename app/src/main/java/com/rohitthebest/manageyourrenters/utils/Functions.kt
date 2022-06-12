@@ -515,7 +515,7 @@ class Functions {
                 else -> {
                     title = "Open url in browser"
                     message = "Description : ${supportingDoc.documentName}" +
-                            "\nUrl :  ${supportingDoc.documentUrl} in browser..."
+                            "\nUrl :  ${supportingDoc.documentUrl}"
                     positiveBtnText = "Open"
                 }
             }

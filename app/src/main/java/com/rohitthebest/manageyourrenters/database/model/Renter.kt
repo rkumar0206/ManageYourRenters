@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 
 @Entity(tableName = "renter_table")
 @IgnoreExtraProperties
@@ -22,6 +23,8 @@ data class Renter(
     var renterId: String,
     var renterPassword: String,
     var key: String?,
+    var isSupportingDocAdded: Boolean = false,
+    var supportingDocument: SupportingDocument? = null,
     var isSynced: String = "false"
 ) {
 
@@ -43,7 +46,10 @@ data class Renter(
         "",
         "",
         "",
-        ""
+        "",
+        false,
+        null,
+        "false"
     )
 
 }

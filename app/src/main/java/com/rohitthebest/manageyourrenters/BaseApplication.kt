@@ -24,7 +24,7 @@ class BaseApplication : Application() {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
                 "Adding contents to cloud database.",
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_LOW
             )
 
             val manager = getSystemService(NotificationManager::class.java)

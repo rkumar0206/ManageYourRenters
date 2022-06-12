@@ -5,14 +5,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditRenterBinding
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
@@ -24,8 +30,11 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
 import dagger.hilt.android.AndroidEntryPoint
 
+private const val TAG = "AddRenterFragment"
+
 @AndroidEntryPoint
-class AddRenterFragment : Fragment(), View.OnClickListener {
+class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnCheckedChangeListener,
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
     private val renterViewModel: RenterViewModel by viewModels()
 
@@ -38,6 +47,8 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
     //received for editing vars
     private var receivedRenter: Renter? = null
     private var isMessageReceivesForEditing = false
+
+    private lateinit var supportingDocmtHelperModel: SupportingDocumentHelperModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,6 +70,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
             WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                 selectedDate
             )
+        supportingDocmtHelperModel = SupportingDocumentHelperModel()
 
         getMessage()
         initListeners()
@@ -131,6 +143,9 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
 
             selectedDate = renter.timeStamp!!
         }
+
+        includeBinding.addSupportingDocCB.hide()
+        includeBinding.viewEditSupportingDoc.hide()
     }
 
     private fun initListeners() {
@@ -151,9 +166,62 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
         }
 
         includeBinding.dateAddedCalendarPickBtn.setOnClickListener(this)
-
         includeBinding.mobileNumCodePicker.registerCarrierNumberEditText(includeBinding.renterMobileNumberET)
+        includeBinding.addSupportingDocCB.setOnCheckedChangeListener(this)
+        includeBinding.viewEditSupportingDoc.setOnClickListener(this)
     }
+
+    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+
+        when (buttonView?.id) {
+
+            includeBinding.addSupportingDocCB.id -> {
+
+                if (isChecked) {
+
+                    supportingDocmtHelperModel = SupportingDocumentHelperModel()
+                    supportingDocmtHelperModel.modelName = getString(R.string.renters)
+                    showSupportDocumentBottomSheetDialog()
+                    includeBinding.viewEditSupportingDoc.show()
+                } else {
+
+                    includeBinding.viewEditSupportingDoc.hide()
+                }
+            }
+        }
+
+    }
+
+    private fun showSupportDocumentBottomSheetDialog() {
+
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+            supportingDocmtHelperModel.convertToJsonString()
+        )
+
+        requireActivity().supportFragmentManager.let {
+
+            SupportingDocumentDialogFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
+
+    override fun onBottomSheetDismissed(
+        isDocumentAdded: Boolean,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel
+    ) {
+
+        if (!isDocumentAdded) {
+            includeBinding.addSupportingDocCB.isChecked = false
+        } else {
+
+            supportingDocmtHelperModel = supportingDocumentHelperModel
+        }
+    }
+
 
     override fun onClick(v: View?) {
 
@@ -175,16 +243,21 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
                     }
                 )
             }
+
+            includeBinding.viewEditSupportingDoc.id -> {
+
+                showSupportDocumentBottomSheetDialog()
+            }
         }
     }
 
     private fun initRenterForDatabase() {
 
-        val renter = Renter()
+        var renter = Renter()
 
         if (isMessageReceivesForEditing) {
 
-            renter.id = receivedRenter?.id
+            renter = receivedRenter!!
         }
 
         renter.modified = System.currentTimeMillis()
@@ -224,17 +297,63 @@ class AddRenterFragment : Fragment(), View.OnClickListener {
                 if (!isMessageReceivesForEditing) 0.0 else receivedRenter?.dueOrAdvanceAmount!!
 
             isSynced = getString(R.string.f)
+
+            if (!isMessageReceivesForEditing && includeBinding.addSupportingDocCB.isChecked) {
+
+                isSupportingDocAdded = true
+
+                if (supportingDocmtHelperModel.documentType == DocumentType.URL) {
+
+                    supportingDocument = SupportingDocument(
+                        supportingDocmtHelperModel.documentName,
+                        supportingDocmtHelperModel.documentUrl,
+                        supportingDocmtHelperModel.documentType
+                    )
+                }
+            }
+
         }
 
-        if (isMessageReceivesForEditing) {
+        if (!isMessageReceivesForEditing
+            && renter.isSupportingDocAdded
+            && supportingDocmtHelperModel.documentType != DocumentType.URL
+        ) {
 
-            renterViewModel.updateRenter(requireContext(), renter)
+            // if the document type is not URL, then we need internet connection to upload the uri
+            if (!Functions.isInternetAvailable(requireContext())) {
+                showToast(
+                    requireContext(),
+                    getString(R.string.internet_required_message_for_uploading_doc),
+                    Toast.LENGTH_LONG
+                )
+                return
+            }
+        }
+
+        insertRenterToDatabase(renter)
+    }
+
+    private fun insertRenterToDatabase(renter: Renter) {
+
+        if (!isMessageReceivesForEditing) {
+
+            // insert
+            if (renter.isSupportingDocAdded && renter.supportingDocument?.documentType != DocumentType.URL)
+                renterViewModel.insertRenter(
+                    requireContext(),
+                    renter,
+                    supportingDocmtHelperModel
+                )
+            else
+                renterViewModel.insertRenter(requireContext(), renter)
+
+            showToast(requireContext(), "Renter added")
         } else {
-
-            renterViewModel.insertRenter(requireContext(), renter)
+            // update
+            renterViewModel.updateRenter(requireContext(), renter)
+            showToast(requireContext(), "Renter info updated")
         }
 
-        showToast(requireContext(), "Renter saved")
         requireActivity().onBackPressed()
     }
 

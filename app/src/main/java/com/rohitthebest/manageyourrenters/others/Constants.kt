@@ -41,6 +41,7 @@ object Constants {
     const val CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_KEY = "sbjsbbhjsbhbyguqyJBABBHJBkbnd"
 
     const val SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY = "dcsnckjkscn"
+    const val SUPPORTING_DOCUMENT_HELPER_MODEL_KEY = "dsbjsbjhbuyavvu"
 
     const val SHOW_EDIT_MENU = "SHOW_EDIT_MENU_sjcjwncjkn"
     const val SHOW_DOCUMENTS_MENU = "SHOW_DOCUMENTS_MENU_sjcjwncacacn"

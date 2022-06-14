@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -259,11 +260,25 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
         if (borrowerPaymentForMenus != null) {
 
-            val action =
-                BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
-                    receivedBorrowerKey, borrowerPaymentForMenus?.key
+
+            // checking if the borrower payment already contains some partial payment or not
+            // if it contains at least one partial payment then user cannot edit the payment
+
+            if (borrowerPaymentForMenus!!.dueLeftAmount < borrowerPaymentForMenus!!.amountTakenOnRent) {
+
+                showToast(
+                    requireContext(),
+                    getString(R.string.this_payment_already_has_some_partial_payments),
+                    Toast.LENGTH_LONG
                 )
-            findNavController().navigate(action)
+            } else {
+
+                val action =
+                    BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
+                        receivedBorrowerKey, borrowerPaymentForMenus?.key
+                    )
+                findNavController().navigate(action)
+            }
         }
 
     }

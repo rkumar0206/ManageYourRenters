@@ -9,24 +9,16 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.data.Interest
-import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
-import com.rohitthebest.manageyourrenters.data.InterestTimeSchedule
-import com.rohitthebest.manageyourrenters.data.InterestType
+import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.AddBorrowerPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_TAG_KEY
-import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
-import com.rohitthebest.manageyourrenters.others.Constants.IS_DOCUMENT_FOR_EDITING_KEY
-import com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBottomSheetFragment
+import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -38,15 +30,13 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
-private const val TAG = "AddBorrowerPaymentFragm"
+private const val TAG = "AddBorrowerPaymentFragment"
 
 @AndroidEntryPoint
 class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payment),
     CompoundButton.OnCheckedChangeListener, RadioGroup.OnCheckedChangeListener,
-    View.OnClickListener, AddSupportingDocumentBottomSheetFragment.OnBottomSheetDismissListener {
+    View.OnClickListener, SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
     private var _binding: FragmentAddBorrowerPaymentBinding? = null
     private val binding get() = _binding!!
@@ -69,6 +59,8 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
     private var selectedDate: Long = 0L
     private var interestType: InterestType = InterestType.SIMPLE_INTEREST
 
+    private lateinit var supportingDocmtHelperModel: SupportingDocumentHelperModel
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAddBorrowerPaymentBinding.bind(view)
@@ -81,29 +73,14 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         currencySymbols = resources.getStringArray(R.array.currency_symbol).toList()
         interestTimeSchedules = resources.getStringArray(R.array.interest_time_schedule).toList()
 
+        supportingDocmtHelperModel = SupportingDocumentHelperModel()
+
         initUI()
 
         getMessage()  // getting the message passed by thr BorrowerPaymentFragment
 
         initListeners()
         textWatchers()
-        observeForSupportingDocumentBottomSheetDismissListener()
-    }
-
-    private fun observeForSupportingDocumentBottomSheetDismissListener() {
-
-        findNavController()
-            .currentBackStackEntry
-            ?.savedStateHandle
-            ?.getLiveData<Boolean>(Constants.SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY)
-            ?.observe(viewLifecycleOwner) {
-
-                if (it) {
-
-                    //todo : call back pressed
-                    Log.d(TAG, "observeForSupportingDocumentBottomSheetDismissListener: $it")
-                }
-            }
     }
 
     private fun getMessage() {
@@ -126,9 +103,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                     isMessageReceivedForEditing = true
                     getBorrowerPayment(borrowerPaymentKey!!)
                 }
-
             }
-
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -242,6 +217,8 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private fun initListeners() {
 
+        includeBinding.addSupportingDocCB.isChecked = false
+
         includeBinding.selectDateBtn.setOnClickListener(this)
         includeBinding.dateTV.setOnClickListener(this)
         includeBinding.calculateInterestBtn.setOnClickListener(this)
@@ -256,14 +233,15 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         binding.addBorrowerPaymentToolBar.menu.findItem(R.id.menu_save_btn)
             .setOnMenuItemClickListener {
-
-                Log.d(TAG, "initListeners: Menu item clicked")
                 if (isFormValid()) {
 
                     initBorrowerPayment()
                 }
                 true
             }
+
+        includeBinding.addSupportingDocCB.setOnCheckedChangeListener(this)
+        includeBinding.viewEditSupportingDoc.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
@@ -289,32 +267,113 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
                 if (isFormValid()) {
 
-                    val interestCalculatorFields = InterestCalculatorFields(
-                        selectedDate,
-                        includeBinding.borrowerAmountET.editText?.text.toString().toDouble(),
-                        Interest(
-                            if (includeBinding.interestTypeRG.checkedRadioButtonId == includeBinding.simpleIntRB.id) {
+                    handleCalculateInterestBtn()
+                }
+            }
 
-                                InterestType.SIMPLE_INTEREST
-                            } else {
-                                InterestType.COMPOUND_INTEREST
-                            },
-                            includeBinding.ratePercentET.text.toString().toDouble(),
-                            selectedInterestTimeSchedule
-                        ),
-                        calculateNumberOfDays(selectedDate, System.currentTimeMillis())
-                    )
+            includeBinding.viewEditSupportingDoc.id -> {
 
-                    val action =
-                        AddBorrowerPaymentFragmentDirections.actionAddBorrowerPaymentFragmentToCalculateInterestBottomSheetFragment(
-                            interestCalculatorFields.convertToJsonString()
-                        )
+                showSupportDocumentBottomSheetDialog()
+            }
+        }
+    }
 
-                    findNavController().navigate(action)
+    private fun handleCalculateInterestBtn() {
+
+        val interestCalculatorFields = InterestCalculatorFields(
+            selectedDate,
+            includeBinding.borrowerAmountET.editText?.text.toString().toDouble(),
+            Interest(
+                if (includeBinding.interestTypeRG.checkedRadioButtonId == includeBinding.simpleIntRB.id) {
+
+                    InterestType.SIMPLE_INTEREST
+                } else {
+                    InterestType.COMPOUND_INTEREST
+                },
+                includeBinding.ratePercentET.text.toString().toDouble(),
+                selectedInterestTimeSchedule
+            ),
+            calculateNumberOfDays(selectedDate, System.currentTimeMillis())
+        )
+
+        val action =
+            AddBorrowerPaymentFragmentDirections.actionAddBorrowerPaymentFragmentToCalculateInterestBottomSheetFragment(
+                interestCalculatorFields.convertToJsonString()
+            )
+
+        findNavController().navigate(action)
+    }
+
+    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+
+        hideKeyBoard(requireActivity())
+
+        when (buttonView?.id) {
+
+            includeBinding.addInterestCB.id -> showInterestCardView(isChecked)
+
+            includeBinding.addSupportingDocCB.id -> {
+
+                if (isChecked) {
+
+                    includeBinding.viewEditSupportingDoc.show()
+                    supportingDocmtHelperModel = SupportingDocumentHelperModel()
+                    supportingDocmtHelperModel.modelName = getString(R.string.borrowerPayments)
+                    showSupportDocumentBottomSheetDialog()
+                } else {
+
+                    includeBinding.viewEditSupportingDoc.hide()
                 }
             }
         }
     }
+
+    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+        hideKeyBoard(requireActivity())
+
+        when (checkedId) {
+
+            includeBinding.simpleIntRB.id -> {
+
+                interestType = InterestType.SIMPLE_INTEREST
+            }
+
+            includeBinding.compundIntRB.id -> {
+                interestType = InterestType.COMPOUND_INTEREST
+            }
+        }
+    }
+
+    private fun showSupportDocumentBottomSheetDialog() {
+
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+            supportingDocmtHelperModel.convertToJsonString()
+        )
+
+        requireActivity().supportFragmentManager.let {
+
+            SupportingDocumentDialogFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
+
+    override fun onBottomSheetDismissed(
+        isDocumentAdded: Boolean,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel
+    ) {
+
+        if (!isDocumentAdded) {
+            includeBinding.addSupportingDocCB.isChecked = false
+        } else {
+
+            supportingDocmtHelperModel = supportingDocumentHelperModel
+        }
+    }
+
 
     private fun isFormValid(): Boolean {
 
@@ -352,8 +411,10 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         if (isMessageReceivedForEditing) {
 
-            borrowerPayment = receivedBorrowerPayment!!
+            borrowerPayment = receivedBorrowerPayment!!.copy()
         }
+
+        Log.d(TAG, "initBorrowerPayment: $borrowerPayment")
 
         borrowerPayment.modified = System.currentTimeMillis()
         borrowerPayment.isSynced = false
@@ -366,6 +427,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 includeBinding.borrowerAmountET.editText?.text.toString().toDouble()
 
             isInterestAdded = includeBinding.addInterestCB.isChecked
+            dueLeftAmount = amountTakenOnRent
 
             interest = if (isInterestAdded) {
 
@@ -383,136 +445,117 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 borrowerKey = receivedBorrowerKey
                 uid = getUid()!!
                 key = generateKey("_${uid}")
-                dueLeftAmount = amountTakenOnRent
                 isDueCleared = false
+
+                if (includeBinding.addSupportingDocCB.isChecked) {
+
+                    isSupportingDocAdded = true
+
+                    if (supportingDocmtHelperModel.documentType == DocumentType.URL) {
+
+                        supportingDocument = SupportingDocument(
+                            supportingDocmtHelperModel.documentName,
+                            supportingDocmtHelperModel.documentUrl,
+                            supportingDocmtHelperModel.documentType
+                        )
+                    }
+                }
             }
 
             messageOrNote = includeBinding.addNoteET.text.toString()
         }
 
-        showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(borrowerPayment)
-    }
+        if (!isMessageReceivedForEditing
+            && borrowerPayment.isSupportingDocAdded
+            && supportingDocmtHelperModel.documentType != DocumentType.URL
+        ) {
 
-    private fun showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(borrowerPayment: BorrowerPayment) {
-
-        // showing dialog if the user wants to upload any supporting document
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Add supporting document")
-            .setMessage("Do you want to add any supporting document?")
-            .setPositiveButton("No") { dialog, _ ->
-
-                // if user selects no, then simply insert the borrower payment to the cloud as well
-                // as local database
-                insertToDatabase(borrowerPayment)
-                dialog.dismiss()
+            // if the document type is not URL, then we need internet connection to upload the uri
+            if (!isInternetAvailable(requireContext())) {
+                showToast(
+                    requireContext(),
+                    getString(R.string.internet_required_message_for_uploading_doc),
+                    Toast.LENGTH_LONG
+                )
+                return
             }
-            .setNegativeButton("Yes") { dialog, _ ->
-
-                // opening  bottomSheet for adding supporting document
-                // and also sending this borrower payment instance and the collection name
-                // as a bundle to the bottomSheet arguments
-                // if the user adds a supporting document then insertion of borrower payment
-                // to the database will be done there only
-
-                if (isInternetAvailable(requireContext())) {
-
-                    requireActivity().supportFragmentManager.let {
-
-                        val bundle = Bundle()
-                        bundle.putString(COLLECTION_TAG_KEY, getString(R.string.borrowerPayments))
-                        bundle.putString(DOCUMENT_KEY, fromBorrowerPaymentToString(borrowerPayment))
-                        bundle.putBoolean(IS_DOCUMENT_FOR_EDITING_KEY, false)
-
-                        AddSupportingDocumentBottomSheetFragment.newInstance(
-                            bundle
-                        ).apply {
-                            show(it, "AddSupportingDocTag")
-                        }.setOnBottomSheetDismissListener(this)
-                    }
-
-                } else {
-
-                    showToast(
-                        requireContext(),
-                        getString(R.string.internet_required_message_for_uploading_doc),
-                        Toast.LENGTH_LONG
-                    )
-                }
-
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-    }
-
-    override fun onBottomSheetDismissed(isDocumentAdded: Boolean) {
-
-        Log.d(TAG, "onBottomSheetDismissed: $isDocumentAdded")
-
-        if (isDocumentAdded) {
-
-            requireActivity().onBackPressed()
         }
-    }
 
+        insertToDatabase(borrowerPayment)
+    }
 
     private fun insertToDatabase(borrowerPayment: BorrowerPayment) {
 
-        Log.d(TAG, "insertToDatabase: ")
+        if (!isMessageReceivedForEditing) {
 
-        borrowerPayment.isSupportingDocAdded = false
-        if (isInternetAvailable(requireContext())) {
+            // insert
+            if (isInternetAvailable(requireContext())) {
 
-            borrowerPayment.isSynced = true
+                borrowerPayment.isSynced = true
 
-            uploadDocumentToFireStore(
-                requireContext(),
-                getString(R.string.borrowerPayments),
-                borrowerPayment.key
-            )
+                uploadDocumentToFireStore(
+                    requireContext(),
+                    getString(R.string.borrowerPayments),
+                    borrowerPayment.key
+                )
+
+                if (borrowerPayment.isSupportingDocAdded && supportingDocmtHelperModel.documentType != DocumentType.URL
+                ) {
+                    supportingDocmtHelperModel.modelName = getString(R.string.borrowerPayments)
+                    uploadFileToFirebaseCloudStorage(
+                        requireContext(), supportingDocmtHelperModel, borrowerPayment.key
+                    )
+                }
+
+            } else {
+
+                borrowerPayment.isSynced = false
+            }
+
+            borrowerPaymentViewModel.insertBorrowerPayment(requireContext(), borrowerPayment)
+
+            showToast(requireContext(), getString(R.string.payment_added))
+
         } else {
 
-            borrowerPayment.isSynced = false
-        }
+            // update
+            if (isInternetAvailable(requireContext())) {
 
-        borrowerPaymentViewModel.insertBorrowerPayment(
-            requireContext(), borrowerPayment
-        )
+                borrowerPayment.isSynced = true
 
-        lifecycleScope.launch {
+                if (!receivedBorrowerPayment!!.isSynced) {
 
-            delay(100)
+                    uploadDocumentToFireStore(
+                        requireContext(),
+                        getString(R.string.borrowerPayments),
+                        borrowerPayment.key
+                    )
+                } else {
 
-            requireActivity().onBackPressed()
-        }
-    }
+                    val map =
+                        compareBorrowerPaymentModel(receivedBorrowerPayment!!, borrowerPayment)
 
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+                    Log.d(TAG, "insertToDatabase: update map :  $map")
 
-        hideKeyBoard(requireActivity())
+                    if (map.isNotEmpty()) {
 
-        when (buttonView?.id) {
-
-            includeBinding.addInterestCB.id -> showInterestCardView(isChecked)
-
-        }
-
-    }
-
-    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
-        hideKeyBoard(requireActivity())
-
-        when (checkedId) {
-
-            includeBinding.simpleIntRB.id -> {
-
-                interestType = InterestType.SIMPLE_INTEREST
+                        updateDocumentOnFireStore(
+                            requireContext(),
+                            map,
+                            getString(R.string.borrowerPayments),
+                            borrowerPayment.key
+                        )
+                    }
+                }
+            } else {
+                borrowerPayment.isSynced = false
             }
 
-            includeBinding.compundIntRB.id -> {
-                interestType = InterestType.COMPOUND_INTEREST
-            }
+            borrowerPaymentViewModel.updateBorrowerPayment(borrowerPayment)
+            showToast(requireContext(), getString(R.string.payment_updated))
         }
+
+        requireActivity().onBackPressed()
     }
 
     private fun textWatchers() {

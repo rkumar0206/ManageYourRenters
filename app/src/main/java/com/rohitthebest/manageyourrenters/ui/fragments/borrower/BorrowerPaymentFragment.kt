@@ -94,7 +94,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                 lifecycleScope.launch {
 
-                    delay(200)
+                    delay(300)
 
                     getBorrower()
                     getBorrowerPayments()

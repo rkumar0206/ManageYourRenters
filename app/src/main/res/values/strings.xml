@@ -260,6 +260,9 @@
     <string name="edit_payment">Edit payment</string>
     <string name="this_payment_already_has_some_partial_payments">This payment already has some partial payments.</string>
     <string name="please_enter_amount_grater_than_0">Please enter amount greater than 0.</string>
+    <string name="payment_added">Payment Added</string>
+    <string name="payment_updated">Payment updated</string>
+    <string name="uploading_supporting_document_to_cloud">Uploading supporting document to cloud.</string>
 
     <string-array name="interest_time_schedule">
 

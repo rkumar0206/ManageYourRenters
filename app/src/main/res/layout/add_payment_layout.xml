@@ -886,7 +886,7 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView6"
+        android:id="@+id/borrowerAmountCV"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -1053,7 +1053,7 @@
         android:padding="3dp"
         android:text="@string/add_supporting_document"
         app:layout_constraintStart_toStartOf="@+id/cardView3"
-        app:layout_constraintTop_toBottomOf="@+id/cardView6" />
+        app:layout_constraintTop_toBottomOf="@+id/borrowerAmountCV" />
 
     <TextView
         android:id="@+id/viewEditSupportingDoc"
@@ -1064,7 +1064,7 @@
         android:textColor="@color/blue_text_color"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/addSupportingDocCB"
-        app:layout_constraintEnd_toEndOf="@+id/cardView6"
+        app:layout_constraintEnd_toEndOf="@+id/borrowerAmountCV"
         app:layout_constraintStart_toEndOf="@+id/addSupportingDocCB"
         app:layout_constraintTop_toTopOf="@+id/addSupportingDocCB"
         tools:visibility="visible" />

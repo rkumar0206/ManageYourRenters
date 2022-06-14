@@ -75,6 +75,10 @@
         <action
             android:id="@+id/action_addBorrowerPaymentFragment_to_calculateInterestBottomSheetFragment"
             app:destination="@id/calculateInterestBottomSheetFragment" />
+        <argument
+            android:name="borrowerPaymentKey"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <dialog
         android:id="@+id/addPartialPaymentFragment"

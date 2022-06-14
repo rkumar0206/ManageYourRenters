@@ -56,6 +56,9 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private var receivedBorrower: Borrower? = null
     private var receivedBorrowerKey: String = ""
+    private var receivedBorrowerPayment: BorrowerPayment? = null
+
+    private var isMessageReceivedForEditing = false
 
     private lateinit var includeBinding: AddBorrowerPaymentLayoutBinding
     private lateinit var currencySymbols: List<String>
@@ -115,13 +118,79 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
                 }
 
                 receivedBorrowerKey = args?.borrowerKeyMessage!!
-                    getBorrower()
+                getBorrower()
+
+                val borrowerPaymentKey = args.borrowerPaymentKey
+                if (borrowerPaymentKey.isValid()) {
+
+                    isMessageReceivedForEditing = true
+                    getBorrowerPayment(borrowerPaymentKey!!)
+                }
 
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun getBorrowerPayment(borrowerPaymentKey: String) {
+
+        borrowerPaymentViewModel.getBorrowerPaymentByKey(borrowerPaymentKey)
+            .observe(viewLifecycleOwner) { payment ->
+
+                receivedBorrowerPayment = payment
+
+                updateUI()
+            }
+    }
+
+    private fun updateUI() {
+
+        binding.addBorrowerPaymentToolBar.title = getString(R.string.edit_payment)
+
+        if (receivedBorrowerPayment != null) {
+
+            includeBinding.moneySymbolSpinner.setSelection(
+                currencySymbols.indexOf(
+                    receivedBorrowerPayment!!.currencySymbol
+                )
+            )
+            selectedDate = receivedBorrowerPayment!!.created
+            includeBinding.dateTV.setDateInTextView(selectedDate)
+            includeBinding.borrowerAmountET.editText?.setText(receivedBorrowerPayment!!.amountTakenOnRent.toString())
+
+            // interest
+            if (receivedBorrowerPayment!!.isInterestAdded) {
+
+                includeBinding.addInterestCB.isChecked = true
+                onCheckedChanged(includeBinding.addInterestCB, true)
+
+                includeBinding.timeScheduleSpinner.setSelection(
+                    when (receivedBorrowerPayment!!.interest?.timeSchedule) {
+
+                        InterestTimeSchedule.ANNUALLY -> 0
+                        InterestTimeSchedule.MONTHLY -> 1
+                        InterestTimeSchedule.DAILY -> 2
+                        else -> 0
+                    }
+                )
+                if (receivedBorrowerPayment!!.interest?.type == InterestType.SIMPLE_INTEREST) {
+
+                    includeBinding.interestTypeRG.check(includeBinding.simpleIntRB.id)
+                } else {
+
+                    includeBinding.interestTypeRG.check(includeBinding.compundIntRB.id)
+                }
+
+                includeBinding.ratePercentET.setText(receivedBorrowerPayment!!.interest?.ratePercent.toString())
+            }
+            includeBinding.addNoteET.setText(receivedBorrowerPayment!!.messageOrNote)
+
+            includeBinding.addSupportingDocCB.hide()
+            includeBinding.viewEditSupportingDoc.hide()
+        }
+
     }
 
     private fun getBorrower() {
@@ -139,10 +208,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private fun initUI() {
 
-        includeBinding.dateTV.text =
-            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
-                selectedDate, "dd-MMMM-yyyy"
-            )
+        includeBinding.dateTV.setDateInTextView(selectedDate)
 
         setUpCurrencySymbolSpinner()
         setUpTimeScheduleSpinner()
@@ -225,7 +291,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
                     val interestCalculatorFields = InterestCalculatorFields(
                         selectedDate,
-                        includeBinding.borrowerPaymentET.editText?.text.toString().toDouble(),
+                        includeBinding.borrowerAmountET.editText?.text.toString().toDouble(),
                         Interest(
                             if (includeBinding.interestTypeRG.checkedRadioButtonId == includeBinding.simpleIntRB.id) {
 
@@ -252,15 +318,16 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private fun isFormValid(): Boolean {
 
-        if (!includeBinding.borrowerPaymentET.editText?.isTextValid()!!) {
+        if (!includeBinding.borrowerAmountET.editText?.isTextValid()!!) {
 
-            includeBinding.borrowerPaymentET.error = EDIT_TEXT_EMPTY_MESSAGE
+            includeBinding.borrowerAmountET.error = EDIT_TEXT_EMPTY_MESSAGE
             return false
         }
 
-        if (includeBinding.borrowerPaymentET.editText?.text.toString().toDouble() <= 0) {
+        if (includeBinding.borrowerAmountET.editText?.text.toString().toDouble() <= 0) {
 
-            includeBinding.borrowerPaymentET.error = "Please enter amount greater than 0."
+            includeBinding.borrowerAmountET.error =
+                getString(R.string.please_enter_amount_grater_than_0)
             return false
         }
 
@@ -274,42 +341,51 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             }
         }
 
-        return includeBinding.borrowerPaymentET.editText?.isTextValid()!!
+        return includeBinding.borrowerAmountET.editText?.isTextValid()!!
     }
 
     private fun initBorrowerPayment() {
 
         Log.d(TAG, "initBorrowerPayment: ")
 
-        val borrowerPayment = BorrowerPayment()
+        var borrowerPayment = BorrowerPayment()
+
+        if (isMessageReceivedForEditing) {
+
+            borrowerPayment = receivedBorrowerPayment!!
+        }
 
         borrowerPayment.modified = System.currentTimeMillis()
         borrowerPayment.isSynced = false
-        borrowerPayment.currencySymbol = selectedCurrencySymbol
 
         borrowerPayment.apply {
             created = selectedDate
-            borrowerId = receivedBorrower?.borrowerId!!
-            borrowerKey = receivedBorrowerKey
+
+            currencySymbol = selectedCurrencySymbol
             amountTakenOnRent =
-                includeBinding.borrowerPaymentET.editText?.text.toString().toDouble()
-            dueLeftAmount = amountTakenOnRent
-            isDueCleared = false
+                includeBinding.borrowerAmountET.editText?.text.toString().toDouble()
 
             isInterestAdded = includeBinding.addInterestCB.isChecked
 
-            if (isInterestAdded) {
+            interest = if (isInterestAdded) {
 
-                interest = Interest(
+                Interest(
                     interestType,
                     includeBinding.ratePercentET.text.toString().toDouble(),
                     selectedInterestTimeSchedule
                 )
+            } else {
+                null
             }
+            if (!isMessageReceivedForEditing) {
 
-            uid = getUid()!!
-
-            key = generateKey("_${uid}")
+                borrowerId = receivedBorrower?.borrowerId!!
+                borrowerKey = receivedBorrowerKey
+                uid = getUid()!!
+                key = generateKey("_${uid}")
+                dueLeftAmount = amountTakenOnRent
+                isDueCleared = false
+            }
 
             messageOrNote = includeBinding.addNoteET.text.toString()
         }
@@ -441,14 +517,14 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
     private fun textWatchers() {
 
-        includeBinding.borrowerPaymentET.editText?.onTextChangedListener { s ->
+        includeBinding.borrowerAmountET.editText?.onTextChangedListener { s ->
 
             if (s?.trim()?.isEmpty()!!) {
 
-                includeBinding.borrowerPaymentET.error = EDIT_TEXT_EMPTY_MESSAGE
+                includeBinding.borrowerAmountET.error = EDIT_TEXT_EMPTY_MESSAGE
             } else {
 
-                includeBinding.borrowerPaymentET.error = null
+                includeBinding.borrowerAmountET.error = null
             }
         }
 

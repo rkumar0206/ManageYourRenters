@@ -63,7 +63,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                 val action =
                     BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
-                        receivedBorrowerKey
+                        receivedBorrowerKey, ""
                     )
                 findNavController().navigate(action)
             }
@@ -256,7 +256,16 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     }
 
     override fun onEditMenuClick() {
-        //TODO("Not yet implemented")
+
+        if (borrowerPaymentForMenus != null) {
+
+            val action =
+                BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
+                    receivedBorrowerKey, borrowerPaymentForMenus?.key
+                )
+            findNavController().navigate(action)
+        }
+
     }
 
     override fun onDeleteMenuClick() {

@@ -98,7 +98,7 @@
         app:layout_constraintTop_toBottomOf="@+id/dateTV" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView6"
+        android:id="@+id/borrowerAmountCV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -151,7 +151,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView18" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/borrowerPaymentET"
+                android:id="@+id/borrowerAmountET"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -399,8 +399,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/add_interest"
-        app:layout_constraintStart_toStartOf="@+id/cardView6"
-        app:layout_constraintTop_toBottomOf="@+id/cardView6" />
+        app:layout_constraintStart_toStartOf="@+id/borrowerAmountCV"
+        app:layout_constraintTop_toBottomOf="@+id/borrowerAmountCV" />
 
     <CheckBox
         android:id="@+id/addSupportingDocCB"

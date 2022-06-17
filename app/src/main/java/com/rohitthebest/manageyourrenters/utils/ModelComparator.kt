@@ -24,6 +24,10 @@ fun compareBorrowerPaymentModel(
     if (oldData.isDueCleared != newData.isDueCleared) map["dueCleared"] = newData.isDueCleared
     if (oldData.interest != newData.interest) map["interest"] = newData.interest
     if (oldData.messageOrNote != newData.messageOrNote) map["messageOrNote"] = newData.messageOrNote
+    if (oldData.isSupportingDocAdded != newData.isSupportingDocAdded) map["supportingDocAdded"] =
+        newData.isSupportingDocAdded
+    if (oldData.supportingDocument != newData.supportingDocument) map["supportingDocument"] =
+        newData.supportingDocument
 
     return map
 }

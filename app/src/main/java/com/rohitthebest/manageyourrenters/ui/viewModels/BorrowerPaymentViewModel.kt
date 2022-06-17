@@ -7,6 +7,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
@@ -222,6 +223,50 @@ class BorrowerPaymentViewModel @Inject constructor(
             updateBorrowerDueAmount(borrowerPayment.borrowerKey)
         }
 
+
+    fun addOrReplaceBorrowerSupportingDocument(
+        borrowerPayment: BorrowerPayment,
+        supportDocumentHelper: SupportingDocumentHelperModel
+    ) {
+        val context = getApplication<Application>().applicationContext
+
+        val oldBorrowerPayment = borrowerPayment.copy()
+
+        if (oldBorrowerPayment.supportingDocument != null && oldBorrowerPayment.supportingDocument?.documentType != DocumentType.URL) {
+
+            // if borrower contains supporting document previously, then call delete service also
+
+            deleteFileFromFirebaseStorage(
+                context,
+                borrowerPayment.supportingDocument?.documentUrl!!
+            )
+        }
+
+        if (supportDocumentHelper.documentType == DocumentType.URL) {
+
+            val supportingDoc = SupportingDocument(
+                supportDocumentHelper.documentName,
+                supportDocumentHelper.documentUrl,
+                supportDocumentHelper.documentType
+            )
+
+            borrowerPayment.isSupportingDocAdded = true
+            borrowerPayment.supportingDocument = supportingDoc
+
+            updateBorrowerPayment(oldBorrowerPayment, borrowerPayment)
+        } else {
+
+            supportDocumentHelper.modelName = context.getString(R.string.borrowerPayments)
+
+            if (!oldBorrowerPayment.isSynced) {
+                insertBorrowerPayment(borrowerPayment, supportDocumentHelper)
+                return
+            }
+            uploadFileToFirebaseCloudStorage(
+                context, supportDocumentHelper, borrowerPayment.key
+            )
+        }
+    }
 
     fun deleteAllBorrowerPayments() = viewModelScope.launch {
         borrowerPaymentRepository.deleteAllBorrowerPayments()

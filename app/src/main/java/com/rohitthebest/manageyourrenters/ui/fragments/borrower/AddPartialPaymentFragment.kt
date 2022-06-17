@@ -367,85 +367,38 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             return
         }
 
-        receivedBorrowerPayment?.let { borrowerPayment ->
+        val borrowerPayment = receivedBorrowerPayment?.copy()
+
+        borrowerPayment?.let { payment ->
 
             calculateDueAmount()
 
-            val map = HashMap<String, Any?>()
-
-            if (includeBinding.markAsDoneCB.isChecked != borrowerPayment.isDueCleared) {
-
-                receivedBorrowerPayment!!.isDueCleared = includeBinding.markAsDoneCB.isChecked
-
-                map["dueCleared"] = receivedBorrowerPayment!!.isDueCleared
+            if (includeBinding.markAsDoneCB.isChecked != payment.isDueCleared) {
 
                 if (includeBinding.markAsDoneCB.isChecked) {
 
-                    receivedBorrowerPayment!!.dueLeftAmount = 0.0
-                    map["dueLeftAmount"] = 0.0
-
+                    payment.isDueCleared = true
+                    payment.dueLeftAmount = 0.0
                 } else {
 
-                    receivedBorrowerPayment!!.dueLeftAmount = dueLeftAmount
-                    map["dueLeftAmount"] = dueLeftAmount
+                    payment.dueLeftAmount = dueLeftAmount
                 }
 
             } else {
 
-                if (dueLeftAmount >= 0.0 && dueLeftAmount != borrowerPayment.dueLeftAmount) {
+                if (dueLeftAmount >= 0.0 && dueLeftAmount != payment.dueLeftAmount) {
 
-                    Log.d(TAG, "saveChangesToTheDatabase: dueLeftAmount : $dueLeftAmount")
-
-                    receivedBorrowerPayment!!.dueLeftAmount = dueLeftAmount
-                    map["dueLeftAmount"] = dueLeftAmount
+                    payment.dueLeftAmount = dueLeftAmount
                 }
             }
 
-            //borrower payment was already synced - need to be updated
-            if (receivedBorrowerPayment!!.isSynced) {
+            borrowerPaymentViewModel.updateBorrowerPayment(
+                receivedBorrowerPayment!!,
+                borrowerPayment
+            )
 
-                if (isInternetAvailable(requireContext())) {
-
-                    if (map.isNotEmpty()) {
-
-                        updateDocumentOnFireStore(
-                            requireContext(),
-                            map,
-                            getString(R.string.borrowerPayments),
-                            receivedBorrowerPayment!!.key
-                        )
-                    }
-
-                } else {
-
-                    if (map.isNotEmpty()) {
-
-                        receivedBorrowerPayment!!.isSynced = false
-                    }
-                }
-            } else {
-
-                //not synced - needs to be uploaded
-
-                if (isInternetAvailable(requireContext())) {
-
-                    receivedBorrowerPayment!!.isSynced = true
-
-                    Log.d(TAG, "saveChangesToTheDatabase: upload payment to firestore")
-
-                    uploadDocumentToFireStore(
-                        requireContext(),
-                        getString(R.string.borrowerPayments),
-                        borrowerPayment.key
-                    )
-                }
-
-            }
-
-            borrowerPaymentViewModel.updateBorrowerPayment(receivedBorrowerPayment!!)
             savePartialPaymentsToFireStore()
             getAndUpdateTotalDueAmountOfBorrower()
-
         }
     }
 

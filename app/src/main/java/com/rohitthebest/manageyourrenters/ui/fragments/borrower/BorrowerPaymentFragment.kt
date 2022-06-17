@@ -173,15 +173,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
             if (isInternetAvailable(requireContext())) {
 
-                borrowerPayment.isSynced = true
-
-                uploadDocumentToFireStore(
-                    requireContext(),
-                    getString(R.string.borrowerPayments),
-                    borrowerPayment.key
-                )
-
-                borrowerPaymentViewModel.updateBorrowerPayment(borrowerPayment)
+                borrowerPaymentViewModel.updateBorrowerPayment(borrowerPayment, borrowerPayment)
                 borrowerPaymentAdapter.notifyItemChanged(position)
 
             } else {
@@ -294,7 +286,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
                     if (!borrowerPaymentForMenus!!.isSynced) {
 
                         borrowerPaymentViewModel.deleteBorrowerPayment(
-                            requireContext(),
                             borrowerPaymentForMenus!!
                         )
 
@@ -303,7 +294,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
                         if (isInternetAvailable(requireContext())) {
 
                             borrowerPaymentViewModel.deleteBorrowerPayment(
-                                requireContext(),
                                 borrowerPaymentForMenus!!
                             )
 

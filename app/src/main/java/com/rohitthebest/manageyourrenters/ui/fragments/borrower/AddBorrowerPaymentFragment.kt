@@ -489,69 +489,26 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         if (!isMessageReceivedForEditing) {
 
             // insert
-            if (isInternetAvailable(requireContext())) {
-
-                borrowerPayment.isSynced = true
-
-                uploadDocumentToFireStore(
-                    requireContext(),
-                    getString(R.string.borrowerPayments),
-                    borrowerPayment.key
+            if (borrowerPayment.isSupportingDocAdded && supportingDocmtHelperModel.documentType != DocumentType.URL
+            ) {
+                supportingDocmtHelperModel.modelName = getString(R.string.borrowerPayments)
+                borrowerPaymentViewModel.insertBorrowerPayment(
+                    borrowerPayment,
+                    supportingDocmtHelperModel
                 )
-
-                if (borrowerPayment.isSupportingDocAdded && supportingDocmtHelperModel.documentType != DocumentType.URL
-                ) {
-                    supportingDocmtHelperModel.modelName = getString(R.string.borrowerPayments)
-                    uploadFileToFirebaseCloudStorage(
-                        requireContext(), supportingDocmtHelperModel, borrowerPayment.key
-                    )
-                }
-
             } else {
-
-                borrowerPayment.isSynced = false
+                borrowerPaymentViewModel.insertBorrowerPayment(borrowerPayment, null)
             }
-
-            borrowerPaymentViewModel.insertBorrowerPayment(requireContext(), borrowerPayment)
 
             showToast(requireContext(), getString(R.string.payment_added))
 
         } else {
 
             // update
-            if (isInternetAvailable(requireContext())) {
-
-                borrowerPayment.isSynced = true
-
-                if (!receivedBorrowerPayment!!.isSynced) {
-
-                    uploadDocumentToFireStore(
-                        requireContext(),
-                        getString(R.string.borrowerPayments),
-                        borrowerPayment.key
-                    )
-                } else {
-
-                    val map =
-                        compareBorrowerPaymentModel(receivedBorrowerPayment!!, borrowerPayment)
-
-                    Log.d(TAG, "insertToDatabase: update map :  $map")
-
-                    if (map.isNotEmpty()) {
-
-                        updateDocumentOnFireStore(
-                            requireContext(),
-                            map,
-                            getString(R.string.borrowerPayments),
-                            borrowerPayment.key
-                        )
-                    }
-                }
-            } else {
-                borrowerPayment.isSynced = false
-            }
-
-            borrowerPaymentViewModel.updateBorrowerPayment(borrowerPayment)
+            borrowerPaymentViewModel.updateBorrowerPayment(
+                receivedBorrowerPayment!!,
+                borrowerPayment
+            )
             showToast(requireContext(), getString(R.string.payment_updated))
         }
 

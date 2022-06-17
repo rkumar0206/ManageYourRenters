@@ -1,12 +1,13 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import android.content.Context
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
@@ -16,7 +17,7 @@ import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,55 +25,69 @@ private const val TAG = "BorrowerPaymentViewMode"
 
 @HiltViewModel
 class BorrowerPaymentViewModel @Inject constructor(
+    app: Application,
     private val borrowerPaymentRepository: BorrowerPaymentRepository,
     private val partialPaymentRepository: PartialPaymentRepository,
     private val borrowerRepository: BorrowerRepository
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
-    fun insertBorrowerPayment(context: Context, borrowerPayment: BorrowerPayment) =
+    fun insertBorrowerPayment(
+        borrowerPayment: BorrowerPayment,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel? = null
+    ) =
         viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
+
+            if (isInternetAvailable(context)) {
+
+                borrowerPayment.isSynced = true
+
+                uploadDocumentToFireStore(
+                    context,
+                    context.getString(R.string.borrowerPayments),
+                    borrowerPayment.key
+                )
+
+                if (supportingDocumentHelperModel != null && supportingDocumentHelperModel.documentType != DocumentType.URL
+                ) {
+                    supportingDocumentHelperModel.modelName =
+                        context.getString(R.string.borrowerPayments)
+                    uploadFileToFirebaseCloudStorage(
+                        context, supportingDocumentHelperModel, borrowerPayment.key
+                    )
+                }
+
+            } else {
+
+                borrowerPayment.isSynced = false
+            }
 
             borrowerPaymentRepository.insertBorrowerPayment(borrowerPayment)
 
             delay(50)
 
             // update the borrower due
-
-            updateBorrowerDueAmount(context, borrowerPayment.borrowerKey)
+            updateBorrowerDueAmount(borrowerPayment.borrowerKey)
         }
 
-    private var isRefreshEnabled = true
+    private suspend fun updateBorrowerDueAmount(borrowerKey: String) {
 
-    private suspend fun updateBorrowerDueAmount(context: Context, borrowerKey: String) {
+        val borrower = borrowerRepository.getBorrowerByKey(borrowerKey).first()
 
-        borrowerRepository.getBorrowerByKey(borrowerKey).collect { borrower ->
+        try {
+            val totalDue = borrowerPaymentRepository.getTotalDueOfTheBorrower(borrowerKey).first()
+            proceedUpdate(borrower, totalDue)
+        } catch (e: NullPointerException) {
 
-            if (isRefreshEnabled) {
-
-                try {
-
-                    borrowerPaymentRepository.getTotalDueOfTheBorrower(borrowerKey)
-                        .collect { value ->
-
-                            isRefreshEnabled = false
-                            proceedUpdate(context, borrower, value)
-
-                        }
-                } catch (e: NullPointerException) {
-
-                    // The last borrower payment has been deleted and therefore the collect block
-                    // throws null pointer exception
-                    isRefreshEnabled = false
-                    proceedUpdate(context, borrower, 0.0)
-
-                    e.printStackTrace()
-                }
-            }
+            proceedUpdate(borrower, 0.0)
         }
 
     }
 
-    private suspend fun proceedUpdate(context: Context, borrower: Borrower, value: Double) {
+    private suspend fun proceedUpdate(borrower: Borrower, value: Double) {
+
+        val context = getApplication<Application>().applicationContext
 
         borrower.totalDueAmount = value
         borrower.modified = System.currentTimeMillis()
@@ -116,12 +131,57 @@ class BorrowerPaymentViewModel @Inject constructor(
         borrowerPaymentRepository.insertAllBorrowerPayment(borrowerPayments)
     }
 
-    fun updateBorrowerPayment(borrowerPayment: BorrowerPayment) = viewModelScope.launch {
+    fun updateBorrowerPayment(
+        oldBorrowerPayment: BorrowerPayment,
+        borrowerPayment: BorrowerPayment,
+        shouldUpdateBorrowerDueAmount: Boolean = false
+    ) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
+
+        if (isInternetAvailable(context)) {
+
+            borrowerPayment.isSynced = true
+
+            if (!oldBorrowerPayment.isSynced) {
+
+                uploadDocumentToFireStore(
+                    context,
+                    context.getString(R.string.borrowerPayments),
+                    borrowerPayment.key
+                )
+            } else {
+
+                val map =
+                    compareBorrowerPaymentModel(oldBorrowerPayment, borrowerPayment)
+
+                if (map.isNotEmpty()) {
+
+                    updateDocumentOnFireStore(
+                        context,
+                        map,
+                        context.getString(R.string.borrowerPayments),
+                        borrowerPayment.key
+                    )
+                }
+            }
+        } else {
+            borrowerPayment.isSynced = false
+        }
+
         borrowerPaymentRepository.updateBorrowerPayment(borrowerPayment)
+
+        if (shouldUpdateBorrowerDueAmount) {
+
+            updateBorrowerDueAmount(borrowerPayment.borrowerKey)
+        }
+
     }
 
-    fun deleteBorrowerPayment(context: Context, borrowerPayment: BorrowerPayment) =
+    fun deleteBorrowerPayment(borrowerPayment: BorrowerPayment) =
         viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
 
             val partialPaymentKeys =
                 partialPaymentRepository.getKeysByBorrowerPaymentKey(borrowerPayment.key)
@@ -159,9 +219,7 @@ class BorrowerPaymentViewModel @Inject constructor(
 
             borrowerPaymentRepository.deleteBorrowerPayment(borrowerPayment)
             partialPaymentRepository.deleteAllPartialPaymentByBorrowerPaymentKey(borrowerPayment.key)
-
-            isRefreshEnabled = true
-            updateBorrowerDueAmount(context, borrowerPayment.borrowerKey)
+            updateBorrowerDueAmount(borrowerPayment.borrowerKey)
         }
 
 

@@ -32,7 +32,7 @@ fun uploadDocumentToFireStore(
     )
 
     foregroundService.putExtra(
-        Constants.DOCUMENT_KEY,
+        DOCUMENT_KEY,
         documentKey
     )
 
@@ -59,7 +59,7 @@ fun updateDocumentOnFireStore(
     )
 
     foregroundService.putExtra(
-        Constants.DOCUMENT_KEY,
+        DOCUMENT_KEY,
         documentKey
     )
 
@@ -91,7 +91,7 @@ fun deleteDocumentFromFireStore(
     )
 
     foregroundService.putExtra(
-        Constants.DOCUMENT_KEY,
+        DOCUMENT_KEY,
         documentKey
     )
 

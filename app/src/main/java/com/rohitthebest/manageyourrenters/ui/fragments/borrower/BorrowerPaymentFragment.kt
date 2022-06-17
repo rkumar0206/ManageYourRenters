@@ -387,7 +387,52 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
 
     override fun onDeleteSupportingDocumentClick() {
-        //TODO("Not yet implemented")
+
+        if (borrowerPaymentForMenus != null
+            && borrowerPaymentForMenus!!.isSupportingDocAdded
+            && borrowerPaymentForMenus!!.supportingDocument != null
+        ) {
+            showAlertDialogForDeletion(
+                requireContext(),
+                {
+                    if (borrowerPaymentForMenus!!.supportingDocument?.documentType != DocumentType.URL) {
+
+                        if (!isInternetAvailable(requireContext())) {
+
+                            showToast(
+                                requireContext(),
+                                getString(R.string.network_required_for_deleting_file_from_cloud)
+                            )
+                            return@showAlertDialogForDeletion
+                        } else {
+
+                            deleteFileFromFirebaseStorage(
+                                requireContext(),
+                                borrowerPaymentForMenus!!.supportingDocument?.documentUrl!!
+                            )
+                        }
+                    }
+
+                    val borrowerPayment = borrowerPaymentForMenus!!.copy()
+
+                    borrowerPayment.supportingDocument = null
+                    borrowerPayment.isSupportingDocAdded = false
+
+                    borrowerPaymentViewModel.updateBorrowerPayment(
+                        borrowerPaymentForMenus!!,
+                        borrowerPayment
+                    )
+                    showToast(requireContext(), getString(R.string.supporting_document_deleted))
+                    it.dismiss()
+                },
+                {
+                    it.dismiss()
+                }
+            )
+        } else {
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+        }
+
     }
 
     override fun onSyncMenuClick() {}

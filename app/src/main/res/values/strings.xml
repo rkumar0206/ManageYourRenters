@@ -263,6 +263,8 @@
     <string name="payment_added">Payment Added</string>
     <string name="payment_updated">Payment updated</string>
     <string name="uploading_supporting_document_to_cloud">Uploading supporting document to cloud.</string>
+    <string name="network_required_for_deleting_file_from_cloud">Network connection required to delete the file from cloud</string>
+    <string name="supporting_document_deleted">Supporting Document deleted</string>
 
     <string-array name="interest_time_schedule">
 

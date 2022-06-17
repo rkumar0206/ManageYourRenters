@@ -513,7 +513,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
                         }
                     }
 
-                    borrowerViewModel.updateBorrower(requireContext(), borrower)
+                    borrowerViewModel.updateBorrower(borrower)
 
                     isBorrowerUpdateEnabled = false
                 }

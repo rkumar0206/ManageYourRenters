@@ -1,8 +1,8 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import android.content.Context
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
@@ -25,16 +25,18 @@ private const val TAG = "BorrowerViewModel"
 
 @HiltViewModel
 class BorrowerViewModel @Inject constructor(
+    app: Application,
     private val borrowerRepository: BorrowerRepository,
     private val borrowerPaymentRepository: BorrowerPaymentRepository,
     private val partialPaymentRepository: PartialPaymentRepository
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     fun insertBorrower(
-        context: Context,
         borrower: Borrower,
         supportDocumentHelper: SupportingDocumentHelperModel? = null
     ) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
 
         if (Functions.isInternetAvailable(context)) {
 
@@ -69,7 +71,9 @@ class BorrowerViewModel @Inject constructor(
         borrowerRepository.insertBorrowers(borrowers)
     }
 
-    fun updateBorrower(context: Context, borrower: Borrower) = viewModelScope.launch {
+    fun updateBorrower(borrower: Borrower) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
 
         if (Functions.isInternetAvailable(context)) {
 
@@ -89,10 +93,10 @@ class BorrowerViewModel @Inject constructor(
     }
 
     fun addOrReplaceBorrowerSupportingDocument(
-        context: Context,
         borrower: Borrower,
         supportDocumentHelper: SupportingDocumentHelperModel
     ) {
+        val context = getApplication<Application>().applicationContext
 
         if (borrower.supportingDocument != null && borrower.supportingDocument?.documentType != DocumentType.URL) {
 
@@ -115,13 +119,13 @@ class BorrowerViewModel @Inject constructor(
             borrower.isSupportingDocAdded = true
             borrower.supportingDocument = supportingDoc
 
-            updateBorrower(context, borrower)
+            updateBorrower(borrower)
         } else {
 
             supportDocumentHelper.modelName = context.getString(R.string.borrowers)
 
             if (!borrower.isSynced) {
-                insertBorrower(context, borrower, supportDocumentHelper)
+                insertBorrower(borrower, supportDocumentHelper)
                 return
             }
             uploadFileToFirebaseCloudStorage(
@@ -130,7 +134,8 @@ class BorrowerViewModel @Inject constructor(
         }
     }
 
-    fun deleteBorrower(context: Context, borrower: Borrower) = viewModelScope.launch {
+    fun deleteBorrower(borrower: Borrower) = viewModelScope.launch {
+        val context = getApplication<Application>().applicationContext
 
         // all the payments related to this borrower
         val borrowerPaymentKeys =

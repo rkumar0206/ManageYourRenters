@@ -185,7 +185,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                 if (!borrowerForMenus.isSynced) {
 
                     borrowerViewModel.deleteBorrower(
-                        requireContext(),
                         borrowerForMenus
                     )
                 } else {
@@ -193,7 +192,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                     if (isInternetAvailable(requireContext())) {
 
                         borrowerViewModel.deleteBorrower(
-                            requireContext(),
                             borrowerForMenus
                         )
                     } else {
@@ -278,7 +276,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
                 // call the viewmodel method for adding or replacing the document
                 borrowerViewModel.addOrReplaceBorrowerSupportingDocument(
-                    requireContext(),
                     borrowerForMenus,
                     supportingDocumentHelperModel
                 )
@@ -315,7 +312,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
             }
             borrowerForMenus.supportingDocument = null
             borrowerForMenus.isSupportingDocAdded = false
-            borrowerViewModel.updateBorrower(requireContext(), borrowerForMenus)
+            borrowerViewModel.updateBorrower(borrowerForMenus)
             showToast(requireContext(), "Supporting Document deleted")
 
         } else {
@@ -341,7 +338,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                         borrowerForMenus.key
                     )
 
-                    borrowerViewModel.updateBorrower(requireContext(), borrowerForMenus)
+                    borrowerViewModel.updateBorrower(borrowerForMenus)
 
                     borrowerAdapter.notifyItemChanged(currentAdapterPosition)
                 }

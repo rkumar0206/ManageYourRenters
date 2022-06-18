@@ -98,50 +98,24 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
     }
 
     private lateinit var emiForMenuItems: EMI
+    private var adapterPosition = -1
 
     override fun onMenuBtnClicked(emi: EMI, position: Int) {
 
         emiForMenuItems = emi
+        adapterPosition = position
 
         requireActivity().supportFragmentManager.let {
 
             val bundle = Bundle()
-            bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !emi.isSynced)
 
             CustomMenuItems.newInstance(
                 bundle
             ).apply {
-                show(it, "emi_menu_bottomsheet_tag")
+                show(it, TAG)
             }.setOnClickListener(this)
         }
-    }
-
-    override fun onSyncBtnClicked(emi: EMI, position: Int) {
-
-        if (emi.isSynced) {
-
-            requireContext().showToast("Already synced")
-        } else {
-
-            if (isInternetAvailable(requireContext())) {
-
-                emi.isSynced = true
-
-                uploadDocumentToFireStore(
-                    requireContext(),
-                    getString(R.string.emis),
-                    emi.key
-                )
-
-                emiViewModel.updateEMI(emi, emi)
-
-                emiAdapter.notifyItemChanged(position)
-            } else {
-
-                showNoInternetMessage(requireContext())
-            }
-        }
-
     }
 
     //[START OF MENUS]
@@ -180,7 +154,6 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
                 }
             )
         }
-
     }
 
     override fun onViewSupportingDocumentMenuClick() {
@@ -189,9 +162,11 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
             if (!emiForMenuItems.isSupportingDocAdded) {
 
-                requireContext().showToast(getString(R.string.no_supporting_doc_added))
-            } else {
+                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            } else if (emiForMenuItems.isSupportingDocAdded && emiForMenuItems.supportingDocument == null) {
 
+                showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
+            } else {
                 emiForMenuItems.supportingDocument?.let { supportingDoc ->
 
                     onViewOrDownloadSupportingDocument(
@@ -201,7 +176,6 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
                 }
             }
         }
-
     }
 
     override fun onReplaceSupportingDocumentClick() {
@@ -278,7 +252,24 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
     }
 
-    override fun onSyncMenuClick() {}
+    override fun onSyncMenuClick() {
+
+        if (emiForMenuItems.isSynced) {
+
+            requireContext().showToast("Already synced")
+        } else {
+
+            if (isInternetAvailable(requireContext())) {
+
+                emiViewModel.updateEMI(emiForMenuItems, emiForMenuItems)
+                emiAdapter.notifyItemChanged(adapterPosition)
+            } else {
+
+                showNoInternetMessage(requireContext())
+            }
+        }
+
+    }
     //[END OF MENUS]
 
     private fun getEMIs() {

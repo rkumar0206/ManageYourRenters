@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.emiAdapte
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -38,17 +39,6 @@ class EMIAdapter : ListAdapter<EMI, EMIAdapter.EMIViewHolder>(DiffUtilCallback()
                     )
                 }
             }
-
-            binding.emiSyncBtn.setOnClickListener {
-
-                if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
-
-                    mListener!!.onSyncBtnClicked(
-                        getItem(absoluteAdapterPosition),
-                        absoluteAdapterPosition
-                    )
-                }
-            }
         }
 
         @SuppressLint("SetTextI18n")
@@ -72,10 +62,20 @@ class EMIAdapter : ListAdapter<EMI, EMIAdapter.EMIViewHolder>(DiffUtilCallback()
 
                     if (e.isSynced) {
 
-                        emiSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                        root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_green
+                            )
+                        )
                     } else {
 
-                        emiSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                        root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_orange
+                            )
+                        )
                     }
                 }
             }
@@ -110,7 +110,6 @@ class EMIAdapter : ListAdapter<EMI, EMIAdapter.EMIViewHolder>(DiffUtilCallback()
 
         fun onItemClick(emi: EMI)
         fun onMenuBtnClicked(emi: EMI, position: Int)
-        fun onSyncBtnClicked(emi: EMI, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

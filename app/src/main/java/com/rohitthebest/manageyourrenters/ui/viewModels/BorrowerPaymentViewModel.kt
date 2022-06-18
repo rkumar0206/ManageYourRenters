@@ -234,7 +234,7 @@ class BorrowerPaymentViewModel @Inject constructor(
 
         if (oldBorrowerPayment.supportingDocument != null && oldBorrowerPayment.supportingDocument?.documentType != DocumentType.URL) {
 
-            // if borrower contains supporting document previously, then call delete service also
+            // if borrower payment contains supporting document previously, then call delete service also
 
             deleteFileFromFirebaseStorage(
                 context,

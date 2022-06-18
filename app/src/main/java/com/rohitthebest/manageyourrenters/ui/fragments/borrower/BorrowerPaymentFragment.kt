@@ -163,25 +163,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         findNavController().navigate(action)
     }
 
-    override fun onSyncBtnClick(borrowerPayment: BorrowerPayment, position: Int) {
-
-        if (borrowerPayment.isSynced) {
-
-            showToast(requireContext(), "Already synced")
-        } else {
-
-            if (isInternetAvailable(requireContext())) {
-
-                borrowerPaymentViewModel.updateBorrowerPayment(borrowerPayment, borrowerPayment)
-                borrowerPaymentAdapter.notifyItemChanged(position)
-
-            } else {
-
-                showNoInternetMessage(requireContext())
-            }
-        }
-    }
-
     override fun onShowMessageBtnClick(message: String) {
 
         var m = message
@@ -236,7 +217,11 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         requireActivity().supportFragmentManager.let {
 
             val bundle = Bundle()
-            bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
+
+            if (!borrowerPayment.isSynced)
+                bundle.putBoolean(Constants.SHOW_SYNC_MENU, true)
+            else
+                bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
 
             CustomMenuItems.newInstance(
                 bundle
@@ -385,7 +370,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         }
     }
 
-
     override fun onDeleteSupportingDocumentClick() {
 
         if (borrowerPaymentForMenus != null
@@ -435,7 +419,28 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     }
 
-    override fun onSyncMenuClick() {}
+    override fun onSyncMenuClick() {
+
+        if (borrowerPaymentForMenus != null && borrowerPaymentForMenus!!.isSynced) {
+
+            showToast(requireContext(), "Already synced")
+        } else {
+
+            if (isInternetAvailable(requireContext())) {
+
+                borrowerPaymentViewModel.updateBorrowerPayment(
+                    borrowerPaymentForMenus!!,
+                    borrowerPaymentForMenus!!
+                )
+                borrowerPaymentAdapter.notifyItemChanged(adapterItemPosition)
+
+            } else {
+
+                showNoInternetMessage(requireContext())
+            }
+        }
+
+    }
 
     //[END OF ADAPTER CLICK LISTENER]
 

@@ -247,7 +247,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         if (!isMessageReceivedForEditing) {
 
-            emi.isSupportingDocumentAdded = false
+            emi.isSupportingDocAdded = false
 
             emiViewModel.insertEMI(emi)
             Log.d(TAG, "insertToDatabase: EMI inserted")

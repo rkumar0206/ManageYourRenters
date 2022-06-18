@@ -13,7 +13,6 @@ import com.rohitthebest.manageyourrenters.database.databases.*
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EMI_DATABASE_NAME
-import com.rohitthebest.manageyourrenters.others.Constants.EMI_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.MANAGE_YOUR_RENTERS_API_BASE_URL
 import com.rohitthebest.manageyourrenters.others.Constants.MONTHLY_PAYMENT_DATABASE_NAME
@@ -146,7 +145,7 @@ object Module {
     @Singleton
     fun providePartialPaymentDao(db: PartialPaymentDatabase) = db.getPartialPaymentDao()
 
-    //============================== EMI Database========================================
+    //============================== EMI and EMI payment Database========================================
 
     @Provides
     @Singleton
@@ -154,39 +153,17 @@ object Module {
         @ApplicationContext context: Context
     ) = Room.databaseBuilder(
         context,
-        EMIDatabase::class.java,
+        EmiAndEmiPaymentDatabase::class.java,
         EMI_DATABASE_NAME
     ).build()
 
     @Provides
     @Singleton
-    fun provideEMIDao(db: EMIDatabase) = db.getEmiDao()
-
-    //============================== EMI Payment Database========================================
-
-    private val migrationEMIPayment = object : Migration(1, 2) {
-
-        override fun migrate(database: SupportSQLiteDatabase) {
-
-            database.execSQL("ALTER TABLE 'emi_payment_table' ADD COLUMN 'message' VARCHAR NOT NULL DEFAULT ''")
-        }
-    }
+    fun provideEMIDao(db: EmiAndEmiPaymentDatabase) = db.getEmiDao()
 
     @Provides
     @Singleton
-    fun provideEMIPaymentDatabase(
-        @ApplicationContext context: Context
-    ) = Room.databaseBuilder(
-        context,
-        EMIPaymentDatabase::class.java,
-        EMI_PAYMENT_DATABASE_NAME
-    )
-        .addMigrations(migrationEMIPayment)
-        .build()
-
-    @Provides
-    @Singleton
-    fun provideEMIPaymentDao(db: EMIPaymentDatabase) = db.getEMIPaymentDao()
+    fun provideEMIPaymentDao(db: EmiAndEmiPaymentDatabase) = db.getEMIPaymentDao()
 
     // =========================================================================================
 

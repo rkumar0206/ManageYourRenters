@@ -174,7 +174,7 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
             emiKey = receivedEMIKey
             fromMonth = includeBinding.emiPaymentFromMonthTV.text.toString().toInt()
             tillMonth = includeBinding.emiPaymentTillMonthET.text.toString().toInt()
-            isSupportingDocumentAdded = false
+            isSupportingDocAdded = false
             uid = receivedEMI.uid
             key = generateKey("_$uid")
             message = if (!includeBinding.addNoteET.isTextValid()) {
@@ -255,7 +255,7 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
 
         emiPayment.isSynced = Functions.isInternetAvailable(requireContext())
 
-        emiPayment.isSupportingDocumentAdded = false
+        emiPayment.isSupportingDocAdded = false
 
         emiPaymentViewModel.insertEMIPayment(requireContext(), emiPayment)
 

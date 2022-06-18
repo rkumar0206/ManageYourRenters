@@ -230,7 +230,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
                 requireContext(),
                 { dialog ->
 
-                    if (!emiPayment.isSynced || !emiPayment.isSupportingDocumentAdded) {
+                    if (!emiPayment.isSynced || !emiPayment.isSupportingDocAdded) {
 
                         emiPaymentViewModel.deleteEMIPayment(
                             requireContext(),
@@ -280,7 +280,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
         if (this::emiPaymentForMenus.isInitialized) {
 
-            if (!emiPaymentForMenus.isSupportingDocumentAdded) {
+            if (!emiPaymentForMenus.isSupportingDocAdded) {
 
                 requireContext().showToast(getString(R.string.no_supporting_doc_added))
             } else {
@@ -320,7 +320,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
             if (isInternetAvailable(requireContext())) {
 
-                if (emiPaymentForMenus.isSupportingDocumentAdded) {
+                if (emiPaymentForMenus.isSupportingDocAdded) {
 
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Are you sure?")
@@ -336,7 +336,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
                             }
 
-                            emiPaymentForMenus.isSupportingDocumentAdded = false
+                            emiPaymentForMenus.isSupportingDocAdded = false
                             emiPaymentForMenus.supportingDocument = null
 
                             val map = HashMap<String, Any?>()

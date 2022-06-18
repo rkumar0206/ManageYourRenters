@@ -190,7 +190,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
         if (this::emiForMenuItems.isInitialized) {
 
-            if (!emiForMenuItems.isSupportingDocumentAdded) {
+            if (!emiForMenuItems.isSupportingDocAdded) {
 
                 requireContext().showToast(getString(R.string.no_supporting_doc_added))
             } else {
@@ -229,7 +229,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
         if (this::emiForMenuItems.isInitialized) {
 
-            if (emiForMenuItems.isSupportingDocumentAdded) {
+            if (emiForMenuItems.isSupportingDocAdded) {
 
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Are you sure?")
@@ -245,7 +245,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
                         }
 
-                        emiForMenuItems.isSupportingDocumentAdded = false
+                        emiForMenuItems.isSupportingDocAdded = false
                         emiForMenuItems.supportingDocument = null
 
                         val map = HashMap<String, Any?>()

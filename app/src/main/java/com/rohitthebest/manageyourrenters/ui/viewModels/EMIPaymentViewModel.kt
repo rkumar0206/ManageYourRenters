@@ -88,7 +88,7 @@ class EMIPaymentViewModel @Inject constructor(
         if (isInternetAvailable(context)) {
 
             // delete supporting document
-            if (emiPayment.isSupportingDocumentAdded) {
+            if (emiPayment.isSupportingDocAdded) {
 
                 if (emiPayment.supportingDocument != null
                     && emiPayment.supportingDocument?.documentType != DocumentType.URL

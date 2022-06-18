@@ -94,7 +94,7 @@ class EMIViewModel @Inject constructor(
         }
 
         // delete supporting document of the emi
-        if (emi.isSupportingDocumentAdded) {
+        if (emi.isSupportingDocAdded) {
 
             if (emi.supportingDocument != null && emi.supportingDocument?.documentType != DocumentType.URL)
 

@@ -8,17 +8,17 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocument
 @IgnoreExtraProperties
 @Entity(tableName = "emi_payment_table")
 data class EMIPayment(
-    var created: Long,
-    var modified: Long,
-    var key: String,
-    var emiKey: String,
-    var amountPaid: Double,
-    var fromMonth: Int,
-    var tillMonth: Int,
-    var isSupportingDocumentAdded: Boolean = false,
-    var supportingDocument: SupportingDocument?,
-    var isSynced: Boolean,
-    var uid: String,
+    var created: Long = 0L,
+    var modified: Long = 0L,
+    var key: String = "",
+    var emiKey: String = "",
+    var amountPaid: Double = 0.0,
+    var fromMonth: Int = 0,
+    var tillMonth: Int = 0,
+    var isSupportingDocAdded: Boolean = false,
+    var supportingDocument: SupportingDocument? = null,
+    var isSynced: Boolean = false,
+    var uid: String = "",
     var message: String = ""
 ) {
     @PrimaryKey(autoGenerate = true)

@@ -126,7 +126,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
                     if (isDocumentReceivedForEditing) {
 
-                        if (receivedEMI.isSupportingDocumentAdded) {
+                        if (receivedEMI.isSupportingDocAdded) {
 
                             if (receivedEMI.supportingDocument?.documentType != DocumentType.URL) {
 
@@ -160,7 +160,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
                     if (isDocumentReceivedForEditing) {
 
-                        if (receivedEMIPayment.isSupportingDocumentAdded) {
+                        if (receivedEMIPayment.isSupportingDocAdded) {
 
                             if (receivedEMIPayment.supportingDocument?.documentType != DocumentType.URL) {
 
@@ -246,7 +246,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
             getString(R.string.emis) -> {
 
-                receivedEMI.isSupportingDocumentAdded = true
+                receivedEMI.isSupportingDocAdded = true
 
                 receivedEMI.supportingDocument = SupportingDocument(
                     includeBinding.fileNameET.text.toString().trim(),
@@ -283,7 +283,7 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
             getString(R.string.emiPayments) -> {
 
-                receivedEMIPayment.isSupportingDocumentAdded = true
+                receivedEMIPayment.isSupportingDocAdded = true
 
                 receivedEMIPayment.supportingDocument = SupportingDocument(
                     documentName = includeBinding.fileNameET.text.toString().trim(),

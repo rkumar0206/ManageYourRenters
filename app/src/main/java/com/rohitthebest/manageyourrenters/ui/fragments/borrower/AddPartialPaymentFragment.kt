@@ -146,7 +146,6 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                     partialPaymentAdapter.submitList(addedPartialPaymentList)
                     calculateDueAmount()
-                    //handleTheDue()
 
                     isRefereshEnabled = false
                 }

@@ -1,10 +1,10 @@
 package com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters
 
-import android.annotation.SuppressLint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +12,10 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterShowPaymentBinding
-import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.changeTextColor
+import com.rohitthebest.manageyourrenters.utils.format
+import com.rohitthebest.manageyourrenters.utils.isValid
 
 private const val TAG = "ShowPaymentAdapter"
 
@@ -31,13 +34,13 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
             workingWithDateAndTime = WorkingWithDateAndTime()
 
             binding.root.setOnClickListener(this)
-            binding.paymentAdapterSyncBtn.setOnClickListener(this)
-            binding.paymentAdapterDeleteBtn.setOnClickListener(this)
+            binding.paymentAdapterMenuBtn.setOnClickListener(this)
             binding.paymentAdapterMessageBtn.setOnClickListener(this)
         }
 
-        @SuppressLint("SetTextI18n")
         fun setData(payment: RenterPayment) {
+
+            val context = binding.root.context
 
             binding.apply {
 
@@ -46,8 +49,12 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
                 //Period
                 if (payment.billPeriodInfo.billPeriodType == BillPeriodType.BY_MONTH) {
 
-                    paymentAdapterBillPeriodTV.text =
-                        "${monthList[payment.billPeriodInfo.renterBillMonthType?.forBillMonth!! - 1]}, ${payment.billPeriodInfo.billYear}"
+                    paymentAdapterBillPeriodTV.text = context.getString(
+                        R.string.month_year,
+                        monthList[payment.billPeriodInfo.renterBillMonthType?.forBillMonth!! - 1],
+                        payment.billPeriodInfo.billYear
+                    )
+
                 } else {
 
                     if (payment.billPeriodInfo.renterBillDateType?.fromBillDate
@@ -138,18 +145,20 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
 
                 if (payment.isSynced) {
 
-                    paymentAdapterSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                    binding.root.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            binding.root.context,
+                            R.color.color_green
+                        )
+                    )
                 } else {
 
-                    paymentAdapterSyncBtn.setImageResource(R.drawable.ic_baseline_sync_24)
-                }
-
-                if (absoluteAdapterPosition == 0) {
-
-                    paymentAdapterDeleteBtn.show()
-                } else {
-
-                    paymentAdapterDeleteBtn.hide()
+                    binding.root.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            binding.root.context,
+                            R.color.color_orange
+                        )
+                    )
                 }
             }
         }
@@ -166,19 +175,14 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
                     }
                 }
 
-                binding.paymentAdapterSyncBtn.id -> {
+                binding.paymentAdapterMenuBtn.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
-                        mListener!!.onSyncClicked(getItem(absoluteAdapterPosition))
-                    }
-                }
-
-                binding.paymentAdapterDeleteBtn.id -> {
-
-                    if (checkForNullability(absoluteAdapterPosition)) {
-
-                        mListener!!.onDeleteClicked(getItem(absoluteAdapterPosition))
+                        mListener!!.onMenuBtnClicked(
+                            getItem(absoluteAdapterPosition),
+                            absoluteAdapterPosition
+                        )
                     }
                 }
 
@@ -235,8 +239,7 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
     interface OnClickListener {
 
         fun onPaymentClick(payment: RenterPayment)
-        fun onSyncClicked(payment: RenterPayment)
-        fun onDeleteClicked(payment: RenterPayment)
+        fun onMenuBtnClicked(payment: RenterPayment, position: Int)
         fun onMessageBtnClicked(paymentMessage: String)
     }
 

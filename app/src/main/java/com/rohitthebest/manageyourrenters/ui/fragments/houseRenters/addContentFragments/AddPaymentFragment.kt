@@ -979,7 +979,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
-
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
 
         if (checkedId == includeBinding.byMonthRB.id) {

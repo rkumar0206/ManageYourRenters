@@ -19,6 +19,8 @@ import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentBinding
+import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -36,7 +38,8 @@ private const val TAG = "PaymentFragment"
 
 @SuppressLint("SetTextI18n")
 @AndroidEntryPoint
-class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnClickListener {
+class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnClickListener,
+    CustomMenuItems.OnItemClickListener {
 
     private val renterViewModel: RenterViewModel by viewModels()
     private val renterPaymentViewModel: RenterPaymentViewModel by viewModels()
@@ -151,11 +154,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                     binding.paymentRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
                     rvStateParcelable = null
                     hideProgressBar()
-
-                    paymentAdapter.notifyItemChanged(0)
-                    paymentAdapter.notifyItemChanged(1)
-                    paymentAdapter.notifyItemChanged(2)
-
                 }
 
         } catch (e: Exception) {
@@ -280,49 +278,114 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     }
 
-    override fun onSyncClicked(payment: RenterPayment) {
+    private lateinit var renterPaymentForMenus: RenterPayment
+    private var adapterItemPosition = 0
 
-        if (isInternetAvailable(requireContext())) {
+    override fun onMenuBtnClicked(payment: RenterPayment, position: Int) {
 
-            if (payment.isSynced) {
+        renterPaymentForMenus = payment
+        adapterItemPosition = position
 
-                showToast(requireContext(), "Already Synced")
-            } else {
+        requireActivity().supportFragmentManager.let {
 
-                payment.isSynced = true
-                renterPaymentViewModel.updatePayment(requireContext(), payment)
-            }
+            val bundle = Bundle()
 
-        } else {
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !payment.isSynced)
+            bundle.putBoolean(Constants.SHOW_DELETE_MENU, position == 0)
+            bundle.putBoolean(Constants.SHOW_EDIT_MENU, false)
+            bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
 
-            showNoInternetMessage(requireContext())
+            CustomMenuItems.newInstance(
+                bundle
+            ).apply {
+                show(it, TAG)
+            }.setOnClickListener(this)
+        }
+    }
+
+    override fun onEditMenuClick() {}
+
+    override fun onDeleteMenuClick() {
+
+        if (::renterPaymentForMenus.isInitialized) {
+
+            showAlertDialogForDeletion(
+                requireContext(),
+                { dialog ->
+
+                    if (isInternetAvailable(requireContext())) {
+
+                        renterPaymentViewModel.deletePayment(
+                            requireContext(),
+                            renterPaymentForMenus
+                        )
+
+                    } else {
+                        showNoInternetMessage(requireContext())
+                    }
+
+                    dialog.dismiss()
+
+                },
+                { dialog ->
+
+                    dialog.dismiss()
+                }
+            )
         }
 
     }
 
-    override fun onDeleteClicked(payment: RenterPayment) {
+    override fun onViewSupportingDocumentMenuClick() {
 
-        showAlertDialogForDeletion(
-            requireContext(),
-            { dialog ->
+        if (::renterPaymentForMenus.isInitialized) {
+            if (!renterPaymentForMenus.isSupportingDocAdded) {
 
-                if (isInternetAvailable(requireContext())) {
+                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            } else {
 
-                    renterPaymentViewModel.deletePayment(requireContext(), payment)
+                renterPaymentForMenus.supportingDocument?.let { supportingDoc ->
 
+                    Functions.onViewOrDownloadSupportingDocument(
+                        requireActivity(),
+                        supportingDoc
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onReplaceSupportingDocumentClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDeleteSupportingDocumentClick() {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onSyncMenuClick() {
+
+        if (::renterPaymentForMenus.isInitialized) {
+            if (isInternetAvailable(requireContext())) {
+
+                if (renterPaymentForMenus.isSynced) {
+
+                    showToast(requireContext(), "Already Synced")
                 } else {
-                    showNoInternetMessage(requireContext())
+
+                    renterPaymentForMenus.isSynced = true
+                    renterPaymentViewModel.updatePayment(requireContext(), renterPaymentForMenus)
+                    paymentAdapter.notifyItemChanged(adapterItemPosition)
                 }
 
-                dialog.dismiss()
+            } else {
 
-            },
-            { dialog ->
-
-                dialog.dismiss()
+                showNoInternetMessage(requireContext())
             }
-        )
+        }
+
     }
+
 
     override fun onMessageBtnClicked(paymentMessage: String) {
 
@@ -479,5 +542,4 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         _binding = null
     }
-
 }

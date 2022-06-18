@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.content.ContextCompat
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.others.Constants
@@ -208,6 +209,8 @@ fun uploadFileToFirebaseCloudStorage(
 suspend fun getDataFromFireStore(
     collection: String,
     uid: String,
+    orderBy: String = "created",
+    limit: Int = 500,
     failureListener: (Exception) -> Unit
 ): QuerySnapshot? {
 
@@ -216,6 +219,8 @@ suspend fun getDataFromFireStore(
         FirebaseFirestore.getInstance()
             .collection(collection)
             .whereEqualTo("uid", uid)
+            .orderBy(orderBy, Query.Direction.DESCENDING)
+            .limit(limit.toLong())
             .get()
             .addOnFailureListener {
                 failureListener(it)

@@ -1,8 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import android.content.Context
-import android.util.Log
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
@@ -15,9 +14,6 @@ import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
 import com.rohitthebest.manageyourrenters.repositories.PartialPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,16 +21,18 @@ private const val TAG = "BorrowerViewModel"
 
 @HiltViewModel
 class BorrowerViewModel @Inject constructor(
+    app: Application,
     private val borrowerRepository: BorrowerRepository,
     private val borrowerPaymentRepository: BorrowerPaymentRepository,
     private val partialPaymentRepository: PartialPaymentRepository
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     fun insertBorrower(
-        context: Context,
         borrower: Borrower,
         supportDocumentHelper: SupportingDocumentHelperModel? = null
     ) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
 
         if (Functions.isInternetAvailable(context)) {
 
@@ -69,7 +67,9 @@ class BorrowerViewModel @Inject constructor(
         borrowerRepository.insertBorrowers(borrowers)
     }
 
-    fun updateBorrower(context: Context, borrower: Borrower) = viewModelScope.launch {
+    fun updateBorrower(borrower: Borrower) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
 
         if (Functions.isInternetAvailable(context)) {
 
@@ -89,10 +89,10 @@ class BorrowerViewModel @Inject constructor(
     }
 
     fun addOrReplaceBorrowerSupportingDocument(
-        context: Context,
         borrower: Borrower,
         supportDocumentHelper: SupportingDocumentHelperModel
     ) {
+        val context = getApplication<Application>().applicationContext
 
         if (borrower.supportingDocument != null && borrower.supportingDocument?.documentType != DocumentType.URL) {
 
@@ -115,13 +115,13 @@ class BorrowerViewModel @Inject constructor(
             borrower.isSupportingDocAdded = true
             borrower.supportingDocument = supportingDoc
 
-            updateBorrower(context, borrower)
+            updateBorrower(borrower)
         } else {
 
             supportDocumentHelper.modelName = context.getString(R.string.borrowers)
 
             if (!borrower.isSynced) {
-                insertBorrower(context, borrower, supportDocumentHelper)
+                insertBorrower(borrower, supportDocumentHelper)
                 return
             }
             uploadFileToFirebaseCloudStorage(
@@ -130,15 +130,8 @@ class BorrowerViewModel @Inject constructor(
         }
     }
 
-    fun deleteBorrower(context: Context, borrower: Borrower) = viewModelScope.launch {
-
-        // all the payments related to this borrower
-        val borrowerPaymentKeys =
-            borrowerPaymentRepository.getPaymentKeysByBorrowerKey(borrower.key)
-        val borrowerPayments = borrowerPaymentRepository.getPaymentsByBorrowerKey(borrower.key)
-
-        // all the partial payment related to this borrower
-        val partialPaymentKeys = partialPaymentRepository.getKeysByBorrowerId(borrower.borrowerId)
+    fun deleteBorrower(borrower: Borrower) = viewModelScope.launch {
+        val context = getApplication<Application>().applicationContext
 
         if (Functions.isInternetAvailable(context)) {
 
@@ -158,39 +151,31 @@ class BorrowerViewModel @Inject constructor(
                 )
             }
 
-            if (borrowerPaymentKeys.isNotEmpty()) {
+            // all the payments related to this borrower
+            val keysAndSupportingDocs =
+                borrowerPaymentRepository.getPaymentKeysAndSupportingDocumentByBorrowerKey(borrower.key)
+
+            val keys = keysAndSupportingDocs.map { it.key }
+            val supportingDocument = keysAndSupportingDocs.map { it.supportingDocument }
+                .filter { it != null && it.documentType != DocumentType.URL }
+
+            supportingDocument.forEach { supportingDoc ->
+
+                supportingDoc?.let { deleteFileFromFirebaseStorage(context, it.documentUrl) }
+            }
+
+            if (keys.isNotEmpty()) {
 
                 deleteAllDocumentsUsingKeyFromFirestore(
                     context,
                     context.getString(R.string.borrowerPayments),
-                    convertStringListToJSON(borrowerPaymentKeys)
+                    convertStringListToJSON(keys)
                 )
-
-                CoroutineScope(Dispatchers.IO).launch {
-
-                    Log.d(TAG, "deleteBorrower: Deleting supporting document coroutine scope")
-                    // checking if the payment contains any supporting document,
-                    // and if it contains, deleting it from the firebase storage
-                    borrowerPayments.collect { payments ->
-
-                        Log.d(TAG, "deleteBorrower: supporting document payment collect")
-                        payments.forEach { payment ->
-
-                            if (payment.isSupportingDocAdded
-                                && payment.supportingDocument?.documentType != DocumentType.URL
-                            ) {
-                                payment.supportingDocument?.documentUrl?.let { docUrl ->
-                                    deleteFileFromFirebaseStorage(
-                                        context,
-                                        docUrl
-                                    )
-                                }
-                            }
-                        }
-                        return@collect
-                    }
-                }
             }
+
+            // all the partial payment related to this borrower
+            val partialPaymentKeys =
+                partialPaymentRepository.getKeysByBorrowerId(borrower.borrowerId)
 
             if (partialPaymentKeys.isNotEmpty()) {
 

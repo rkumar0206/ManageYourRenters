@@ -1,11 +1,13 @@
 package com.rohitthebest.manageyourrenters.data
 
+import java.io.Serializable
+
 data class RenterBillPeriodInfo(
     var billPeriodType: BillPeriodType,
     var renterBillMonthType: RenterBillMonthType?,
     var renterBillDateType: RenterBillDateType?,
     var billYear: Int
-) {
+) : Serializable {
 
     constructor() : this(
         BillPeriodType.BY_MONTH,
@@ -25,7 +27,7 @@ data class RenterBillMonthType(
     var forBillMonth: Int,
     var toBillMonth: Int,
     var numberOfMonths: Int
-) {
+) : Serializable {
     constructor() : this(
         0,
         0,

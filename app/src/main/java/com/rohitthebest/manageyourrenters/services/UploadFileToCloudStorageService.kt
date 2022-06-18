@@ -19,7 +19,9 @@ import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_BORROWERS
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_HOUSE_RENTERS
 import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY
+import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
+import com.rohitthebest.manageyourrenters.repositories.RenterPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
 import com.rohitthebest.manageyourrenters.utils.Functions
@@ -44,6 +46,12 @@ class UploadFileToCloudStorageService : Service() {
 
     @Inject
     lateinit var renterRepository: RenterRepository
+
+    @Inject
+    lateinit var borrowerPaymentRepository: BorrowerPaymentRepository
+
+    @Inject
+    lateinit var renterPaymentRepository: RenterPaymentRepository
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private var notificationId = 100
@@ -70,6 +78,10 @@ class UploadFileToCloudStorageService : Service() {
 
                     getString(R.string.renters) -> SHORTCUT_HOUSE_RENTERS
 
+                    getString(R.string.borrowerPayments) -> SHORTCUT_BORROWERS
+
+                    getString(R.string.renter_payments) -> SHORTCUT_HOUSE_RENTERS
+
                     else -> ""
                 }
                 PendingIntent.getActivity(this, 0, notificationIntent, 0)
@@ -82,7 +94,7 @@ class UploadFileToCloudStorageService : Service() {
 
             setSmallIcon(R.drawable.ic_house_renters)
             setContentIntent(pendingIntent)
-            setContentTitle("Uploading supporting document to cloud.")
+            setContentTitle(getString(R.string.uploading_supporting_document_to_cloud))
         }
 
         NotificationManagerCompat.from(this).apply {
@@ -211,6 +223,28 @@ class UploadFileToCloudStorageService : Service() {
                 renter.supportingDocument = supportingDocument
 
                 renterRepository.updateRenter(renter)
+                updateFinalNotificationAndStopService()
+            }
+
+            getString(R.string.borrowerPayments) -> {
+
+                val payment = borrowerPaymentRepository.getBorrowerPaymentByKey(documentKey).first()
+
+                payment.isSupportingDocAdded = true
+                payment.supportingDocument = supportingDocument
+
+                borrowerPaymentRepository.updateBorrowerPayment(payment)
+                updateFinalNotificationAndStopService()
+            }
+
+            getString(R.string.renter_payments) -> {
+
+                val payment = renterPaymentRepository.getPaymentByPaymentKey(documentKey).first()
+
+                payment.isSupportingDocAdded = true
+                payment.supportingDocument = supportingDocument
+
+                renterPaymentRepository.updateRenterPayment(payment)
                 updateFinalNotificationAndStopService()
             }
         }

@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
-import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.EMIRepository
@@ -72,27 +71,16 @@ class EMIViewModel @Inject constructor(
         if (keysAndSupportingDocs.isNotEmpty()) {
 
             // extract the keys and supporting doc urls from the list
-            val keys: ArrayList<String> = ArrayList()
-            val supportingDocs: ArrayList<SupportingDocument?> = ArrayList()
-
-            keysAndSupportingDocs.forEach { keyAndSupportingDoc ->
-
-                keys.add(keyAndSupportingDoc.key)
-                supportingDocs.add(keyAndSupportingDoc.supportingDocument)
-            }
-
-            Log.d(TAG, "deleteEMI: Keys : $keys")
-            Log.d(TAG, "deleteEMI: Supporting doc : $supportingDocs")
+            val keys = keysAndSupportingDocs.map { it.key }
+            val supportingDocs = keysAndSupportingDocs.map { it.supportingDocument }
+                .filter { it != null && it.documentType != DocumentType.URL }
 
             // delete the supporting document from the firebase storage
             if (supportingDocs.isNotEmpty()) {
 
                 supportingDocs.forEach { supportingDoc ->
 
-                    if (supportingDoc != null && supportingDoc.documentType != DocumentType.URL) {
-
-                        deleteFileFromFirebaseStorage(context, supportingDoc.documentUrl)
-                    }
+                    supportingDoc?.let { deleteFileFromFirebaseStorage(context, it.documentUrl) }
                 }
             }
 

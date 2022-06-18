@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:padding="5dp">
 
     <androidx.cardview.widget.CardView
@@ -276,13 +277,13 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="5dp"
                 android:padding="5dp"
-                tools:text="@string/__0"
-
                 app:layout_constraintBottom_toBottomOf="parent"
+
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/textView56"
                 app:layout_constraintTop_toBottomOf="@+id/textView62"
-                tools:ignore="Autofill" />
+                tools:ignore="Autofill"
+                tools:text="@string/__0" />
 
             <TextView
                 android:id="@+id/textView56"
@@ -380,6 +381,30 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardView16" />
+        app:layout_constraintTop_toBottomOf="@+id/addSupportingDocCB" />
+
+    <TextView
+        android:id="@+id/viewEditSupportingDoc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/view_edit"
+        android:textColor="@color/blue_text_color"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/addSupportingDocCB"
+        app:layout_constraintEnd_toEndOf="@+id/cardView16"
+        app:layout_constraintStart_toEndOf="@+id/addSupportingDocCB"
+        app:layout_constraintTop_toTopOf="@+id/addSupportingDocCB"
+        tools:visibility="visible" />
+
+    <CheckBox
+        android:id="@+id/addSupportingDocCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:padding="3dp"
+        android:text="@string/add_supporting_document"
+        app:layout_constraintStart_toStartOf="@+id/cardView16"
+        app:layout_constraintTop_toBottomOf="@+id/cardView16" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

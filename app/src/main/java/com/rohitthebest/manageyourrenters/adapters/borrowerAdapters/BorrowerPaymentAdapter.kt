@@ -26,7 +26,6 @@ class BorrowerPaymentAdapter :
         init {
 
             binding.adapterBorrowerPaymentMCV.setOnClickListener(this)
-            binding.syncBtn.setOnClickListener(this)
             binding.messageBtn.setOnClickListener(this)
             binding.interestBtn.setOnClickListener(this)
             binding.menuBtnForBorrowerPayment.setOnClickListener(this)
@@ -35,58 +34,67 @@ class BorrowerPaymentAdapter :
         @SuppressLint("SetTextI18n")
         fun setData(borrowerPayment: BorrowerPayment?) {
 
+            val context = binding.root.context
             borrowerPayment?.let { payment ->
-
                 binding.apply {
-
                     borrowedAmountTV.text =
-                        "Borrowed : ${payment.currencySymbol} ${payment.amountTakenOnRent}"
+                        context.getString(
+                            R.string.borrowed_currency_symbol_amount_taken,
+                            payment.currencySymbol,
+                            payment.amountTakenOnRent
+                        )
                     paidAmountTV.text =
-                        "Paid : ${payment.currencySymbol} ${(payment.amountTakenOnRent - payment.dueLeftAmount)}"
+                        context.getString(
+                            R.string.paid_currency_symbol_amount,
+                            payment.currencySymbol,
+                            (payment.amountTakenOnRent - payment.dueLeftAmount)
+                        )
 
-                    dueAmountTV.text = "Due : ${payment.currencySymbol} ${payment.dueLeftAmount}"
+                    dueAmountTV.text = context
+                        .getString(
+                            R.string.due_currency_symbol_amount,
+                            payment.currencySymbol,
+                            payment.dueLeftAmount
+                        )
 
                     if (payment.isSynced) {
 
-                        syncBtn.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                        binding.root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_green
+                            )
+                        )
                     } else {
 
-                        syncBtn.setImageResource(R.drawable.ic_baseline_sync_24)
+                        binding.root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_orange
+                            )
+                        )
                     }
 
                     if (payment.dueLeftAmount <= 0.0) {
 
-                        dueAmountTV.changeTextColor(
-                            binding.root.context,
-                            R.color.color_green
-                        )
+                        dueAmountTV.changeTextColor(context, R.color.color_green)
                     } else {
 
-                        dueAmountTV.changeTextColor(
-                            binding.root.context,
-                            R.color.color_orange
-                        )
-
+                        dueAmountTV.changeTextColor(context, R.color.color_orange)
                     }
 
-                    borrowedPaymentDateTV.text =
-                        "Borrowed on : " + WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                    borrowedPaymentDateTV.text = context.getString(
+                        R.string.borrowed_on,
+                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
                             payment.created
                         )
+                    )
 
-                    if (!payment.isDueCleared) {
-
-                        binding.adapterBorrowerPaymentMCV.strokeColor =
-                            ContextCompat.getColor(binding.root.context, R.color.color_orange)
-                    } else {
-
-                        binding.adapterBorrowerPaymentMCV.strokeColor =
-                            ContextCompat.getColor(binding.root.context, R.color.color_green)
+                    if (payment.isDueCleared) {
 
                         binding.borrowedAmountTV.strikeThrough()
                         binding.paidAmountTV.strikeThrough()
                         binding.dueAmountTV.strikeThrough()
-
                     }
                 }
             }
@@ -101,15 +109,6 @@ class BorrowerPaymentAdapter :
                     binding.adapterBorrowerPaymentMCV.id -> {
 
                         mListener!!.onItemClick(getItem(absoluteAdapterPosition))
-                    }
-
-
-                    binding.syncBtn.id -> {
-
-                        mListener!!.onSyncBtnClick(
-                            getItem(absoluteAdapterPosition),
-                            absoluteAdapterPosition
-                        )
                     }
 
                     binding.messageBtn.id -> {
@@ -172,7 +171,6 @@ class BorrowerPaymentAdapter :
     interface OnClickListener {
 
         fun onItemClick(borrowerPayment: BorrowerPayment)
-        fun onSyncBtnClick(borrowerPayment: BorrowerPayment, position: Int)
         fun onShowMessageBtnClick(message: String)
         fun onInterestBtnClick(borrowerPayment: BorrowerPayment)
         fun onMenuBtnClick(borrowerPayment: BorrowerPayment, position: Int)

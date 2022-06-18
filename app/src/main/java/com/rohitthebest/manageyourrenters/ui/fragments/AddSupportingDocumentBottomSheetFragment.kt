@@ -385,12 +385,12 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
             if (!isDocumentReceivedForEditing) {
 
                 borrowerPaymentViewModel.insertBorrowerPayment(
-                    requireContext(),
                     borrowerPayment
                 )
             } else {
 
                 borrowerPaymentViewModel.updateBorrowerPayment(
+                    borrowerPayment,
                     borrowerPayment
                 )
             }

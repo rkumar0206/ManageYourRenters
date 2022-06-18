@@ -236,6 +236,7 @@ class BorrowerPaymentViewModel @Inject constructor(
             )
         }
 
+        borrowerPayment.modified = System.currentTimeMillis()
         if (supportDocumentHelper.documentType == DocumentType.URL) {
 
             val supportingDoc = SupportingDocument(

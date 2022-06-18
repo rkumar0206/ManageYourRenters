@@ -2,7 +2,6 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.content.Context
 import android.os.Parcelable
-import android.util.Log
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
@@ -156,10 +155,6 @@ class RenterViewModel @Inject constructor(
 
     fun deleteRenter(context: Context, renter: Renter) = viewModelScope.launch {
 
-        val paymentKeys = paymentRepository.getPaymentKeysByRenterKey(renter.key!!)
-
-        Log.d(TAG, "deleteRenter: PaymentsKeys : $paymentKeys")
-
         if (isInternetAvailable(context)) {
 
             deleteDocumentFromFireStore(
@@ -178,13 +173,24 @@ class RenterViewModel @Inject constructor(
                 )
             }
 
+            val keysAndSupportingDocs =
+                paymentRepository.getPaymentKeysAndSupportingDocumentByRenterKey(renter.key!!)
 
-            if (paymentKeys.isNotEmpty()) {
+            val keys = keysAndSupportingDocs.map { it.key }
+            val supportingDocument = keysAndSupportingDocs.map { it.supportingDocument }
+                .filter { it != null && it.documentType != DocumentType.URL }
+
+            supportingDocument.forEach { supportingDoc ->
+
+                supportingDoc?.let { deleteFileFromFirebaseStorage(context, it.documentUrl) }
+            }
+
+            if (keysAndSupportingDocs.isNotEmpty()) {
 
                 deleteAllDocumentsUsingKeyFromFirestore(
                     context,
                     context.getString(R.string.renter_payments),
-                    convertStringListToJSON(paymentKeys)
+                    convertStringListToJSON(keys)
                 )
             }
         }

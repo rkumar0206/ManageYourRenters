@@ -560,7 +560,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 if (isInternetAvailable(requireContext())) {
 
                     renterPaymentViewModel.deleteAllPaymentsOfRenter(
-                        requireContext(),
                         receivedRenter?.key!!
                     )
 

@@ -838,21 +838,21 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             )
 
             val payment = RenterPayment(
-                generateKey(appendString = "_${getUid()}"),
-                currentTimestamp,
-                currentTimestamp,
-                receivedRenter?.key!!,
-                currencySymbol,
-                billInfo,
-                isElectricBillIncluded,
-                if (isElectricBillIncluded) {
+                key = generateKey(appendString = "_${getUid()}"),
+                created = currentTimestamp,
+                modified = currentTimestamp,
+                renterKey = receivedRenter?.key!!,
+                currencySymbol = currencySymbol,
+                billPeriodInfo = billInfo,
+                isElectricityBillIncluded = isElectricBillIncluded,
+                electricityBillInfo = if (isElectricBillIncluded) {
                     electricityBillInfo
                 } else {
                     null
                 },
-                houseRent,
-                parkingBill,
-                if (includeBinding.extraFieldNameET.text.toString().trim().isValid()) {
+                houseRent = houseRent,
+                parkingRent = parkingBill,
+                extras = if (includeBinding.extraFieldNameET.text.toString().trim().isValid()) {
                     RenterPaymentExtras(
                         includeBinding.extraFieldNameET.text.toString().trim(),
                         extraBillAmount
@@ -860,11 +860,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 } else {
                     null
                 },
-                netDemand,
-                amountPaid,
-                includeBinding.addNoteET.text.toString().trim(),
-                getUid()!!,
-                true
+                netDemand = netDemand,
+                amountPaid = amountPaid,
+                note = includeBinding.addNoteET.text.toString().trim(),
+                uid = getUid()!!,
+                isSynced = true
             )
 
             Log.d(TAG, "initPayment: Net demand : $netDemand")

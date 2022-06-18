@@ -5,25 +5,28 @@ import androidx.room.PrimaryKey
 import com.rohitthebest.manageyourrenters.data.RenterBillPeriodInfo
 import com.rohitthebest.manageyourrenters.data.RenterElectricityBillInfo
 import com.rohitthebest.manageyourrenters.data.RenterPaymentExtras
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 
 @Entity(tableName = "renter_payment_table")
 data class RenterPayment(
-    @PrimaryKey(autoGenerate = false) var key: String,
-    var created: Long,
-    var modified: Long,
-    var renterKey: String,
-    var currencySymbol: String,
-    var billPeriodInfo: RenterBillPeriodInfo,
+    @PrimaryKey(autoGenerate = false) var key: String = "",
+    var created: Long = 0L,
+    var modified: Long = 0L,
+    var renterKey: String = "",
+    var currencySymbol: String = "",
+    var billPeriodInfo: RenterBillPeriodInfo = RenterBillPeriodInfo(),
     var isElectricityBillIncluded: Boolean = false,
-    var electricityBillInfo: RenterElectricityBillInfo?,
-    var houseRent: Double,
-    var parkingRent: Double,
-    var extras: RenterPaymentExtras?,
-    var netDemand: Double,
-    var amountPaid: Double,
+    var electricityBillInfo: RenterElectricityBillInfo? = null,
+    var houseRent: Double = 0.0,
+    var parkingRent: Double = 0.0,
+    var extras: RenterPaymentExtras? = null,
+    var netDemand: Double = 0.0,
+    var amountPaid: Double = 0.0,
     var note: String = "",
-    var uid: String,
-    var isSynced: Boolean
+    var uid: String = "",
+    var isSupportingDocAdded: Boolean = false,
+    var supportingDocument: SupportingDocument? = null,
+    var isSynced: Boolean = false
 ) {
 
     constructor() : this(
@@ -42,6 +45,8 @@ data class RenterPayment(
         0.0,
         "",
         "",
+        false,
+        null,
         false
     )
 }

@@ -21,6 +21,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_HOUSE_RENTER
 import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY
 import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
+import com.rohitthebest.manageyourrenters.repositories.RenterPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
 import com.rohitthebest.manageyourrenters.utils.Functions
@@ -49,6 +50,9 @@ class UploadFileToCloudStorageService : Service() {
     @Inject
     lateinit var borrowerPaymentRepository: BorrowerPaymentRepository
 
+    @Inject
+    lateinit var renterPaymentRepository: RenterPaymentRepository
+
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private var notificationId = 100
 
@@ -75,6 +79,8 @@ class UploadFileToCloudStorageService : Service() {
                     getString(R.string.renters) -> SHORTCUT_HOUSE_RENTERS
 
                     getString(R.string.borrowerPayments) -> SHORTCUT_BORROWERS
+
+                    getString(R.string.renter_payments) -> SHORTCUT_HOUSE_RENTERS
 
                     else -> ""
                 }
@@ -228,6 +234,17 @@ class UploadFileToCloudStorageService : Service() {
                 payment.supportingDocument = supportingDocument
 
                 borrowerPaymentRepository.updateBorrowerPayment(payment)
+                updateFinalNotificationAndStopService()
+            }
+
+            getString(R.string.renter_payments) -> {
+
+                val payment = renterPaymentRepository.getPaymentByPaymentKey(documentKey).first()
+
+                payment.isSupportingDocAdded = true
+                payment.supportingDocument = supportingDocument
+
+                renterPaymentRepository.updateRenterPayment(payment)
                 updateFinalNotificationAndStopService()
             }
         }

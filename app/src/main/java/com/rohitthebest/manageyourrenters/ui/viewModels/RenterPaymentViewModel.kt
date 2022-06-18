@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Parcelable
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.repositories.RenterPaymentRepository
@@ -42,7 +44,11 @@ class RenterPaymentViewModel @Inject constructor(
 
     // ---------------------------------------------------------------
 
-    fun insertPayment(context: Context, renterPayment: RenterPayment) = viewModelScope.launch {
+    fun insertPayment(
+        context: Context,
+        renterPayment: RenterPayment,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel? = null
+    ) = viewModelScope.launch {
 
         updateRenterDuesOrAdvance(context, renterPayment, renterPayment.renterKey)
 
@@ -54,6 +60,19 @@ class RenterPaymentViewModel @Inject constructor(
                 context.getString(R.string.renter_payments),
                 renterPayment.key
             )
+
+            if (supportingDocumentHelperModel != null && supportingDocumentHelperModel.documentType != DocumentType.URL) {
+
+                supportingDocumentHelperModel.modelName =
+                    context.getString(R.string.renter_payments)
+
+                uploadFileToFirebaseCloudStorage(
+                    context,
+                    supportingDocumentHelperModel,
+                    renterPayment.key
+                )
+            }
+
         } else {
 
             renterPayment.isSynced = false
@@ -150,6 +169,18 @@ class RenterPaymentViewModel @Inject constructor(
                 context.getString(R.string.renter_payments),
                 renterPayment.key
             )
+
+            if (renterPayment.isSupportingDocAdded
+                && renterPayment.supportingDocument != null
+                && renterPayment.supportingDocument?.documentType != DocumentType.URL
+            ) {
+
+                deleteFileFromFirebaseStorage(
+                    context,
+                    renterPayment.supportingDocument?.documentUrl!!
+                )
+            }
+
         }
 
         paymentRepository.deleteRenterPayment(renterPayment)

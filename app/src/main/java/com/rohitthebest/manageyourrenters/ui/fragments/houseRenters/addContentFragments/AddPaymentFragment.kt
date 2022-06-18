@@ -8,8 +8,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -24,7 +26,9 @@ import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.AddPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPaymentBinding
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
@@ -40,7 +44,9 @@ import kotlin.math.abs
 private const val TAG = "AddPaymentFragment"
 
 @AndroidEntryPoint
-class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnCheckedChangeListener {
+class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnCheckedChangeListener,
+    CompoundButton.OnCheckedChangeListener,
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
     private val paymentViewModel: RenterPaymentViewModel by viewModels()
 
@@ -76,6 +82,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
 
+    private lateinit var supportingDocmtHelperModel: SupportingDocumentHelperModel
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -92,6 +100,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         binding.progressBar.show()
 
         workingWithDateAndTime = WorkingWithDateAndTime()
+        supportingDocmtHelperModel = SupportingDocumentHelperModel()
 
         includeBinding = binding.include
 
@@ -381,6 +390,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun initListeners() {
 
+        includeBinding.addSupportingDocCB.isChecked = false
+
         binding.toolbar.setNavigationOnClickListener {
             requireActivity().onBackPressed()
         }
@@ -395,6 +406,9 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         includeBinding.periodTypeRG.setOnCheckedChangeListener(this)
         includeBinding.dateContainer.setOnClickListener(this)
 
+        includeBinding.addSupportingDocCB.setOnCheckedChangeListener(this)
+        includeBinding.viewEditSupportingDoc.setOnClickListener(this)
+
         binding.toolbar.menu.findItem(R.id.menuSaveRenterPayment).setOnMenuItemClickListener {
 
             if (validateForm()) {
@@ -406,6 +420,29 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             true
         }
     }
+
+    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+
+        hideKeyBoard(requireActivity())
+
+        when (buttonView?.id) {
+
+            includeBinding.addSupportingDocCB.id -> {
+
+                if (isChecked) {
+
+                    includeBinding.viewEditSupportingDoc.show()
+                    supportingDocmtHelperModel = SupportingDocumentHelperModel()
+                    supportingDocmtHelperModel.modelName = getString(R.string.renter_payments)
+                    showSupportDocumentBottomSheetDialog()
+                } else {
+
+                    includeBinding.viewEditSupportingDoc.hide()
+                }
+            }
+        }
+    }
+
 
     @SuppressLint("SetTextI18n")
     override fun onClick(v: View?) {
@@ -436,6 +473,10 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 }
 
             }
+            includeBinding.viewEditSupportingDoc.id -> {
+
+                showSupportDocumentBottomSheetDialog()
+            }
         }
 
         if (v?.id == includeBinding.dateRangePickerBtn.id || v?.id == includeBinding.fromDateTV.id
@@ -456,6 +497,37 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         return includeBinding.houseRentET.error == null
     }
+
+    private fun showSupportDocumentBottomSheetDialog() {
+
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+            supportingDocmtHelperModel.convertToJsonString()
+        )
+
+        requireActivity().supportFragmentManager.let {
+
+            SupportingDocumentDialogFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
+
+    override fun onBottomSheetDismissed(
+        isDocumentAdded: Boolean,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel
+    ) {
+
+        if (!isDocumentAdded) {
+            includeBinding.addSupportingDocCB.isChecked = false
+        } else {
+
+            supportingDocmtHelperModel = supportingDocumentHelperModel
+        }
+    }
+
 
     private fun showDateRangePickerDialog() {
 
@@ -864,12 +936,44 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 amountPaid = amountPaid,
                 note = includeBinding.addNoteET.text.toString().trim(),
                 uid = getUid()!!,
-                isSynced = true
+                isSynced = true,
+                isSupportingDocAdded = includeBinding.addSupportingDocCB.isChecked,
+                supportingDocument = if (includeBinding.addSupportingDocCB.isChecked
+                    && supportingDocmtHelperModel.documentType == DocumentType.URL
+                ) {
+                    SupportingDocument(
+                        supportingDocmtHelperModel.documentName,
+                        supportingDocmtHelperModel.documentUrl,
+                        supportingDocmtHelperModel.documentType
+                    )
+                } else {
+                    null
+                }
             )
 
-            Log.d(TAG, "initPayment: Net demand : $netDemand")
+            if (payment.isSupportingDocAdded
+                && supportingDocmtHelperModel.documentType != DocumentType.URL
+            ) {
 
-            paymentViewModel.insertPayment(requireContext(), payment)
+                // if the document type is not URL, then we need internet connection to upload the uri
+                if (!Functions.isInternetAvailable(requireContext())) {
+                    Functions.showToast(
+                        requireContext(),
+                        getString(R.string.internet_required_message_for_uploading_doc),
+                        Toast.LENGTH_LONG
+                    )
+                    return
+                }
+
+                paymentViewModel.insertPayment(
+                    requireContext(),
+                    payment,
+                    supportingDocmtHelperModel
+                )
+            } else {
+
+                paymentViewModel.insertPayment(requireContext(), payment, null)
+            }
 
             requireActivity().onBackPressed()
         }

@@ -64,4 +64,6 @@ object Constants {
     const val SHORTCUT_BORROWERS = "com.rohitthebest.manageyourrenters.borrowers"
     const val SHORTCUT_HOUSE_RENTERS = "com.rohitthebest.manageyourrenters.house_renters"
     const val SHORTCUT_MONTHLY_PAYMENTS = "com.rohitthebest.manageyourrenters.monthly_payments"
+    const val SHORTCUT_EMI = "com.rohitthebest.manageyourrenters.emis"
+
 }

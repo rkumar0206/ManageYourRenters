@@ -133,7 +133,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
                     emi.key
                 )
 
-                emiViewModel.updateEMI(emi)
+                emiViewModel.updateEMI(emi, emi)
 
                 emiAdapter.notifyItemChanged(position)
             } else {
@@ -167,10 +167,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
                     if (isInternetAvailable(requireContext())) {
 
-                        emiViewModel.deleteEMI(
-                            requireContext(),
-                            emiForMenuItems
-                        )
+                        emiViewModel.deleteEMI(emiForMenuItems)
                     } else {
 
                         showNoInternetMessage(requireContext())
@@ -259,7 +256,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
                             emiForMenuItems.key
                         )
 
-                        emiViewModel.updateEMI(emiForMenuItems)
+                        emiViewModel.updateEMI(emiForMenuItems, emiForMenuItems)
 
                         dialog.dismiss()
                     }

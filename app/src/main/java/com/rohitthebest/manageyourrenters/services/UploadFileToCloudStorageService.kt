@@ -17,12 +17,10 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_BORROWERS
+import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_EMI
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_HOUSE_RENTERS
 import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY
-import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
-import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
-import com.rohitthebest.manageyourrenters.repositories.RenterPaymentRepository
-import com.rohitthebest.manageyourrenters.repositories.RenterRepository
+import com.rohitthebest.manageyourrenters.repositories.*
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
@@ -53,6 +51,9 @@ class UploadFileToCloudStorageService : Service() {
     @Inject
     lateinit var renterPaymentRepository: RenterPaymentRepository
 
+    @Inject
+    lateinit var emiRepository: EMIRepository
+
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private var notificationId = 100
 
@@ -81,6 +82,8 @@ class UploadFileToCloudStorageService : Service() {
                     getString(R.string.borrowerPayments) -> SHORTCUT_BORROWERS
 
                     getString(R.string.renter_payments) -> SHORTCUT_HOUSE_RENTERS
+
+                    getString(R.string.emis) -> SHORTCUT_EMI
 
                     else -> ""
                 }
@@ -245,6 +248,17 @@ class UploadFileToCloudStorageService : Service() {
                 payment.supportingDocument = supportingDocument
 
                 renterPaymentRepository.updateRenterPayment(payment)
+                updateFinalNotificationAndStopService()
+            }
+
+            getString(R.string.emis) -> {
+
+                val emi = emiRepository.getEMIByKey(documentKey).first()
+
+                emi.isSupportingDocAdded = true
+                emi.supportingDocument = supportingDocument
+
+                emiRepository.updateEMI(emi)
                 updateFinalNotificationAndStopService()
             }
         }

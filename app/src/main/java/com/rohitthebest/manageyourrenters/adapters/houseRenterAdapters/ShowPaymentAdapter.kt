@@ -52,7 +52,7 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
                     paymentAdapterBillPeriodTV.text = context.getString(
                         R.string.month_year,
                         monthList[payment.billPeriodInfo.renterBillMonthType?.forBillMonth!! - 1],
-                        payment.billPeriodInfo.billYear
+                        payment.billPeriodInfo.billYear.toString()
                     )
 
                 } else {

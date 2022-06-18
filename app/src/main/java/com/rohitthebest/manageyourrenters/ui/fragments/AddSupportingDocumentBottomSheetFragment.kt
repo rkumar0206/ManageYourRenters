@@ -421,13 +421,6 @@ class AddSupportingDocumentBottomSheetFragment : BottomSheetDialogFragment(),
 
             isDocumentAdded = true
 
-            if (!isDocumentReceivedForEditing) {
-
-                emiViewModel.insertEMI(emi)
-            } else {
-
-                emiViewModel.updateEMI(emi)
-            }
 
             dismiss()
 

@@ -20,7 +20,12 @@ import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
 import com.rohitthebest.manageyourrenters.data.RenterTypes
 import com.rohitthebest.manageyourrenters.databinding.ActivityHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_BORROWERS
+import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_EMI
+import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_EXPENSE
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_FRAGMENT_NAME_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_HOUSE_RENTERS
+import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.ui.ProfileBottomSheet
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
 import com.rohitthebest.manageyourrenters.utils.Functions
@@ -78,24 +83,25 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         renterTypeAdapter.submitList(renterTypeList)
 
         handleShortcuts()
-
-
     }
 
     private fun handleShortcuts() {
 
         when (intent.action) { // we can also use intent.data for the same purpose
 
-            Constants.SHORTCUT_EXPENSE -> {
+            SHORTCUT_EXPENSE -> {
                 onClick(binding.shortcutExpenses)
             }
-            Constants.SHORTCUT_MONTHLY_PAYMENTS -> {
+            SHORTCUT_MONTHLY_PAYMENTS -> {
                 onClick(binding.shortcutMonthlyPayments)
             }
-            Constants.SHORTCUT_HOUSE_RENTERS -> {
+            SHORTCUT_EMI -> {
+                onClick(binding.shortcutEmis)
+            }
+            SHORTCUT_HOUSE_RENTERS -> {
                 onItemClick(RenterTypes(1, "", 0))
             }
-            Constants.SHORTCUT_BORROWERS -> {
+            SHORTCUT_BORROWERS -> {
                 onItemClick(RenterTypes(2, "", 0))
             }
         }

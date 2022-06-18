@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.utils
 
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
+import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 
 /**
@@ -56,6 +57,32 @@ fun compareRenterPaymentModel(
     if (oldData.amountPaid != newData.amountPaid) map["amountPaid"] = newData.amountPaid
     if (oldData.extras != newData.extras) map["extras"] = newData.extras
     if (oldData.note != newData.note) map["note"] = newData.note
+    if (oldData.isSupportingDocAdded != newData.isSupportingDocAdded) map["supportingDocAdded"] =
+        newData.isSupportingDocAdded
+    if (oldData.supportingDocument != newData.supportingDocument) map["supportingDocument"] =
+        newData.supportingDocument
+
+    return map
+}
+
+fun compareEmi(
+    oldData: EMI,
+    newData: EMI
+): HashMap<String, Any?> {
+
+    val map: HashMap<String, Any?> = HashMap()
+
+    if (oldData.created != newData.created) map["created"] = newData.created
+    if (oldData.modified != newData.modified) map["modified"] = newData.modified
+    if (oldData.currencySymbol != newData.currencySymbol) map["currencySymbol"] =
+        newData.currencySymbol
+    if (oldData.emiName != newData.emiName) map["emiName"] = newData.emiName
+    if (oldData.totalMonths != newData.totalMonths) map["totalMonths"] = newData.totalMonths
+    if (oldData.monthsCompleted != newData.monthsCompleted) map["monthsCompleted"] =
+        newData.monthsCompleted
+    if (oldData.amountPaidPerMonth != newData.amountPaidPerMonth) map["amountPaidPerMonth"] =
+        newData.amountPaidPerMonth
+    if (oldData.amountPaid != newData.amountPaid) map["amountPaid"] = newData.amountPaid
     if (oldData.isSupportingDocAdded != newData.isSupportingDocAdded) map["supportingDocAdded"] =
         newData.isSupportingDocAdded
     if (oldData.supportingDocument != newData.supportingDocument) map["supportingDocument"] =

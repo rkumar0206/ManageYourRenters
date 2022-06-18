@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
@@ -117,6 +118,53 @@ class EMIViewModel @Inject constructor(
 
         emiRepository.updateEMI(emi)
     }
+
+    fun addOrReplaceBorrowerSupportingDocument(
+        emi: EMI,
+        supportDocumentHelper: SupportingDocumentHelperModel
+    ) {
+        val context = getApplication<Application>().applicationContext
+
+        val oldEMI = emi.copy()
+
+        emi.modified = System.currentTimeMillis()
+
+        if (emi.supportingDocument != null && emi.supportingDocument?.documentType != DocumentType.URL) {
+
+            // if borrower contains supporting document previously, then call delete service also
+
+            deleteFileFromFirebaseStorage(
+                context,
+                emi.supportingDocument?.documentUrl!!
+            )
+        }
+
+        if (supportDocumentHelper.documentType == DocumentType.URL) {
+
+            val supportingDoc = SupportingDocument(
+                supportDocumentHelper.documentName,
+                supportDocumentHelper.documentUrl,
+                supportDocumentHelper.documentType
+            )
+
+            emi.isSupportingDocAdded = true
+            emi.supportingDocument = supportingDoc
+
+            updateEMI(oldEMI, emi)
+        } else {
+
+            supportDocumentHelper.modelName = context.getString(R.string.emis)
+
+            if (!emi.isSynced) {
+                insertEMI(emi, supportDocumentHelper)
+                return
+            }
+            uploadFileToFirebaseCloudStorage(
+                context, supportDocumentHelper, emi.key
+            )
+        }
+    }
+
 
     fun deleteEMI(emi: EMI) = viewModelScope.launch {
 

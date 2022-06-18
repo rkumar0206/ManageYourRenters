@@ -11,15 +11,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.emiAdapters.EMIAdapter
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiBinding
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.others.Constants.IS_DOCUMENT_FOR_EDITING_KEY
-import com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBottomSheetFragment
+import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -35,7 +34,8 @@ private const val TAG = "EmiFragment"
 
 @AndroidEntryPoint
 class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
-    CustomMenuItems.OnItemClickListener {
+    CustomMenuItems.OnItemClickListener,
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
     private var _binding: FragmentEmiBinding? = null
     private val binding get() = _binding!!
@@ -180,73 +180,101 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
     override fun onReplaceSupportingDocumentClick() {
 
-        requireActivity().supportFragmentManager.let {
+        if (isInternetAvailable(requireContext())) {
+            if (this::emiForMenuItems.isInitialized) {
 
-            val bundle = Bundle()
-            bundle.putString(Constants.COLLECTION_TAG_KEY, getString(R.string.emis))
-            bundle.putString(Constants.DOCUMENT_KEY, fromEMIToString(emiForMenuItems))
-            bundle.putBoolean(IS_DOCUMENT_FOR_EDITING_KEY, true)
+                val supportingDocumentHelperModel = SupportingDocumentHelperModel()
+                supportingDocumentHelperModel.modelName = getString(R.string.emis)
 
-            AddSupportingDocumentBottomSheetFragment.newInstance(
-                bundle
-            ).apply {
-                show(it, "AddSupportingDocTag")
+                showSupportDocumentBottomSheetDialog(supportingDocumentHelperModel)
             }
+        } else {
+
+            showNoInternetMessage(requireContext())
         }
 
     }
 
+    private fun showSupportDocumentBottomSheetDialog(supportingDocmtHelperModel: SupportingDocumentHelperModel) {
+
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+            supportingDocmtHelperModel.convertToJsonString()
+        )
+
+        requireActivity().supportFragmentManager.let {
+
+            SupportingDocumentDialogFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
+
+    override fun onBottomSheetDismissed(
+        isDocumentAdded: Boolean,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel
+    ) {
+
+        if (isInternetAvailable(requireContext())) {
+            if (isDocumentAdded) {
+
+                // call the viewmodel method for adding or replacing the document
+                emiViewModel.addOrReplaceBorrowerSupportingDocument(
+                    emiForMenuItems,
+                    supportingDocumentHelperModel
+                )
+            }
+        } else {
+
+            showNoInternetMessage(requireContext())
+        }
+    }
+
     override fun onDeleteSupportingDocumentClick() {
 
-        if (this::emiForMenuItems.isInitialized) {
+        if (this::emiForMenuItems.isInitialized
+            && emiForMenuItems.isSupportingDocAdded
+            && emiForMenuItems.supportingDocument != null
+        ) {
 
-            if (emiForMenuItems.isSupportingDocAdded) {
+            showAlertDialogForDeletion(
+                requireContext(),
+                {
+                    if (emiForMenuItems.supportingDocument?.documentType != DocumentType.URL) {
 
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Are you sure?")
-                    .setMessage("After deleting you cannot retrieve it again.")
-                    .setPositiveButton("Yes") { dialog, _ ->
+                        if (!isInternetAvailable(requireContext())) {
 
-                        if (emiForMenuItems.supportingDocument?.documentType != DocumentType.URL) {
+                            showToast(
+                                requireContext(),
+                                getString(R.string.network_required_for_deleting_file_from_cloud)
+                            )
+                            return@showAlertDialogForDeletion
+                        } else {
 
                             deleteFileFromFirebaseStorage(
                                 requireContext(),
                                 emiForMenuItems.supportingDocument?.documentUrl!!
                             )
-
                         }
-
-                        emiForMenuItems.isSupportingDocAdded = false
-                        emiForMenuItems.supportingDocument = null
-
-                        val map = HashMap<String, Any?>()
-                        map["supportingDocumentAdded"] = false
-                        map["supportingDocument"] = null
-
-                        updateDocumentOnFireStore(
-                            requireContext(),
-                            map,
-                            getString(R.string.emis),
-                            emiForMenuItems.key
-                        )
-
-                        emiViewModel.updateEMI(emiForMenuItems, emiForMenuItems)
-
-                        dialog.dismiss()
                     }
-                    .setNegativeButton("Cancel") { dialog, _ ->
 
-                        dialog.dismiss()
-                    }
-                    .create()
-                    .show()
+                    val emi = emiForMenuItems.copy()
 
-            } else {
+                    emi.supportingDocument = null
+                    emi.isSupportingDocAdded = false
 
-                requireContext().showToast(
-                    "No supporting document added!!!"
-                )
-            }
+                    emiViewModel.updateEMI(emiForMenuItems, emi)
+                    showToast(requireContext(), getString(R.string.supporting_document_deleted))
+                    it.dismiss()
+                },
+                {
+                    it.dismiss()
+                }
+            )
+        } else {
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
         }
 
 

@@ -270,6 +270,7 @@
     <string name="due_currency_symbol_amount">Due : %1$s %2$s</string>
     <string name="borrowed_on">Borrowed on : %1$s</string>
     <string name="month_year">%1$s, %2$s</string>
+    <string name="already_synced">Already Synced</string>
 
     <string-array name="interest_time_schedule">
 

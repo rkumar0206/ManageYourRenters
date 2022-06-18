@@ -399,6 +399,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                     val borrowerPayment = borrowerPaymentForMenus!!.copy()
 
+                    borrowerPayment.modified = System.currentTimeMillis()
                     borrowerPayment.supportingDocument = null
                     borrowerPayment.isSupportingDocAdded = false
 

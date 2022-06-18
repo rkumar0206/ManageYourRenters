@@ -899,15 +899,22 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 selectedYear
             )
 
-            val isElectricBillIncluded = calculateElectricBill() != 0.0
+            val isElectricBillIncluded = (includeBinding.previousReadingET.isTextValid()
+                    && includeBinding.currentReadingET.isTextValid()
+                    && includeBinding.rateET.isTextValid())
 
-            val electricityBillInfo = RenterElectricityBillInfo(
-                previousReading,
-                currentReading,
-                rate,
-                difference,
-                totalElectricBill
-            )
+
+            val electricityBillInfo = if (isElectricBillIncluded) {
+                RenterElectricityBillInfo(
+                    previousReading,
+                    currentReading,
+                    rate,
+                    difference,
+                    totalElectricBill
+                )
+            } else {
+                null
+            }
 
             val payment = RenterPayment(
                 key = generateKey(appendString = "_${getUid()}"),
@@ -917,11 +924,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 currencySymbol = currencySymbol,
                 billPeriodInfo = billInfo,
                 isElectricityBillIncluded = isElectricBillIncluded,
-                electricityBillInfo = if (isElectricBillIncluded) {
-                    electricityBillInfo
-                } else {
-                    null
-                },
+                electricityBillInfo = electricityBillInfo,
                 houseRent = houseRent,
                 parkingRent = parkingBill,
                 extras = if (includeBinding.extraFieldNameET.text.toString().trim().isValid()) {
@@ -966,13 +969,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 }
 
                 paymentViewModel.insertPayment(
-                    requireContext(),
                     payment,
                     supportingDocmtHelperModel
                 )
             } else {
 
-                paymentViewModel.insertPayment(requireContext(), payment, null)
+                paymentViewModel.insertPayment(payment, null)
             }
 
             requireActivity().onBackPressed()

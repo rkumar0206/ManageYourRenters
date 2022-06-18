@@ -134,8 +134,7 @@ class BorrowerPaymentViewModel @Inject constructor(
 
     fun updateBorrowerPayment(
         oldBorrowerPayment: BorrowerPayment,
-        borrowerPayment: BorrowerPayment,
-        shouldUpdateBorrowerDueAmount: Boolean = false
+        borrowerPayment: BorrowerPayment
     ) = viewModelScope.launch {
 
         val context = getApplication<Application>().applicationContext
@@ -171,11 +170,6 @@ class BorrowerPaymentViewModel @Inject constructor(
         }
 
         borrowerPaymentRepository.updateBorrowerPayment(borrowerPayment)
-
-        if (shouldUpdateBorrowerDueAmount) {
-
-            updateBorrowerDueAmount(borrowerPayment.borrowerKey)
-        }
 
     }
 

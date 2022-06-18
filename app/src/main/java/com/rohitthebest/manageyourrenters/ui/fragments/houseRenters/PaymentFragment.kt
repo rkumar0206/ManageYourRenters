@@ -16,10 +16,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowPaymentAdapter
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
+import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
@@ -39,7 +42,8 @@ private const val TAG = "PaymentFragment"
 @SuppressLint("SetTextI18n")
 @AndroidEntryPoint
 class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnClickListener,
-    CustomMenuItems.OnItemClickListener {
+    CustomMenuItems.OnItemClickListener,
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
     private val renterViewModel: RenterViewModel by viewModels()
     private val renterPaymentViewModel: RenterPaymentViewModel by viewModels()
@@ -315,11 +319,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                     if (isInternetAvailable(requireContext())) {
 
-                        renterPaymentViewModel.deletePayment(
-                            requireContext(),
-                            renterPaymentForMenus
-                        )
-
+                        renterPaymentViewModel.deletePayment(renterPaymentForMenus)
                     } else {
                         showNoInternetMessage(requireContext())
                     }
@@ -356,11 +356,107 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     }
 
     override fun onReplaceSupportingDocumentClick() {
-        //TODO("Not yet implemented")
+        if (isInternetAvailable(requireContext())) {
+            if (::renterPaymentForMenus.isInitialized) {
+
+                val supportingDocumentHelperModel = SupportingDocumentHelperModel()
+                supportingDocumentHelperModel.modelName = getString(R.string.renter_payments)
+
+                showSupportDocumentBottomSheetDialog(supportingDocumentHelperModel)
+            }
+        } else {
+
+            showNoInternetMessage(requireContext())
+        }
+
     }
 
+    private fun showSupportDocumentBottomSheetDialog(supportingDocmtHelperModel: SupportingDocumentHelperModel) {
+
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+            supportingDocmtHelperModel.convertToJsonString()
+        )
+
+        requireActivity().supportFragmentManager.let {
+
+            SupportingDocumentDialogFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
+
+    override fun onBottomSheetDismissed(
+        isDocumentAdded: Boolean,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel
+    ) {
+
+        if (isInternetAvailable(requireContext())) {
+            if (isDocumentAdded) {
+                // call the viewmodel method for adding or replacing the document
+                renterPaymentViewModel.addOrReplaceBorrowerSupportingDocument(
+                    renterPaymentForMenus,
+                    supportingDocumentHelperModel
+                )
+            }
+        } else {
+
+            showNoInternetMessage(requireContext())
+        }
+    }
+
+
     override fun onDeleteSupportingDocumentClick() {
-        //TODO("Not yet implemented")
+
+        if (::renterPaymentForMenus.isInitialized
+            && renterPaymentForMenus.isSupportingDocAdded
+            && renterPaymentForMenus.supportingDocument != null
+        ) {
+            showAlertDialogForDeletion(
+                requireContext(),
+                {
+                    // if supporting doc is not a url then delete from cloud storage
+                    if (renterPaymentForMenus.supportingDocument?.documentType != DocumentType.URL) {
+
+                        if (!isInternetAvailable(requireContext())) {
+
+                            showToast(
+                                requireContext(),
+                                getString(R.string.network_required_for_deleting_file_from_cloud)
+                            )
+                            return@showAlertDialogForDeletion
+                        } else {
+
+                            deleteFileFromFirebaseStorage(
+                                requireContext(),
+                                renterPaymentForMenus.supportingDocument?.documentUrl!!
+                            )
+                        }
+                    }
+
+                    val renterPayment = renterPaymentForMenus.copy()
+
+                    renterPayment.modified = System.currentTimeMillis()
+                    renterPayment.supportingDocument = null
+                    renterPayment.isSupportingDocAdded = false
+
+                    renterPaymentViewModel.updatePayment(
+                        renterPaymentForMenus,
+                        renterPayment
+                    )
+                    showToast(requireContext(), getString(R.string.supporting_document_deleted))
+                    it.dismiss()
+                },
+                {
+                    it.dismiss()
+                }
+            )
+        } else {
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+        }
+
     }
 
     override fun onSyncMenuClick() {
@@ -370,11 +466,10 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                 if (renterPaymentForMenus.isSynced) {
 
-                    showToast(requireContext(), "Already Synced")
+                    showToast(requireContext(), getString(R.string.already_synced))
                 } else {
 
-                    renterPaymentForMenus.isSynced = true
-                    renterPaymentViewModel.updatePayment(requireContext(), renterPaymentForMenus)
+                    renterPaymentViewModel.insertPayment(renterPaymentForMenus, null)
                     paymentAdapter.notifyItemChanged(adapterItemPosition)
                 }
 

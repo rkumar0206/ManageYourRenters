@@ -6,6 +6,7 @@ import com.rohitthebest.manageyourrenters.data.RenterBillPeriodInfo
 import com.rohitthebest.manageyourrenters.data.RenterElectricityBillInfo
 import com.rohitthebest.manageyourrenters.data.RenterPaymentExtras
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import java.io.Serializable
 
 @Entity(tableName = "renter_payment_table")
 data class RenterPayment(
@@ -27,7 +28,7 @@ data class RenterPayment(
     var isSupportingDocAdded: Boolean = false,
     var supportingDocument: SupportingDocument? = null,
     var isSynced: Boolean = false
-) {
+) : Serializable {
 
     constructor() : this(
         "",

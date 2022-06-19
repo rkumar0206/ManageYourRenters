@@ -54,6 +54,9 @@ class UploadFileToCloudStorageService : Service() {
     @Inject
     lateinit var emiRepository: EMIRepository
 
+    @Inject
+    lateinit var emiPaymentRepository: EMIPaymentRepository
+
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private var notificationId = 100
 
@@ -84,6 +87,8 @@ class UploadFileToCloudStorageService : Service() {
                     getString(R.string.renter_payments) -> SHORTCUT_HOUSE_RENTERS
 
                     getString(R.string.emis) -> SHORTCUT_EMI
+
+                    getString(R.string.emiPayments) -> SHORTCUT_EMI
 
                     else -> ""
                 }
@@ -259,6 +264,17 @@ class UploadFileToCloudStorageService : Service() {
                 emi.supportingDocument = supportingDocument
 
                 emiRepository.updateEMI(emi)
+                updateFinalNotificationAndStopService()
+            }
+
+            getString(R.string.emiPayments) -> {
+
+                val emiPayment = emiPaymentRepository.getEMIPaymentByKey(documentKey).first()
+
+                emiPayment.isSupportingDocAdded = true
+                emiPayment.supportingDocument = supportingDocument
+
+                emiPaymentRepository.updateEMIPayment(emiPayment)
                 updateFinalNotificationAndStopService()
             }
         }

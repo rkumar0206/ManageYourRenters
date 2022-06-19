@@ -35,6 +35,9 @@ interface EMIPaymentDao {
     @Query("SELECT * FROM emi_payment_table WHERE emiKey =:emiKey ORDER BY modified DESC")
     fun getAllEMIPaymentsByEMIKey(emiKey: String): Flow<List<EMIPayment>>
 
+    @Query("SELECT * FROM emi_payment_table WHERE emiKey = :emiKey ORDER BY created DESC LIMIT 1")
+    fun getLastEMIPaymentOfEMIbyEMIKey(emiKey: String): Flow<EMIPayment>
+
     @Query("SELECT * FROM emi_payment_table WHERE `key` = :emiPaymentKey")
     fun getEMIPaymentByKey(emiPaymentKey: String): Flow<EMIPayment>
 

@@ -18,7 +18,6 @@ import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.SHOW_DOCUMENTS_MENU
-import com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBottomSheetFragment
 import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
@@ -184,16 +183,8 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
             if (isInternetAvailable(requireContext())) {
 
-                emiPayment.isSynced = true
-
-                uploadDocumentToFireStore(
-                    requireContext(),
-                    getString(R.string.emiPayments),
-                    emiPayment.key
-                )
-
-                emiPaymentViewModel.updateEMIPayment(emiPayment)
-
+                // inserting as update is not allowed for emiPayment
+                emiPaymentViewModel.insertEMIPayment(emiPayment, null)
                 emiPaymentAdapter.notifyItemChanged(position)
             } else {
 
@@ -230,25 +221,15 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
                 requireContext(),
                 { dialog ->
 
-                    if (!emiPayment.isSynced || !emiPayment.isSupportingDocAdded) {
+                    if (isInternetAvailable(requireContext())) {
 
                         emiPaymentViewModel.deleteEMIPayment(
-                            requireContext(),
                             emiPayment
                         )
+
                     } else {
 
-                        if (isInternetAvailable(requireContext())) {
-
-                            emiPaymentViewModel.deleteEMIPayment(
-                                requireContext(),
-                                emiPayment
-                            )
-
-                        } else {
-
-                            showNoInternetMessage(requireContext())
-                        }
+                        showNoInternetMessage(requireContext())
                     }
 
                     dialog.dismiss()
@@ -299,19 +280,19 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
     override fun onReplaceSupportingDocumentClick() {
 
-        requireActivity().supportFragmentManager.let {
-
-            val bundle = Bundle()
-            bundle.putString(Constants.COLLECTION_TAG_KEY, getString(R.string.emiPayments))
-            bundle.putString(Constants.DOCUMENT_KEY, fromEMIPaymentToString(emiPaymentForMenus))
-            bundle.putBoolean(Constants.IS_DOCUMENT_FOR_EDITING_KEY, true)
-
-            AddSupportingDocumentBottomSheetFragment.newInstance(
-                bundle
-            ).apply {
-                show(it, "AddSupportingDocTag")
-            }
-        }
+//        requireActivity().supportFragmentManager.let {
+//
+//            val bundle = Bundle()
+//            bundle.putString(Constants.COLLECTION_TAG_KEY, getString(R.string.emiPayments))
+//            bundle.putString(Constants.DOCUMENT_KEY, fromEMIPaymentToString(emiPaymentForMenus))
+//            bundle.putBoolean(Constants.IS_DOCUMENT_FOR_EDITING_KEY, true)
+//
+//            AddSupportingDocumentBottomSheetFragment.newInstance(
+//                bundle
+//            ).apply {
+//                show(it, "AddSupportingDocTag")
+//            }
+//        }
     }
 
     override fun onDeleteSupportingDocumentClick() {

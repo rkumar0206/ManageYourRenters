@@ -125,7 +125,7 @@ class MonthlyPaymentCategoryFragment : Fragment(R.layout.fragment_monthly_paymen
                     if (Functions.isInternetAvailable(requireContext())) {
 
                         monthlyPaymentCategoryViewModel.deleteMonthlyPaymentCategory(
-                            requireContext(), monthlyPaymentCategoryForMenus
+                            monthlyPaymentCategoryForMenus
                         )
                     } else {
                         Functions.showNoInternetMessage(requireContext())
@@ -148,7 +148,6 @@ class MonthlyPaymentCategoryFragment : Fragment(R.layout.fragment_monthly_paymen
             if (Functions.isInternetAvailable(requireContext())) {
 
                 monthlyPaymentCategoryViewModel.insertMonthlyPaymentCategory(
-                    requireContext(),
                     monthlyPaymentCategoryForMenus
                 )
                 monthlyPaymentCategoryAdapter.notifyItemChanged(itemPosition)

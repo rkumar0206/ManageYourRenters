@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.database.dao
 
 
 import androidx.room.*
+import com.rohitthebest.manageyourrenters.data.KeyAndSupportingDoc
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import kotlinx.coroutines.flow.Flow
 
@@ -38,8 +39,8 @@ interface RenterPaymentDao {
     @Query("SELECT * FROM renter_payment_table WHERE `key` =:paymentKey")
     fun getPaymentByPaymentKey(paymentKey: String): Flow<RenterPayment>
 
-    @Query("SELECT `key` FROM renter_payment_table WHERE renterKey = :renterKey")
-    suspend fun getPaymentKeysByRenterKey(renterKey: String): List<String>
+    @Query("SELECT `key`, supportingDocument FROM renter_payment_table WHERE renterKey = :renterKey")
+    suspend fun getPaymentKeysAndSupportingDocumentByRenterKey(renterKey: String): List<KeyAndSupportingDoc>
 
     @Query("SELECT * FROM renter_payment_table WHERE renterKey = :renterKey ORDER BY created DESC LIMIT 1")
     fun getLastRenterPayment(renterKey: String): Flow<RenterPayment>

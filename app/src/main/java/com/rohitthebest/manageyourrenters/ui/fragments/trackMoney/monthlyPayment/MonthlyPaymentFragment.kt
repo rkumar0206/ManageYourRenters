@@ -173,7 +173,7 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
                     if (isInternetAvailable(requireContext())) {
 
                         monthlyPaymentViewModel.deleteMonthlyPayment(
-                            requireContext(), monthlyPaymentForMenus
+                            monthlyPaymentForMenus
                         )
                     } else {
 
@@ -196,14 +196,14 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
             if (isInternetAvailable(requireContext())) {
 
                 monthlyPaymentViewModel.insertMonthlyPayment(
-                    requireContext(), monthlyPaymentForMenus
+                    monthlyPaymentForMenus
                 )
                 monthlyPaymentAdapter.notifyItemChanged(monthlyPaymentForMenusAdapterPosition)
 
                 receivedMonthlyPaymentCategory.modified = System.currentTimeMillis()
 
                 monthlyPaymentCategoryViewModel.updateMonthlyPaymentCategory(
-                    requireContext(), receivedMonthlyPaymentCategory, false
+                    receivedMonthlyPaymentCategory, false
                 )
 
             } else {

@@ -1,6 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import android.content.Context
+import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
@@ -19,9 +19,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MonthlyPaymentViewModel @Inject constructor(
+    app: Application,
     private val repository: MonthlyPaymentRepository,
     private val state: SavedStateHandle
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     // ------------------------- UI related ----------------------------
 
@@ -44,8 +45,10 @@ class MonthlyPaymentViewModel @Inject constructor(
     // ---------------------------------------------------------------
 
 
-    fun insertMonthlyPayment(context: Context, monthlyPayment: MonthlyPayment) =
+    fun insertMonthlyPayment(monthlyPayment: MonthlyPayment) =
         viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
 
             if (Functions.isInternetAvailable(context)) {
 
@@ -68,8 +71,10 @@ class MonthlyPaymentViewModel @Inject constructor(
         repository.insertAllMonthlyPayment(monthlyPayments)
     }
 
-    fun updateMonthlyPayment(context: Context, monthlyPayment: MonthlyPayment) =
+    fun updateMonthlyPayment(monthlyPayment: MonthlyPayment) =
         viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
 
             if (Functions.isInternetAvailable(context)) {
 
@@ -88,8 +93,10 @@ class MonthlyPaymentViewModel @Inject constructor(
             Functions.showToast(context, "Payment updated")
         }
 
-    fun deleteMonthlyPayment(context: Context, monthlyPayment: MonthlyPayment) =
+    fun deleteMonthlyPayment(monthlyPayment: MonthlyPayment) =
         viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
 
             if (Functions.isInternetAvailable(context)) {
 

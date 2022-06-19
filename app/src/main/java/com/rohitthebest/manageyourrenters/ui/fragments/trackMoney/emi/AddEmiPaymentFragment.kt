@@ -3,19 +3,22 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.databinding.AddEmiPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
-import com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBottomSheetFragment
+import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -24,9 +27,12 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import dagger.hilt.android.AndroidEntryPoint
 
+private const val TAG = "AddEmiPaymentFragment"
+
 @AndroidEntryPoint
 class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.OnClickListener,
-    AddSupportingDocumentBottomSheetFragment.OnBottomSheetDismissListener {
+    CompoundButton.OnCheckedChangeListener,
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
     private var _binding: FragmentAddEmiPaymentBinding? = null
     private val binding get() = _binding!!
@@ -42,6 +48,7 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
     private var previousEmiPayment: EMIPayment? = null
 
     private var selectedDate = 0L
+    private lateinit var supportingDocmtHelperModel: SupportingDocumentHelperModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,6 +56,7 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
 
         includeBinding = binding.include
         getMessage()
+        supportingDocmtHelperModel = SupportingDocumentHelperModel()
 
         selectedDate = System.currentTimeMillis()
         updateSelectedDate()
@@ -86,58 +94,17 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
 
     private fun getPreviousEMIPayment() {
 
-        emiPaymentViewModel.getAllEMIPaymentsByEMIKey(receivedEMIKey)
-            .observe(viewLifecycleOwner) { emiPayments ->
+        emiPaymentViewModel.getLastEMIPaymentOfEMIbyEMIKey(receivedEMIKey)
+            .observe(viewLifecycleOwner) { emiPayment ->
 
-                if (emiPayments.isNotEmpty()) {
+                if (emiPayment != null) {
 
                     // previous payment
-                    previousEmiPayment =
-                        emiPayments[0] // getting the first element as the list is in descending order
+                    previousEmiPayment = emiPayment
                 }
 
                 initUI()
             }
-    }
-
-    private fun initListeners() {
-
-        binding.addEmiPaymentToolbar.setNavigationOnClickListener {
-
-            hideKeyBoard(requireActivity())
-            requireActivity().onBackPressed()
-        }
-
-        binding.addEmiPaymentToolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
-
-            if (isFormValid()) {
-
-                initEMIPayment()
-            }
-
-            true
-        }
-
-        includeBinding.emiPaymentPaidOnTV.setOnClickListener(this)
-        includeBinding.emiPaymentPaidOnIB.setOnClickListener(this)
-    }
-
-    override fun onClick(v: View?) {
-
-        if (v?.id == includeBinding.emiPaymentPaidOnTV.id || v?.id == includeBinding.emiPaymentPaidOnIB.id) {
-
-            showCalendarDialog(
-                selectedDate,
-                {
-                    requireActivity().supportFragmentManager
-                },
-                { date ->
-
-                    selectedDate = date
-                    updateSelectedDate()
-                }
-            )
-        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -159,6 +126,110 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
     }
 
 
+    private fun initListeners() {
+
+        includeBinding.addSupportingDocCB.isChecked = false
+
+        binding.addEmiPaymentToolbar.setNavigationOnClickListener {
+
+            hideKeyBoard(requireActivity())
+            requireActivity().onBackPressed()
+        }
+
+        binding.addEmiPaymentToolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
+
+            if (isFormValid()) {
+
+                initEMIPayment()
+            }
+
+            true
+        }
+
+        includeBinding.emiPaymentPaidOnTV.setOnClickListener(this)
+        includeBinding.emiPaymentPaidOnIB.setOnClickListener(this)
+        includeBinding.addSupportingDocCB.setOnCheckedChangeListener(this)
+        includeBinding.viewEditSupportingDoc.setOnClickListener(this)
+    }
+
+    override fun onClick(v: View?) {
+
+        if (v?.id == includeBinding.emiPaymentPaidOnTV.id || v?.id == includeBinding.emiPaymentPaidOnIB.id) {
+
+            showCalendarDialog(
+                selectedDate,
+                {
+                    requireActivity().supportFragmentManager
+                },
+                { date ->
+
+                    selectedDate = date
+                    updateSelectedDate()
+                }
+            )
+        }
+
+        when (v?.id) {
+
+            includeBinding.viewEditSupportingDoc.id -> {
+                showSupportDocumentBottomSheetDialog()
+            }
+        }
+
+    }
+
+    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+
+        hideKeyBoard(requireActivity())
+
+        when (buttonView?.id) {
+
+            includeBinding.addSupportingDocCB.id -> {
+
+                if (isChecked) {
+
+                    includeBinding.viewEditSupportingDoc.show()
+                    supportingDocmtHelperModel = SupportingDocumentHelperModel()
+                    supportingDocmtHelperModel.modelName = getString(R.string.emiPayments)
+                    showSupportDocumentBottomSheetDialog()
+                } else {
+
+                    includeBinding.viewEditSupportingDoc.hide()
+                }
+            }
+        }
+    }
+
+    private fun showSupportDocumentBottomSheetDialog() {
+
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+            supportingDocmtHelperModel.convertToJsonString()
+        )
+
+        requireActivity().supportFragmentManager.let {
+
+            SupportingDocumentDialogFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
+
+    override fun onBottomSheetDismissed(
+        isDocumentAdded: Boolean,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel
+    ) {
+
+        if (!isDocumentAdded) {
+            includeBinding.addSupportingDocCB.isChecked = false
+        } else {
+
+            supportingDocmtHelperModel = supportingDocumentHelperModel
+        }
+    }
+
     private fun initEMIPayment() {
 
         val emiPayment = EMIPayment()
@@ -174,7 +245,7 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
             emiKey = receivedEMIKey
             fromMonth = includeBinding.emiPaymentFromMonthTV.text.toString().toInt()
             tillMonth = includeBinding.emiPaymentTillMonthET.text.toString().toInt()
-            isSupportingDocumentAdded = false
+            isSupportingDocAdded = false
             uid = receivedEMI.uid
             key = generateKey("_$uid")
             message = if (!includeBinding.addNoteET.isTextValid()) {
@@ -183,91 +254,42 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
 
                 includeBinding.addNoteET.text.toString().trim()
             }
+
+            isSupportingDocAdded = includeBinding.addSupportingDocCB.isChecked
+
+            if (includeBinding.addSupportingDocCB.isChecked
+                && supportingDocmtHelperModel.documentType == DocumentType.URL
+            ) {
+                SupportingDocument(
+                    supportingDocmtHelperModel.documentName,
+                    supportingDocmtHelperModel.documentUrl,
+                    supportingDocmtHelperModel.documentType
+                )
+            }
         }
 
-        showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(emiPayment)
-    }
+        if (emiPayment.isSupportingDocAdded
+            && supportingDocmtHelperModel.documentType != DocumentType.URL
+        ) {
 
-    private fun showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(emiPayment: EMIPayment) {
-
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Add supporting document")
-            .setMessage("Do you want to add any supporting document?")
-            .setPositiveButton("No") { dialog, _ ->
-
-                // if user selects no, then simply insert the emi to the cloud as well
-                // as local database
-                insertToDatabase(emiPayment)
-                dialog.dismiss()
+            // if the document type is not URL, then we need internet connection to upload the uri
+            if (!Functions.isInternetAvailable(requireContext())) {
+                Functions.showToast(
+                    requireContext(),
+                    getString(R.string.internet_required_message_for_uploading_doc),
+                    Toast.LENGTH_LONG
+                )
+                return
             }
-            .setNegativeButton("Yes") { dialog, _ ->
 
-                // opening  bottomSheet for adding supporting document
-                // and also sending this emiPayment instance and the collection name
-                // as a bundle to the bottomSheet arguments
-                // if the user adds a supporting document then insertion of emiPayment to the database will
-                // be handled there only
-                if (Functions.isInternetAvailable(requireContext())) {
-
-                    requireActivity().supportFragmentManager.let { fragmentManager ->
-
-                        val bundle = Bundle()
-                        bundle.putString(
-                            Constants.COLLECTION_TAG_KEY,
-                            getString(R.string.emiPayments)
-                        )
-                        bundle.putString(Constants.DOCUMENT_KEY, fromEMIPaymentToString(emiPayment))
-                        bundle.putBoolean(Constants.IS_DOCUMENT_FOR_EDITING_KEY, false)
-
-                        AddSupportingDocumentBottomSheetFragment.newInstance(
-                            bundle
-                        ).apply {
-                            show(fragmentManager, "AddSupportingDocTag")
-                        }.setOnBottomSheetDismissListener(this)
-                    }
-
-                } else {
-
-                    Functions.showToast(
-                        requireContext(),
-                        getString(R.string.internet_required_message_for_uploading_doc),
-                        Toast.LENGTH_LONG
-                    )
-                }
-
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-
-    }
-
-    override fun onBottomSheetDismissed(isDocumentAdded: Boolean) {
-
-        if (isDocumentAdded) {
-
-            requireActivity().onBackPressed()
-        }
-    }
-
-
-    private fun insertToDatabase(emiPayment: EMIPayment) {
-
-        emiPayment.isSynced = Functions.isInternetAvailable(requireContext())
-
-        emiPayment.isSupportingDocumentAdded = false
-
-        emiPaymentViewModel.insertEMIPayment(requireContext(), emiPayment)
-
-        if (emiPayment.isSynced) {
-
-            uploadDocumentToFireStore(
-                requireContext(),
-                getString(R.string.emiPayments),
-                emiPayment.key
+            emiPaymentViewModel.insertEMIPayment(
+                emiPayment,
+                supportingDocmtHelperModel
             )
-        }
+        } else {
 
+            emiPaymentViewModel.insertEMIPayment(emiPayment, null)
+        }
         requireActivity().onBackPressed()
     }
 

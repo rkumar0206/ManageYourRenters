@@ -13,7 +13,6 @@ import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.api.MonthlyPaymentCategoryRepositoryAPI
-import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,9 +45,9 @@ class MonthlyPaymentCategoryService : Service() {
             intent?.getStringExtra(Constants.MONTHLY_PAYMENT_CATEGORY_KEY)
 
         val pendingIntent: PendingIntent =
-            Intent(this, HomeActivity::class.java).let { notificationIntent ->
-                PendingIntent.getActivity(this, 0, notificationIntent, 0)
-            }
+            Functions.getPendingIntentForForegroundServiceNotification(
+                this, getString(R.string.monthly_payments)
+            )
 
         val image = R.drawable.ic_track_money
 

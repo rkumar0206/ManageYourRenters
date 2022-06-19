@@ -1,6 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import android.content.Context
+import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
@@ -18,10 +18,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExpenseCategoryViewModel @Inject constructor(
+    app: Application,
     private val expenseCategoryRepository: ExpenseCategoryRepository,
     private val expenseRepository: ExpenseRepository,
     private val state: SavedStateHandle
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     // ------------------------- UI related ----------------------------
 
@@ -45,21 +46,21 @@ class ExpenseCategoryViewModel @Inject constructor(
 
 
     // ------------------------- Database related ---------------------------
-    fun insertExpenseCategory(context: Context, expenseCategory: ExpenseCategory) =
+    fun insertExpenseCategory(expenseCategory: ExpenseCategory) = viewModelScope.launch {
 
-        viewModelScope.launch {
+        val context = getApplication<Application>().applicationContext
 
-            if (isInternetAvailable(context)) {
+        if (isInternetAvailable(context)) {
 
-                expenseCategory.isSynced = true
+            expenseCategory.isSynced = true
 
-                // this method invokes the expense category foreground service to upload the category
-                expenseCategoryServiceHelper(
-                    context,
-                    expenseCategory.key,
-                    context.getString(R.string.post)
-                )
-            } else {
+            // this method invokes the expense category foreground service to upload the category
+            expenseCategoryServiceHelper(
+                context,
+                expenseCategory.key,
+                context.getString(R.string.post)
+            )
+        } else {
 
                 expenseCategory.isSynced = false
             }
@@ -74,12 +75,12 @@ class ExpenseCategoryViewModel @Inject constructor(
     }
 
     fun updateExpenseCategory(
-        context: Context,
         expenseCategory: ExpenseCategory,
         shouldUpload: Boolean = true
     ) =
 
         viewModelScope.launch {
+            val context = getApplication<Application>().applicationContext
 
             if (isInternetAvailable(context) && shouldUpload) {
 
@@ -100,8 +101,10 @@ class ExpenseCategoryViewModel @Inject constructor(
             expenseCategoryRepository.updateExpenseCategory(expenseCategory)
         }
 
-    fun deleteExpenseCategory(context: Context, expenseCategory: ExpenseCategory) =
+    fun deleteExpenseCategory(expenseCategory: ExpenseCategory) =
         viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
 
             if (isInternetAvailable(context)) {
 

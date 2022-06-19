@@ -30,6 +30,8 @@ class EMIPaymentRepository @Inject constructor(
 
     fun getAllEMIPaymentsByEMIKey(emiKey: String) = dao.getAllEMIPaymentsByEMIKey(emiKey)
 
+    fun getLastEMIPaymentOfEMIbyEMIKey(emiKey: String) = dao.getLastEMIPaymentOfEMIbyEMIKey(emiKey)
+
     fun getEMIPaymentByKey(emiPaymentKey: String) = dao.getEMIPaymentByKey(emiPaymentKey)
 
     suspend fun getEmiPaymentsKeysAndSupportingDocsByEMIKey(emiKey: String) =

@@ -29,8 +29,8 @@ class RenterPaymentRepository @Inject constructor(
 
     fun getPaymentByPaymentKey(paymentKey: String) = dao.getPaymentByPaymentKey(paymentKey)
 
-    suspend fun getPaymentKeysByRenterKey(renterKey: String) =
-        dao.getPaymentKeysByRenterKey(renterKey)
+    suspend fun getPaymentKeysAndSupportingDocumentByRenterKey(renterKey: String) =
+        dao.getPaymentKeysAndSupportingDocumentByRenterKey(renterKey)
 
     fun getLastRenterPayment(renterKey: String) = dao.getLastRenterPayment(renterKey)
 

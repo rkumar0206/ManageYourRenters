@@ -211,8 +211,8 @@ class LoginActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.IO).launch {
 
                 val renters = getDataFromFireStore(
-                    getString(R.string.renters),
-                    getUid()!!
+                    collection = getString(R.string.renters),
+                    uid = getUid()!!
                 ) {
 
                     // on failure
@@ -257,8 +257,8 @@ class LoginActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) {
 
             val renterPayments = getDataFromFireStore(
-                getString(R.string.renter_payments),
-                getUid()!!
+                collection = getString(R.string.renter_payments),
+                uid = getUid()!!
             ) {
                 lifecycleScope.launch {
 

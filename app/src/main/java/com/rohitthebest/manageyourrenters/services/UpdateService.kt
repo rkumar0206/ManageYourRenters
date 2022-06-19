@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.services
 
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -12,6 +13,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPDATE_DOCUMENT_MAP_KEY
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,10 +32,16 @@ class UpdateService : Service() {
 
         val randomId = intent.getIntExtra(RANDOM_ID_KEY, 1000)
 
+        val pendingIntent: PendingIntent =
+            Functions.getPendingIntentForForegroundServiceNotification(
+                this, collection ?: ""
+            )
+
         val notification = NotificationCompat.Builder(
             this,
             Constants.NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(R.drawable.ic_baseline_payment_24)
+            .setContentIntent(pendingIntent)
             .setContentTitle("Updating on $collection.")
             .setProgress(100, 0, true)
             .build()

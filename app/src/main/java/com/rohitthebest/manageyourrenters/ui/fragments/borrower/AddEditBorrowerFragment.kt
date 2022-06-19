@@ -325,17 +325,16 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
             // insert
             if (borrower.isSupportingDocAdded && borrower.supportingDocument?.documentType != DocumentType.URL)
                 borrowerViewModel.insertBorrower(
-                    requireContext(),
                     borrower,
                     supportingDocmtHelperModel
                 )
             else
-                borrowerViewModel.insertBorrower(requireContext(), borrower)
+                borrowerViewModel.insertBorrower(borrower)
 
             showToast(requireContext(), "Borrower added")
         } else {
             // update
-            borrowerViewModel.updateBorrower(requireContext(), borrower)
+            borrowerViewModel.updateBorrower(borrower)
             showToast(requireContext(), "Borrower info updated")
         }
 

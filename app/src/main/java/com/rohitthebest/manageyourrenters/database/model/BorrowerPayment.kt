@@ -2,14 +2,16 @@ package com.rohitthebest.manageyourrenters.database.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.rohitthebest.manageyourrenters.data.Interest
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import java.io.Serializable
 
 @IgnoreExtraProperties
 @Entity(tableName = "borrower_payment_table")
 data class BorrowerPayment(
-    @PrimaryKey(autoGenerate = true) val id: Int?,
+    @Exclude @PrimaryKey(autoGenerate = true) val id: Int?,
     var created: Long = System.currentTimeMillis(),
     var modified: Long = System.currentTimeMillis(),
     var borrowerId: String,
@@ -26,7 +28,7 @@ data class BorrowerPayment(
     var uid: String,
     var isSynced: Boolean = false,
     var messageOrNote: String = ""
-) {
+) : Serializable {
 
     constructor() : this(
         null,

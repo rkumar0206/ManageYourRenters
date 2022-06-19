@@ -185,7 +185,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                 if (!borrowerForMenus.isSynced) {
 
                     borrowerViewModel.deleteBorrower(
-                        requireContext(),
                         borrowerForMenus
                     )
                 } else {
@@ -193,7 +192,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                     if (isInternetAvailable(requireContext())) {
 
                         borrowerViewModel.deleteBorrower(
-                            requireContext(),
                             borrowerForMenus
                         )
                     } else {
@@ -212,25 +210,34 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     }
 
+    private fun checkSupportingDocumentValidation(): Boolean {
+
+        if (!borrowerForMenus.isSupportingDocAdded) {
+
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            return false
+        } else if (borrowerForMenus.isSupportingDocAdded && borrowerForMenus.supportingDocument == null) {
+
+            showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
+            return false
+        }
+
+        return true
+    }
+
+
     override fun onViewSupportingDocumentMenuClick() {
 
-        if (::borrowerForMenus.isInitialized) {
+        if (::borrowerForMenus.isInitialized && checkSupportingDocumentValidation()) {
 
-            if (!borrowerForMenus.isSupportingDocAdded) {
+            borrowerForMenus.supportingDocument?.let { supportingDoc ->
 
-                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
-            } else if (borrowerForMenus.isSupportingDocAdded && borrowerForMenus.supportingDocument == null) {
-
-                showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
-            } else {
-                borrowerForMenus.supportingDocument?.let { supportingDoc ->
-
-                    Functions.onViewOrDownloadSupportingDocument(
-                        requireActivity(),
-                        supportingDoc
-                    )
-                }
+                Functions.onViewOrDownloadSupportingDocument(
+                    requireActivity(),
+                    supportingDoc
+                )
             }
+
         }
     }
 
@@ -278,7 +285,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
                 // call the viewmodel method for adding or replacing the document
                 borrowerViewModel.addOrReplaceBorrowerSupportingDocument(
-                    requireContext(),
                     borrowerForMenus,
                     supportingDocumentHelperModel
                 )
@@ -292,35 +298,44 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
     override fun onDeleteSupportingDocumentClick() {
 
         if (::borrowerForMenus.isInitialized
-            && borrowerForMenus.isSupportingDocAdded
+            && checkSupportingDocumentValidation()
             && borrowerForMenus.supportingDocument != null
         ) {
 
-            if (borrowerForMenus.supportingDocument?.documentType != DocumentType.URL) {
+            showAlertDialogForDeletion(
+                requireContext(),
+                {
+                    if (borrowerForMenus.supportingDocument?.documentType != DocumentType.URL) {
 
-                if (!isInternetAvailable(requireContext())) {
+                        if (!isInternetAvailable(requireContext())) {
 
-                    showToast(
-                        requireContext(),
-                        "Network connection required to delete the document from cloud"
-                    )
-                    return
-                } else {
+                            showToast(
+                                requireContext(),
+                                getString(R.string.network_required_for_deleting_file_from_cloud)
+                            )
+                            return@showAlertDialogForDeletion
+                        } else {
 
-                    deleteFileFromFirebaseStorage(
-                        requireContext(),
-                        borrowerForMenus.supportingDocument?.documentUrl!!
-                    )
+                            deleteFileFromFirebaseStorage(
+                                requireContext(),
+                                borrowerForMenus.supportingDocument?.documentUrl!!
+                            )
+                        }
+                    }
+                    borrowerForMenus.supportingDocument = null
+                    borrowerForMenus.isSupportingDocAdded = false
+                    borrowerViewModel.updateBorrower(borrowerForMenus)
+                    showToast(requireContext(), getString(R.string.supporting_document_deleted))
+                    it.dismiss()
+                },
+                {
+                    it.dismiss()
                 }
-            }
-            borrowerForMenus.supportingDocument = null
-            borrowerForMenus.isSupportingDocAdded = false
-            borrowerViewModel.updateBorrower(requireContext(), borrowerForMenus)
-            showToast(requireContext(), "Supporting Document deleted")
-
+            )
         } else {
             showToast(requireContext(), getString(R.string.no_supporting_doc_added))
         }
+
     }
 
     override fun onSyncMenuClick() {
@@ -341,7 +356,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                         borrowerForMenus.key
                     )
 
-                    borrowerViewModel.updateBorrower(requireContext(), borrowerForMenus)
+                    borrowerViewModel.updateBorrower(borrowerForMenus)
 
                     borrowerAdapter.notifyItemChanged(currentAdapterPosition)
                 }

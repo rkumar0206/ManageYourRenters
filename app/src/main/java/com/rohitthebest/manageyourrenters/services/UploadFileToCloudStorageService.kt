@@ -16,12 +16,8 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
-import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_BORROWERS
-import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_HOUSE_RENTERS
 import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY
-import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
-import com.rohitthebest.manageyourrenters.repositories.RenterRepository
-import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
+import com.rohitthebest.manageyourrenters.repositories.*
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
 import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
@@ -45,6 +41,18 @@ class UploadFileToCloudStorageService : Service() {
     @Inject
     lateinit var renterRepository: RenterRepository
 
+    @Inject
+    lateinit var borrowerPaymentRepository: BorrowerPaymentRepository
+
+    @Inject
+    lateinit var renterPaymentRepository: RenterPaymentRepository
+
+    @Inject
+    lateinit var emiRepository: EMIRepository
+
+    @Inject
+    lateinit var emiPaymentRepository: EMIPaymentRepository
+
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private var notificationId = 100
 
@@ -63,17 +71,9 @@ class UploadFileToCloudStorageService : Service() {
         notificationId = Random.nextInt(1000, 9999)
 
         val pendingIntent: PendingIntent =
-            Intent(this, HomeActivity::class.java).let { notificationIntent ->
-                notificationIntent.action = when (supportingDocumentHelperModel.modelName) {
-
-                    getString(R.string.borrowers) -> SHORTCUT_BORROWERS
-
-                    getString(R.string.renters) -> SHORTCUT_HOUSE_RENTERS
-
-                    else -> ""
-                }
-                PendingIntent.getActivity(this, 0, notificationIntent, 0)
-            }
+            Functions.getPendingIntentForForegroundServiceNotification(
+                this, supportingDocumentHelperModel.modelName
+            )
 
         notificationBuilder = NotificationCompat.Builder(
             this,
@@ -82,7 +82,7 @@ class UploadFileToCloudStorageService : Service() {
 
             setSmallIcon(R.drawable.ic_house_renters)
             setContentIntent(pendingIntent)
-            setContentTitle("Uploading supporting document to cloud.")
+            setContentTitle(getString(R.string.uploading_supporting_document_to_cloud))
         }
 
         NotificationManagerCompat.from(this).apply {
@@ -211,6 +211,50 @@ class UploadFileToCloudStorageService : Service() {
                 renter.supportingDocument = supportingDocument
 
                 renterRepository.updateRenter(renter)
+                updateFinalNotificationAndStopService()
+            }
+
+            getString(R.string.borrowerPayments) -> {
+
+                val payment = borrowerPaymentRepository.getBorrowerPaymentByKey(documentKey).first()
+
+                payment.isSupportingDocAdded = true
+                payment.supportingDocument = supportingDocument
+
+                borrowerPaymentRepository.updateBorrowerPayment(payment)
+                updateFinalNotificationAndStopService()
+            }
+
+            getString(R.string.renter_payments) -> {
+
+                val payment = renterPaymentRepository.getPaymentByPaymentKey(documentKey).first()
+
+                payment.isSupportingDocAdded = true
+                payment.supportingDocument = supportingDocument
+
+                renterPaymentRepository.updateRenterPayment(payment)
+                updateFinalNotificationAndStopService()
+            }
+
+            getString(R.string.emis) -> {
+
+                val emi = emiRepository.getEMIByKey(documentKey).first()
+
+                emi.isSupportingDocAdded = true
+                emi.supportingDocument = supportingDocument
+
+                emiRepository.updateEMI(emi)
+                updateFinalNotificationAndStopService()
+            }
+
+            getString(R.string.emiPayments) -> {
+
+                val emiPayment = emiPaymentRepository.getEMIPaymentByKey(documentKey).first()
+
+                emiPayment.isSupportingDocAdded = true
+                emiPayment.supportingDocument = supportingDocument
+
+                emiPaymentRepository.updateEMIPayment(emiPayment)
                 updateFinalNotificationAndStopService()
             }
         }

@@ -2,20 +2,22 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.AddEmiLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEmiBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
-import com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBottomSheetFragment
+import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
@@ -31,7 +33,8 @@ private const val TAG = "AddEditEMIFragment"
 
 @AndroidEntryPoint
 class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickListener,
-    AddSupportingDocumentBottomSheetFragment.OnBottomSheetDismissListener {
+    CompoundButton.OnCheckedChangeListener,
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
     private var _binding: FragmentAddEmiBinding? = null
     private val binding get() = _binding!!
@@ -48,6 +51,8 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
     private var receivedEmiKey = ""
     private lateinit var receivedEmi: EMI
 
+    private lateinit var supportingDocmtHelperModel: SupportingDocumentHelperModel
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAddEmiBinding.bind(view)
@@ -60,6 +65,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
         includeBinding.emiStartDateTV.setDateInTextView(
             selectedEMIStartDate
         )
+        supportingDocmtHelperModel = SupportingDocumentHelperModel()
 
         initListeners()
         textWatcher()
@@ -118,11 +124,15 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
                 emiAmountPerMonthET.setText(receivedEmi.amountPaidPerMonth.toString())
                 calculateTotalEmiAmount()
                 amountPaidTillNowForEMITV.text = receivedEmi.amountPaid.toString()
+                addSupportingDocCB.hide()
+                viewEditSupportingDoc.hide()
             }
         }
     }
 
     private fun initListeners() {
+
+        includeBinding.addSupportingDocCB.isChecked = false
 
         includeBinding.emiStartDateTV.setOnClickListener(this)
         includeBinding.emiStartDateCalendarBtn.setOnClickListener(this)
@@ -140,139 +150,70 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
             }
             true
         }
+        includeBinding.addSupportingDocCB.setOnCheckedChangeListener(this)
+        includeBinding.viewEditSupportingDoc.setOnClickListener(this)
     }
 
-    private fun initEMI() {
+    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
 
-        var emi = EMI()
+        when (buttonView?.id) {
 
-        if (isMessageReceivedForEditing) {
+            includeBinding.addSupportingDocCB.id -> {
 
-            emi = receivedEmi
-        }
+                if (isChecked) {
 
-        emi.modified = System.currentTimeMillis()
-        emi.isSynced = false
-
-        emi.apply {
-
-            created =
-                if (!isMessageReceivedForEditing) System.currentTimeMillis() else receivedEmi.created
-
-            emiName = includeBinding.emiNameET.editText?.text.toString().trim()
-            startDate = selectedEMIStartDate
-            totalMonths = includeBinding.totalEmiMonthsET.text.toString().toInt()
-            monthsCompleted = includeBinding.numberOfMonthsCompltedET.text.toString().toInt()
-            amountPaidPerMonth = includeBinding.emiAmountPerMonthET.text.toString().toDouble()
-            amountPaid = calculateAmountPaidTillNow()
-            currencySymbol = selectedCurrencySymbol
-            uid = getUid()!!
-
-            key = if (!isMessageReceivedForEditing) generateKey("_${uid}") else receivedEmi.key
-        }
-
-        if (!isMessageReceivedForEditing) {
-
-            showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(emi)
-        } else {
-
-            insertToDatabase(emi)
-        }
-    }
-
-    private fun showDialogForAskingIfTheUserNeedsToUploadSupportingDoc(emi: EMI) {
-
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Add supporting document")
-            .setMessage("Do you want to add any supporting document?")
-            .setPositiveButton("No") { dialog, _ ->
-
-                // if user selects no, then simply insert the emi to the cloud as well
-                // as local database
-                insertToDatabase(emi)
-                dialog.dismiss()
-            }
-            .setNegativeButton("Yes") { dialog, _ ->
-
-                // opening  bottomSheet for adding supporting document
-                // and also sending this emi instance and the collection name
-                // as a bundle to the bottomSheet arguments
-                // if the user adds a supporting document then insertion of emi to the database will
-                // be done there only
-                if (isInternetAvailable(requireContext())) {
-
-                    requireActivity().supportFragmentManager.let { fragmentManager ->
-
-                        val bundle = Bundle()
-                        bundle.putString(Constants.COLLECTION_TAG_KEY, getString(R.string.emis))
-                        bundle.putString(Constants.DOCUMENT_KEY, fromEMIToString(emi))
-                        bundle.putBoolean(Constants.IS_DOCUMENT_FOR_EDITING_KEY, false)
-
-                        AddSupportingDocumentBottomSheetFragment.newInstance(
-                            bundle
-                        ).apply {
-                            show(fragmentManager, "AddSupportingDocTag")
-                        }.setOnBottomSheetDismissListener(this)
-                    }
-
+                    supportingDocmtHelperModel = SupportingDocumentHelperModel()
+                    supportingDocmtHelperModel.modelName = getString(R.string.emis)
+                    showSupportDocumentBottomSheetDialog()
+                    includeBinding.viewEditSupportingDoc.show()
                 } else {
 
-                    showToast(
-                        requireContext(),
-                        getString(R.string.internet_required_message_for_uploading_doc),
-                        Toast.LENGTH_LONG
-                    )
+                    includeBinding.viewEditSupportingDoc.hide()
                 }
-
-                dialog.dismiss()
             }
-            .create()
-            .show()
-
-    }
-
-    override fun onBottomSheetDismissed(isDocumentAdded: Boolean) {
-
-        if (isDocumentAdded) {
-
-            requireActivity().onBackPressed()
         }
     }
 
-    private fun insertToDatabase(emi: EMI) {
+    private fun showSupportDocumentBottomSheetDialog() {
 
-        Log.d(TAG, "insertToDatabase: ")
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+            supportingDocmtHelperModel.convertToJsonString()
+        )
 
-        emi.isSynced = isInternetAvailable(requireContext())
+        requireActivity().supportFragmentManager.let {
 
-        if (!isMessageReceivedForEditing) {
+            SupportingDocumentDialogFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
 
-            emi.isSupportingDocumentAdded = false
+    override fun onBottomSheetDismissed(
+        isDocumentAdded: Boolean,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel
+    ) {
 
-            emiViewModel.insertEMI(emi)
-            Log.d(TAG, "insertToDatabase: EMI inserted")
+        if (!isDocumentAdded) {
+            includeBinding.addSupportingDocCB.isChecked = false
         } else {
 
-            emiViewModel.updateEMI(emi)
-            requireContext().showToast(
-                "EMI details updated"
-            )
+            supportingDocmtHelperModel = supportingDocumentHelperModel
         }
-
-        if (emi.isSynced) {
-
-            uploadDocumentToFireStore(
-                requireContext(),
-                getString(R.string.emis),
-                emi.key
-            )
-        }
-
-
-        requireActivity().onBackPressed()
     }
 
+
     override fun onClick(v: View?) {
+
+        when (v?.id) {
+
+            includeBinding.viewEditSupportingDoc.id -> {
+
+                showSupportDocumentBottomSheetDialog()
+            }
+        }
 
         if (v?.id == includeBinding.emiStartDateTV.id || v?.id == includeBinding.emiStartDateCalendarBtn.id) {
 
@@ -292,6 +233,91 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
     }
 
+
+    private fun initEMI() {
+
+        var emi = EMI()
+
+        if (isMessageReceivedForEditing) {
+
+            emi = receivedEmi.copy()
+        }
+
+        emi.modified = System.currentTimeMillis()
+        emi.isSynced = false
+
+        emi.apply {
+
+            emiName = includeBinding.emiNameET.editText?.text.toString().trim()
+            startDate = selectedEMIStartDate
+            totalMonths = includeBinding.totalEmiMonthsET.text.toString().toInt()
+            monthsCompleted = includeBinding.numberOfMonthsCompltedET.text.toString().toInt()
+            amountPaidPerMonth = includeBinding.emiAmountPerMonthET.text.toString().toDouble()
+            amountPaid = calculateAmountPaidTillNow()
+            currencySymbol = selectedCurrencySymbol
+
+            if (!isMessageReceivedForEditing) {
+
+                created = System.currentTimeMillis()
+                uid = getUid()!!
+                key = generateKey("_${uid}")
+
+                if (includeBinding.addSupportingDocCB.isChecked) {
+
+                    isSupportingDocAdded = true
+
+                    if (supportingDocmtHelperModel.documentType == DocumentType.URL) {
+
+                        supportingDocument = SupportingDocument(
+                            supportingDocmtHelperModel.documentName,
+                            supportingDocmtHelperModel.documentUrl,
+                            supportingDocmtHelperModel.documentType
+                        )
+                    }
+                }
+
+            }
+        }
+
+        if (!isMessageReceivedForEditing
+            && emi.isSupportingDocAdded
+            && supportingDocmtHelperModel.documentType != DocumentType.URL
+        ) {
+
+            // if the document type is not URL, then we need internet connection to upload the uri
+            if (!isInternetAvailable(requireContext())) {
+                showToast(
+                    requireContext(),
+                    getString(R.string.internet_required_message_for_uploading_doc),
+                    Toast.LENGTH_LONG
+                )
+                return
+            }
+        }
+
+        insertToDatabase(emi)
+    }
+
+    private fun insertToDatabase(emi: EMI) {
+
+        if (!isMessageReceivedForEditing) {
+
+            if (emi.isSupportingDocAdded && supportingDocmtHelperModel.documentType != DocumentType.URL
+            ) {
+                supportingDocmtHelperModel.modelName = getString(R.string.emis)
+                emiViewModel.insertEMI(emi, supportingDocmtHelperModel)
+            } else {
+                emiViewModel.insertEMI(emi, null)
+            }
+
+        } else {
+
+            emiViewModel.updateEMI(receivedEmi, emi)
+        }
+
+        requireActivity().onBackPressed()
+    }
+
     private fun isFormValid(): Boolean {
 
         if (!includeBinding.emiNameET.editText?.isTextValid()!!) {
@@ -302,7 +328,8 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         if (!includeBinding.totalEmiMonthsET.isTextValid()) {
 
-            includeBinding.emiNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+            includeBinding.totalEmiMonthsET.requestFocus()
+            includeBinding.totalEmiMonthsET.error = EDIT_TEXT_EMPTY_MESSAGE
             return false
         }
 

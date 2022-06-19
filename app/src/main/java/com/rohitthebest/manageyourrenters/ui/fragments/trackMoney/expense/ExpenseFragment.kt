@@ -331,7 +331,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
                     if (isInternetAvailable(requireContext())) {
 
-                        expenseViewModel.deleteExpense(requireContext(), expenseForMenuItems)
+                        expenseViewModel.deleteExpense(expenseForMenuItems)
                     } else {
 
                         showNoInternetMessage(requireContext())
@@ -361,17 +361,12 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
                 if (isInternetAvailable(requireContext())) {
 
-                    expenseViewModel.insertExpense(
-                        requireContext(),
-                        expenseForMenuItems
-                    )
+                    expenseViewModel.insertExpense(expenseForMenuItems)
                     expenseAdapter.notifyItemChanged(expenseForMenuPosition)
 
                     receivedExpenseCategory.modified = System.currentTimeMillis()
 
-                    expenseCategoryViewModel.updateExpenseCategory(
-                        requireContext(), receivedExpenseCategory, false
-                    )
+                    expenseCategoryViewModel.updateExpenseCategory(receivedExpenseCategory, false)
 
                 } else {
 

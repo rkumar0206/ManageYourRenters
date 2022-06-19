@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.database.dao
 
 import androidx.room.*
+import com.rohitthebest.manageyourrenters.data.KeyAndSupportingDoc
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import kotlinx.coroutines.flow.Flow
 
@@ -39,8 +40,8 @@ interface BorrowerPaymentDao {
     @Query("SELECT * FROM borrower_payment_table WHERE `key` = :paymentKey")
     fun getBorrowerPaymentByKey(paymentKey: String): Flow<BorrowerPayment>
 
-    @Query("SELECT `key` FROM borrower_payment_table WHERE borrowerKey = :borrowerKey AND isSynced = 1")
-    suspend fun getPaymentKeysByBorrowerKey(borrowerKey: String): List<String>
+    @Query("SELECT `key`, supportingDocument FROM borrower_payment_table WHERE borrowerKey = :borrowerKey AND isSynced = 1")
+    suspend fun getPaymentKeysAndSupportingDocumentByBorrowerKey(borrowerKey: String): List<KeyAndSupportingDoc>
 
 }
 

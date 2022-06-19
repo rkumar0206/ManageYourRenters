@@ -15,7 +15,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
 import com.rohitthebest.manageyourrenters.repositories.*
-import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.insertToFireStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -58,9 +58,9 @@ class UploadService : Service() {
         val image = R.drawable.ic_house_renters
 
         val pendingIntent: PendingIntent =
-            Intent(this, HomeActivity::class.java).let { notificationIntent ->
-                PendingIntent.getActivity(this, 0, notificationIntent, 0)
-            }
+            Functions.getPendingIntentForForegroundServiceNotification(
+                this, collection ?: ""
+            )
 
         val notification = NotificationCompat.Builder(
             this,
@@ -79,94 +79,52 @@ class UploadService : Service() {
 
         CoroutineScope(Dispatchers.IO).launch {
 
+            var model: Any? = null
+
             when (collection) {
 
                 getString(R.string.renters) -> {
-
-                    val renter = renterRepository.getRenterByKey(key).first()
-
-                    updateIsSyncedValueOfDocument(
-                        collection,
-                        renter,
-                        insertToFireStore(docRef, renter)
-                    )
-                    stopSelf()
+                    model = renterRepository.getRenterByKey(key).first()
                 }
 
                 getString(R.string.renter_payments) -> {
-
-                    val payment = renterPaymentRepository.getPaymentByPaymentKey(key).first()
-
-                    updateIsSyncedValueOfDocument(
-                        collection,
-                        payment,
-                        insertToFireStore(docRef, payment)
-                    )
-
-                    stopSelf()
+                    model = renterPaymentRepository.getPaymentByPaymentKey(key).first()
                 }
 
                 getString(R.string.borrowers) -> {
-
-                    val borrower = borrowerRepository.getBorrowerByKey(key).first()
-
-                    updateIsSyncedValueOfDocument(
-                        collection,
-                        borrower,
-                        insertToFireStore(docRef, borrower)
-                    )
-
-                    stopSelf()
+                    model = borrowerRepository.getBorrowerByKey(key).first()
                 }
 
                 getString(R.string.borrowerPayments) -> {
-
-                    val borrowerPayment =
-                        borrowerPaymentRepository.getBorrowerPaymentByKey(key).first()
-
-                    updateIsSyncedValueOfDocument(
-                        collection,
-                        borrowerPayment,
-                        insertToFireStore(docRef, borrowerPayment)
-                    )
-
-                    stopSelf()
+                    model = borrowerPaymentRepository.getBorrowerPaymentByKey(key).first()
                 }
 
                 getString(R.string.emis) -> {
-
-                    val emi = emiRepository.getEMIByKey(key).first()
-
-                    updateIsSyncedValueOfDocument(
-                        collection,
-                        emi,
-                        insertToFireStore(docRef, emi)
-                    )
-
-                    stopSelf()
+                    model = emiRepository.getEMIByKey(key).first()
                 }
 
                 getString(R.string.emiPayments) -> {
-
-                    val emiPayment = emiPaymentRepository.getEMIPaymentByKey(key).first()
-
-                    updateIsSyncedValueOfDocument(
-                        collection,
-                        emiPayment,
-                        insertToFireStore(docRef, emiPayment)
-                    )
-
-                    stopSelf()
+                    model = emiPaymentRepository.getEMIPaymentByKey(key).first()
                 }
 
                 else -> {
-
                     stopSelf()
                 }
             }
 
-        }
+            if (model != null) {
 
+                updateIsSyncedValueOfDocument(
+                    collection,
+                    model,
+                    insertToFireStore(docRef, model)
+                )
+                stopSelf()
+            } else {
+
+                stopSelf()
+            }
+        }
 
         return START_NOT_STICKY
     }
@@ -178,51 +136,51 @@ class UploadService : Service() {
         isSyncedValue: Boolean
     ) {
 
-        when (collection) {
+        if (!isSyncedValue) {
+            when (collection) {
 
-            getString(R.string.renters) -> {
+                getString(R.string.renters) -> {
 
-                val renter = document as Renter
+                    val renter = document as Renter
+                    renter.isSynced = getString(R.string.f)
+                    renterRepository.updateRenter(renter)
+                }
 
-                renter.isSynced =
-                    if (isSyncedValue) getString(R.string.t) else getString(R.string.f)
+                getString(R.string.renter_payments) -> {
 
-                renterRepository.updateRenter(renter)
+                    val payment = document as RenterPayment
+                    payment.isSynced = isSyncedValue
+                    renterPaymentRepository.updateRenterPayment(payment)
+                }
+
+                getString(R.string.borrowers) -> {
+
+                    val borrower = document as Borrower
+                    borrower.isSynced = isSyncedValue
+                    borrowerRepository.update(borrower)
+                }
+
+                getString(R.string.borrowerPayments) -> {
+                    val borrowerPayment = document as BorrowerPayment
+                    borrowerPayment.isSynced = isSyncedValue
+                    borrowerPaymentRepository.updateBorrowerPayment(borrowerPayment)
+                }
+
+                getString(R.string.emis) -> {
+                    val emi = document as EMI
+                    emi.isSynced = isSyncedValue
+                    emiRepository.updateEMI(emi)
+                }
+
+                getString(R.string.emiPayments) -> {
+                    val emiPayment = document as EMIPayment
+                    emiPayment.isSynced = isSyncedValue
+                    emiPaymentRepository.updateEMIPayment(emiPayment)
+                }
+
+                else -> stopSelf()
             }
 
-            getString(R.string.renter_payments) -> {
-
-                val payment = document as RenterPayment
-                payment.isSynced = isSyncedValue
-                renterPaymentRepository.updateRenterPayment(payment)
-            }
-
-            getString(R.string.borrowers) -> {
-
-                val borrower = document as Borrower
-                borrower.isSynced = isSyncedValue
-                borrowerRepository.update(borrower)
-            }
-
-            getString(R.string.borrowerPayments) -> {
-                val borrowerPayment = document as BorrowerPayment
-                borrowerPayment.isSynced = isSyncedValue
-                borrowerPaymentRepository.updateBorrowerPayment(borrowerPayment)
-            }
-
-            getString(R.string.emis) -> {
-                val emi = document as EMI
-                emi.isSynced = isSyncedValue
-                emiRepository.updateEMI(emi)
-            }
-
-            getString(R.string.emiPayments) -> {
-                val emiPayment = document as EMIPayment
-                emiPayment.isSynced = isSyncedValue
-                emiPaymentRepository.updateEMIPayment(emiPayment)
-            }
-
-            else -> stopSelf()
         }
 
         if (isSyncedValue) {

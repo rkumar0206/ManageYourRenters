@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
+    app:cardBackgroundColor="@color/color_green"
     app:cardCornerRadius="5dp">
 
     <com.google.android.material.card.MaterialCardView
@@ -12,9 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:cardCornerRadius="5dp"
-        app:rippleColor="@color/rippleColor"
-        app:strokeColor="@color/colorGrey"
-        app:strokeWidth="0.5dp">
+        android:layout_marginStart="1.8dp"
+        app:rippleColor="@color/rippleColor">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -66,86 +66,31 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="3dp"
+                android:layout_marginEnd="3dp"
+                android:maxLines="2"
                 android:padding="3dp"
                 android:textColor="@color/color_green"
-                android:textSize="22sp"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toStartOf="@+id/emiPaymentMenuIB"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider63"
                 tools:text="Amount : 2000" />
 
-            <View
-                android:id="@+id/divider64"
-                android:layout_width="397dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="8dp"
-                android:background="?android:attr/listDivider"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/emiAmountPaymentTV" />
-
-            <View
-                android:id="@+id/divider65"
-                android:layout_width="397dp"
-                android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="3dp"
-                android:background="?android:attr/listDivider"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/emiPaymentMessageIB" />
-
             <ImageButton
-                android:id="@+id/emiPaymentDocIB"
+                android:id="@+id/emiPaymentMenuIB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:backgroundTint="@color/color_white"
-                android:contentDescription="@string/document"
-                app:layout_constraintEnd_toStartOf="@+id/emiPaymentMessageIB"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/divider64"
-                app:srcCompat="@drawable/ic_document" />
-
-            <ImageButton
-                android:id="@+id/emiPaymentMessageIB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/color_white"
-                android:contentDescription="@string/view_message_or_note"
-                app:layout_constraintEnd_toStartOf="@+id/emiPaymentSyncedIV"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/emiPaymentDocIB"
-                app:layout_constraintTop_toTopOf="@+id/emiPaymentDocIB"
-                app:srcCompat="@drawable/ic_baseline_message_24" />
-
-            <ImageButton
-                android:id="@+id/emiPaymentDeleteIB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
                 android:backgroundTint="@color/color_white"
                 android:contentDescription="@string/delete_this_payment"
-                android:visibility="gone"
+                android:minHeight="48dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/emiPaymentSyncedIV"
-                app:layout_constraintTop_toTopOf="@+id/emiPaymentDocIB"
-                app:srcCompat="@drawable/ic_baseline_delete_24"
+                app:layout_constraintTop_toBottomOf="@+id/divider63"
+                app:srcCompat="@drawable/ic_baseline_more_vert_24"
                 tools:visibility="visible" />
-
-            <ImageButton
-                android:id="@+id/emiPaymentSyncedIV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/color_white"
-                app:layout_constraintEnd_toStartOf="@+id/emiPaymentDeleteIB"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/emiPaymentMessageIB"
-                app:layout_constraintTop_toTopOf="@+id/emiPaymentDocIB"
-                app:srcCompat="@drawable/ic_baseline_sync_24_green" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -11,8 +12,6 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
-import com.rohitthebest.manageyourrenters.utils.hide
-import com.rohitthebest.manageyourrenters.utils.show
 
 class EMIPaymentAdapter :
     ListAdapter<EMIPayment, EMIPaymentAdapter.EMIPaymentViewHolder>(DiffUtilCallback()) {
@@ -24,12 +23,8 @@ class EMIPaymentAdapter :
 
         init {
 
-            binding.emiPaymentDocIB.setOnClickListener(this)
-            binding.emiPaymentSyncedIV.setOnClickListener(this)
-            binding.emiPaymentMessageIB.setOnClickListener(this)
-            binding.emiPaymentDeleteIB.setOnClickListener(this)
-
-
+            binding.emiPaymentAdapterRoot.setOnClickListener(this)
+            binding.emiPaymentMenuIB.setOnClickListener(this)
         }
 
         @SuppressLint("SetTextI18n")
@@ -38,15 +33,6 @@ class EMIPaymentAdapter :
             emiPayment?.let { payment ->
 
                 binding.apply {
-
-                    // showing delete button only on the first item
-                    if (absoluteAdapterPosition == 0) {
-
-                        emiPaymentDeleteIB.show()
-                    } else {
-
-                        emiPaymentDeleteIB.hide()
-                    }
 
                     emiAmountPaymentTV.text = "Amount : ${payment.amountPaid}"
 
@@ -68,10 +54,21 @@ class EMIPaymentAdapter :
 
                     if (payment.isSynced) {
 
-                        emiPaymentSyncedIV.setImageResource(R.drawable.ic_baseline_sync_24_green)
+                        root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_green
+                            )
+                        )
+
                     } else {
 
-                        emiPaymentSyncedIV.setImageResource(R.drawable.ic_baseline_sync_24)
+                        root.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.color_orange
+                            )
+                        )
                     }
                 }
             }
@@ -89,29 +86,14 @@ class EMIPaymentAdapter :
 
                 when (v?.id) {
 
-                    binding.emiPaymentDocIB.id -> {
+                    binding.emiPaymentAdapterRoot.id -> {
 
-                        mListener!!.onEMIDocumentBtnClicked(
-                            getItem(absoluteAdapterPosition),
-                            absoluteAdapterPosition
-                        )
+                        mListener!!.onItemClick(getItem(absoluteAdapterPosition))
                     }
 
-                    binding.emiPaymentSyncedIV.id -> {
+                    binding.emiPaymentMenuIB.id -> {
 
-                        mListener!!.onSyncBtnClicked(
-                            getItem(absoluteAdapterPosition),
-                            absoluteAdapterPosition
-                        )
-                    }
-
-                    binding.emiPaymentMessageIB.id -> {
-
-                        mListener!!.onEMIPaymentMessageBtnClicked(getItem(absoluteAdapterPosition).message)
-                    }
-                    binding.emiPaymentDeleteIB.id -> {
-
-                        mListener!!.onDeleteEMIPaymentBtnClicked(
+                        mListener!!.onMenuButtonBtnClicked(
                             getItem(absoluteAdapterPosition),
                             absoluteAdapterPosition
                         )
@@ -150,10 +132,8 @@ class EMIPaymentAdapter :
 
     interface OnClickListener {
 
-        fun onEMIDocumentBtnClicked(emiPayment: EMIPayment, position: Int)
-        fun onSyncBtnClicked(emiPayment: EMIPayment, position: Int)
-        fun onEMIPaymentMessageBtnClicked(message: String)
-        fun onDeleteEMIPaymentBtnClicked(emiPayment: EMIPayment, position: Int)
+        fun onItemClick(emiPayment: EMIPayment)
+        fun onMenuButtonBtnClicked(emiPayment: EMIPayment, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

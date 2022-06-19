@@ -1,8 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import android.content.Context
+import android.app.Application
 import android.os.Parcelable
-import android.util.Log
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
@@ -26,11 +25,12 @@ private const val TAG = "RenterViewModel"
 
 @HiltViewModel
 class RenterViewModel @Inject constructor(
+    app: Application,
     private val repo: RenterRepository,
     private val paymentRepository: RenterPaymentRepository,
     private val deletedRenterRepository: DeletedRenterRepository,
     private val state: SavedStateHandle
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     // ------------------------- UI related ----------------------------
 
@@ -53,10 +53,11 @@ class RenterViewModel @Inject constructor(
     // ---------------------------------------------------------------
 
     fun insertRenter(
-        context: Context,
         renter: Renter,
         supportDocumentHelper: SupportingDocumentHelperModel? = null
     ) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
 
         if (isInternetAvailable(context)) {
 
@@ -86,7 +87,9 @@ class RenterViewModel @Inject constructor(
     }
 
 
-    fun updateRenter(context: Context, renter: Renter) = viewModelScope.launch {
+    fun updateRenter(renter: Renter) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
 
         if (isInternetAvailable(context)) {
 
@@ -112,10 +115,11 @@ class RenterViewModel @Inject constructor(
     }
 
     fun addOrReplaceBorrowerSupportingDocument(
-        context: Context,
         renter: Renter,
         supportDocumentHelper: SupportingDocumentHelperModel
     ) {
+
+        val context = getApplication<Application>().applicationContext
 
         if (renter.supportingDocument != null && renter.supportingDocument?.documentType != DocumentType.URL) {
 
@@ -138,12 +142,12 @@ class RenterViewModel @Inject constructor(
             renter.isSupportingDocAdded = true
             renter.supportingDocument = supportingDoc
 
-            updateRenter(context, renter)
+            updateRenter(renter)
         } else {
 
             supportDocumentHelper.modelName = context.getString(R.string.renters)
             if (renter.isSynced != context.getString(R.string.t)) {
-                insertRenter(context, renter, supportDocumentHelper)
+                insertRenter(renter, supportDocumentHelper)
                 return
             }
 
@@ -154,11 +158,9 @@ class RenterViewModel @Inject constructor(
     }
 
 
-    fun deleteRenter(context: Context, renter: Renter) = viewModelScope.launch {
+    fun deleteRenter(renter: Renter) = viewModelScope.launch {
 
-        val paymentKeys = paymentRepository.getPaymentKeysByRenterKey(renter.key!!)
-
-        Log.d(TAG, "deleteRenter: PaymentsKeys : $paymentKeys")
+        val context = getApplication<Application>().applicationContext
 
         if (isInternetAvailable(context)) {
 
@@ -178,13 +180,24 @@ class RenterViewModel @Inject constructor(
                 )
             }
 
+            val keysAndSupportingDocs =
+                paymentRepository.getPaymentKeysAndSupportingDocumentByRenterKey(renter.key!!)
 
-            if (paymentKeys.isNotEmpty()) {
+            val keys = keysAndSupportingDocs.map { it.key }
+            val supportingDocument = keysAndSupportingDocs.map { it.supportingDocument }
+                .filter { it != null && it.documentType != DocumentType.URL }
+
+            supportingDocument.forEach { supportingDoc ->
+
+                supportingDoc?.let { deleteFileFromFirebaseStorage(context, it.documentUrl) }
+            }
+
+            if (keysAndSupportingDocs.isNotEmpty()) {
 
                 deleteAllDocumentsUsingKeyFromFirestore(
                     context,
                     context.getString(R.string.renter_payments),
-                    convertStringListToJSON(paymentKeys)
+                    convertStringListToJSON(keys)
                 )
             }
         }

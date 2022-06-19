@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -10,14 +11,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.BorrowerPaymentAdapter
-import com.rohitthebest.manageyourrenters.data.Interest
-import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
-import com.rohitthebest.manageyourrenters.data.InterestTimeSchedule
-import com.rohitthebest.manageyourrenters.data.InterestType
+import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
@@ -34,7 +33,8 @@ private const val TAG = "BorrowerPaymentFragment"
 
 @AndroidEntryPoint
 class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
-    BorrowerPaymentAdapter.OnClickListener, CustomMenuItems.OnItemClickListener {
+    BorrowerPaymentAdapter.OnClickListener, CustomMenuItems.OnItemClickListener,
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
     private var _binding: FragmentBorrowerPaymentBinding? = null
     private val binding get() = _binding!!
@@ -63,7 +63,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                 val action =
                     BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
-                        receivedBorrowerKey
+                        receivedBorrowerKey, ""
                     )
                 findNavController().navigate(action)
             }
@@ -93,7 +93,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                 lifecycleScope.launch {
 
-                    delay(200)
+                    delay(300)
 
                     getBorrower()
                     getBorrowerPayments()
@@ -163,33 +163,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         findNavController().navigate(action)
     }
 
-    override fun onSyncBtnClick(borrowerPayment: BorrowerPayment, position: Int) {
-
-        if (borrowerPayment.isSynced) {
-
-            showToast(requireContext(), "Already synced")
-        } else {
-
-            if (isInternetAvailable(requireContext())) {
-
-                borrowerPayment.isSynced = true
-
-                uploadDocumentToFireStore(
-                    requireContext(),
-                    getString(R.string.borrowerPayments),
-                    borrowerPayment.key
-                )
-
-                borrowerPaymentViewModel.updateBorrowerPayment(borrowerPayment)
-                borrowerPaymentAdapter.notifyItemChanged(position)
-
-            } else {
-
-                showNoInternetMessage(requireContext())
-            }
-        }
-    }
-
     override fun onShowMessageBtnClick(message: String) {
 
         var m = message
@@ -244,7 +217,11 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         requireActivity().supportFragmentManager.let {
 
             val bundle = Bundle()
-            bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
+
+            if (!borrowerPayment.isSynced)
+                bundle.putBoolean(Constants.SHOW_SYNC_MENU, true)
+            else
+                bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
 
             CustomMenuItems.newInstance(
                 bundle
@@ -256,7 +233,30 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     }
 
     override fun onEditMenuClick() {
-        //TODO("Not yet implemented")
+
+        if (borrowerPaymentForMenus != null) {
+
+
+            // checking if the borrower payment already contains some partial payment or not
+            // if it contains at least one partial payment then user cannot edit the payment
+
+            if (borrowerPaymentForMenus!!.dueLeftAmount < borrowerPaymentForMenus!!.amountTakenOnRent) {
+
+                showToast(
+                    requireContext(),
+                    getString(R.string.this_payment_already_has_some_partial_payments),
+                    Toast.LENGTH_LONG
+                )
+            } else {
+
+                val action =
+                    BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddBorrowerPaymentFragment(
+                        receivedBorrowerKey, borrowerPaymentForMenus?.key
+                    )
+                findNavController().navigate(action)
+            }
+        }
+
     }
 
     override fun onDeleteMenuClick() {
@@ -270,7 +270,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
                     if (!borrowerPaymentForMenus!!.isSynced) {
 
                         borrowerPaymentViewModel.deleteBorrowerPayment(
-                            requireContext(),
                             borrowerPaymentForMenus!!
                         )
 
@@ -279,7 +278,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
                         if (isInternetAvailable(requireContext())) {
 
                             borrowerPaymentViewModel.deleteBorrowerPayment(
-                                requireContext(),
                                 borrowerPaymentForMenus!!
                             )
 
@@ -299,35 +297,161 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     }
 
+    private fun checkSupportingDocumentValidation(): Boolean {
+
+        if (!borrowerPaymentForMenus?.isSupportingDocAdded!!) {
+
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            return false
+        } else if (borrowerPaymentForMenus!!.isSupportingDocAdded && borrowerPaymentForMenus!!.supportingDocument == null) {
+
+            showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
+            return false
+        }
+
+        return true
+    }
+
+
     override fun onViewSupportingDocumentMenuClick() {
 
-        if (borrowerPaymentForMenus != null) {
-            if (!borrowerPaymentForMenus!!.isSupportingDocAdded) {
+        if (borrowerPaymentForMenus != null && checkSupportingDocumentValidation()) {
 
-                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
-            } else {
+            borrowerPaymentForMenus!!.supportingDocument?.let { supportingDoc ->
 
-                borrowerPaymentForMenus!!.supportingDocument?.let { supportingDoc ->
-
-                    onViewOrDownloadSupportingDocument(
-                        requireActivity(),
-                        supportingDoc
-                    )
-                }
+                onViewOrDownloadSupportingDocument(
+                    requireActivity(),
+                    supportingDoc
+                )
             }
+        }
+    }
+
+    override fun onReplaceSupportingDocumentClick() {
+        if (isInternetAvailable(requireContext())) {
+            if (borrowerPaymentForMenus != null) {
+
+                val supportingDocumentHelperModel = SupportingDocumentHelperModel()
+                supportingDocumentHelperModel.modelName = getString(R.string.borrowerPayments)
+
+                showSupportDocumentBottomSheetDialog(supportingDocumentHelperModel)
+            }
+        } else {
+
+            showNoInternetMessage(requireContext())
         }
 
     }
 
-    override fun onReplaceSupportingDocumentClick() {
-        //TODO("Not yet implemented")
+    private fun showSupportDocumentBottomSheetDialog(supportingDocmtHelperModel: SupportingDocumentHelperModel) {
+
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+            supportingDocmtHelperModel.convertToJsonString()
+        )
+
+        requireActivity().supportFragmentManager.let {
+
+            SupportingDocumentDialogFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
+
+    override fun onBottomSheetDismissed(
+        isDocumentAdded: Boolean,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel
+    ) {
+
+        if (isInternetAvailable(requireContext())) {
+            if (isDocumentAdded) {
+
+                // call the viewmodel method for adding or replacing the document
+                borrowerPaymentViewModel.addOrReplaceBorrowerSupportingDocument(
+                    borrowerPaymentForMenus!!,
+                    supportingDocumentHelperModel
+                )
+            }
+        } else {
+
+            showNoInternetMessage(requireContext())
+        }
     }
 
     override fun onDeleteSupportingDocumentClick() {
-        //TODO("Not yet implemented")
+
+        if (borrowerPaymentForMenus != null
+            && checkSupportingDocumentValidation()
+            && borrowerPaymentForMenus!!.supportingDocument != null
+        ) {
+            showAlertDialogForDeletion(
+                requireContext(),
+                {
+                    if (borrowerPaymentForMenus!!.supportingDocument?.documentType != DocumentType.URL) {
+
+                        if (!isInternetAvailable(requireContext())) {
+
+                            showToast(
+                                requireContext(),
+                                getString(R.string.network_required_for_deleting_file_from_cloud)
+                            )
+                            return@showAlertDialogForDeletion
+                        } else {
+
+                            deleteFileFromFirebaseStorage(
+                                requireContext(),
+                                borrowerPaymentForMenus!!.supportingDocument?.documentUrl!!
+                            )
+                        }
+                    }
+
+                    val borrowerPayment = borrowerPaymentForMenus!!.copy()
+
+                    borrowerPayment.modified = System.currentTimeMillis()
+                    borrowerPayment.supportingDocument = null
+                    borrowerPayment.isSupportingDocAdded = false
+
+                    borrowerPaymentViewModel.updateBorrowerPayment(
+                        borrowerPaymentForMenus!!,
+                        borrowerPayment
+                    )
+                    showToast(requireContext(), getString(R.string.supporting_document_deleted))
+                    it.dismiss()
+                },
+                {
+                    it.dismiss()
+                }
+            )
+        } else {
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+        }
+
     }
 
-    override fun onSyncMenuClick() {}
+    override fun onSyncMenuClick() {
+
+        if (borrowerPaymentForMenus != null && borrowerPaymentForMenus!!.isSynced) {
+
+            showToast(requireContext(), "Already synced")
+        } else {
+
+            if (isInternetAvailable(requireContext())) {
+
+                borrowerPaymentViewModel.updateBorrowerPayment(
+                    borrowerPaymentForMenus!!,
+                    borrowerPaymentForMenus!!
+                )
+                borrowerPaymentAdapter.notifyItemChanged(adapterItemPosition)
+
+            } else {
+
+                showNoInternetMessage(requireContext())
+            }
+        }
+
+    }
 
     //[END OF ADAPTER CLICK LISTENER]
 

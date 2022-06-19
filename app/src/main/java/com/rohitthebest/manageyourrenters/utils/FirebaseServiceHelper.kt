@@ -2,7 +2,6 @@ package com.rohitthebest.manageyourrenters.utils
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.core.content.ContextCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -11,8 +10,6 @@ import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DELETE_FILE_FROM_FIREBASE_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
-import com.rohitthebest.manageyourrenters.others.Constants.FILE_NAME_KEY
-import com.rohitthebest.manageyourrenters.others.Constants.FILE_URI_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
 import com.rohitthebest.manageyourrenters.services.*
 import kotlinx.coroutines.tasks.await
@@ -32,7 +29,7 @@ fun uploadDocumentToFireStore(
     )
 
     foregroundService.putExtra(
-        Constants.DOCUMENT_KEY,
+        DOCUMENT_KEY,
         documentKey
     )
 
@@ -59,7 +56,7 @@ fun updateDocumentOnFireStore(
     )
 
     foregroundService.putExtra(
-        Constants.DOCUMENT_KEY,
+        DOCUMENT_KEY,
         documentKey
     )
 
@@ -91,7 +88,7 @@ fun deleteDocumentFromFireStore(
     )
 
     foregroundService.putExtra(
-        Constants.DOCUMENT_KEY,
+        DOCUMENT_KEY,
         documentKey
     )
 
@@ -169,23 +166,6 @@ fun deleteFileFromFirebaseStorage(context: Context, documentUrl: String) {
     )
 
     ContextCompat.startForegroundService(context, foregroundService)
-}
-
-
-fun uploadFileToFirebaseStorage(
-    context: Context,
-    fileInfo: Pair<Uri, String>,  // pass fileUri and fileName
-    uploadDataInfo: Pair<String, String>, // pass upload data and collection
-) {
-
-    val foregroundServiceIntent = Intent(context, UploadFileToFirebaseStorageService::class.java)
-
-    foregroundServiceIntent.putExtra(FILE_URI_KEY, fileInfo.first.toString())
-    foregroundServiceIntent.putExtra(FILE_NAME_KEY, fileInfo.second)
-    foregroundServiceIntent.putExtra(UPLOAD_DATA_KEY, uploadDataInfo.first)
-    foregroundServiceIntent.putExtra(COLLECTION_KEY, uploadDataInfo.second)
-
-    ContextCompat.startForegroundService(context, foregroundServiceIntent)
 }
 
 fun uploadFileToFirebaseCloudStorage(

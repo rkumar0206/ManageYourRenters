@@ -339,11 +339,14 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     override fun onViewSupportingDocumentMenuClick() {
 
         if (::renterPaymentForMenus.isInitialized) {
+
             if (!renterPaymentForMenus.isSupportingDocAdded) {
 
                 showToast(requireContext(), getString(R.string.no_supporting_doc_added))
-            } else {
+            } else if (renterPaymentForMenus.isSupportingDocAdded && renterPaymentForMenus.supportingDocument == null) {
 
+                showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
+            } else {
                 renterPaymentForMenus.supportingDocument?.let { supportingDoc ->
 
                     Functions.onViewOrDownloadSupportingDocument(

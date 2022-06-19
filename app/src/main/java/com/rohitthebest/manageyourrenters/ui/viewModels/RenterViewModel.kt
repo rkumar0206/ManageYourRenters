@@ -1,6 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import android.content.Context
+import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
@@ -25,11 +25,12 @@ private const val TAG = "RenterViewModel"
 
 @HiltViewModel
 class RenterViewModel @Inject constructor(
+    app: Application,
     private val repo: RenterRepository,
     private val paymentRepository: RenterPaymentRepository,
     private val deletedRenterRepository: DeletedRenterRepository,
     private val state: SavedStateHandle
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     // ------------------------- UI related ----------------------------
 
@@ -52,10 +53,11 @@ class RenterViewModel @Inject constructor(
     // ---------------------------------------------------------------
 
     fun insertRenter(
-        context: Context,
         renter: Renter,
         supportDocumentHelper: SupportingDocumentHelperModel? = null
     ) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
 
         if (isInternetAvailable(context)) {
 
@@ -85,7 +87,9 @@ class RenterViewModel @Inject constructor(
     }
 
 
-    fun updateRenter(context: Context, renter: Renter) = viewModelScope.launch {
+    fun updateRenter(renter: Renter) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
 
         if (isInternetAvailable(context)) {
 
@@ -111,10 +115,11 @@ class RenterViewModel @Inject constructor(
     }
 
     fun addOrReplaceBorrowerSupportingDocument(
-        context: Context,
         renter: Renter,
         supportDocumentHelper: SupportingDocumentHelperModel
     ) {
+
+        val context = getApplication<Application>().applicationContext
 
         if (renter.supportingDocument != null && renter.supportingDocument?.documentType != DocumentType.URL) {
 
@@ -137,12 +142,12 @@ class RenterViewModel @Inject constructor(
             renter.isSupportingDocAdded = true
             renter.supportingDocument = supportingDoc
 
-            updateRenter(context, renter)
+            updateRenter(renter)
         } else {
 
             supportDocumentHelper.modelName = context.getString(R.string.renters)
             if (renter.isSynced != context.getString(R.string.t)) {
-                insertRenter(context, renter, supportDocumentHelper)
+                insertRenter(renter, supportDocumentHelper)
                 return
             }
 
@@ -153,7 +158,9 @@ class RenterViewModel @Inject constructor(
     }
 
 
-    fun deleteRenter(context: Context, renter: Renter) = viewModelScope.launch {
+    fun deleteRenter(renter: Renter) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
 
         if (isInternetAvailable(context)) {
 

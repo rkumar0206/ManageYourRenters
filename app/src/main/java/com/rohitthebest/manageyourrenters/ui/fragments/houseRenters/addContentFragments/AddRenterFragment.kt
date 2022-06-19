@@ -340,17 +340,16 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             // insert
             if (renter.isSupportingDocAdded && renter.supportingDocument?.documentType != DocumentType.URL)
                 renterViewModel.insertRenter(
-                    requireContext(),
                     renter,
                     supportingDocmtHelperModel
                 )
             else
-                renterViewModel.insertRenter(requireContext(), renter)
+                renterViewModel.insertRenter(renter)
 
             showToast(requireContext(), "Renter added")
         } else {
             // update
-            renterViewModel.updateRenter(requireContext(), renter)
+            renterViewModel.updateRenter(renter)
             showToast(requireContext(), "Renter info updated")
         }
 

@@ -152,9 +152,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
                     // cloud database and been updated later and is not synced now
                     if (isInternetAvailable(requireContext())) {
 
-                        expenseCategoryViewModel.deleteExpenseCategory(
-                            requireContext(), expenseCategoryForMenus
-                        )
+                        expenseCategoryViewModel.deleteExpenseCategory(expenseCategoryForMenus)
                     } else {
                         showNoInternetMessage(requireContext())
                     }
@@ -177,10 +175,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
                 if (isInternetAvailable(requireContext())) {
 
-                    expenseCategoryViewModel.insertExpenseCategory(
-                        requireContext(),
-                        expenseCategoryForMenus
-                    )
+                    expenseCategoryViewModel.insertExpenseCategory(expenseCategoryForMenus)
                     expenseCategoryAdapter.notifyItemChanged(itemPosition)
                 } else {
 

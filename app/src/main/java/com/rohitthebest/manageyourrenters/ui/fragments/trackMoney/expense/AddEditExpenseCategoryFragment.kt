@@ -337,18 +337,12 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
 
         if (!isMessageReceivedForEditing) {
 
-            expenseCategoryViewModel.insertExpenseCategory(
-                requireContext(),
-                expenseCategory
-            )
+            expenseCategoryViewModel.insertExpenseCategory(expenseCategory)
 
             Log.i(TAG, "saveToDatabase: $expenseCategory")
         } else {
 
-            expenseCategoryViewModel.updateExpenseCategory(
-                requireContext(),
-                expenseCategory
-            )
+            expenseCategoryViewModel.updateExpenseCategory(expenseCategory)
         }
 
         requireActivity().onBackPressed()

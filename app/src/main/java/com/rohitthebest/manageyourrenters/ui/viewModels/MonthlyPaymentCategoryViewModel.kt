@@ -1,6 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import android.content.Context
+import android.app.Application
 import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.*
@@ -21,10 +21,11 @@ private const val TAG = "MonthlyPaymentCategoryViewModel"
 
 @HiltViewModel
 class MonthlyPaymentCategoryViewModel @Inject constructor(
+    app: Application,
     private val repository: MonthlyPaymentCategoryRepository,
     private val monthlyPaymentRepository: MonthlyPaymentRepository,
     private val state: SavedStateHandle
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     // ------------------------- UI related ----------------------------
 
@@ -47,24 +48,24 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
     // ---------------------------------------------------------------
 
 
-    fun insertMonthlyPaymentCategory(
-        context: Context,
-        monthlyPaymentCategory: MonthlyPaymentCategory
-    ) = viewModelScope.launch {
+    fun insertMonthlyPaymentCategory(monthlyPaymentCategory: MonthlyPaymentCategory) =
+        viewModelScope.launch {
 
-        if (isInternetAvailable(context)) {
+            val context = getApplication<Application>().applicationContext
 
-            monthlyPaymentCategory.isSynced = true
+            if (isInternetAvailable(context)) {
 
-            Log.d(TAG, "insertMonthlyPaymentCategory: ")
+                monthlyPaymentCategory.isSynced = true
 
-            monthlyPaymentCategoryServiceHelper(
-                context,
-                monthlyPaymentCategory.key,
-                context.getString(R.string.post)
-            )
+                Log.d(TAG, "insertMonthlyPaymentCategory: ")
 
-        } else {
+                monthlyPaymentCategoryServiceHelper(
+                    context,
+                    monthlyPaymentCategory.key,
+                    context.getString(R.string.post)
+                )
+
+            } else {
 
             monthlyPaymentCategory.isSynced = false
         }
@@ -80,11 +81,12 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
         }
 
     fun updateMonthlyPaymentCategory(
-        context: Context,
         monthlyPaymentCategory: MonthlyPaymentCategory,
         shouldUpload: Boolean = true
     ) =
         viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
 
             if (isInternetAvailable(context) && shouldUpload) {
 
@@ -108,10 +110,11 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
         }
 
     fun deleteMonthlyPaymentCategory(
-        context: Context,
         monthlyPaymentCategory: MonthlyPaymentCategory
     ) =
         viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
 
             if (isInternetAvailable(context)) {
 

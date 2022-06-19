@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.services
 
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -8,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.fromStringToPartialPaymentList
 import com.rohitthebest.manageyourrenters.utils.uploadFilesOnFirestore
 import kotlinx.coroutines.CoroutineScope
@@ -25,18 +27,20 @@ class UploadDocumentListToFireStoreService : Service() {
         val uploadData = intent?.getStringExtra(Constants.UPLOAD_DATA_KEY)
         val randomId = intent?.getIntExtra(Constants.RANDOM_ID_KEY, 1003)
 
-        val image =
-            if (collection == getString(R.string.renters) || collection == getString(R.string.borrowers)) {
+        val pendingIntent: PendingIntent =
+            Functions.getPendingIntentForForegroundServiceNotification(
+                this,
+                if (collection == getString(R.string.partialPayments)) getString(R.string.borrowerPayments) else collection
+                    ?: ""
+            )
 
-                R.drawable.ic_baseline_person_add_24
-            } else {
-                R.drawable.ic_baseline_payment_24
-            }
+        val image = R.drawable.ic_baseline_payment_24
 
         val notification = NotificationCompat.Builder(
             this,
             Constants.NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(image)
+            .setContentIntent(pendingIntent)
             .setContentTitle("Uploading list to the $collection...")
             .build()
 

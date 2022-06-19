@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.services
 
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -11,6 +12,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.NOTIFICATION_CHANNEL_ID
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.deleteFromFireStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,11 +28,17 @@ class DeleteService : Service() {
         val key = intent?.getStringExtra(DOCUMENT_KEY)
         val randomId = intent?.getIntExtra(RANDOM_ID_KEY, 1006)
 
+        val pendingIntent: PendingIntent =
+            Functions.getPendingIntentForForegroundServiceNotification(
+                this, collection ?: ""
+            )
+
         val notification = NotificationCompat.Builder(
             this,
             NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(R.drawable.ic_baseline_delete_24)
             .setContentTitle("Deleting from $collection")
+            .setContentIntent(pendingIntent)
             .setProgress(100, 0, true)
             .build()
 

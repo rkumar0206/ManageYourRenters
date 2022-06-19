@@ -7,6 +7,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
+import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.EMIRepository
@@ -269,6 +270,48 @@ class EMIPaymentViewModel @Inject constructor(
 
     fun getLastEMIPaymentOfEMIbyEMIKey(emiKey: String) =
         emiPaymentRepository.getLastEMIPaymentOfEMIbyEMIKey(emiKey).asLiveData()
+
+    fun buildEMIPaymentInfoStringForAlertDialogMessage(
+        emiPayment: EMIPayment,
+        emi: EMI
+    ): String {
+
+        val workingWithDateAndTime = WorkingWithDateAndTime()
+        val message = StringBuilder()
+        message.append(
+            "\nModified On : ${
+                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    emiPayment.modified,
+                    "dd-MM-yyyy hh:mm a"
+                )
+            }\n\n"
+        )
+        message.append(
+            "Created On : ${
+                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    emiPayment.created,
+                    "dd-MM-yyyy hh:mm a"
+                )
+            }\n\n---------------------------\n\n"
+        )
+
+        if (emiPayment.fromMonth == emiPayment.tillMonth) {
+
+            message.append("For month : ${emiPayment.fromMonth}\n\n")
+        } else {
+            message.append("From month : ${emiPayment.fromMonth}\nTill month : ${emiPayment.tillMonth}\n\n")
+        }
+
+        message.append("Amount paid : ${emi.currencySymbol} ${emiPayment.amountPaid}\n\n")
+
+        if (emiPayment.message.isValid()) {
+
+            message.append("Message : ${emiPayment.message}\n\n")
+        }
+
+        message.append("For EMI : ${emi.emiName}")
+        return message.toString()
+    }
 
     /* fun getAllEMIPayments() = emiPaymentRepository.getAllEMIPayments().asLiveData()
 

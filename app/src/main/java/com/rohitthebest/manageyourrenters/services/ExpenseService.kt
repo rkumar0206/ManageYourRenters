@@ -15,7 +15,7 @@ import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.repositories.api.ExpenseCategoryRepositoryAPI
 import com.rohitthebest.manageyourrenters.repositories.api.ExpenseRepositoryAPI
-import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,9 +51,9 @@ class ExpenseService : Service() {
         val expenseKey = intent?.getStringExtra(Constants.EXPENSE_KEY)
 
         val pendingIntent: PendingIntent =
-            Intent(this, HomeActivity::class.java).let { notificationIntent ->
-                PendingIntent.getActivity(this, 0, notificationIntent, 0)
-            }
+            Functions.getPendingIntentForForegroundServiceNotification(
+                this, getString(R.string.expenses)
+            )
 
         val image = R.drawable.ic_track_money
 

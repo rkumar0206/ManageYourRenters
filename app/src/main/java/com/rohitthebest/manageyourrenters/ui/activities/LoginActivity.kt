@@ -212,7 +212,6 @@ class LoginActivity : AppCompatActivity() {
 
                 val renters = getDataFromFireStore(
                     collection = getString(R.string.renters),
-                    orderBy = "timeStamp",
                     uid = getUid()!!
                 ) {
 

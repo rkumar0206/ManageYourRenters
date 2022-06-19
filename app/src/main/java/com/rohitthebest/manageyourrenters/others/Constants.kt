@@ -16,8 +16,7 @@ object Constants {
     const val BORROWER_DATABASE_NAME = "borrowerdatabase.db"
     const val BORROWER_PAYMENT_DATABASE_NAME = "borrowerpaymentdatabase.db"
     const val PARTIAL_PAYMENT_DATABASE_NAME = "partialpaymentdatabase.db"
-    const val EMI_DATABASE_NAME = "emidatabase.db"
-    const val EMI_PAYMENT_DATABASE_NAME = "emi_paymentdatabase.db"
+    const val EMI_DATABASE_NAME = "emi_database.db"
     const val EXPENSE_DATABASE_NAME = "expense_database.db"
     const val MONTHLY_PAYMENT_DATABASE_NAME = "monthly_payment_db"
 
@@ -65,4 +64,6 @@ object Constants {
     const val SHORTCUT_BORROWERS = "com.rohitthebest.manageyourrenters.borrowers"
     const val SHORTCUT_HOUSE_RENTERS = "com.rohitthebest.manageyourrenters.house_renters"
     const val SHORTCUT_MONTHLY_PAYMENTS = "com.rohitthebest.manageyourrenters.monthly_payments"
+    const val SHORTCUT_EMI = "com.rohitthebest.manageyourrenters.emis"
+
 }

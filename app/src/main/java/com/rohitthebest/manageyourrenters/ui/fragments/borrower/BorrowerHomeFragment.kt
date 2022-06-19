@@ -210,25 +210,34 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     }
 
+    private fun checkSupportingDocumentValidation(): Boolean {
+
+        if (!borrowerForMenus.isSupportingDocAdded) {
+
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            return false
+        } else if (borrowerForMenus.isSupportingDocAdded && borrowerForMenus.supportingDocument == null) {
+
+            showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
+            return false
+        }
+
+        return true
+    }
+
+
     override fun onViewSupportingDocumentMenuClick() {
 
-        if (::borrowerForMenus.isInitialized) {
+        if (::borrowerForMenus.isInitialized && checkSupportingDocumentValidation()) {
 
-            if (!borrowerForMenus.isSupportingDocAdded) {
+            borrowerForMenus.supportingDocument?.let { supportingDoc ->
 
-                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
-            } else if (borrowerForMenus.isSupportingDocAdded && borrowerForMenus.supportingDocument == null) {
-
-                showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
-            } else {
-                borrowerForMenus.supportingDocument?.let { supportingDoc ->
-
-                    Functions.onViewOrDownloadSupportingDocument(
-                        requireActivity(),
-                        supportingDoc
-                    )
-                }
+                Functions.onViewOrDownloadSupportingDocument(
+                    requireActivity(),
+                    supportingDoc
+                )
             }
+
         }
     }
 
@@ -289,7 +298,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
     override fun onDeleteSupportingDocumentClick() {
 
         if (::borrowerForMenus.isInitialized
-            && borrowerForMenus.isSupportingDocAdded
+            && checkSupportingDocumentValidation()
             && borrowerForMenus.supportingDocument != null
         ) {
 
@@ -326,6 +335,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         } else {
             showToast(requireContext(), getString(R.string.no_supporting_doc_added))
         }
+
     }
 
     override fun onSyncMenuClick() {

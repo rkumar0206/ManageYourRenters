@@ -9,16 +9,16 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.emiAdapters.EMIPaymentAdapter
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.SHOW_DOCUMENTS_MENU
-import com.rohitthebest.manageyourrenters.ui.fragments.AddSupportingDocumentBottomSheetFragment
+import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
@@ -34,7 +34,8 @@ private const val TAG = "EMIPaymentFragment"
 
 @AndroidEntryPoint
 class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
-    EMIPaymentAdapter.OnClickListener, CustomMenuItems.OnItemClickListener {
+    EMIPaymentAdapter.OnClickListener, CustomMenuItems.OnItemClickListener,
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
     private var _binding: FragmentEmiPaymentBinding? = null
     private val binding get() = _binding!!
@@ -150,105 +151,55 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
     }
 
     private lateinit var emiPaymentForMenus: EMIPayment
+    private var adapterPosition = -1
 
-    override fun onEMIDocumentBtnClicked(emiPayment: EMIPayment, position: Int) {
+    override fun onItemClick(emiPayment: EMIPayment) {
+
+        //todo : open dialog to show the details
+    }
+
+    override fun onMenuButtonBtnClicked(emiPayment: EMIPayment, position: Int) {
 
         emiPaymentForMenus = emiPayment
+        adapterPosition = position
 
-        requireActivity().supportFragmentManager.let { fm ->
+        requireActivity().supportFragmentManager.let {
 
             val bundle = Bundle()
+
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !emiPayment.isSynced)
+            bundle.putBoolean(Constants.SHOW_DELETE_MENU, position == 0)
             bundle.putBoolean(Constants.SHOW_EDIT_MENU, false)
-            bundle.putBoolean(Constants.SHOW_DELETE_MENU, false)
             bundle.putBoolean(SHOW_DOCUMENTS_MENU, true)
 
             CustomMenuItems.newInstance(
                 bundle
             ).apply {
-
-                show(fm, TAG)
+                show(it, TAG)
             }.setOnClickListener(this)
         }
 
     }
 
-    override fun onSyncBtnClicked(emiPayment: EMIPayment, position: Int) {
-
-        if (emiPayment.isSynced) {
-
-            showToast(
-                requireContext(),
-                "Already synced!!"
-            )
-        } else {
-
-            if (isInternetAvailable(requireContext())) {
-
-                emiPayment.isSynced = true
-
-                uploadDocumentToFireStore(
-                    requireContext(),
-                    getString(R.string.emiPayments),
-                    emiPayment.key
-                )
-
-                emiPaymentViewModel.updateEMIPayment(emiPayment)
-
-                emiPaymentAdapter.notifyItemChanged(position)
-            } else {
-
-                showNoInternetMessage(requireContext())
-            }
-        }
+    //[START OF MENUS]
+    override fun onEditMenuClick() {
+        // not visible
     }
 
-    override fun onEMIPaymentMessageBtnClicked(message: String) {
+    override fun onDeleteMenuClick() {
 
-        if (!message.isValid()) {
-
-            showToast(requireContext(), "No message or note added!!!")
-        } else {
-
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Message / Note")
-                .setMessage(message)
-                .setPositiveButton("Ok") { dialog, _ ->
-
-                    dialog.dismiss()
-                }
-                .create()
-                .show()
-        }
-
-    }
-
-    override fun onDeleteEMIPaymentBtnClicked(emiPayment: EMIPayment, position: Int) {
-
-        if (position == 0) {
+        if (adapterPosition == 0) {
 
             showAlertDialogForDeletion(
                 requireContext(),
                 { dialog ->
 
-                    if (!emiPayment.isSynced || !emiPayment.isSupportingDocumentAdded) {
+                    if (isInternetAvailable(requireContext())) {
 
-                        emiPaymentViewModel.deleteEMIPayment(
-                            requireContext(),
-                            emiPayment
-                        )
+                        emiPaymentViewModel.deleteEMIPayment(emiPaymentForMenus)
                     } else {
 
-                        if (isInternetAvailable(requireContext())) {
-
-                            emiPaymentViewModel.deleteEMIPayment(
-                                requireContext(),
-                                emiPayment
-                            )
-
-                        } else {
-
-                            showNoInternetMessage(requireContext())
-                        }
+                        showNoInternetMessage(requireContext())
                     }
 
                     dialog.dismiss()
@@ -262,111 +213,161 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
         } else {
 
             showToast(requireContext(), "You cannot delete this payment!!!!")
-            emiPaymentAdapter.notifyItemChanged(position)
+            emiPaymentAdapter.notifyItemChanged(adapterPosition)
         }
-    }
 
-    //[START OF MENUS]
-    override fun onEditMenuClick() {
-        // not visible
-    }
-
-    override fun onDeleteMenuClick() {
-
-        // not visible
     }
 
     override fun onViewSupportingDocumentMenuClick() {
 
-        if (this::emiPaymentForMenus.isInitialized) {
+        if (::emiPaymentForMenus.isInitialized && checkSupportingDocumentValidation()) {
 
-            if (!emiPaymentForMenus.isSupportingDocumentAdded) {
+            emiPaymentForMenus.supportingDocument?.let { supportingDoc ->
 
-                requireContext().showToast(getString(R.string.no_supporting_doc_added))
-            } else {
-
-                emiPaymentForMenus.supportingDocument?.let { supportingDoc ->
-
-                    Functions.onViewOrDownloadSupportingDocument(
-                        requireActivity(),
-                        supportingDoc
-                    )
-                }
+                Functions.onViewOrDownloadSupportingDocument(
+                    requireActivity(),
+                    supportingDoc
+                )
             }
+
+        }
+    }
+
+    private fun checkSupportingDocumentValidation(): Boolean {
+
+        if (!emiPaymentForMenus.isSupportingDocAdded) {
+
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            return false
+        } else if (emiPaymentForMenus.isSupportingDocAdded && emiPaymentForMenus.supportingDocument == null) {
+
+            showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
+            return false
         }
 
+        return true
     }
 
     override fun onReplaceSupportingDocumentClick() {
 
+        if (isInternetAvailable(requireContext())) {
+            if (::emiPaymentForMenus.isInitialized) {
+
+                val supportingDocumentHelperModel = SupportingDocumentHelperModel()
+                supportingDocumentHelperModel.modelName = getString(R.string.emiPayments)
+
+                showSupportDocumentBottomSheetDialog(supportingDocumentHelperModel)
+            }
+        } else {
+
+            showNoInternetMessage(requireContext())
+        }
+
+    }
+
+    private fun showSupportDocumentBottomSheetDialog(supportingDocmtHelperModel: SupportingDocumentHelperModel) {
+
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY,
+            supportingDocmtHelperModel.convertToJsonString()
+        )
+
         requireActivity().supportFragmentManager.let {
 
-            val bundle = Bundle()
-            bundle.putString(Constants.COLLECTION_TAG_KEY, getString(R.string.emiPayments))
-            bundle.putString(Constants.DOCUMENT_KEY, fromEMIPaymentToString(emiPaymentForMenus))
-            bundle.putBoolean(Constants.IS_DOCUMENT_FOR_EDITING_KEY, true)
+            SupportingDocumentDialogFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
 
-            AddSupportingDocumentBottomSheetFragment.newInstance(
-                bundle
-            ).apply {
-                show(it, "AddSupportingDocTag")
+    override fun onBottomSheetDismissed(
+        isDocumentAdded: Boolean,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel
+    ) {
+
+        if (isInternetAvailable(requireContext())) {
+            if (isDocumentAdded) {
+
+                // call the viewmodel method for adding or replacing the document
+                emiPaymentViewModel.addOrReplaceBorrowerSupportingDocument(
+                    emiPaymentForMenus,
+                    supportingDocumentHelperModel
+                )
             }
+        } else {
+
+            showNoInternetMessage(requireContext())
         }
     }
 
     override fun onDeleteSupportingDocumentClick() {
 
-        if (this::emiPaymentForMenus.isInitialized) {
+        if (::emiPaymentForMenus.isInitialized
+            && checkSupportingDocumentValidation()
+            && emiPaymentForMenus.supportingDocument != null
+        ) {
+            showAlertDialogForDeletion(
+                requireContext(),
+                {
+                    if (emiPaymentForMenus.supportingDocument?.documentType != DocumentType.URL) {
+
+                        if (!isInternetAvailable(requireContext())) {
+
+                            showToast(
+                                requireContext(),
+                                getString(R.string.network_required_for_deleting_file_from_cloud)
+                            )
+                            return@showAlertDialogForDeletion
+                        } else {
+
+                            deleteFileFromFirebaseStorage(
+                                requireContext(),
+                                emiPaymentForMenus.supportingDocument?.documentUrl!!
+                            )
+                        }
+                        }
+
+                        val emiPayment = emiPaymentForMenus.copy()
+
+                        emiPayment.modified = System.currentTimeMillis()
+                        emiPayment.supportingDocument = null
+                        emiPayment.isSupportingDocAdded = false
+
+                        emiPaymentViewModel.updateEMIPayment(
+                            emiPaymentForMenus,
+                            emiPayment
+                        )
+                        showToast(requireContext(), getString(R.string.supporting_document_deleted))
+                        emiPaymentAdapter.notifyItemChanged(adapterPosition)
+                        it.dismiss()
+                    },
+                    {
+                        it.dismiss()
+                    }
+                )
+            } else {
+                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            }
+
+    }
+
+    override fun onSyncMenuClick() {
+
+        if (emiPaymentForMenus.isSynced) {
+
+            showToast(
+                requireContext(),
+                "Already synced!!"
+            )
+        } else {
 
             if (isInternetAvailable(requireContext())) {
 
-                if (emiPaymentForMenus.isSupportingDocumentAdded) {
-
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Are you sure?")
-                        .setMessage("After deleting you cannot retrieve it again.")
-                        .setPositiveButton("Yes") { dialog, _ ->
-
-                            if (emiPaymentForMenus.supportingDocument?.documentType != DocumentType.URL) {
-
-                                deleteFileFromFirebaseStorage(
-                                    requireContext(),
-                                    emiPaymentForMenus.supportingDocument?.documentUrl!!
-                                )
-
-                            }
-
-                            emiPaymentForMenus.isSupportingDocumentAdded = false
-                            emiPaymentForMenus.supportingDocument = null
-
-                            val map = HashMap<String, Any?>()
-                            map["supportingDocumentAdded"] = false
-                            map["supportingDocument"] = null
-
-                            updateDocumentOnFireStore(
-                                requireContext(),
-                                map,
-                                getString(R.string.emiPayments),
-                                emiPaymentForMenus.key
-                            )
-
-                            emiPaymentViewModel.updateEMIPayment(emiPaymentForMenus)
-
-                            dialog.dismiss()
-                        }
-                        .setNegativeButton("Cancel") { dialog, _ ->
-
-                            dialog.dismiss()
-                        }
-                        .create()
-                        .show()
-
-                } else {
-
-                    requireContext().showToast(
-                        "No supporting document added!!!"
-                    )
-                }
+                // inserting as update is not allowed for emiPayment
+                emiPaymentViewModel.updateEMIPayment(emiPaymentForMenus, emiPaymentForMenus)
+                emiPaymentAdapter.notifyItemChanged(adapterPosition)
             } else {
 
                 showNoInternetMessage(requireContext())
@@ -374,8 +375,6 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
         }
 
     }
-
-    override fun onSyncMenuClick() {}
     //[END OF MENUS]
 
     private fun initListeners() {

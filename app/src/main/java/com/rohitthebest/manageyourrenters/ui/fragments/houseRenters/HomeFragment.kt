@@ -264,24 +264,32 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     }
 
+    private fun checkSupportingDocumentValidation(): Boolean {
+
+        if (!renterForMenus.isSupportingDocAdded) {
+
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            return false
+        } else if (renterForMenus.isSupportingDocAdded && renterForMenus.supportingDocument == null) {
+
+            showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
+            return false
+        }
+
+        return true
+    }
+
+
     override fun onViewSupportingDocumentMenuClick() {
 
-        if (::renterForMenus.isInitialized) {
+        if (::renterForMenus.isInitialized && checkSupportingDocumentValidation()) {
 
-            if (!renterForMenus.isSupportingDocAdded) {
+            renterForMenus.supportingDocument?.let { supportingDoc ->
 
-                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
-            } else if (renterForMenus.isSupportingDocAdded && renterForMenus.supportingDocument == null) {
-
-                showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
-            } else {
-                renterForMenus.supportingDocument?.let { supportingDoc ->
-
-                    Functions.onViewOrDownloadSupportingDocument(
-                        requireActivity(),
-                        supportingDoc
-                    )
-                }
+                Functions.onViewOrDownloadSupportingDocument(
+                    requireActivity(),
+                    supportingDoc
+                )
             }
         }
     }
@@ -340,8 +348,9 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     }
 
     override fun onDeleteSupportingDocumentClick() {
+
         if (::renterForMenus.isInitialized
-            && renterForMenus.isSupportingDocAdded
+            && checkSupportingDocumentValidation()
             && renterForMenus.supportingDocument != null
         ) {
 
@@ -370,7 +379,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         } else {
             showToast(requireContext(), getString(R.string.no_supporting_doc_added))
         }
-
     }
 
     override fun onSyncMenuClick() {

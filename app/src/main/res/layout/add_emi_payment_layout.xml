@@ -291,7 +291,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addSupportingDocCB2"
+        app:layout_constraintTop_toBottomOf="@+id/addSupportingDocCB"
         app:strokeColor="@color/sky_blue"
         app:strokeWidth="1dp">
 
@@ -329,21 +329,21 @@
         app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
 
     <TextView
-        android:id="@+id/viewEditSupportingDoc2"
+        android:id="@+id/viewEditSupportingDoc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="3dp"
         android:text="@string/view_edit"
         android:textColor="@color/blue_text_color"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/addSupportingDocCB2"
+        app:layout_constraintBottom_toBottomOf="@+id/addSupportingDocCB"
         app:layout_constraintEnd_toEndOf="@+id/cardView18"
-        app:layout_constraintStart_toEndOf="@+id/addSupportingDocCB2"
-        app:layout_constraintTop_toTopOf="@+id/addSupportingDocCB2"
+        app:layout_constraintStart_toEndOf="@+id/addSupportingDocCB"
+        app:layout_constraintTop_toTopOf="@+id/addSupportingDocCB"
         tools:visibility="visible" />
 
     <CheckBox
-        android:id="@+id/addSupportingDocCB2"
+        android:id="@+id/addSupportingDocCB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

@@ -1,18 +1,17 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import android.content.Context
+import android.app.Application
 import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.EMIRepository
-import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
-import com.rohitthebest.manageyourrenters.utils.deleteAllDocumentsUsingKeyFromFirestore
-import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
-import com.rohitthebest.manageyourrenters.utils.deleteFileFromFirebaseStorage
+import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,10 +20,11 @@ private const val TAG = "EMIViewModel"
 
 @HiltViewModel
 class EMIViewModel @Inject constructor(
+    app: Application,
     private val emiRepository: EMIRepository,
     private val emiPaymentRepository: EMIPaymentRepository,
     private val state: SavedStateHandle
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     // ------------------------- UI related ----------------------------
 
@@ -46,7 +46,37 @@ class EMIViewModel @Inject constructor(
 
     // ---------------------------------------------------------------
 
-    fun insertEMI(emi: EMI) = viewModelScope.launch {
+    fun insertEMI(
+        emi: EMI,
+        supportingDocumentHelperModel: SupportingDocumentHelperModel? = null
+    ) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
+
+        if (Functions.isInternetAvailable(context)) {
+
+            emi.isSynced = true
+
+            uploadDocumentToFireStore(
+                context,
+                context.getString(R.string.emis),
+                emi.key
+            )
+
+            if (supportingDocumentHelperModel != null && supportingDocumentHelperModel.documentType != DocumentType.URL
+            ) {
+                supportingDocumentHelperModel.modelName =
+                    context.getString(R.string.emis)
+                uploadFileToFirebaseCloudStorage(
+                    context, supportingDocumentHelperModel, emi.key
+                )
+            }
+
+        } else {
+
+            emi.isSynced = false
+        }
+
         emiRepository.insertEMI(emi)
     }
 
@@ -54,11 +84,91 @@ class EMIViewModel @Inject constructor(
         emiRepository.insertAllEMI(emis)
     }
 
-    fun updateEMI(emi: EMI) = viewModelScope.launch {
+    fun updateEMI(oldEMI: EMI, emi: EMI) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
+
+        if (Functions.isInternetAvailable(context)) {
+
+            emi.isSynced = true
+
+            if (!oldEMI.isSynced) {
+
+                uploadDocumentToFireStore(
+                    context,
+                    context.getString(R.string.emis),
+                    emi.key
+                )
+            } else {
+
+                val map = compareEmi(oldEMI, emi)
+
+                if (map.isNotEmpty()) {
+                    updateDocumentOnFireStore(
+                        context,
+                        map,
+                        context.getString(R.string.emis),
+                        emi.key
+                    )
+                }
+            }
+        } else {
+            emi.isSynced = false
+        }
+
         emiRepository.updateEMI(emi)
     }
 
-    fun deleteEMI(context: Context, emi: EMI) = viewModelScope.launch {
+    fun addOrReplaceBorrowerSupportingDocument(
+        emi: EMI,
+        supportDocumentHelper: SupportingDocumentHelperModel
+    ) {
+        val context = getApplication<Application>().applicationContext
+
+        val oldEMI = emi.copy()
+
+        emi.modified = System.currentTimeMillis()
+
+        if (emi.supportingDocument != null && emi.supportingDocument?.documentType != DocumentType.URL) {
+
+            // if borrower contains supporting document previously, then call delete service also
+
+            deleteFileFromFirebaseStorage(
+                context,
+                emi.supportingDocument?.documentUrl!!
+            )
+        }
+
+        if (supportDocumentHelper.documentType == DocumentType.URL) {
+
+            val supportingDoc = SupportingDocument(
+                supportDocumentHelper.documentName,
+                supportDocumentHelper.documentUrl,
+                supportDocumentHelper.documentType
+            )
+
+            emi.isSupportingDocAdded = true
+            emi.supportingDocument = supportingDoc
+
+            updateEMI(oldEMI, emi)
+        } else {
+
+            supportDocumentHelper.modelName = context.getString(R.string.emis)
+
+            if (!emi.isSynced) {
+                insertEMI(emi, supportDocumentHelper)
+                return
+            }
+            uploadFileToFirebaseCloudStorage(
+                context, supportDocumentHelper, emi.key
+            )
+        }
+    }
+
+
+    fun deleteEMI(emi: EMI) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
 
         // get all the supporting documents and keys of payments for this emi
         val keysAndSupportingDocs =
@@ -94,7 +204,7 @@ class EMIViewModel @Inject constructor(
         }
 
         // delete supporting document of the emi
-        if (emi.isSupportingDocumentAdded) {
+        if (emi.isSupportingDocAdded) {
 
             if (emi.supportingDocument != null && emi.supportingDocument?.documentType != DocumentType.URL)
 

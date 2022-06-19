@@ -41,20 +41,20 @@ class BorrowerPaymentAdapter :
                         context.getString(
                             R.string.borrowed_currency_symbol_amount_taken,
                             payment.currencySymbol,
-                            payment.amountTakenOnRent
+                            payment.amountTakenOnRent.toString()
                         )
                     paidAmountTV.text =
                         context.getString(
                             R.string.paid_currency_symbol_amount,
                             payment.currencySymbol,
-                            (payment.amountTakenOnRent - payment.dueLeftAmount)
+                            (payment.amountTakenOnRent - payment.dueLeftAmount).toString()
                         )
 
                     dueAmountTV.text = context
                         .getString(
                             R.string.due_currency_symbol_amount,
                             payment.currencySymbol,
-                            payment.dueLeftAmount
+                            payment.dueLeftAmount.toString()
                         )
 
                     if (payment.isSynced) {

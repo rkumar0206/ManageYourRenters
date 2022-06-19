@@ -94,6 +94,8 @@ class BorrowerViewModel @Inject constructor(
     ) {
         val context = getApplication<Application>().applicationContext
 
+        borrower.modified = System.currentTimeMillis()
+
         if (borrower.supportingDocument != null && borrower.supportingDocument?.documentType != DocumentType.URL) {
 
             // if borrower contains supporting document previously, then call delete service also

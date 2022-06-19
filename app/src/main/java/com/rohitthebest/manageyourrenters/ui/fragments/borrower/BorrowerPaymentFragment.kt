@@ -297,24 +297,34 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     }
 
-    override fun onViewSupportingDocumentMenuClick() {
+    private fun checkSupportingDocumentValidation(): Boolean {
 
-        if (borrowerPaymentForMenus != null) {
-            if (!borrowerPaymentForMenus!!.isSupportingDocAdded) {
+        if (!borrowerPaymentForMenus?.isSupportingDocAdded!!) {
 
-                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
-            } else {
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            return false
+        } else if (borrowerPaymentForMenus!!.isSupportingDocAdded && borrowerPaymentForMenus!!.supportingDocument == null) {
 
-                borrowerPaymentForMenus!!.supportingDocument?.let { supportingDoc ->
-
-                    onViewOrDownloadSupportingDocument(
-                        requireActivity(),
-                        supportingDoc
-                    )
-                }
-            }
+            showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
+            return false
         }
 
+        return true
+    }
+
+
+    override fun onViewSupportingDocumentMenuClick() {
+
+        if (borrowerPaymentForMenus != null && checkSupportingDocumentValidation()) {
+
+            borrowerPaymentForMenus!!.supportingDocument?.let { supportingDoc ->
+
+                onViewOrDownloadSupportingDocument(
+                    requireActivity(),
+                    supportingDoc
+                )
+            }
+        }
     }
 
     override fun onReplaceSupportingDocumentClick() {
@@ -373,7 +383,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     override fun onDeleteSupportingDocumentClick() {
 
         if (borrowerPaymentForMenus != null
-            && borrowerPaymentForMenus!!.isSupportingDocAdded
+            && checkSupportingDocumentValidation()
             && borrowerPaymentForMenus!!.supportingDocument != null
         ) {
             showAlertDialogForDeletion(

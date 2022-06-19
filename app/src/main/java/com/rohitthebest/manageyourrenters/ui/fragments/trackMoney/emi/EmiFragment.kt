@@ -156,25 +156,33 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
         }
     }
 
+    private fun checkSupportingDocumentValidation(): Boolean {
+
+        if (!emiForMenuItems.isSupportingDocAdded) {
+
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            return false
+        } else if (emiForMenuItems.isSupportingDocAdded && emiForMenuItems.supportingDocument == null) {
+
+            showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
+            return false
+        }
+
+        return true
+    }
+
     override fun onViewSupportingDocumentMenuClick() {
 
-        if (this::emiForMenuItems.isInitialized) {
+        if (this::emiForMenuItems.isInitialized && checkSupportingDocumentValidation()) {
 
-            if (!emiForMenuItems.isSupportingDocAdded) {
+            emiForMenuItems.supportingDocument?.let { supportingDoc ->
 
-                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
-            } else if (emiForMenuItems.isSupportingDocAdded && emiForMenuItems.supportingDocument == null) {
-
-                showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
-            } else {
-                emiForMenuItems.supportingDocument?.let { supportingDoc ->
-
-                    onViewOrDownloadSupportingDocument(
-                        requireActivity(),
-                        supportingDoc
-                    )
-                }
+                onViewOrDownloadSupportingDocument(
+                    requireActivity(),
+                    supportingDoc
+                )
             }
+
         }
     }
 
@@ -235,7 +243,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
     override fun onDeleteSupportingDocumentClick() {
 
         if (this::emiForMenuItems.isInitialized
-            && emiForMenuItems.isSupportingDocAdded
+            && checkSupportingDocumentValidation()
             && emiForMenuItems.supportingDocument != null
         ) {
 
@@ -276,7 +284,6 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
         } else {
             showToast(requireContext(), getString(R.string.no_supporting_doc_added))
         }
-
 
     }
 

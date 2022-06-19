@@ -336,24 +336,32 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     }
 
+    private fun checkSupportingDocumentValidation(): Boolean {
+
+        if (!renterPaymentForMenus.isSupportingDocAdded) {
+
+            showToast(requireContext(), getString(R.string.no_supporting_doc_added))
+            return false
+        } else if (renterPaymentForMenus.isSupportingDocAdded && renterPaymentForMenus.supportingDocument == null) {
+
+            showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
+            return false
+        }
+
+        return true
+    }
+
+
     override fun onViewSupportingDocumentMenuClick() {
 
-        if (::renterPaymentForMenus.isInitialized) {
+        if (::renterPaymentForMenus.isInitialized && checkSupportingDocumentValidation()) {
 
-            if (!renterPaymentForMenus.isSupportingDocAdded) {
+            renterPaymentForMenus.supportingDocument?.let { supportingDoc ->
 
-                showToast(requireContext(), getString(R.string.no_supporting_doc_added))
-            } else if (renterPaymentForMenus.isSupportingDocAdded && renterPaymentForMenus.supportingDocument == null) {
-
-                showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
-            } else {
-                renterPaymentForMenus.supportingDocument?.let { supportingDoc ->
-
-                    Functions.onViewOrDownloadSupportingDocument(
-                        requireActivity(),
-                        supportingDoc
-                    )
-                }
+                Functions.onViewOrDownloadSupportingDocument(
+                    requireActivity(),
+                    supportingDoc
+                )
             }
         }
     }
@@ -414,7 +422,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     override fun onDeleteSupportingDocumentClick() {
 
         if (::renterPaymentForMenus.isInitialized
-            && renterPaymentForMenus.isSupportingDocAdded
+            && checkSupportingDocumentValidation()
             && renterPaymentForMenus.supportingDocument != null
         ) {
             showAlertDialogForDeletion(
@@ -459,6 +467,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         } else {
             showToast(requireContext(), getString(R.string.no_supporting_doc_added))
         }
+
 
     }
 

@@ -220,18 +220,16 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
     override fun onViewSupportingDocumentMenuClick() {
 
-        if (::emiPaymentForMenus.isInitialized) {
+        if (::emiPaymentForMenus.isInitialized && checkSupportingDocumentValidation()) {
 
-            if (checkSupportingDocumentValidation()) {
+            emiPaymentForMenus.supportingDocument?.let { supportingDoc ->
 
-                emiPaymentForMenus.supportingDocument?.let { supportingDoc ->
-
-                    Functions.onViewOrDownloadSupportingDocument(
-                        requireActivity(),
-                        supportingDoc
-                    )
-                }
+                Functions.onViewOrDownloadSupportingDocument(
+                    requireActivity(),
+                    supportingDoc
+                )
             }
+
         }
     }
 
@@ -306,29 +304,29 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
     override fun onDeleteSupportingDocumentClick() {
 
-        if (checkSupportingDocumentValidation()) {
+        if (::emiPaymentForMenus.isInitialized
+            && checkSupportingDocumentValidation()
+            && emiPaymentForMenus.supportingDocument != null
+        ) {
+            showAlertDialogForDeletion(
+                requireContext(),
+                {
+                    if (emiPaymentForMenus.supportingDocument?.documentType != DocumentType.URL) {
 
-            if (::emiPaymentForMenus.isInitialized && emiPaymentForMenus.supportingDocument != null
-            ) {
-                showAlertDialogForDeletion(
-                    requireContext(),
-                    {
-                        if (emiPaymentForMenus.supportingDocument?.documentType != DocumentType.URL) {
+                        if (!isInternetAvailable(requireContext())) {
 
-                            if (!isInternetAvailable(requireContext())) {
+                            showToast(
+                                requireContext(),
+                                getString(R.string.network_required_for_deleting_file_from_cloud)
+                            )
+                            return@showAlertDialogForDeletion
+                        } else {
 
-                                showToast(
-                                    requireContext(),
-                                    getString(R.string.network_required_for_deleting_file_from_cloud)
-                                )
-                                return@showAlertDialogForDeletion
-                            } else {
-
-                                deleteFileFromFirebaseStorage(
-                                    requireContext(),
-                                    emiPaymentForMenus.supportingDocument?.documentUrl!!
-                                )
-                            }
+                            deleteFileFromFirebaseStorage(
+                                requireContext(),
+                                emiPaymentForMenus.supportingDocument?.documentUrl!!
+                            )
+                        }
                         }
 
                         val emiPayment = emiPaymentForMenus.copy()
@@ -352,7 +350,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
             } else {
                 showToast(requireContext(), getString(R.string.no_supporting_doc_added))
             }
-        }
+
     }
 
     override fun onSyncMenuClick() {

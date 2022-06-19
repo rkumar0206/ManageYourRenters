@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.utils
 
 import android.app.Activity
 import android.app.DatePickerDialog
+import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -38,6 +39,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
+import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -918,6 +920,30 @@ class Functions {
 
 
             return Pair(interest, amount)
+        }
+
+        fun getPendingIntentForForegroundServiceNotification(
+            context: Context,
+            modelCollectionName: String
+        ): PendingIntent {
+
+            return Intent(context, HomeActivity::class.java).let { notificationIntent ->
+
+                notificationIntent.action = when (modelCollectionName) {
+
+                    context.getString(R.string.borrowers) -> Constants.SHORTCUT_BORROWERS
+                    context.getString(R.string.renters) -> Constants.SHORTCUT_HOUSE_RENTERS
+                    context.getString(R.string.borrowerPayments) -> Constants.SHORTCUT_BORROWERS
+                    context.getString(R.string.renter_payments) -> Constants.SHORTCUT_HOUSE_RENTERS
+                    context.getString(R.string.emis) -> Constants.SHORTCUT_EMI
+                    context.getString(R.string.emiPayments) -> Constants.SHORTCUT_EMI
+                    context.getString(R.string.expenses) -> Constants.SHORTCUT_EXPENSE
+                    context.getString(R.string.monthly_payments) -> Constants.SHORTCUT_MONTHLY_PAYMENTS
+
+                    else -> ""
+                }
+                PendingIntent.getActivity(context, 0, notificationIntent, 0)
+            }
         }
 
     }

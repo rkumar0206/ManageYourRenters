@@ -16,12 +16,8 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
-import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_BORROWERS
-import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_EMI
-import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_HOUSE_RENTERS
 import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY
 import com.rohitthebest.manageyourrenters.repositories.*
-import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
 import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
@@ -75,25 +71,9 @@ class UploadFileToCloudStorageService : Service() {
         notificationId = Random.nextInt(1000, 9999)
 
         val pendingIntent: PendingIntent =
-            Intent(this, HomeActivity::class.java).let { notificationIntent ->
-                notificationIntent.action = when (supportingDocumentHelperModel.modelName) {
-
-                    getString(R.string.borrowers) -> SHORTCUT_BORROWERS
-
-                    getString(R.string.renters) -> SHORTCUT_HOUSE_RENTERS
-
-                    getString(R.string.borrowerPayments) -> SHORTCUT_BORROWERS
-
-                    getString(R.string.renter_payments) -> SHORTCUT_HOUSE_RENTERS
-
-                    getString(R.string.emis) -> SHORTCUT_EMI
-
-                    getString(R.string.emiPayments) -> SHORTCUT_EMI
-
-                    else -> ""
-                }
-                PendingIntent.getActivity(this, 0, notificationIntent, 0)
-            }
+            Functions.getPendingIntentForForegroundServiceNotification(
+                this, supportingDocumentHelperModel.modelName
+            )
 
         notificationBuilder = NotificationCompat.Builder(
             this,

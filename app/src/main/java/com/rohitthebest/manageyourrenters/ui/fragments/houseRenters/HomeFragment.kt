@@ -248,7 +248,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                     if (isInternetAvailable(requireContext())) {
 
-                        renterViewModel.deleteRenter(requireContext(), renterForMenus)
+                        renterViewModel.deleteRenter(renterForMenus)
                     } else {
                         showNoInternetMessage(requireContext())
                     }
@@ -336,7 +336,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                 // call the viewmodel method for adding or replacing the document
                 renterViewModel.addOrReplaceBorrowerSupportingDocument(
-                    requireContext(),
                     renterForMenus,
                     supportingDocumentHelperModel
                 )
@@ -373,7 +372,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
             }
             renterForMenus.supportingDocument = null
             renterForMenus.isSupportingDocAdded = false
-            renterViewModel.updateRenter(requireContext(), renterForMenus)
+            renterViewModel.updateRenter(renterForMenus)
             showToast(requireContext(), "Supporting Document deleted")
 
         } else {
@@ -391,7 +390,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     showToast(requireContext(), "Already Synced")
                 } else {
 
-                    renterViewModel.updateRenter(requireContext(), renterForMenus)
+                    renterViewModel.updateRenter(renterForMenus)
                     mAdapter.notifyItemChanged(currentAdapterPosition)
                 }
 

@@ -279,13 +279,11 @@ class AddEditMonthlyPaymentCategory :
         if (!isMessageReceivedForEditing) {
 
             monthlyPaymentCategoryViewModel.insertMonthlyPaymentCategory(
-                requireContext(),
                 monthlyPaymentCategory
             )
         } else {
 
             monthlyPaymentCategoryViewModel.updateMonthlyPaymentCategory(
-                requireContext(),
                 monthlyPaymentCategory
             )
         }

@@ -1,7 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import android.content.Context
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
@@ -18,11 +18,14 @@ private const val TAG = "ExpenseViewModel"
 
 @HiltViewModel
 class ExpenseViewModel @Inject constructor(
+    app: Application,
     private val expenseRepository: ExpenseRepository
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
-    fun insertExpense(context: Context, expense: Expense) =
+    fun insertExpense(expense: Expense) =
         viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
 
             if (isInternetAvailable(context)) {
 
@@ -46,8 +49,10 @@ class ExpenseViewModel @Inject constructor(
         expenseRepository.insertAllExpense(expenses)
     }
 
-    fun updateExpense(context: Context, expense: Expense) =
+    fun updateExpense(expense: Expense) =
         viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
 
             if (isInternetAvailable(context)) {
 
@@ -61,12 +66,14 @@ class ExpenseViewModel @Inject constructor(
                 expense.isSynced = false
             }
 
-        expenseRepository.updateExpense(expense)
+            expenseRepository.updateExpense(expense)
 
-        Functions.showToast(context, "Expense updated")
-    }
+            Functions.showToast(context, "Expense updated")
+        }
 
-    fun deleteExpense(context: Context, expense: Expense) = viewModelScope.launch {
+    fun deleteExpense(expense: Expense) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
 
         if (isInternetAvailable(context)) {
 

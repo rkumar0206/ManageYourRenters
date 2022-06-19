@@ -271,6 +271,7 @@
     <string name="borrowed_on">Borrowed on : %1$s</string>
     <string name="month_year">%1$s, %2$s</string>
     <string name="already_synced">Already Synced</string>
+    <string name="payment_info">Payment info</string>
 
     <string-array name="interest_time_schedule">
 

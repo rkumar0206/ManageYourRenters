@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.emiAdapters.EMIPaymentAdapter
 import com.rohitthebest.manageyourrenters.data.DocumentType
@@ -155,7 +156,20 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
     override fun onItemClick(emiPayment: EMIPayment) {
 
-        //todo : open dialog to show the details
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.payment_info))
+            .setMessage(
+                emiPaymentViewModel.buildEMIPaymentInfoStringForAlertDialogMessage(
+                    emiPayment,
+                    receivedEMI
+                )
+            )
+            .setPositiveButton("Ok") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+
     }
 
     override fun onMenuButtonBtnClicked(emiPayment: EMIPayment, position: Int) {

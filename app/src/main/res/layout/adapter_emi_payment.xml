@@ -85,7 +85,7 @@
                 android:backgroundTint="@color/color_white"
                 android:contentDescription="@string/delete_this_payment"
                 android:minHeight="48dp"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider63"

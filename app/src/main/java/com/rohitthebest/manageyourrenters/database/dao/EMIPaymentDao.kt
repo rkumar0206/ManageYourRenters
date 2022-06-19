@@ -14,7 +14,7 @@ interface EMIPaymentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllEMIPayment(emiPayments: List<EMIPayment>)
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateEMIPayment(emiPayment: EMIPayment)
 
     @Delete

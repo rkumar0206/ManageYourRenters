@@ -5,6 +5,7 @@ import android.os.Parcelable
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
@@ -89,9 +90,42 @@ class EMIPaymentViewModel @Inject constructor(
         emiPaymentRepository.insertAllEMIPayment(emiPayments)
     }
 
-    fun updateEMIPayment(emiPayment: EMIPayment) = viewModelScope.launch {
-        emiPaymentRepository.updateEMIPayment(emiPayment)
-    }
+    fun updateEMIPayment(oldEmiPayment: EMIPayment, emiPayment: EMIPayment) =
+        viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
+
+            if (isInternetAvailable(context)) {
+
+                emiPayment.isSynced = true
+
+                if (!oldEmiPayment.isSynced) {
+
+                    uploadDocumentToFireStore(
+                        context,
+                        context.getString(R.string.emiPayments),
+                        emiPayment.key
+                    )
+                } else {
+
+                    val map = compareEMIPaymentModel(oldEmiPayment, emiPayment)
+
+                    if (map.isNotEmpty()) {
+
+                        updateDocumentOnFireStore(
+                            context,
+                            map,
+                            context.getString(R.string.emiPayments),
+                            emiPayment.key
+                        )
+                    }
+                }
+            } else {
+                emiPayment.isSynced = false
+            }
+
+            emiPaymentRepository.updateEMIPayment(emiPayment)
+        }
 
     fun deleteEMIPayment(emiPayment: EMIPayment) = viewModelScope.launch {
 
@@ -167,6 +201,50 @@ class EMIPaymentViewModel @Inject constructor(
         }
 
         emiRepository.updateEMI(emi)
+    }
+
+    fun addOrReplaceBorrowerSupportingDocument(
+        emiPayment: EMIPayment,
+        supportDocumentHelper: SupportingDocumentHelperModel
+    ) {
+        val context = getApplication<Application>().applicationContext
+
+        val oldEMIPayment = emiPayment.copy()
+
+        emiPayment.modified = System.currentTimeMillis()
+
+        if (emiPayment.supportingDocument != null && emiPayment.supportingDocument?.documentType != DocumentType.URL) {
+
+            deleteFileFromFirebaseStorage(
+                context,
+                emiPayment.supportingDocument?.documentUrl!!
+            )
+        }
+
+        if (supportDocumentHelper.documentType == DocumentType.URL) {
+
+            val supportingDoc = SupportingDocument(
+                supportDocumentHelper.documentName,
+                supportDocumentHelper.documentUrl,
+                supportDocumentHelper.documentType
+            )
+
+            emiPayment.isSupportingDocAdded = true
+            emiPayment.supportingDocument = supportingDoc
+
+            updateEMIPayment(oldEMIPayment, emiPayment)
+        } else {
+
+            supportDocumentHelper.modelName = context.getString(R.string.emiPayments)
+
+            if (!emiPayment.isSynced) {
+                insertEMIPayment(emiPayment, supportDocumentHelper)
+                return
+            }
+            uploadFileToFirebaseCloudStorage(
+                context, supportDocumentHelper, emiPayment.key
+            )
+        }
     }
 
     fun deleteEMIPaymentsByIsSynced(isSynced: Boolean) = viewModelScope.launch {

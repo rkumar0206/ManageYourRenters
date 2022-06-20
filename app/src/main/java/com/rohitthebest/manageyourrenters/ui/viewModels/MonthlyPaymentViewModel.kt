@@ -125,11 +125,10 @@ class MonthlyPaymentViewModel @Inject constructor(
         monthList: List<String>
     ): String {
 
-        val workingWithDateAndTime = WorkingWithDateAndTime()
         val message = StringBuilder()
         message.append(
             "\nModified On : ${
-                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     monthlyPayment.modified,
                     "dd-MM-yyyy hh:mm a"
                 )
@@ -137,7 +136,7 @@ class MonthlyPaymentViewModel @Inject constructor(
         )
         message.append(
             "Created On : ${
-                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     monthlyPayment.created,
                     "dd-MM-yyyy hh:mm a"
                 )
@@ -170,8 +169,6 @@ class MonthlyPaymentViewModel @Inject constructor(
         monthList: List<String>
     ): String {
 
-        val workingWithDateAndTime = WorkingWithDateAndTime()
-
         return if (monthlyPaymentDateTimeInfo?.paymentPeriodType == BillPeriodType.BY_MONTH) {
             val fromMonthYear =
                 "${monthList[monthlyPaymentDateTimeInfo.forBillMonth - 1]}, " +
@@ -186,11 +183,11 @@ class MonthlyPaymentViewModel @Inject constructor(
             }
         } else {
             "${
-                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     monthlyPaymentDateTimeInfo?.fromBillDate
                 )
             } to ${
-                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     monthlyPaymentDateTimeInfo?.toBillDate
                 )
             }"

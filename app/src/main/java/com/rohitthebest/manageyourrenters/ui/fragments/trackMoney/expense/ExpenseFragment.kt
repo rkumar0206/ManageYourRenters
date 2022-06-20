@@ -257,7 +257,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
                 val msg =
                     "\nDate : ${
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             expense.created, "dd-MM-yyyy hh:mm a"
                         )
                     }\n\n" +
@@ -440,12 +440,12 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 ).observe(viewLifecycleOwner) { totalAmount ->
 
                     val title = "${receivedExpenseCategory.categoryName}\nFrom ${
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             startDate
                         )
                     } to " +
                             "${
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     endDate
                                 )
                             }"
@@ -477,12 +477,12 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 ).observe(viewLifecycleOwner) { totalAmount ->
 
                     val title = "From ${
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             startDate
                         )
                     } to " +
                             "${
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     endDate
                                 )
                             }"
@@ -576,12 +576,12 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
                             binding.toolbar.subtitle =
                                 "${
-                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                    WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                         startDate
                                     )
                                 } - " +
                                         "${
-                                            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                                 endDate
                                             )
                                         }"

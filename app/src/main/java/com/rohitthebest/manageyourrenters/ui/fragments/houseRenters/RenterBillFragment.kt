@@ -40,7 +40,6 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
     private var receivedPaymentKey = ""
 
     private lateinit var includeBinding: ShowBillLayoutBinding
-    private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
 
     private var monthList: List<String> = emptyList()
 
@@ -50,7 +49,6 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
         _binding = FragmentRenterBillBinding.bind(view)
 
         includeBinding = binding.include
-        workingWithDateAndTime = WorkingWithDateAndTime()
         monthList = resources.getStringArray(R.array.months).toList()
 
         getMessage()
@@ -91,12 +89,12 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
                 } else {
 
                     "${receivedRenter.name}_" + "${
-                        workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             receivedPayment.billPeriodInfo.renterBillDateType?.fromBillDate
                         )
                     }" +
                             "_to_${
-                                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     receivedPayment.billPeriodInfo.renterBillDateType?.toBillDate
                                 )
                             }"
@@ -243,9 +241,9 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
                 "${monthList[receivedPayment.billPeriodInfo.renterBillMonthType?.forBillMonth!! - 1]}, ${receivedPayment.billPeriodInfo.billYear}"
             } else {
 
-                "${workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(receivedPayment.billPeriodInfo.renterBillDateType?.fromBillDate)}" +
+                "${WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(receivedPayment.billPeriodInfo.renterBillDateType?.fromBillDate)}" +
                         " to ${
-                            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                 receivedPayment.billPeriodInfo.renterBillDateType?.toBillDate
                             )
                         }"

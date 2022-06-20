@@ -137,7 +137,7 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
 
         var message = "Name : ${deletedRenter.name}\n\n" +
                 "Added on : ${
-                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                    WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                         deletedRenter.timeStamp
                     )
                 }\n\n" +

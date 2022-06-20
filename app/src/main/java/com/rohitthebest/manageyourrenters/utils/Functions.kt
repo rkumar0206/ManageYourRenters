@@ -715,7 +715,7 @@ class Functions {
             customDateRange: CustomDateRange
         ): Pair<Long, Long> {
 
-            val workingWithDateAndTime = WorkingWithDateAndTime()
+            val workingWithDateAndTime = WorkingWithDateAndTime
             val timeInMillis = System.currentTimeMillis()
 
             when (customDateRange) {
@@ -778,7 +778,7 @@ class Functions {
             pattern: String = "dd-MM-yyyy"
         ): String {
 
-            val workingWithDateAndTime = WorkingWithDateAndTime()
+            val workingWithDateAndTime = WorkingWithDateAndTime
 
             return "${
                 workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
@@ -897,7 +897,7 @@ class Functions {
 
             val interest = if (interestType == InterestType.SIMPLE_INTEREST) {
 
-                (principal * rate * time) / 100;
+                (principal * rate * time) / 100
             } else {
 
                 // compound interest

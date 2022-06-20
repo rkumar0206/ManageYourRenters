@@ -18,15 +18,12 @@ class MonthlyPaymentAdapter :
     ListAdapter<MonthlyPayment, MonthlyPaymentAdapter.MonthlyPaymentViewHolder>(DiffUtilCallback()) {
 
     private var mListener: OnClickListener? = null
-    private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
     private lateinit var monthList: List<String>
 
     inner class MonthlyPaymentViewHolder(val binding: ItemMonthlyPaymentBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
-
-            workingWithDateAndTime = WorkingWithDateAndTime()
 
             monthList = binding.root.context.getStringArray(R.array.months).toList()
 
@@ -70,12 +67,12 @@ class MonthlyPaymentAdapter :
 
                     monthlyPaymentPaymentDateAndTimeTV.text =
                         "Payment date : ${
-                            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                 payment.created
                             )
                         }\n" +
                                 "Payment time : ${
-                                    workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                    WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                         payment.created, "hh:mm a"
                                     )
                                 }"
@@ -104,11 +101,11 @@ class MonthlyPaymentAdapter :
 
                         monthlyPaymentPaymentForTV.text =
                             "From : ${
-                                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     payment.monthlyPaymentDateTimeInfo?.fromBillDate
                                 )
                             }\nTo      : ${
-                                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     payment.monthlyPaymentDateTimeInfo?.toBillDate
                                 )
                             }"

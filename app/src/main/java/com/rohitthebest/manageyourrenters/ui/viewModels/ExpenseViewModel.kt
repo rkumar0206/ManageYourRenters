@@ -94,6 +94,8 @@ class ExpenseViewModel @Inject constructor(
 
     fun getAllExpenses() = expenseRepository.getAllExpenses().asLiveData()
 
+    fun getAllSpentOn() = expenseRepository.getAllSpentOn().asLiveData()
+
     fun getExpenseAmountSumByExpenseCategoryKey(expenseCategoryKey: String) =
         expenseRepository.getExpenseAmountSumByExpenseCategoryKey(expenseCategoryKey)
 

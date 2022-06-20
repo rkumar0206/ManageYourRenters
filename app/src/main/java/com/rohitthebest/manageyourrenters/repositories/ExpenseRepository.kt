@@ -28,6 +28,8 @@ class ExpenseRepository @Inject constructor(
 
     fun getAllExpenses() = dao.getAllExpenses()
 
+    fun getAllSpentOn() = dao.getAllSpentOn()
+
     fun getExpenseAmountSumByExpenseCategoryKey(expenseCategoryKey: String) =
         dao.getExpenseAmountSumByExpenseCategoryKey(expenseCategoryKey)
 

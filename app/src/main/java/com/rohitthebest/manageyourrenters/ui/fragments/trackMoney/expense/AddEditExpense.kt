@@ -4,6 +4,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ArrayAdapter
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -64,6 +65,22 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
         initListeners()
 
         textWatchers()
+
+        setUpSpentOnAutoCompleteTextView()
+    }
+
+    private fun setUpSpentOnAutoCompleteTextView() {
+
+        expenseViewModel.getAllSpentOn().observe(viewLifecycleOwner) { spentOnList ->
+
+            val adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                spentOnList
+            )
+
+            includeBinding.expenseSpentOnET.setAdapter(adapter)
+        }
     }
 
     private fun updateSelectedDateTextView() {

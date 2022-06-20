@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @SuppressLint("SimpleDateFormat")
-class WorkingWithDateAndTime {
+object WorkingWithDateAndTime {
 
     private val TAG = "WorkingWithDateAndTime"
 

@@ -80,8 +80,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private var isPaymentAdded = false
 
-    private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
-
     private lateinit var supportingDocmtHelperModel: SupportingDocumentHelperModel
 
     override fun onCreateView(
@@ -99,7 +97,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         binding.progressBar.show()
 
-        workingWithDateAndTime = WorkingWithDateAndTime()
         supportingDocmtHelperModel = SupportingDocumentHelperModel()
 
         includeBinding = binding.include
@@ -116,7 +113,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         setUpSpinnerMonth() //Setting the from(month) and till(month) spinners
         setUpCurrencySymbolList()
 
-        selectedYear = workingWithDateAndTime.getCurrentYear()
+        selectedYear = WorkingWithDateAndTime.getCurrentYear()
 
         yearList = populateYearList(selectedYear)
 
@@ -254,13 +251,13 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private fun setDateAndTimeInTextViews() {
 
         includeBinding.dateTV.text = "Payment Date : ${
-            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                 currentTimestamp
             )
         }"
 
         includeBinding.timeTV.text = "Time : ${
-            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                 currentTimestamp,
                 "hh:mm a"
             )
@@ -315,7 +312,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
 
         numberOfDays =
-            workingWithDateAndTime.calculateNumberOfDays(fromDateTimestamp, tillDateTimeStamp)
+            WorkingWithDateAndTime.calculateNumberOfDays(fromDateTimestamp, tillDateTimeStamp)
 
         setNumberOfDays()
     }
@@ -463,7 +460,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 Functions.showDateAndTimePickerDialog(
                     requireContext(),
-                    workingWithDateAndTime.convertMillisecondsToCalendarInstance(currentTimestamp),
+                    WorkingWithDateAndTime.convertMillisecondsToCalendarInstance(currentTimestamp),
                     false,
                     if (lastPaymentInfo != null) lastPaymentInfo?.created!! else 0L
                 ) { calendar ->
@@ -553,7 +550,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 includeBinding.tillDateTV.setDateInTextView(dates.second)
 
                 numberOfDays =
-                    workingWithDateAndTime.calculateNumberOfDays(dates.first!!, dates.second!!)
+                    WorkingWithDateAndTime.calculateNumberOfDays(dates.first!!, dates.second!!)
 
                 setNumberOfDays()
             },

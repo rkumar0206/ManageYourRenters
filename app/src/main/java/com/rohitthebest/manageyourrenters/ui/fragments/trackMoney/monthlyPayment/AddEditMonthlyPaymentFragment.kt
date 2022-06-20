@@ -71,8 +71,6 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
         includeBinding = binding.includeLayout
 
-        workingWithDateAndTime = WorkingWithDateAndTime()
-
         paymentDate = Calendar.getInstance()
 
         updateSelectedPaymentDateTextView()

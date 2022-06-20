@@ -102,7 +102,7 @@ class BorrowerAdapter :
                     adapterRenterDocNumTV.text = b.otherDocumentNumber
                     adapterRenterMobileTV.text = b.mobileNumber
                     adapterRenterTimeTV.text = "Added on : ${
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             b.created
                         )
                     }"

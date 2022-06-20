@@ -67,7 +67,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
 
         selectedDate = System.currentTimeMillis()
         includeBinding.dateAddedTV.text =
-            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                 selectedDate
             )
         supportingDocmtHelperModel = SupportingDocumentHelperModel()
@@ -137,7 +137,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             )
 
             includeBinding.dateAddedTV.text =
-                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     renter.timeStamp
                 )
 
@@ -237,7 +237,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
                         selectedDate = it
 
                         includeBinding.dateAddedTV.text =
-                            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                 selectedDate
                             )
                     }

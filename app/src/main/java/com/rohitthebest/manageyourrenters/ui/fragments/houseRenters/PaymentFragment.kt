@@ -217,12 +217,12 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                         if (payment.billPeriodInfo.billPeriodType == BillPeriodType.BY_DATE) {
 
                             from =
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     payment.billPeriodInfo.renterBillDateType?.fromBillDate
                                 )
 
                             till =
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     payment.billPeriodInfo.renterBillDateType?.toBillDate
                                 )
                         } else {

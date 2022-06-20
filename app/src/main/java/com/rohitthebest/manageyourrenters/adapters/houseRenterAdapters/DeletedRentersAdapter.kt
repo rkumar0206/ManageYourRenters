@@ -64,7 +64,7 @@ class DeletedRentersAdapter :
 
                     renterNameTV.text = theDeletedRenter.renterInfo.name
                     deletedOnTV.text = "Deleted on : ${
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             theDeletedRenter.created
                         )
                     }"

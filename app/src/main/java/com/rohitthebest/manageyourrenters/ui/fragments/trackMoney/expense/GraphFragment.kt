@@ -378,11 +378,11 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         } else {
 
             binding.dateRangeTv.text = "${
-                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     d1
                 )
             } to ${
-                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     d2
                 )
             }"

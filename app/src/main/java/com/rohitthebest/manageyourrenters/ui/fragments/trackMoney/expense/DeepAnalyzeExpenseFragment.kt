@@ -212,12 +212,12 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
                         binding.toolbar.subtitle =
                             "${
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     startDate
                                 )
                             } - " +
                                     "${
-                                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                             endDate
                                         )
                                     }"

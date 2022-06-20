@@ -159,7 +159,7 @@ fun TextView.changeTextColor(context: Context, color: Int) {
 
 fun TextView.setDateInTextView(timeStamp: Long?, pattern: String = "dd-MM-yyyy") {
 
-    this.text = WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+    this.text = WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
         timeStamp, pattern
     )
 

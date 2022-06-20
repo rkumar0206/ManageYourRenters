@@ -69,7 +69,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
     private fun updateSelectedDateTextView() {
 
         includeBinding.expenseDateTV.text =
-            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                 selectedDate.timeInMillis, "dd-MM-yyyy hh:mm a"
             )
     }
@@ -120,7 +120,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
             includeBinding.apply {
 
                 selectedDate =
-                    WorkingWithDateAndTime().convertMillisecondsToCalendarInstance(receivedExpense.created)
+                    WorkingWithDateAndTime.convertMillisecondsToCalendarInstance(receivedExpense.created)
                 updateSelectedDateTextView()
                 expenseAmountET.editText?.setText(receivedExpense.amount.toString())
                 expenseSpentOnET.setText(receivedExpense.spentOn)

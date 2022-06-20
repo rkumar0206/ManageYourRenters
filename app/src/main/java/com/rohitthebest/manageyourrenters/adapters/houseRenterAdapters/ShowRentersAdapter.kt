@@ -53,7 +53,7 @@ class ShowRentersAdapter :
                 binding.adapterRenterNameTV.text = renter.name
                 binding.adapterRoomNumTV.text = renter.roomNumber
                 binding.adapterRenterTimeTV.text = "Added on : ${
-                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                    WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                         renter.timeStamp
                     )
                 }"

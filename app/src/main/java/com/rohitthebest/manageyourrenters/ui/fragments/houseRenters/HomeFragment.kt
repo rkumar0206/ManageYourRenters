@@ -59,8 +59,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private var rvStateParcelable: Parcelable? = null
 
-    private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
-
     private var isRevenueObserveEnabled = false
 
     override fun onCreateView(
@@ -83,8 +81,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         mAdapter = ShowRentersAdapter()
 
         binding.homeProgressBar.show()
-
-        workingWithDateAndTime = WorkingWithDateAndTime()
 
         setupRecyclerView()
 

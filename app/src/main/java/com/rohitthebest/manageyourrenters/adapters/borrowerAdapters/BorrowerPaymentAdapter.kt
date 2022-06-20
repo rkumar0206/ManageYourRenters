@@ -85,7 +85,7 @@ class BorrowerPaymentAdapter :
 
                     borrowedPaymentDateTV.text = context.getString(
                         R.string.borrowed_on,
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             payment.created
                         )
                     )

@@ -56,7 +56,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
 
         selectedDate = System.currentTimeMillis()
         includeBinding.dateAddedTV.text =
-            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                 selectedDate
             )
         supportingDocmtHelperModel = SupportingDocumentHelperModel()
@@ -135,7 +135,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
             )
 
             includeBinding.dateAddedTV.text =
-                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     b.created
                 )
 
@@ -235,7 +235,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
                         selectedDate = it
 
                         includeBinding.dateAddedTV.text =
-                            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                 selectedDate
                             )
                     }

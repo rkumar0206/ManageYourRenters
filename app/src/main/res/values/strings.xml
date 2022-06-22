@@ -274,6 +274,7 @@
     <string name="payment_info">Payment info</string>
     <string name="move_to_category">Move to other category</string>
     <string name="Copy">Copy</string>
+    <string name="expense_copied">Expense copied</string>
 
     <string-array name="interest_time_schedule">
 

@@ -162,6 +162,10 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
         findNavController().navigate(action)
     }
 
+    override fun onCopyMenuClick() {}
+
+    override fun onMoveMenuClick() {}
+
     override fun onDeleteMenuClick() {
 
         if (this::monthlyPaymentForMenus.isInitialized) {

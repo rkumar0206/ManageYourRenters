@@ -235,6 +235,10 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     }
 
+    override fun onCopyMenuClick() {}
+
+    override fun onMoveMenuClick() {}
+
     override fun onDeleteMenuClick() {
 
         if (::renterForMenus.isInitialized) {

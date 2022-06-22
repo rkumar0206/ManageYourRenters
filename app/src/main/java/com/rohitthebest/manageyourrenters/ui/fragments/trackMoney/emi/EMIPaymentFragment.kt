@@ -200,6 +200,10 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
         // not visible
     }
 
+    override fun onCopyMenuClick() {}
+
+    override fun onMoveMenuClick() {}
+
     override fun onDeleteMenuClick() {
 
         if (adapterPosition == 0) {

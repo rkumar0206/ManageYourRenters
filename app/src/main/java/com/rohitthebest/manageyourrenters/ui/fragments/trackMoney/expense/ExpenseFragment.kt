@@ -21,7 +21,10 @@ import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showDateAndTimePickerDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -292,11 +295,9 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             bundle.putBoolean(Constants.SHOW_EDIT_MENU, true)
             bundle.putBoolean(Constants.SHOW_DELETE_MENU, true)
             bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, false)
-
-            if (!expense.isSynced) {
-
-                bundle.putBoolean(Constants.SHOW_SYNC_MENU, true)
-            }
+            bundle.putBoolean(Constants.SHOW_COPY_MENU, true)
+            bundle.putBoolean(Constants.SHOW_MOVE_MENU, true)
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !expense.isSynced)
 
             CustomMenuItems.newInstance(
                 bundle
@@ -320,6 +321,34 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         }
 
     }
+
+    override fun onCopyMenuClick() {
+
+        // when copying an expense, user can change the date and time
+
+        if (this::expenseForMenuItems.isInitialized) {
+            showDateAndTimePickerDialog(
+                context = requireContext(),
+                selectedDate = WorkingWithDateAndTime.convertMillisecondsToCalendarInstance(System.currentTimeMillis()),
+                isFutureDatesValid = false,
+                pickedDateListener = { calendar ->
+
+                    val expense = expenseForMenuItems.copy(
+                        id = null,
+                        created = calendar.timeInMillis,
+                        modified = System.currentTimeMillis(),
+                        key = generateKey("_${getUid()}"),
+                        isSynced = isInternetAvailable(requireContext())
+                    )
+
+                    expenseViewModel.insertExpense(expense)
+                    showToast(requireContext(), getString(R.string.expense_copied))
+                }
+            )
+        }
+    }
+
+    override fun onMoveMenuClick() {}
 
     override fun onDeleteMenuClick() {
 

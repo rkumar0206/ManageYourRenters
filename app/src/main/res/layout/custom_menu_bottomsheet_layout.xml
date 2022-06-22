@@ -21,7 +21,7 @@
         android:visibility="invisible" />
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/edit_emi_menu"
+        android:id="@+id/edit_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -319,7 +319,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/delete_emi_menu"
+        android:id="@+id/delete_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:rippleColor="@color/rippleColor">

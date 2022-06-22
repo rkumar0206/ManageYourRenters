@@ -308,6 +308,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     }
 
     override fun onEditMenuClick() {}
+    override fun onCopyMenuClick() {}
+    override fun onMoveMenuClick() {}
 
     override fun onDeleteMenuClick() {
 

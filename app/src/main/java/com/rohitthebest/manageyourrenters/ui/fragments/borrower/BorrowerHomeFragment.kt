@@ -176,6 +176,9 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         }
     }
 
+    override fun onCopyMenuClick() {}
+    override fun onMoveMenuClick() {}
+
     override fun onDeleteMenuClick() {
 
         showAlertDialogForDeletion(

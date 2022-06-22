@@ -131,6 +131,10 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
         }
     }
 
+    override fun onCopyMenuClick() {}
+
+    override fun onMoveMenuClick() {}
+
     override fun onDeleteMenuClick() {
 
         if (this::emiForMenuItems.isInitialized) {

@@ -112,6 +112,10 @@ class MonthlyPaymentCategoryFragment : Fragment(R.layout.fragment_monthly_paymen
         findNavController().navigate(action)
     }
 
+    override fun onCopyMenuClick() {}
+
+    override fun onMoveMenuClick() {}
+
     override fun onDeleteMenuClick() {
         showAlertDialogForDeletion(
             requireContext(),

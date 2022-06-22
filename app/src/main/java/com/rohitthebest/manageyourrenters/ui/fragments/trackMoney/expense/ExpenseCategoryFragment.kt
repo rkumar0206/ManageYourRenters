@@ -110,11 +110,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
             bundle.putBoolean(Constants.SHOW_EDIT_MENU, true)
             bundle.putBoolean(Constants.SHOW_DELETE_MENU, true)
             bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, false)
-
-            if (!expenseCategory.isSynced) {
-
-                bundle.putBoolean(Constants.SHOW_SYNC_MENU, true)
-            }
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !expenseCategory.isSynced)
 
             CustomMenuItems.newInstance(
                 bundle
@@ -138,6 +134,10 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
             findNavController().navigate(action)
         }
     }
+
+    override fun onCopyMenuClick() {}
+
+    override fun onMoveMenuClick() {}
 
     override fun onDeleteMenuClick() {
 

@@ -48,6 +48,7 @@ object Constants {
     const val SHOW_SYNC_MENU = "SYNC_MENUvxnnlznlbskjc"
     const val SHOW_MOVE_MENU = "MOVE_SAdhbhfbABJnbhsb"
     const val SHOW_COPY_MENU = "COPY_SANJABABJnbhhsb"
+    const val COPY_MENU_TEXT = "COPY-TEXT_SwwAdsdrBAbuh=hsb"
 
     const val REQUEST_METHOD_KEY = "sacnakjnkankan"
     const val EXPENSE_CATEGORY_KEY = "acjakjcakjbcabb"

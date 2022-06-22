@@ -298,6 +298,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             bundle.putBoolean(Constants.SHOW_COPY_MENU, true)
             bundle.putBoolean(Constants.SHOW_MOVE_MENU, true)
             bundle.putBoolean(Constants.SHOW_SYNC_MENU, !expense.isSynced)
+            bundle.putString(Constants.COPY_MENU_TEXT, getString(R.string.duplicate_this_expense))
 
             CustomMenuItems.newInstance(
                 bundle

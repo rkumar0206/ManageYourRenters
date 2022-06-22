@@ -2,7 +2,6 @@ package com.rohitthebest.manageyourrenters.ui.fragments
 
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,7 +53,8 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
                 val isCopyMenuVisible = bundle.getBoolean(Constants.SHOW_COPY_MENU, false)
                 val isMoveMenuVisible = bundle.getBoolean(Constants.SHOW_MOVE_MENU, false)
 
-                Log.d(TAG, "getMessage: sync_menu : $isSyncMenuVisible")
+                binding.copyMenuTV.text =
+                    bundle.getString(Constants.COPY_MENU_TEXT, getString(R.string.Copy))
 
                 binding.editMenu.isVisible = isEditMenuVisible
                 binding.deleteMenu.isVisible = isDeleteMenuVisible

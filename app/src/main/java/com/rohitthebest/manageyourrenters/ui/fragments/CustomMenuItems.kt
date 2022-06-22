@@ -1,17 +1,15 @@
-package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney
+package com.rohitthebest.manageyourrenters.ui.fragments
 
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.CustomMenuBottomsheetLayoutBinding
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.utils.hide
-import com.rohitthebest.manageyourrenters.utils.show
 
 private const val TAG = "CustomMenuItems"
 
@@ -46,51 +44,26 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
 
         if (arguments != null && !arguments?.isEmpty!!) {
 
-
             arguments?.let { bundle ->
 
                 val isEditMenuVisible = bundle.getBoolean(Constants.SHOW_EDIT_MENU, true)
                 val isDeleteMenuVisible = bundle.getBoolean(Constants.SHOW_DELETE_MENU, true)
                 val isDocumentMenuVisible = bundle.getBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
                 val isSyncMenuVisible = bundle.getBoolean(Constants.SHOW_SYNC_MENU, false)
+                val isCopyMenuVisible = bundle.getBoolean(Constants.SHOW_COPY_MENU, false)
+                val isMoveMenuVisible = bundle.getBoolean(Constants.SHOW_MOVE_MENU, false)
 
-                Log.d(TAG, "getMessage: sync_menu : $isSyncMenuVisible")
+                binding.copyMenuTV.text =
+                    bundle.getString(Constants.COPY_MENU_TEXT, getString(R.string.Copy))
 
-                if (!isEditMenuVisible) {
-
-                    binding.editEmiMenu.hide()
-                } else {
-
-                    binding.editEmiMenu.show()
-                }
-
-                if (!isDeleteMenuVisible) {
-
-                    binding.deleteEmiMenu.hide()
-                } else {
-
-                    binding.deleteEmiMenu.show()
-                }
-
-                if (!isDocumentMenuVisible) {
-
-                    binding.viewOrDownloadSupportingDocumentMenu.hide()
-                    binding.replaceSupportingDocumentMenu.hide()
-                    binding.deleteSupportingDocumentMenu.hide()
-                } else {
-
-                    binding.viewOrDownloadSupportingDocumentMenu.show()
-                    binding.replaceSupportingDocumentMenu.show()
-                    binding.deleteSupportingDocumentMenu.show()
-                }
-
-                if (!isSyncMenuVisible) {
-
-                    binding.syncMenu.hide()
-                } else {
-
-                    binding.syncMenu.show()
-                }
+                binding.editMenu.isVisible = isEditMenuVisible
+                binding.deleteMenu.isVisible = isDeleteMenuVisible
+                binding.viewOrDownloadSupportingDocumentMenu.isVisible = isDocumentMenuVisible
+                binding.replaceSupportingDocumentMenu.isVisible = isDocumentMenuVisible
+                binding.deleteSupportingDocumentMenu.isVisible = isDocumentMenuVisible
+                binding.syncMenu.isVisible = isSyncMenuVisible
+                binding.copyMenu.isVisible = isCopyMenuVisible
+                binding.moveMenu.isVisible = isMoveMenuVisible
             }
         }
 
@@ -98,55 +71,50 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
 
     private fun intiListeners() {
 
-        binding.editEmiMenu.setOnClickListener(this)
-        binding.deleteEmiMenu.setOnClickListener(this)
+        binding.editMenu.setOnClickListener(this)
+        binding.deleteMenu.setOnClickListener(this)
         binding.viewOrDownloadSupportingDocumentMenu.setOnClickListener(this)
         binding.replaceSupportingDocumentMenu.setOnClickListener(this)
         binding.deleteSupportingDocumentMenu.setOnClickListener(this)
         binding.syncMenu.setOnClickListener(this)
+        binding.copyMenu.setOnClickListener(this)
+        binding.moveMenu.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
 
         when (v?.id) {
 
-            binding.editEmiMenu.id -> {
-
+            binding.editMenu.id -> {
                 mListener?.onEditMenuClick()
-                dismiss()
             }
 
-            binding.deleteEmiMenu.id -> {
-
+            binding.deleteMenu.id -> {
                 mListener?.onDeleteMenuClick()
-                dismiss()
             }
 
             binding.viewOrDownloadSupportingDocumentMenu.id -> {
-
                 mListener?.onViewSupportingDocumentMenuClick()
-                dismiss()
             }
 
             binding.replaceSupportingDocumentMenu.id -> {
-
                 mListener?.onReplaceSupportingDocumentClick()
-                dismiss()
             }
 
             binding.deleteSupportingDocumentMenu.id -> {
-
                 mListener?.onDeleteSupportingDocumentClick()
-                dismiss()
             }
 
             binding.syncMenu.id -> {
-
                 mListener?.onSyncMenuClick()
-                dismiss()
             }
 
+            binding.copyMenu.id -> mListener?.onCopyMenuClick()
+            binding.moveMenu.id -> mListener?.onMoveMenuClick()
+
         }
+
+        dismiss()
 
     }
 
@@ -154,6 +122,8 @@ class CustomMenuItems : BottomSheetDialogFragment(), View.OnClickListener {
     interface OnItemClickListener {
 
         fun onEditMenuClick()
+        fun onCopyMenuClick()
+        fun onMoveMenuClick()
         fun onDeleteMenuClick()
         fun onViewSupportingDocumentMenuClick()
         fun onReplaceSupportingDocumentClick()

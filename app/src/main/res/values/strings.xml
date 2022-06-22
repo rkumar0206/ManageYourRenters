@@ -272,6 +272,10 @@
     <string name="month_year">%1$s, %2$s</string>
     <string name="already_synced">Already Synced</string>
     <string name="payment_info">Payment info</string>
+    <string name="move_to_category">Move to other category</string>
+    <string name="Copy">Copy</string>
+    <string name="expense_copied">Expense copied</string>
+    <string name="duplicate_this_expense">Duplicate this expense</string>
 
     <string-array name="interest_time_schedule">
 

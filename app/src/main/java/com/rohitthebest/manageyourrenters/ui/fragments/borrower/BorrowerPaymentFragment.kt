@@ -16,8 +16,8 @@ import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
-import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -217,11 +217,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         requireActivity().supportFragmentManager.let {
 
             val bundle = Bundle()
-
-            if (!borrowerPayment.isSynced)
-                bundle.putBoolean(Constants.SHOW_SYNC_MENU, true)
-            else
-                bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !borrowerPayment.isSynced)
 
             CustomMenuItems.newInstance(
                 bundle
@@ -258,6 +254,10 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         }
 
     }
+
+    override fun onCopyMenuClick() {}
+
+    override fun onMoveMenuClick() {}
 
     override fun onDeleteMenuClick() {
 

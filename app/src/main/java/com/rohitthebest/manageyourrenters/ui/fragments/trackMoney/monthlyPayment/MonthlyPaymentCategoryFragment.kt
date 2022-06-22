@@ -14,7 +14,7 @@ import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.monthlyPay
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentMonthlyPaymentCategoryBinding
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
+import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentCategoryViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.AndroidEntryPoint

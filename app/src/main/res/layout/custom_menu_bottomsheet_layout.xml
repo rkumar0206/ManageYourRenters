@@ -20,7 +20,6 @@
         android:padding="5dp"
         android:visibility="invisible" />
 
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/edit_emi_menu"
         android:layout_width="match_parent"
@@ -65,6 +64,92 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/copy_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:rippleColor="@color/rippleColor"
+        tools:visibility="visible">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <ImageView
+                android:id="@+id/imageView115681"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/image"
+                android:padding="10dp"
+                app:srcCompat="@drawable/ic_baseline_content_copy_24" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/imageView115681"
+                android:layout_alignBottom="@+id/imageView115681"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@+id/imageView115681"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:text="@string/Copy"
+                android:textSize="18sp" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/move_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:rippleColor="@color/rippleColor"
+        tools:visibility="visible">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <ImageView
+                android:id="@+id/imageView11345"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/image"
+                android:padding="10dp"
+                app:srcCompat="@drawable/ic_outline_drive_file_move_24" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/imageView11345"
+                android:layout_alignBottom="@+id/imageView11345"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@+id/imageView11345"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:text="@string/move_to_category"
+                android:textSize="18sp" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/sync_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -106,7 +191,6 @@
                 android:textSize="18sp" />
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
-
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/view_or_download_supporting_document_menu"

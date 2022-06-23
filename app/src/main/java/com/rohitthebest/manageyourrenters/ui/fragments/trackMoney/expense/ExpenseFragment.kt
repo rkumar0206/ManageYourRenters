@@ -344,6 +344,10 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
                     expenseViewModel.insertExpense(expense)
                     showToast(requireContext(), getString(R.string.expense_copied))
+                    lifecycleScope.launch {
+                        delay(150)
+                        binding.expenseRV.scrollToPosition(0)
+                    }
                 }
             )
         }

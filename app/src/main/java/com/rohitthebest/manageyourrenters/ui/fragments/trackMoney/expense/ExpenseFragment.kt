@@ -42,7 +42,7 @@ enum class SortExpense {
 
 @AndroidEntryPoint
 class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnClickListener,
-    CustomMenuItems.OnItemClickListener {
+    CustomMenuItems.OnItemClickListener, ChooseExpenseCategoryBottomSheetFragment.OnItemClicked {
 
     private var _binding: FragmentExpenseBinding? = null
     private val binding get() = _binding!!
@@ -353,7 +353,29 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         }
     }
 
-    override fun onMoveMenuClick() {}
+    override fun onMoveMenuClick() {
+
+        if (this::expenseForMenuItems.isInitialized) {
+            requireActivity().supportFragmentManager.let {
+
+                ChooseExpenseCategoryBottomSheetFragment.newInstance(
+                    Bundle()
+                ).apply {
+
+                    show(it, TAG)
+                }.setOnItemClickedListener(this)
+            }
+        }
+    }
+
+    override fun onCategoryClicked(expenseCategory: ExpenseCategory) {
+
+        expenseForMenuItems.categoryKey = expenseCategory.key
+        expenseForMenuItems.modified = System.currentTimeMillis()
+
+        expenseViewModel.updateExpense(expenseForMenuItems)
+        expenseAdapter.notifyItemChanged(expenseForMenuPosition)
+    }
 
     override fun onDeleteMenuClick() {
 
@@ -672,6 +694,5 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         super.onDestroyView()
         _binding = null
     }
-
 }
 

@@ -97,12 +97,12 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
     }
 
     private lateinit var expenseCategoryForMenus: ExpenseCategory
-    private var itemPosition = 0
+    private var adapterPosition = -1
 
     override fun onMenuBtnClicked(expenseCategory: ExpenseCategory, position: Int) {
 
         expenseCategoryForMenus = expenseCategory
-        itemPosition = position
+        adapterPosition = position
 
         requireActivity().supportFragmentManager.let { fm ->
 
@@ -176,7 +176,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
                 if (isInternetAvailable(requireContext())) {
 
                     expenseCategoryViewModel.insertExpenseCategory(expenseCategoryForMenus)
-                    expenseCategoryAdapter.notifyItemChanged(itemPosition)
+                    expenseCategoryAdapter.notifyItemChanged(adapterPosition)
                 } else {
 
                     showNoInternetMessage(requireContext())

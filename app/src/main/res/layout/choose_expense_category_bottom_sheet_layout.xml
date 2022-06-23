@@ -11,8 +11,10 @@
         android:background="@color/white">
 
         <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:navigationIcon="@drawable/ic_cancel"
             app:title="Choose expense category" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -21,6 +23,7 @@
         android:id="@+id/choose_expense_category_rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="30dp"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

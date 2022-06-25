@@ -72,7 +72,9 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     private fun getAllBorrowers() {
 
-        borrowerViewModel.getAllBorrower().observe(viewLifecycleOwner) {
+        borrowerViewModel.getAllBorrower()
+
+        borrowerViewModel.allBorrowersList.observe(viewLifecycleOwner) {
 
             if (it.isEmpty()) {
 

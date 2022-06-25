@@ -9,10 +9,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterBorrowerPaymentBinding
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateInterestAndAmount
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateNumberOfDays
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
+import com.rohitthebest.manageyourrenters.utils.format
 import com.rohitthebest.manageyourrenters.utils.strikeThrough
 
 class BorrowerPaymentAdapter :
@@ -95,6 +99,34 @@ class BorrowerPaymentAdapter :
                         binding.borrowedAmountTV.strikeThrough()
                         binding.paidAmountTV.strikeThrough()
                         binding.dueAmountTV.strikeThrough()
+                    } else {
+
+                        if (payment.isInterestAdded && payment.interest != null) {
+
+                            val interestCalculatorFields = InterestCalculatorFields(
+                                0L,
+                                payment.amountTakenOnRent,
+                                payment.interest!!,
+                                calculateNumberOfDays(payment.created, System.currentTimeMillis())
+                            )
+
+                            val interestAndAmount = calculateInterestAndAmount(
+                                interestCalculatorFields
+                            )
+
+                            if (interestAndAmount.first > 0.0) {
+
+                                dueAmountTV.textSize = 16.0f
+                                dueAmountTV.text = context
+                                    .getString(
+                                        R.string.due_currency_symbol_amount_interest,
+                                        payment.currencySymbol,
+                                        interestAndAmount.second.format(2),
+                                        interestAndAmount.first.format(2)
+                                    )
+                            }
+                        }
+
                     }
                 }
             }

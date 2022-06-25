@@ -878,6 +878,10 @@ class Functions {
 
         }
 
+        /**
+         * @param interestCalculatorFields
+         * @return Pair object, first : interest, second : amount
+         */
         fun calculateInterestAndAmount(interestCalculatorFields: InterestCalculatorFields): Pair<Double, Double> {
 
             val principal = interestCalculatorFields.principalAmount

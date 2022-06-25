@@ -1,11 +1,10 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
@@ -13,7 +12,10 @@ import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
 import com.rohitthebest.manageyourrenters.repositories.PartialPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateInterestAndAmount
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateNumberOfDays
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -206,7 +208,45 @@ class BorrowerViewModel @Inject constructor(
         borrowerRepository.deleteBorrowerByIsSynced(isSynced)
     }
 
-    fun getAllBorrower() = borrowerRepository.getAllBorrower().asLiveData()
+    private val _allBorrowersList = MutableLiveData<List<Borrower>>()
+
+    val allBorrowersList: LiveData<List<Borrower>> get() = _allBorrowersList
+
+    fun getAllBorrower() {
+
+        // Adding the interest amount to the borrower total due amount dynamically when user request for borrower list
+        viewModelScope.launch {
+
+            val allBorrowers = borrowerRepository.getAllBorrower().first()
+
+            allBorrowers.forEach { borrower ->
+
+                // checking if the borrower has any due payments
+                if (borrower.totalDueAmount > 0.0) {
+
+                    val paymentsList =
+                        borrowerPaymentRepository.getPaymentsByBorrowerKey(borrower.key).first()
+                            .filter { payments -> payments.isInterestAdded && payments.interest != null && !payments.isDueCleared }
+
+                    paymentsList.forEach { payment ->
+
+                        val interestAndAmount = calculateInterestAndAmount(
+                            InterestCalculatorFields(
+                                0L,
+                                payment.amountTakenOnRent,
+                                payment.interest!!,
+                                calculateNumberOfDays(payment.created, System.currentTimeMillis())
+                            )
+                        )
+
+                        borrower.totalDueAmount += interestAndAmount.first
+                    }
+                }
+            }
+
+            _allBorrowersList.value = allBorrowers
+        }
+    }
 
     fun getBorrowerByKey(borrowerKey: String) =
         borrowerRepository.getBorrowerByKey(borrowerKey).asLiveData()

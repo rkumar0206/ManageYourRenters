@@ -18,6 +18,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.PartialPaymentAdapter
+import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.database.model.PartialPayment
 import com.rohitthebest.manageyourrenters.databinding.AddPartialPaymentLayoutBinding
@@ -27,6 +28,8 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PartialPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateInterestAndAmount
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateNumberOfDays
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -65,6 +68,8 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
     private var dueLeftAmount = 0.0
 
     private var isRefereshEnabled = true
+
+    private var mListener: OnPartialPaymentDismiss? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -248,11 +253,27 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private fun calculateDueAmount() {
 
-        val totalDue = receivedBorrowerPayment?.amountTakenOnRent!!
-        val totalAmountPaid = getTotalPaidAmountFromAllThePartialPayment()
+        receivedBorrowerPayment?.let { payment ->
 
-        dueLeftAmount = totalDue - totalAmountPaid
-        handleTheDue()
+            val totalDue = payment.amountTakenOnRent
+            val totalAmountPaid = getTotalPaidAmountFromAllThePartialPayment()
+
+            dueLeftAmount = totalDue - totalAmountPaid
+
+            if (payment.isInterestAdded && payment.interest != null && !payment.isDueCleared) {
+
+                val interestAndAmount = calculateInterestAndAmount(
+                    InterestCalculatorFields(
+                        0L, payment.amountTakenOnRent, payment.interest!!,
+                        calculateNumberOfDays(payment.created, System.currentTimeMillis())
+                    )
+                )
+
+                dueLeftAmount += interestAndAmount.first
+            }
+
+            handleTheDue()
+        }
     }
 
     private fun handleTheDue() {
@@ -274,7 +295,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
     private fun updateDueAmountTV() {
 
         includeBinding.dueLeftAmoutTV.text =
-            "${receivedBorrowerPayment?.currencySymbol} $dueLeftAmount"
+            "${receivedBorrowerPayment?.currencySymbol} ${dueLeftAmount.format(2)}"
 
         if (dueLeftAmount <= 0.0) {
 
@@ -380,6 +401,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
                     payment.dueLeftAmount = 0.0
                 } else {
 
+                    payment.isDueCleared = false
                     payment.dueLeftAmount = dueLeftAmount
                 }
 
@@ -387,6 +409,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                 if (dueLeftAmount >= 0.0 && dueLeftAmount != payment.dueLeftAmount) {
 
+                    payment.isDueCleared = false
                     payment.dueLeftAmount = dueLeftAmount
                 }
             }
@@ -524,8 +547,8 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         lifecycleScope.launch {
 
             delay(200)
-            requireActivity().onBackPressed()
-
+            if (mListener != null) mListener!!.onPartialPaymentDismissed()
+            dismiss()
         }
     }
 
@@ -641,6 +664,26 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             //todo : also change the color of recyclerview list items
         }
     }
+
+    interface OnPartialPaymentDismiss {
+
+        fun onPartialPaymentDismissed()
+    }
+
+    fun setOnPartialPaymentDialogDismissListener(listener: OnPartialPaymentDismiss) {
+
+        this.mListener = listener
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(bundle: Bundle): AddPartialPaymentFragment {
+            val fragment = AddPartialPaymentFragment()
+            fragment.arguments = bundle
+            return fragment
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

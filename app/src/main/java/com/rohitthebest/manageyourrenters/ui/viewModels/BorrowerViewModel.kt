@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.app.Application
+import android.os.Parcelable
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
@@ -26,8 +27,30 @@ class BorrowerViewModel @Inject constructor(
     app: Application,
     private val borrowerRepository: BorrowerRepository,
     private val borrowerPaymentRepository: BorrowerPaymentRepository,
-    private val partialPaymentRepository: PartialPaymentRepository
+    private val partialPaymentRepository: PartialPaymentRepository,
+    private val state: SavedStateHandle
 ) : AndroidViewModel(app) {
+
+    // ------------------------- UI related ----------------------------
+
+    companion object {
+
+        private const val BORROWER_RV_KEY = "adfnjssaaafaaba_dcnjdn"
+    }
+
+    fun saveBorrowerRvState(rvState: Parcelable?) {
+
+        state.set(BORROWER_RV_KEY, rvState)
+    }
+
+    private val _borrowerRvState: MutableLiveData<Parcelable> = state.getLiveData(
+        BORROWER_RV_KEY
+    )
+
+    val borrowerRvState: LiveData<Parcelable> get() = _borrowerRvState
+
+    // ---------------------------------------------------------------
+
 
     fun insertBorrower(
         borrower: Borrower,
@@ -88,6 +111,7 @@ class BorrowerViewModel @Inject constructor(
         }
 
         borrowerRepository.update(borrower)
+        getAllBorrower()
     }
 
     fun addOrReplaceBorrowerSupportingDocument(
@@ -194,6 +218,7 @@ class BorrowerViewModel @Inject constructor(
         borrowerPaymentRepository.deleteAllBorrowerPaymentsByBorrowerKey(borrower.key)
         partialPaymentRepository.deleteAllPartialPaymentByBorrowerId(borrower.borrowerId)
         borrowerRepository.delete(borrower)
+        getAllBorrower()
     }
 
     fun deleteAllBorrower() = viewModelScope.launch {
@@ -230,16 +255,27 @@ class BorrowerViewModel @Inject constructor(
 
                     paymentsList.forEach { payment ->
 
-                        val interestAndAmount = calculateInterestAndAmount(
-                            InterestCalculatorFields(
-                                0L,
-                                payment.amountTakenOnRent,
-                                payment.interest!!,
-                                calculateNumberOfDays(payment.created, System.currentTimeMillis())
-                            )
-                        )
+                        val partialPayments =
+                            partialPaymentRepository.getPartialPaymentByBorrowerPaymentKey(payment.key)
+                                .first()
 
-                        borrower.totalDueAmount += interestAndAmount.first
+                        if (partialPayments.isEmpty()) {
+
+                            // if no payment is added then showing the amount with interest added
+
+                            val interestAndAmount = calculateInterestAndAmount(
+                                InterestCalculatorFields(
+                                    0L,
+                                    payment.amountTakenOnRent,
+                                    payment.interest!!,
+                                    calculateNumberOfDays(
+                                        payment.created,
+                                        System.currentTimeMillis()
+                                    )
+                                )
+                            )
+                            borrower.totalDueAmount += interestAndAmount.first
+                        }
                     }
                 }
             }

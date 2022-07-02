@@ -1,12 +1,12 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.app.Application
+import android.os.Parcelable
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
@@ -18,6 +18,8 @@ import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,8 +31,30 @@ class BorrowerPaymentViewModel @Inject constructor(
     app: Application,
     private val borrowerPaymentRepository: BorrowerPaymentRepository,
     private val partialPaymentRepository: PartialPaymentRepository,
-    private val borrowerRepository: BorrowerRepository
+    private val borrowerRepository: BorrowerRepository,
+    private val state: SavedStateHandle
 ) : AndroidViewModel(app) {
+
+    // ------------------------- UI related ----------------------------
+
+    companion object {
+
+        private const val BORROWER_PAYMENT_RV_KEY = "wwrvnjssabbbiopjdn"
+    }
+
+    fun saveBorrowerPaymentRvState(rvState: Parcelable?) {
+
+        state.set(BORROWER_PAYMENT_RV_KEY, rvState)
+    }
+
+    private val _borrowerPaymentRvState: MutableLiveData<Parcelable> = state.getLiveData(
+        BORROWER_PAYMENT_RV_KEY
+    )
+
+    val borrowerPaymentRvState: LiveData<Parcelable> get() = _borrowerPaymentRvState
+
+    // ---------------------------------------------------------------
+
 
     fun insertBorrowerPayment(
         borrowerPayment: BorrowerPayment,
@@ -170,7 +194,7 @@ class BorrowerPaymentViewModel @Inject constructor(
         }
 
         borrowerPaymentRepository.updateBorrowerPayment(borrowerPayment)
-
+        getPaymentsByBorrowerKey(borrowerPayment.borrowerKey)
     }
 
     fun deleteBorrowerPayment(borrowerPayment: BorrowerPayment) =
@@ -212,9 +236,11 @@ class BorrowerPaymentViewModel @Inject constructor(
                 }
             }
 
-            borrowerPaymentRepository.deleteBorrowerPayment(borrowerPayment)
+            val borrowerKey = borrowerPayment.borrowerKey
             partialPaymentRepository.deleteAllPartialPaymentByBorrowerPaymentKey(borrowerPayment.key)
-            updateBorrowerDueAmount(borrowerPayment.borrowerKey)
+            borrowerPaymentRepository.deleteBorrowerPayment(borrowerPayment)
+            updateBorrowerDueAmount(borrowerKey)
+            getPaymentsByBorrowerKey(borrowerKey)
         }
 
 
@@ -277,8 +303,56 @@ class BorrowerPaymentViewModel @Inject constructor(
         borrowerPaymentRepository.deleteBorrowerPaymentsByIsSynced(isSynced)
     }
 
-    fun getPaymentsByBorrowerKey(borrowerKey: String) =
-        borrowerPaymentRepository.getPaymentsByBorrowerKey(borrowerKey).asLiveData()
+    private val _allPaymentsListOfBorrower = MutableStateFlow<List<BorrowerPayment>>(emptyList())
+
+    val allPaymentsListOfBorrower = _allPaymentsListOfBorrower.asStateFlow()
+
+    fun getPaymentsByBorrowerKey(borrowerKey: String) {
+
+        viewModelScope.launch {
+
+            val allPayments =
+                borrowerPaymentRepository.getPaymentsByBorrowerKey(borrowerKey).first()
+
+            allPayments.forEach { payment ->
+
+                val partialPayments =
+                    partialPaymentRepository.getPartialPaymentByBorrowerPaymentKey(payment.key)
+                        .first()
+
+                payment.totalAmountPaid =
+                    partialPayments.fold(0.0) { acc, partialPayment -> acc + partialPayment.amount }
+
+                if (payment.isDueCleared) {
+
+                    payment.dueLeftAmount = 0.0
+                } else {
+
+                    payment.dueLeftAmount = payment.amountTakenOnRent - payment.totalAmountPaid
+                }
+
+                if (payment.isInterestAdded && payment.interest != null && !payment.isDueCleared) {
+
+                    val interestAndAmount = Functions.calculateInterestAndAmount(
+                        InterestCalculatorFields(
+                            0L, payment.amountTakenOnRent, payment.interest!!,
+                            Functions.calculateNumberOfDays(
+                                payment.created,
+                                System.currentTimeMillis()
+                            )
+                        )
+                    )
+
+                    payment.totalInterestTillNow = interestAndAmount.first
+                    payment.dueLeftAmount += interestAndAmount.first
+                }
+            }
+
+            _allPaymentsListOfBorrower.value = allPayments
+        }
+    }
+
+    //fun getPaymentsByBorrowerKey(borrowerKey: String)  = borrowerPaymentRepository.getPaymentsByBorrowerKey(borrowerKey).asLiveData()
 
     fun getTotalDueOfTheBorrower(borrowerKey: String) =
         borrowerPaymentRepository.getTotalDueOfTheBorrower(borrowerKey).asLiveData()

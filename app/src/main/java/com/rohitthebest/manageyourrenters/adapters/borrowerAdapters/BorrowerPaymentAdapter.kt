@@ -13,6 +13,7 @@ import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.AdapterBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
+import com.rohitthebest.manageyourrenters.utils.format
 import com.rohitthebest.manageyourrenters.utils.strikeThrough
 
 class BorrowerPaymentAdapter :
@@ -41,21 +42,98 @@ class BorrowerPaymentAdapter :
                         context.getString(
                             R.string.borrowed_currency_symbol_amount_taken,
                             payment.currencySymbol,
-                            payment.amountTakenOnRent.toString()
+                            payment.amountTakenOnRent.format(2)
                         )
                     paidAmountTV.text =
                         context.getString(
                             R.string.paid_currency_symbol_amount,
                             payment.currencySymbol,
-                            (payment.amountTakenOnRent - payment.dueLeftAmount).toString()
+                            (payment.totalAmountPaid).format(2)
                         )
 
-                    dueAmountTV.text = context
-                        .getString(
-                            R.string.due_currency_symbol_amount,
-                            payment.currencySymbol,
-                            payment.dueLeftAmount.toString()
-                        )
+                    if (payment.isInterestAdded && payment.interest != null) {
+
+                        dueAmountTV.textSize = 16.0f
+
+                        dueAmountTV.text = context
+                            .getString(
+                                R.string.due_currency_symbol_amount_interest,
+                                payment.currencySymbol,
+                                payment.dueLeftAmount.format(2),
+                                payment.totalInterestTillNow.format(2)
+                            )
+                    } else {
+
+                        dueAmountTV.text = context
+                            .getString(
+                                R.string.due_currency_symbol_amount,
+                                payment.currencySymbol,
+                                payment.dueLeftAmount.format(2)
+                            )
+                    }
+
+
+                    if (payment.isDueCleared) {
+
+                        binding.borrowedAmountTV.strikeThrough()
+                        binding.paidAmountTV.strikeThrough()
+                        binding.dueAmountTV.strikeThrough()
+                    } else {
+
+/*
+                        if (payment.isInterestAdded && payment.interest != null) {
+
+                            val interestCalculatorFields = InterestCalculatorFields(
+                                0L,
+                                payment.amountTakenOnRent,
+                                payment.interest!!,
+                                calculateNumberOfDays(payment.created, System.currentTimeMillis())
+                            )
+
+                            val interestAndAmount = calculateInterestAndAmount(
+                                interestCalculatorFields
+                            )
+
+                            if (interestAndAmount.first > 0.0) {
+
+                                dueAmountTV.textSize = 16.0f
+
+                                if (payment.dueLeftAmount == payment.amountTakenOnRent) {
+                                    dueAmountTV.text = context
+                                        .getString(
+                                            R.string.due_currency_symbol_amount_interest,
+                                            payment.currencySymbol,
+                                            payment.dueLeftAmount.format(2),
+                                            interestAndAmount.first.format(2)
+                                        )
+
+                                } else {
+
+                                    dueAmountTV.text = context
+                                        .getString(
+                                            R.string.due_currency_symbol_amount_interest,
+                                            payment.currencySymbol,
+                                            payment.dueLeftAmount.format(2),
+                                            interestAndAmount.first.format(2)
+                                        )
+
+                                    // showing paid amount with interest included
+                                    paidAmountTV.text =
+                                        context.getString(
+                                            R.string.paid_currency_symbol_amount,
+                                            payment.currencySymbol,
+                                            ((payment.amountTakenOnRent + interestAndAmount.first) - payment.dueLeftAmount).format(
+                                                2
+                                            )
+                                        )
+
+                                }
+
+                            }
+                        }
+*/
+
+                    }
 
                     if (payment.isSynced) {
 
@@ -90,12 +168,6 @@ class BorrowerPaymentAdapter :
                         )
                     )
 
-                    if (payment.isDueCleared) {
-
-                        binding.borrowedAmountTV.strikeThrough()
-                        binding.paidAmountTV.strikeThrough()
-                        binding.dueAmountTV.strikeThrough()
-                    }
                 }
             }
         }
@@ -108,7 +180,10 @@ class BorrowerPaymentAdapter :
 
                     binding.adapterBorrowerPaymentMCV.id -> {
 
-                        mListener!!.onItemClick(getItem(absoluteAdapterPosition))
+                        mListener!!.onItemClick(
+                            getItem(absoluteAdapterPosition),
+                            absoluteAdapterPosition
+                        )
                     }
 
                     binding.messageBtn.id -> {
@@ -170,7 +245,7 @@ class BorrowerPaymentAdapter :
 
     interface OnClickListener {
 
-        fun onItemClick(borrowerPayment: BorrowerPayment)
+        fun onItemClick(borrowerPayment: BorrowerPayment, position: Int)
         fun onShowMessageBtnClick(message: String)
         fun onInterestBtnClick(borrowerPayment: BorrowerPayment)
         fun onMenuBtnClick(borrowerPayment: BorrowerPayment, position: Int)

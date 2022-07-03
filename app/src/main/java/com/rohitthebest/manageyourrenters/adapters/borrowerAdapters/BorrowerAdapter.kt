@@ -13,6 +13,7 @@ import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.AdapterShowRenterBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
+import com.rohitthebest.manageyourrenters.utils.format
 import com.rohitthebest.manageyourrenters.utils.hide
 
 class BorrowerAdapter :
@@ -88,7 +89,7 @@ class BorrowerAdapter :
 
 
                     // using room number textView for showing the due amount of the borrower
-                    adapterRoomNumTV.text = "Total Due : ₹ ${b.totalDueAmount}"
+                    adapterRoomNumTV.text = "Total Due : ₹ ${b.totalDueAmount.format(2)}"
 
                     adapterRenterNameTV.text = b.name
                     adapterRenterEmailTV.text = b.emailId

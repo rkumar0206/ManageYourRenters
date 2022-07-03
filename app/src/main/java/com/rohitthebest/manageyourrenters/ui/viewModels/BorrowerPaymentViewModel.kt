@@ -9,15 +9,12 @@ import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
-import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
-import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
 import com.rohitthebest.manageyourrenters.repositories.PartialPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -31,7 +28,6 @@ class BorrowerPaymentViewModel @Inject constructor(
     app: Application,
     private val borrowerPaymentRepository: BorrowerPaymentRepository,
     private val partialPaymentRepository: PartialPaymentRepository,
-    private val borrowerRepository: BorrowerRepository,
     private val state: SavedStateHandle
 ) : AndroidViewModel(app) {
 
@@ -89,68 +85,7 @@ class BorrowerPaymentViewModel @Inject constructor(
             }
 
             borrowerPaymentRepository.insertBorrowerPayment(borrowerPayment)
-
-            delay(50)
-
-            // update the borrower due
-            updateBorrowerDueAmount(borrowerPayment.borrowerKey)
         }
-
-    private suspend fun updateBorrowerDueAmount(borrowerKey: String) {
-
-        val borrower = borrowerRepository.getBorrowerByKey(borrowerKey).first()
-
-        try {
-            val totalDue = borrowerPaymentRepository.getTotalDueOfTheBorrower(borrowerKey).first()
-            proceedUpdate(borrower, totalDue)
-        } catch (e: NullPointerException) {
-
-            proceedUpdate(borrower, 0.0)
-        }
-
-    }
-
-    private suspend fun proceedUpdate(borrower: Borrower, value: Double) {
-
-        val context = getApplication<Application>().applicationContext
-
-        borrower.totalDueAmount = value
-        borrower.modified = System.currentTimeMillis()
-
-        if (isInternetAvailable(context)) {
-
-            if (borrower.isSynced) {
-
-                // if the borrower document was already synced previously then update the document
-                // or else upload the entire document to the fireStore
-
-                val map = HashMap<String, Any?>()
-                map["totalDueAmount"] = value
-
-                updateDocumentOnFireStore(
-                    context,
-                    map = map,
-                    context.getString(R.string.borrowers),
-                    borrower.key
-                )
-            } else {
-
-                borrower.isSynced = true
-
-                uploadDocumentToFireStore(
-                    context,
-                    context.getString(R.string.borrowers),
-                    borrower.key
-                )
-            }
-        } else {
-
-            borrower.isSynced = false
-        }
-
-        borrowerRepository.update(borrower)
-
-    }
 
     fun insertBorrowerPayments(borrowerPayments: List<BorrowerPayment>) = viewModelScope.launch {
         borrowerPaymentRepository.insertAllBorrowerPayment(borrowerPayments)
@@ -239,7 +174,7 @@ class BorrowerPaymentViewModel @Inject constructor(
             val borrowerKey = borrowerPayment.borrowerKey
             partialPaymentRepository.deleteAllPartialPaymentByBorrowerPaymentKey(borrowerPayment.key)
             borrowerPaymentRepository.deleteBorrowerPayment(borrowerPayment)
-            updateBorrowerDueAmount(borrowerKey)
+
             getPaymentsByBorrowerKey(borrowerKey)
         }
 

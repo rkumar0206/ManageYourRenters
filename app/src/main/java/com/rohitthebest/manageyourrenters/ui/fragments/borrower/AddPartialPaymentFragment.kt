@@ -25,7 +25,6 @@ import com.rohitthebest.manageyourrenters.databinding.AddPartialPaymentLayoutBin
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPartialPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
-import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PartialPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateInterestAndAmount
@@ -52,7 +51,6 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
     private val partialPaymentViewModel by viewModels<PartialPaymentViewModel>()
-    private val borrowerViewModel by viewModels<BorrowerViewModel>()
 
     private var receivedBorrowerPayment: BorrowerPayment? = null
     private var receivedBorrowerPaymentKey: String = ""
@@ -67,7 +65,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
     private lateinit var removedPartialPaymentList: ArrayList<PartialPayment>
     private var dueLeftAmount = 0.0
 
-    private var isRefereshEnabled = true
+    private var isRefreshEnabled = true
 
     private var mListener: OnPartialPaymentDismiss? = null
 
@@ -140,7 +138,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         partialPaymentViewModel.getPartialPaymentByBorrowerPaymentKey(receivedBorrowerPaymentKey)
             .observe(viewLifecycleOwner) { partialPaymentList ->
 
-                if (isRefereshEnabled) {
+                if (isRefreshEnabled) {
 
                     oldPartialPaymentList = partialPaymentList
 
@@ -152,7 +150,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
                     partialPaymentAdapter.submitList(addedPartialPaymentList)
                     calculateDueAmount()
 
-                    isRefereshEnabled = false
+                    isRefreshEnabled = false
                 }
             }
     }
@@ -420,79 +418,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             )
 
             savePartialPaymentsToFireStore()
-            getAndUpdateTotalDueAmountOfBorrower()
         }
-    }
-
-    private fun getAndUpdateTotalDueAmountOfBorrower() {
-
-        Log.d(TAG, "getAndUpdateTotalDueAmountOfBorrower: ")
-
-        borrowerPaymentViewModel.getTotalDueOfTheBorrower(receivedBorrowerPayment?.borrowerKey!!)
-            .observe(viewLifecycleOwner) { totalDue ->
-
-                Log.d(TAG, "getAndUpdateTotalDueAmountOfBorrower: Total due : $totalDue")
-                if (totalDue == null) {
-
-                    updateBorrowerDueAmount(0.0)
-                } else {
-
-                    updateBorrowerDueAmount(totalDue)
-                }
-            }
-    }
-
-    var isBorrowerUpdateEnabled = true
-
-    private fun updateBorrowerDueAmount(totalDue: Double?) {
-
-        Log.d(TAG, "updateBorrowerDueAmount: ")
-
-        borrowerViewModel.getBorrowerByKey(receivedBorrowerPayment?.borrowerKey!!)
-            .observe(viewLifecycleOwner) { borrower ->
-
-                if (isBorrowerUpdateEnabled) {
-                    Log.d(TAG, "updateBorrowerDueAmount: ${borrower.name}")
-
-                    borrower.totalDueAmount = totalDue!!
-                    val map = HashMap<String, Any?>()
-                    map["totalDueAmount"] = totalDue
-
-                    //already synced - need to update
-                    if (borrower.isSynced) {
-
-                        if (isInternetAvailable(requireContext())) {
-
-                            updateDocumentOnFireStore(
-                                requireContext(),
-                                map,
-                                getString(R.string.borrowers),
-                                borrower.key
-                            )
-                        } else {
-
-                            borrower.isSynced = false
-                        }
-                    } else {
-
-                        // borrower not synced - need to be uploaded
-                        if (isInternetAvailable(requireContext())) {
-
-                            borrower.isSynced = true
-
-                            uploadDocumentToFireStore(
-                                requireContext(),
-                                getString(R.string.borrowers),
-                                borrower.key
-                            )
-                        }
-                    }
-
-                    borrowerViewModel.updateBorrower(borrower)
-
-                    isBorrowerUpdateEnabled = false
-                }
-            }
     }
 
     private fun savePartialPaymentsToFireStore() {

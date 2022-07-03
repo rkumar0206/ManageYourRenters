@@ -97,7 +97,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     private fun getRecyclerViewState() {
 
-        borrowerViewModel.borrowerRvState.observe(viewLifecycleOwner) { parcelable ->
+        borrowerPaymentViewModel.borrowerPaymentRvState.observe(viewLifecycleOwner) { parcelable ->
 
             parcelable?.let {
 
@@ -207,13 +207,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
                     show(it, TAG)
                 }.setOnPartialPaymentDialogDismissListener(this)
         }
-
-//        val action =
-//            BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddPartialPaymentFragment(
-//                borrowerPayment.key
-//            )
-//
-//        findNavController().navigate(action)
     }
 
     override fun onPartialPaymentDismissed() {

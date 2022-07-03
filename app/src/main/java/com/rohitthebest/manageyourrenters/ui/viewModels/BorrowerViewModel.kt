@@ -246,36 +246,50 @@ class BorrowerViewModel @Inject constructor(
 
             allBorrowers.forEach { borrower ->
 
-                // checking if the borrower has any due payments
-                if (borrower.totalDueAmount > 0.0) {
+                borrower.totalDueAmount = 0.0
 
-                    val paymentsList =
-                        borrowerPaymentRepository.getPaymentsByBorrowerKey(borrower.key).first()
-                            .filter { payments -> payments.isInterestAdded && payments.interest != null && !payments.isDueCleared }
+                val paymentsList =
+                    borrowerPaymentRepository.getPaymentsByBorrowerKey(borrower.key).first()
+                        .filter { !it.isDueCleared && it.dueLeftAmount != 0.0 }
 
-                    paymentsList.forEach { payment ->
+                paymentsList.forEach { payment ->
+
+                    borrower.totalDueAmount += if (!payment.isInterestAdded) {
+
+                        payment.dueLeftAmount
+                    } else {
 
                         val partialPayments =
                             partialPaymentRepository.getPartialPaymentByBorrowerPaymentKey(payment.key)
                                 .first()
 
-                        if (partialPayments.isEmpty()) {
+                        payment.totalAmountPaid =
+                            partialPayments.fold(0.0) { acc, partialPayment -> acc + partialPayment.amount }
 
-                            // if no payment is added then showing the amount with interest added
+                        var due = if (payment.isDueCleared) {
+
+                            0.0
+                        } else {
+
+                            payment.amountTakenOnRent - payment.totalAmountPaid
+                        }
+
+                        if (payment.interest != null) {
 
                             val interestAndAmount = calculateInterestAndAmount(
                                 InterestCalculatorFields(
-                                    0L,
-                                    payment.amountTakenOnRent,
-                                    payment.interest!!,
+                                    0L, payment.amountTakenOnRent, payment.interest!!,
                                     calculateNumberOfDays(
                                         payment.created,
                                         System.currentTimeMillis()
                                     )
                                 )
                             )
-                            borrower.totalDueAmount += interestAndAmount.first
+
+                            due += interestAndAmount.first
                         }
+
+                        due
                     }
                 }
             }

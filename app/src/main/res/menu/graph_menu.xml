@@ -2,6 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:title="@string/graphs">
+
+        <menu>
+
+            <item
+                android:id="@+id/menu_monthly_graph"
+                android:title="@string/monthly_graph" />
+
+        </menu>
+
+    </item>
+
     <item
         android:id="@+id/menu_share_expense_graph_sc"
         android:icon="@drawable/ic_baseline_share_24"

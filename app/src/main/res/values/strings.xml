@@ -277,6 +277,11 @@
     <string name="Copy">Copy</string>
     <string name="expense_copied">Expense copied</string>
     <string name="duplicate_this_expense">Duplicate this expense</string>
+    <string name="choose_date">choose_date</string>
+    <string name="graphs">Graphs</string>
+    <string name="monthly_graph">Monthly Graph</string>
+    <string name="no_expense_added">No expense added yet</string>
+    <string name="depp_analyze_error_message">You must have at least 2 categories for deep analyze mode</string>
 
     <string-array name="interest_time_schedule">
 
@@ -338,6 +343,23 @@
         <item>"October"</item>
         <item>"November"</item>
         <item>"December"</item>
+
+    </string-array>
+
+    <string-array name="months_short">
+
+        <item>"jan"</item>
+        <item>"feb"</item>
+        <item>"mar"</item>
+        <item>"apr"</item>
+        <item>"may"</item>
+        <item>"jun"</item>
+        <item>"jul"</item>
+        <item>"aug"</item>
+        <item>"sep"</item>
+        <item>"oct"</item>
+        <item>"nov"</item>
+        <item>"dec"</item>
 
     </string-array>
 

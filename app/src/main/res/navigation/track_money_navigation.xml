@@ -198,6 +198,9 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_graphFragment_to_monthlyGraphFragment"
+            app:destination="@id/monthlyGraphFragment" />
     </fragment>
     <fragment
         android:id="@+id/deepAnalyzeExpenseFragment"
@@ -268,4 +271,8 @@
             app:argType="string"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/monthlyGraphFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.MonthlyGraphFragment"
+        android:label="MonthlyGraphFragment" />
 </navigation>

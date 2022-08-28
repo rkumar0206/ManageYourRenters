@@ -2,9 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/white"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -21,59 +20,26 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-            app:menu="@menu/graph_menu"
-            app:title="Expense graph" />
+            app:title="Monthly Expense graph" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
     <RelativeLayout
-        android:id="@+id/relativeLayout2"
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:padding="5dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
-        <TextView
-            android:id="@+id/date_range_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/date_range_menu_btn"
-            android:layout_alignBottom="@+id/date_range_menu_btn"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_toStartOf="@+id/date_range_menu_btn"
-            android:gravity="center_vertical"
-            android:padding="3dp"
-            android:textSize="18sp"
-            tools:text="@string/all_time" />
-
-        <ImageButton
-            android:id="@+id/date_range_menu_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="16dp"
-            android:backgroundTint="@color/white"
-            android:contentDescription="@string/choose_date"
-            app:srcCompat="@drawable/ic_baseline_date_range_24" />
-
-        <View
-            android:id="@+id/divider72"
+        <Spinner
+            android:id="@+id/year_spinner"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_alignStart="@+id/date_range_tv"
-            android:layout_alignEnd="@+id/date_range_tv"
-            android:layout_alignBottom="@+id/date_range_menu_btn"
-            android:layout_marginTop="2dp"
-            android:background="?android:attr/listDivider"
-
-            />
+            android:layout_height="48dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:contentDescription="@string/select_from_year"
+            android:minHeight="48dp" />
 
     </RelativeLayout>
 
@@ -86,7 +52,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout2" />
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -98,5 +64,6 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

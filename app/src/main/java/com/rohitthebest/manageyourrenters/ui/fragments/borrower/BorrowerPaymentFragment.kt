@@ -1,11 +1,15 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.os.Bundle
+import android.os.Parcelable
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -16,8 +20,8 @@ import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
-import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -27,6 +31,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoIntern
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 private const val TAG = "BorrowerPaymentFragment"
@@ -34,7 +39,8 @@ private const val TAG = "BorrowerPaymentFragment"
 @AndroidEntryPoint
 class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     BorrowerPaymentAdapter.OnClickListener, CustomMenuItems.OnItemClickListener,
-    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener,
+    AddPartialPaymentFragment.OnPartialPaymentDismiss {
 
     private var _binding: FragmentBorrowerPaymentBinding? = null
     private val binding get() = _binding!!
@@ -46,11 +52,25 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
 
     private lateinit var borrowerPaymentAdapter: BorrowerPaymentAdapter
+    private var rvStateParcelable: Parcelable? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentBorrowerPaymentBinding.bind(view)
 
+        borrowerPaymentAdapter = BorrowerPaymentAdapter()
+
+        initListener()
+
+        getRecyclerViewState()
+        getMessage()
+
+        setUpRecyclerView()
+
+        binding.refreshLayout.isRefreshing = true
+    }
+
+    private fun initListener() {
 
         binding.borrowerPaymentToolbar.setNavigationOnClickListener {
 
@@ -69,13 +89,21 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
             }
         }
 
-        getMessage()
+        binding.refreshLayout.setOnRefreshListener {
 
-        borrowerPaymentAdapter = BorrowerPaymentAdapter()
+            getBorrowerPayments()
+        }
+    }
 
-        setUpRecyclerView()
+    private fun getRecyclerViewState() {
 
-        binding.progressbar.show()
+        borrowerPaymentViewModel.borrowerPaymentRvState.observe(viewLifecycleOwner) { parcelable ->
+
+            parcelable?.let {
+
+                rvStateParcelable = it
+            }
+        }
     }
 
     private fun getMessage() {
@@ -118,24 +146,37 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     private fun getBorrowerPayments() {
 
+        binding.refreshLayout.isRefreshing = true
+
         borrowerPaymentViewModel.getPaymentsByBorrowerKey(receivedBorrowerKey)
-            .observe(viewLifecycleOwner) { borrowerPayments ->
 
-                borrowerPaymentAdapter.submitList(borrowerPayments)
+        lifecycleScope.launch {
 
-                if (borrowerPayments.isNotEmpty()) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-                    binding.borrowerPaymentRV.show()
-                    binding.noBorrowerPaymentTV.hide()
-                } else {
+                borrowerPaymentViewModel.allPaymentsListOfBorrower.collect { borrowerPayments ->
 
-                    binding.borrowerPaymentRV.hide()
-                    binding.noBorrowerPaymentTV.show()
+                    Log.d(TAG, "getBorrowerPayments: ")
+
+                    borrowerPaymentAdapter.submitList(borrowerPayments)
+                    binding.borrowerPaymentRV.layoutManager?.onRestoreInstanceState(
+                        rvStateParcelable
+                    )
+
+                    if (borrowerPayments.isNotEmpty()) {
+
+                        binding.borrowerPaymentRV.show()
+                        binding.noBorrowerPaymentTV.hide()
+                    } else {
+
+                        binding.borrowerPaymentRV.hide()
+                        binding.noBorrowerPaymentTV.show()
+                    }
+
+                    binding.refreshLayout.isRefreshing = false
                 }
-
-                binding.progressbar.hide()
             }
-
+        }
     }
 
     private fun setUpRecyclerView() {
@@ -153,14 +194,24 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     }
 
     //[START OF ADAPTER CLICK LISTENER]
-    override fun onItemClick(borrowerPayment: BorrowerPayment) {
+    override fun onItemClick(borrowerPayment: BorrowerPayment, position: Int) {
 
-        val action =
-            BorrowerPaymentFragmentDirections.actionBorrowerPaymentFragmentToAddPartialPaymentFragment(
-                borrowerPayment.key
-            )
+        adapterItemPosition = position
+        val bundle = Bundle()
+        bundle.putString("borrower_payment_message", borrowerPayment.key)
 
-        findNavController().navigate(action)
+        requireActivity().supportFragmentManager.let {
+
+            AddPartialPaymentFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnPartialPaymentDialogDismissListener(this)
+        }
+    }
+
+    override fun onPartialPaymentDismissed() {
+
+        getBorrowerPayments()
     }
 
     override fun onShowMessageBtnClick(message: String) {
@@ -217,11 +268,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         requireActivity().supportFragmentManager.let {
 
             val bundle = Bundle()
-
-            if (!borrowerPayment.isSynced)
-                bundle.putBoolean(Constants.SHOW_SYNC_MENU, true)
-            else
-                bundle.putBoolean(Constants.SHOW_SYNC_MENU, false)
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !borrowerPayment.isSynced)
 
             CustomMenuItems.newInstance(
                 bundle
@@ -235,7 +282,6 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
     override fun onEditMenuClick() {
 
         if (borrowerPaymentForMenus != null) {
-
 
             // checking if the borrower payment already contains some partial payment or not
             // if it contains at least one partial payment then user cannot edit the payment
@@ -258,6 +304,10 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
         }
 
     }
+
+    override fun onCopyMenuClick() {}
+
+    override fun onMoveMenuClick() {}
 
     override fun onDeleteMenuClick() {
 
@@ -418,6 +468,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
                         borrowerPayment
                     )
                     showToast(requireContext(), getString(R.string.supporting_document_deleted))
+                    borrowerPaymentViewModel.getPaymentsByBorrowerKey(borrowerPayment.borrowerKey)
                     it.dismiss()
                 },
                 {
@@ -457,6 +508,11 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        borrowerPaymentViewModel.saveBorrowerPaymentRvState(
+            binding.borrowerPaymentRV.layoutManager?.onSaveInstanceState()
+        )
+
         _binding = null
     }
 }

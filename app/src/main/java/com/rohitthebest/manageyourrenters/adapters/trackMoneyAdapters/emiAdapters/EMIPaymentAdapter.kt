@@ -49,7 +49,7 @@ class EMIPaymentAdapter :
                     emiMonthPaidTV.text = monthTVText
 
                     emiPaidOnTV.text = "Paid On : ${
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(payment.created)
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(payment.created)
                     }"
 
                     if (payment.isSynced) {

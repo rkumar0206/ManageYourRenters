@@ -19,8 +19,8 @@ import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.SHOW_DOCUMENTS_MENU
+import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
-import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -199,6 +199,10 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
     override fun onEditMenuClick() {
         // not visible
     }
+
+    override fun onCopyMenuClick() {}
+
+    override fun onMoveMenuClick() {}
 
     override fun onDeleteMenuClick() {
 

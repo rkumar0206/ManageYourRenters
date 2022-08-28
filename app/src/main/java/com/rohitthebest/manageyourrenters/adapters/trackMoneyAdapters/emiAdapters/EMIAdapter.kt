@@ -50,7 +50,7 @@ class EMIAdapter : ListAdapter<EMI, EMIAdapter.EMIViewHolder>(DiffUtilCallback()
 
                     emiNameTV.text = e.emiName
                     emiAddedOnTV.text = "Added on : ${
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             e.created
                         )
                     }"

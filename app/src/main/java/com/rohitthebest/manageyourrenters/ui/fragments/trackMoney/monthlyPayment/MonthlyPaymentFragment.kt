@@ -16,7 +16,7 @@ import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymen
 import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentMonthlyPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
+import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -161,6 +161,10 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
 
         findNavController().navigate(action)
     }
+
+    override fun onCopyMenuClick() {}
+
+    override fun onMoveMenuClick() {}
 
     override fun onDeleteMenuClick() {
 

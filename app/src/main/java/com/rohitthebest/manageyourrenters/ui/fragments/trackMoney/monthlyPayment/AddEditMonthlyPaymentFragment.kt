@@ -44,7 +44,6 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
     private lateinit var receivedMonthlyPaymentCategory: MonthlyPaymentCategory
 
     private lateinit var paymentDate: Calendar
-    private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
 
     private var receivedMonthlyPaymentKey = ""
     private lateinit var receivedMonthlyPayment: MonthlyPayment
@@ -71,13 +70,11 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
         includeBinding = binding.includeLayout
 
-        workingWithDateAndTime = WorkingWithDateAndTime()
-
         paymentDate = Calendar.getInstance()
 
         updateSelectedPaymentDateTextView()
 
-        populateYearList(workingWithDateAndTime.getCurrentYear())
+        populateYearList(WorkingWithDateAndTime.getCurrentYear())
         setUpMonthSpinners()
         setUpYearSpinners()
 
@@ -329,7 +326,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                 includeBinding.tillDateTV.setDateInTextView(dates.second)
 
                 numberOfDays =
-                    workingWithDateAndTime.calculateNumberOfDays(dates.first!!, dates.second!!)
+                    WorkingWithDateAndTime.calculateNumberOfDays(dates.first!!, dates.second!!)
 
                 setNumberOfDaysInTextView()
             },
@@ -351,7 +348,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
     private fun updateSelectedPaymentDateTextView() {
 
         includeBinding.monthlyPaymentDateTV.text =
-            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                 paymentDate.timeInMillis, "dd-MM-yyyy hh:mm a"
             )
     }
@@ -447,7 +444,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         }
 
         numberOfDays =
-            workingWithDateAndTime.calculateNumberOfDays(fromDateTimestamp, tillDateTimeStamp)
+            WorkingWithDateAndTime.calculateNumberOfDays(fromDateTimestamp, tillDateTimeStamp)
 
         includeBinding.fromDateTV.setDateInTextView(fromDateTimestamp)
         includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
@@ -463,7 +460,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                     if (lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillMonth == 12) {
 
                         if (lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillYear!! + 1
-                            != workingWithDateAndTime.getCurrentYear()
+                            != WorkingWithDateAndTime.getCurrentYear()
                         ) {
 
                             // increase year by 1
@@ -482,7 +479,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
                 if (selectedFromMonthNumber == 12) {
 
-                    if (lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillYear != workingWithDateAndTime.getCurrentYear()) {
+                    if (lastPaymentInfo?.monthlyPaymentDateTimeInfo?.toBillYear != WorkingWithDateAndTime.getCurrentYear()) {
 
                         selectedFromYear = yearList[1] // previous year
                     }
@@ -509,10 +506,10 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
                 Log.d(TAG, "populateByMonthLayoutFields: No Last payment or for editing")
 
-                selectedFromMonthNumber = workingWithDateAndTime.getCurrentMonth() + 1
-                selectedToMonthNumber = workingWithDateAndTime.getCurrentMonth() + 1
-                selectedFromYear = workingWithDateAndTime.getCurrentYear()
-                selectedToYear = workingWithDateAndTime.getCurrentYear()
+                selectedFromMonthNumber = WorkingWithDateAndTime.getCurrentMonth() + 1
+                selectedToMonthNumber = WorkingWithDateAndTime.getCurrentMonth() + 1
+                selectedFromYear = WorkingWithDateAndTime.getCurrentYear()
+                selectedToYear = WorkingWithDateAndTime.getCurrentYear()
             }
         }
 
@@ -540,7 +537,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
             includeBinding.apply {
 
                 paymentDate =
-                    workingWithDateAndTime.convertMillisecondsToCalendarInstance(
+                    WorkingWithDateAndTime.convertMillisecondsToCalendarInstance(
                         receivedMonthlyPayment.created
                     )
                 updateSelectedPaymentDateTextView()
@@ -615,7 +612,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
     private fun setNumberOfMonthsInTextView() {
 
-        numberOfMonths = workingWithDateAndTime.calculateNumberOfMonthsInBetween(
+        numberOfMonths = WorkingWithDateAndTime.calculateNumberOfMonthsInBetween(
             Pair(selectedFromMonthNumber, selectedFromYear),
             Pair(selectedToMonthNumber, selectedToYear)
         )

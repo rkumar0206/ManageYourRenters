@@ -14,7 +14,7 @@ import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAda
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseCategoryBinding
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
+import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
@@ -97,12 +97,12 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
     }
 
     private lateinit var expenseCategoryForMenus: ExpenseCategory
-    private var itemPosition = 0
+    private var adapterPosition = -1
 
     override fun onMenuBtnClicked(expenseCategory: ExpenseCategory, position: Int) {
 
         expenseCategoryForMenus = expenseCategory
-        itemPosition = position
+        adapterPosition = position
 
         requireActivity().supportFragmentManager.let { fm ->
 
@@ -110,11 +110,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
             bundle.putBoolean(Constants.SHOW_EDIT_MENU, true)
             bundle.putBoolean(Constants.SHOW_DELETE_MENU, true)
             bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, false)
-
-            if (!expenseCategory.isSynced) {
-
-                bundle.putBoolean(Constants.SHOW_SYNC_MENU, true)
-            }
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !expenseCategory.isSynced)
 
             CustomMenuItems.newInstance(
                 bundle
@@ -138,6 +134,10 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
             findNavController().navigate(action)
         }
     }
+
+    override fun onCopyMenuClick() {}
+
+    override fun onMoveMenuClick() {}
 
     override fun onDeleteMenuClick() {
 
@@ -176,7 +176,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
                 if (isInternetAvailable(requireContext())) {
 
                     expenseCategoryViewModel.insertExpenseCategory(expenseCategoryForMenus)
-                    expenseCategoryAdapter.notifyItemChanged(itemPosition)
+                    expenseCategoryAdapter.notifyItemChanged(adapterPosition)
                 } else {
 
                     showNoInternetMessage(requireContext())

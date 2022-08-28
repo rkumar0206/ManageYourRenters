@@ -23,15 +23,12 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
     ListAdapter<RenterPayment, ShowPaymentAdapter.ShowPaymentViewHolder>(DiffUtilCallback()) {
 
     private var mListener: OnClickListener? = null
-    private lateinit var workingWithDateAndTime: WorkingWithDateAndTime
 
     inner class ShowPaymentViewHolder(val binding: AdapterShowPaymentBinding) :
         RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
 
         init {
-
-            workingWithDateAndTime = WorkingWithDateAndTime()
 
             binding.root.setOnClickListener(this)
             binding.paymentAdapterMenuBtn.setOnClickListener(this)
@@ -62,7 +59,7 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
                     ) {
 
                         paymentAdapterBillPeriodTV.text =
-                            workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                 payment.billPeriodInfo.renterBillDateType?.toBillDate
                             )
                     } else {
@@ -70,11 +67,11 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
                         paymentAdapterBillPeriodTV.textSize = 18.0f
                         paymentAdapterBillPeriodTV.text =
                             "From : ${
-                                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     payment.billPeriodInfo.renterBillDateType?.fromBillDate
                                 )
                             }\nTo      : ${
-                                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     payment.billPeriodInfo.renterBillDateType?.toBillDate
                                 )
                             }"
@@ -84,12 +81,12 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
                 //issue date
                 paymentAdapterIssueDateTV.text =
                     "Payment date : ${
-                        workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             payment.created
                         )
                     }\n" +
                             "Payment time : ${
-                                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     payment.created, "hh:mm a"
                                 )
                             }"

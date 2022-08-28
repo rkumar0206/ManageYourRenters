@@ -18,15 +18,17 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.borrowerAdapters.PartialPaymentAdapter
+import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.database.model.PartialPayment
 import com.rohitthebest.manageyourrenters.databinding.AddPartialPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPartialPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
-import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PartialPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateInterestAndAmount
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateNumberOfDays
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -49,7 +51,6 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private val borrowerPaymentViewModel by viewModels<BorrowerPaymentViewModel>()
     private val partialPaymentViewModel by viewModels<PartialPaymentViewModel>()
-    private val borrowerViewModel by viewModels<BorrowerViewModel>()
 
     private var receivedBorrowerPayment: BorrowerPayment? = null
     private var receivedBorrowerPaymentKey: String = ""
@@ -64,7 +65,9 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
     private lateinit var removedPartialPaymentList: ArrayList<PartialPayment>
     private var dueLeftAmount = 0.0
 
-    private var isRefereshEnabled = true
+    private var isRefreshEnabled = true
+
+    private var mListener: OnPartialPaymentDismiss? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -135,7 +138,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         partialPaymentViewModel.getPartialPaymentByBorrowerPaymentKey(receivedBorrowerPaymentKey)
             .observe(viewLifecycleOwner) { partialPaymentList ->
 
-                if (isRefereshEnabled) {
+                if (isRefreshEnabled) {
 
                     oldPartialPaymentList = partialPaymentList
 
@@ -147,7 +150,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
                     partialPaymentAdapter.submitList(addedPartialPaymentList)
                     calculateDueAmount()
 
-                    isRefereshEnabled = false
+                    isRefreshEnabled = false
                 }
             }
     }
@@ -248,11 +251,27 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
     private fun calculateDueAmount() {
 
-        val totalDue = receivedBorrowerPayment?.amountTakenOnRent!!
-        val totalAmountPaid = getTotalPaidAmountFromAllThePartialPayment()
+        receivedBorrowerPayment?.let { payment ->
 
-        dueLeftAmount = totalDue - totalAmountPaid
-        handleTheDue()
+            val totalDue = payment.amountTakenOnRent
+            val totalAmountPaid = getTotalPaidAmountFromAllThePartialPayment()
+
+            dueLeftAmount = totalDue - totalAmountPaid
+
+            if (payment.isInterestAdded && payment.interest != null && !payment.isDueCleared) {
+
+                val interestAndAmount = calculateInterestAndAmount(
+                    InterestCalculatorFields(
+                        0L, payment.amountTakenOnRent, payment.interest!!,
+                        calculateNumberOfDays(payment.created, System.currentTimeMillis())
+                    )
+                )
+
+                dueLeftAmount += interestAndAmount.first
+            }
+
+            handleTheDue()
+        }
     }
 
     private fun handleTheDue() {
@@ -274,7 +293,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
     private fun updateDueAmountTV() {
 
         includeBinding.dueLeftAmoutTV.text =
-            "${receivedBorrowerPayment?.currencySymbol} $dueLeftAmount"
+            "${receivedBorrowerPayment?.currencySymbol} ${dueLeftAmount.format(2)}"
 
         if (dueLeftAmount <= 0.0) {
 
@@ -380,6 +399,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
                     payment.dueLeftAmount = 0.0
                 } else {
 
+                    payment.isDueCleared = false
                     payment.dueLeftAmount = dueLeftAmount
                 }
 
@@ -387,6 +407,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                 if (dueLeftAmount >= 0.0 && dueLeftAmount != payment.dueLeftAmount) {
 
+                    payment.isDueCleared = false
                     payment.dueLeftAmount = dueLeftAmount
                 }
             }
@@ -397,79 +418,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             )
 
             savePartialPaymentsToFireStore()
-            getAndUpdateTotalDueAmountOfBorrower()
         }
-    }
-
-    private fun getAndUpdateTotalDueAmountOfBorrower() {
-
-        Log.d(TAG, "getAndUpdateTotalDueAmountOfBorrower: ")
-
-        borrowerPaymentViewModel.getTotalDueOfTheBorrower(receivedBorrowerPayment?.borrowerKey!!)
-            .observe(viewLifecycleOwner) { totalDue ->
-
-                Log.d(TAG, "getAndUpdateTotalDueAmountOfBorrower: Total due : $totalDue")
-                if (totalDue == null) {
-
-                    updateBorrowerDueAmount(0.0)
-                } else {
-
-                    updateBorrowerDueAmount(totalDue)
-                }
-            }
-    }
-
-    var isBorrowerUpdateEnabled = true
-
-    private fun updateBorrowerDueAmount(totalDue: Double?) {
-
-        Log.d(TAG, "updateBorrowerDueAmount: ")
-
-        borrowerViewModel.getBorrowerByKey(receivedBorrowerPayment?.borrowerKey!!)
-            .observe(viewLifecycleOwner) { borrower ->
-
-                if (isBorrowerUpdateEnabled) {
-                    Log.d(TAG, "updateBorrowerDueAmount: ${borrower.name}")
-
-                    borrower.totalDueAmount = totalDue!!
-                    val map = HashMap<String, Any?>()
-                    map["totalDueAmount"] = totalDue
-
-                    //already synced - need to update
-                    if (borrower.isSynced) {
-
-                        if (isInternetAvailable(requireContext())) {
-
-                            updateDocumentOnFireStore(
-                                requireContext(),
-                                map,
-                                getString(R.string.borrowers),
-                                borrower.key
-                            )
-                        } else {
-
-                            borrower.isSynced = false
-                        }
-                    } else {
-
-                        // borrower not synced - need to be uploaded
-                        if (isInternetAvailable(requireContext())) {
-
-                            borrower.isSynced = true
-
-                            uploadDocumentToFireStore(
-                                requireContext(),
-                                getString(R.string.borrowers),
-                                borrower.key
-                            )
-                        }
-                    }
-
-                    borrowerViewModel.updateBorrower(borrower)
-
-                    isBorrowerUpdateEnabled = false
-                }
-            }
     }
 
     private fun savePartialPaymentsToFireStore() {
@@ -524,8 +473,8 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
         lifecycleScope.launch {
 
             delay(200)
-            requireActivity().onBackPressed()
-
+            if (mListener != null) mListener!!.onPartialPaymentDismissed()
+            dismiss()
         }
     }
 
@@ -641,6 +590,26 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             //todo : also change the color of recyclerview list items
         }
     }
+
+    interface OnPartialPaymentDismiss {
+
+        fun onPartialPaymentDismissed()
+    }
+
+    fun setOnPartialPaymentDialogDismissListener(listener: OnPartialPaymentDismiss) {
+
+        this.mListener = listener
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(bundle: Bundle): AddPartialPaymentFragment {
+            val fragment = AddPartialPaymentFragment()
+            fragment.arguments = bundle
+            return fragment
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

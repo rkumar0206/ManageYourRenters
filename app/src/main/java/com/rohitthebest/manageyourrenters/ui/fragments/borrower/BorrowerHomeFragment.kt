@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
@@ -16,8 +17,8 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
-import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -41,23 +42,21 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
     private val borrowerViewModel by viewModels<BorrowerViewModel>()
     private lateinit var borrowerAdapter: BorrowerAdapter
 
+    private var rvStateParcelable: Parcelable? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentBorrowerHomeBinding.bind(view)
 
-        binding.addIndividualRenterFAB.setOnClickListener {
-
-            findNavController().navigate(R.id.action_borrowerHomeFragment_to_addBorrowerFragment)
-        }
-        binding.individualRenterToolbar.setNavigationOnClickListener {
-
-            requireActivity().onBackPressed()
-        }
-
-        showHideProgressBar(true)
 
         borrowerAdapter = BorrowerAdapter()
         setUpRecyclerView()
+
+        getRecyclerViewState()
+
+        initListeners()
+
+        binding.refreshLayout.isRefreshing = true
 
         lifecycleScope.launch {
 
@@ -70,9 +69,40 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         )
     }
 
+    private fun initListeners() {
+
+        binding.addIndividualRenterFAB.setOnClickListener {
+
+            findNavController().navigate(R.id.action_borrowerHomeFragment_to_addBorrowerFragment)
+        }
+        binding.individualRenterToolbar.setNavigationOnClickListener {
+
+            requireActivity().onBackPressed()
+        }
+        binding.refreshLayout.setOnRefreshListener {
+
+            getAllBorrowers()
+        }
+    }
+
+    private fun getRecyclerViewState() {
+
+        borrowerViewModel.borrowerRvState.observe(viewLifecycleOwner) { parcelable ->
+
+            parcelable?.let {
+
+                rvStateParcelable = it
+            }
+        }
+    }
+
     private fun getAllBorrowers() {
 
-        borrowerViewModel.getAllBorrower().observe(viewLifecycleOwner) {
+        binding.refreshLayout.isRefreshing = true
+
+        borrowerViewModel.getAllBorrower()
+
+        borrowerViewModel.allBorrowersList.observe(viewLifecycleOwner) {
 
             if (it.isEmpty()) {
 
@@ -83,10 +113,11 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
             }
 
             borrowerAdapter.submitList(it)
+            binding.individualRentersRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
 
             initSearchViewMenu(it)
 
-            showHideProgressBar(false)
+            binding.refreshLayout.isRefreshing = false
         }
     }
 
@@ -176,6 +207,9 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         }
     }
 
+    override fun onCopyMenuClick() {}
+    override fun onMoveMenuClick() {}
+
     override fun onDeleteMenuClick() {
 
         showAlertDialogForDeletion(
@@ -200,7 +234,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                 }
 
                 it.dismiss()
-
+                borrowerAdapter.notifyItemRemoved(currentAdapterPosition)
             },
             negativeButtonListener = {
 
@@ -293,6 +327,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
             showNoInternetMessage(requireContext())
         }
+        getAllBorrowers()
     }
 
     override fun onDeleteSupportingDocumentClick() {
@@ -325,6 +360,8 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                     borrowerForMenus.supportingDocument = null
                     borrowerForMenus.isSupportingDocAdded = false
                     borrowerViewModel.updateBorrower(borrowerForMenus)
+                    borrowerViewModel.getAllBorrower()
+
                     showToast(requireContext(), getString(R.string.supporting_document_deleted))
                     it.dismiss()
                 },
@@ -369,7 +406,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     }
 
-
     //[END OF MENU CLICK LISTENERS]
 
     override fun onMobileNumberClicked(mobileNumber: String, view: View) {
@@ -381,11 +417,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         )
     }
 
-    private fun showHideProgressBar(isVisible: Boolean) {
-
-        binding.progressBar.isVisible = isVisible
-    }
-
     private fun showNoBorrowersAddedTV(isVisible: Boolean) {
 
         binding.noBorrowersAddedMessageTV.isVisible = isVisible
@@ -394,7 +425,11 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        borrowerViewModel.saveBorrowerRvState(
+            binding.individualRentersRV.layoutManager?.onSaveInstanceState()
+        )
+
         _binding = null
     }
-
 }

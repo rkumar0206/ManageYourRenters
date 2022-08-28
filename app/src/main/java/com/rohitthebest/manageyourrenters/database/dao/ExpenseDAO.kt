@@ -59,6 +59,9 @@ interface ExpenseDAO {
     @Query("SELECT * FROM expense_table ORDER BY created DESC")
     fun getAllExpenses(): Flow<List<Expense>>
 
+    @Query("SELECT DISTINCT spentOn FROM expense_table")
+    fun getAllSpentOn(): Flow<List<String>>
+
     @Query("SELECT * FROM expense_table WHERE created BETWEEN :date1 AND :date2 ORDER BY created DESC")
     fun getExpensesByDateRange(date1: Long, date2: Long): Flow<List<Expense>>
 

@@ -22,8 +22,8 @@ import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
-import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -217,12 +217,12 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                         if (payment.billPeriodInfo.billPeriodType == BillPeriodType.BY_DATE) {
 
                             from =
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     payment.billPeriodInfo.renterBillDateType?.fromBillDate
                                 )
 
                             till =
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     payment.billPeriodInfo.renterBillDateType?.toBillDate
                                 )
                         } else {
@@ -308,6 +308,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     }
 
     override fun onEditMenuClick() {}
+    override fun onCopyMenuClick() {}
+    override fun onMoveMenuClick() {}
 
     override fun onDeleteMenuClick() {
 

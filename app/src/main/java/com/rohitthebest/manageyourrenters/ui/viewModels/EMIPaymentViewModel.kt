@@ -276,11 +276,10 @@ class EMIPaymentViewModel @Inject constructor(
         emi: EMI
     ): String {
 
-        val workingWithDateAndTime = WorkingWithDateAndTime()
         val message = StringBuilder()
         message.append(
             "\nModified On : ${
-                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     emiPayment.modified,
                     "dd-MM-yyyy hh:mm a"
                 )
@@ -288,7 +287,7 @@ class EMIPaymentViewModel @Inject constructor(
         )
         message.append(
             "Created On : ${
-                workingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     emiPayment.created,
                     "dd-MM-yyyy hh:mm a"
                 )

@@ -17,11 +17,14 @@ import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
 import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseBinding
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.CustomMenuItems
+import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showDateAndTimePickerDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,7 +42,7 @@ enum class SortExpense {
 
 @AndroidEntryPoint
 class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnClickListener,
-    CustomMenuItems.OnItemClickListener {
+    CustomMenuItems.OnItemClickListener, ChooseExpenseCategoryBottomSheetFragment.OnItemClicked {
 
     private var _binding: FragmentExpenseBinding? = null
     private val binding get() = _binding!!
@@ -257,7 +260,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
                 val msg =
                     "\nDate : ${
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             expense.created, "dd-MM-yyyy hh:mm a"
                         )
                     }\n\n" +
@@ -292,11 +295,10 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             bundle.putBoolean(Constants.SHOW_EDIT_MENU, true)
             bundle.putBoolean(Constants.SHOW_DELETE_MENU, true)
             bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, false)
-
-            if (!expense.isSynced) {
-
-                bundle.putBoolean(Constants.SHOW_SYNC_MENU, true)
-            }
+            bundle.putBoolean(Constants.SHOW_COPY_MENU, true)
+            bundle.putBoolean(Constants.SHOW_MOVE_MENU, true)
+            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !expense.isSynced)
+            bundle.putString(Constants.COPY_MENU_TEXT, getString(R.string.duplicate_this_expense))
 
             CustomMenuItems.newInstance(
                 bundle
@@ -319,6 +321,60 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             findNavController().navigate(action)
         }
 
+    }
+
+    override fun onCopyMenuClick() {
+
+        // when copying an expense, user can change the date and time
+
+        if (this::expenseForMenuItems.isInitialized) {
+            showDateAndTimePickerDialog(
+                context = requireContext(),
+                selectedDate = WorkingWithDateAndTime.convertMillisecondsToCalendarInstance(System.currentTimeMillis()),
+                isFutureDatesValid = false,
+                pickedDateListener = { calendar ->
+
+                    val expense = expenseForMenuItems.copy(
+                        id = null,
+                        created = calendar.timeInMillis,
+                        modified = System.currentTimeMillis(),
+                        key = generateKey("_${getUid()}"),
+                        isSynced = isInternetAvailable(requireContext())
+                    )
+
+                    expenseViewModel.insertExpense(expense)
+                    showToast(requireContext(), getString(R.string.expense_copied))
+                    lifecycleScope.launch {
+                        delay(150)
+                        binding.expenseRV.scrollToPosition(0)
+                    }
+                }
+            )
+        }
+    }
+
+    override fun onMoveMenuClick() {
+
+        if (this::expenseForMenuItems.isInitialized) {
+            requireActivity().supportFragmentManager.let {
+
+                ChooseExpenseCategoryBottomSheetFragment.newInstance(
+                    Bundle()
+                ).apply {
+
+                    show(it, TAG)
+                }.setOnItemClickedListener(this)
+            }
+        }
+    }
+
+    override fun onCategoryClicked(expenseCategory: ExpenseCategory) {
+
+        expenseForMenuItems.categoryKey = expenseCategory.key
+        expenseForMenuItems.modified = System.currentTimeMillis()
+
+        expenseViewModel.updateExpense(expenseForMenuItems)
+        expenseAdapter.notifyItemChanged(expenseForMenuPosition)
     }
 
     override fun onDeleteMenuClick() {
@@ -440,12 +496,12 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 ).observe(viewLifecycleOwner) { totalAmount ->
 
                     val title = "${receivedExpenseCategory.categoryName}\nFrom ${
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             startDate
                         )
                     } to " +
                             "${
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     endDate
                                 )
                             }"
@@ -477,12 +533,12 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 ).observe(viewLifecycleOwner) { totalAmount ->
 
                     val title = "From ${
-                        WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             startDate
                         )
                     } to " +
                             "${
-                                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                     endDate
                                 )
                             }"
@@ -576,12 +632,12 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
                             binding.toolbar.subtitle =
                                 "${
-                                    WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                    WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                         startDate
                                     )
                                 } - " +
                                         "${
-                                            WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                                            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                                                 endDate
                                             )
                                         }"
@@ -638,6 +694,5 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         super.onDestroyView()
         _binding = null
     }
-
 }
 

@@ -13,9 +13,6 @@ import androidx.navigation.fragment.findNavController
 import com.anychart.AnyChart
 import com.anychart.chart.common.dataentry.DataEntry
 import com.anychart.chart.common.dataentry.ValueDataEntry
-import com.anychart.chart.common.listener.Event
-import com.anychart.chart.common.listener.ListenersInterface
-import com.anychart.charts.Cartesian
 import com.anychart.charts.Pie
 import com.anychart.enums.Align
 import com.anychart.enums.LegendLayout
@@ -33,7 +30,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBitmapTo
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 private const val TAG = "GraphFragment"
@@ -48,8 +44,6 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
     private val expenseViewModel by viewModels<ExpenseViewModel>()
 
     private lateinit var pie: Pie
-    private lateinit var cartesian: Cartesian
-
     private var isAllTimeSelected = false
 
     private var selectedCustomDateRangeMenu: CustomDateRange? = CustomDateRange.ALL_TIME
@@ -109,56 +103,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             .itemsLayout(LegendLayout.HORIZONTAL_EXPANDABLE)
             .align(Align.CENTER)
 
-/*
-        pie.setOnClickListener(object :
-            ListenersInterface.OnClickListener(arrayOf("x", "value")) {
-            override fun onClick(event: Event) {
-
-                            Toast.makeText(
-                                requireContext(),
-                                event.data["x"].toString() + ":" + event.data["value"],
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-            }
-        })
-*/
-
         binding.chart.setChart(pie)
-
-    }
-
-    private fun setUpCartesianChart() {
-
-        cartesian = AnyChart.column()
-        binding.chart.setProgressBar(binding.progressBar)
-
-        cartesian.title("Expenses on each category")
-
-        cartesian.labels().position("outside")
-
-        cartesian.legend().title().enabled(true)
-        cartesian.legend().title()
-            .text("Expense categories")
-            .padding(0.0, 0.0, 10.0, 0.0)
-
-        cartesian.legend()
-            .position("center-bottom")
-            .itemsLayout(LegendLayout.HORIZONTAL)
-            .align(Align.CENTER)
-
-        cartesian.setOnClickListener(object :
-            ListenersInterface.OnClickListener(arrayOf("x", "value")) {
-            override fun onClick(event: Event) {
-/*
-                            Toast.makeText(
-                                requireContext(),
-                                event.data["x"].toString() + ":" + event.data["value"],
-                                Toast.LENGTH_SHORT
-                            ).show()
-*/
-            }
-        })
     }
 
     private var d1 = System.currentTimeMillis() - (ONE_DAY_MILLISECONDS * 30)
@@ -181,9 +126,24 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
                     showToast(
                         requireContext(),
-                        "You must have at least 2 categories for deep analyze mode",
+                        getString(R.string.depp_analyze_error_message),
                         Toast.LENGTH_LONG
                     )
+                }
+            }
+
+            true
+        }
+
+        binding.toolbar.menu.findItem(R.id.menu_monthly_graph).setOnMenuItemClickListener {
+
+            expenseViewModel.getAllExpenses().observe(viewLifecycleOwner) {
+
+                if (it.isNotEmpty()) {
+                    findNavController().navigate(R.id.action_graphFragment_to_monthlyGraphFragment)
+                } else {
+
+                    showToast(requireContext(), getString(R.string.no_expense_added))
                 }
             }
 
@@ -243,7 +203,6 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             selectedCustomDateRangeMenu = selectedMenu
             saveCustomDateRangeValueInSharedPreference()
             handleDateRangeSelectionMenu(selectedMenu)
-
         }
     }
 
@@ -378,11 +337,11 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         } else {
 
             binding.dateRangeTv.text = "${
-                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     d1
                 )
             } to ${
-                WorkingWithDateAndTime().convertMillisecondsToDateAndTimePattern(
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                     d2
                 )
             }"
@@ -450,7 +409,6 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
                                 binding.chart.show()
                                 pie.data(data)
-
                             } else {
 
                                 binding.chart.hide()

@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.database.model
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
@@ -29,6 +30,13 @@ data class BorrowerPayment(
     var isSynced: Boolean = false,
     var messageOrNote: String = ""
 ) : Serializable {
+
+    @Exclude
+    @Ignore
+    var totalAmountPaid = 0.0
+    @Exclude
+    @Ignore
+    var totalInterestTillNow = 0.0
 
     constructor() : this(
         null,

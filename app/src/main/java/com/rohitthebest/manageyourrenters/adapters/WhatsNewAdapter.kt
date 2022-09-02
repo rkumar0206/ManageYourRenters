@@ -1,12 +1,15 @@
 package com.rohitthebest.manageyourrenters.adapters
 
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.WhatsNew
 import com.rohitthebest.manageyourrenters.databinding.AdapterWhatsNewBinding
+import com.rohitthebest.manageyourrenters.utils.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.isValid
 import com.rohitthebest.manageyourrenters.utils.show
@@ -36,7 +39,19 @@ class WhatsNewAdapter :
 
                 binding.apply {
 
-                    whatsNewTV.text = new.feature
+                    if (new.feature.contains("-heading")) {
+
+                        whatsNewTV.changeTextColor(binding.root.context, R.color.primaryTextColor)
+                        whatsNewTV.setTypeface(null, Typeface.BOLD)
+                        whatsNewTV.textSize = 20f
+                        whatsNewTV.text = new.feature.replace("-heading", "")
+                    } else {
+
+                        whatsNewTV.changeTextColor(binding.root.context, R.color.secondaryTextColor)
+                        whatsNewTV.setTypeface(null, Typeface.NORMAL)
+                        whatsNewTV.textSize = 16f
+                        whatsNewTV.text = new.feature
+                    }
 
                     if (new.image.isValid()) {
 

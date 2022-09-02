@@ -282,6 +282,14 @@
     <string name="monthly_graph">Monthly Graph</string>
     <string name="no_expense_added">No expense added yet</string>
     <string name="depp_analyze_error_message">You must have at least 2 categories for deep analyze mode</string>
+    <string name="update_to">Update to</string>
+    <string name="update_to_version">Update to %1$s</string>
+    <string name="version">Version</string>
+    <string name="whats_new">Whats New</string>
+    <string name="unable_to_fetch_details">Unable to fetch details</string>
+    <string name="download_apk">Download APK</string>
+    <string name="download">Download</string>
+    <string name="unable_to_load_image">Unable to load the image!!</string>
 
     <string-array name="interest_time_schedule">
 

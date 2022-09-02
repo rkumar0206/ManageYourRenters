@@ -68,9 +68,5 @@ object Constants {
     // app update related
     const val APP_VERSION = "3.6.0"
     const val APP_UPDATE_FIRESTORE_COLLECTION_NAME = "AppUpdates"
-    const val APP_UPDATE_FIRESTORE_DOCUMENT_KEY = "app_update_info_6367_&*#%"
-    const val APP_UPDATE_SHARED_PREF_KEY = "3c6c5f40-0962-451e-81ef-1f168cf769d0"
-    const val APP_UPDATE_SHARED_PREF_NAME = "APP_UPDATE_SHARED_PREF"
-    const val CHECKED_FOR_APP_UPDATE_SHARED_PREF_NAME = "CHECKED_FOR_APP_UPDATE_SHARED_PREF"
-    const val CHECKED_FOR_APP_UPDATE_SHARED_PREF_KEY = "f296253c-3128-4f6f-8ddf-dbb49bae8999"
+    const val APP_UPDATE_FIRESTORE_DOCUMENT_KEY = "latest_app_version"
 }

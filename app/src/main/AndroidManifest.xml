@@ -24,6 +24,7 @@
         </activity>
         <activity android:name=".ui.activities.BorrowerActivity" />
         <activity android:name=".ui.activities.LoginActivity" />
+        <activity android:name=".ui.activities.WhatsNewActivity" />
         <activity
             android:name=".ui.activities.HouseRentersActivity"
             android:exported="true">
@@ -58,7 +59,6 @@
         <service android:name=".services.MonthlyPaymentService" />
         <service android:name=".services.SyncAllMonthlyPaymentsAndCategoriesService" />
         <service android:name=".services.UploadFileToCloudStorageService" />
-        <service android:name=".services.AppUpdateService" />
 
         <meta-data
             android:name="io.sentry.dsn"

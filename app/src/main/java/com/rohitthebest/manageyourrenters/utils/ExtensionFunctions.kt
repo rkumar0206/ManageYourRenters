@@ -174,7 +174,6 @@ fun String?.isValid(): Boolean {
     return this != null
             && this.trim().isNotEmpty()
             && this.trim().isNotBlank()
-            && this.trim() != "null"
 }
 
 inline fun EditText.onTextChangedListener(

@@ -6,11 +6,12 @@ import com.google.firebase.firestore.IgnoreExtraProperties
 data class AppUpdate(
     var version: String,
     var apk_url: String,
-    var whatsNew: HashMap<String, String>?
+    var whatsNew: ArrayList<WhatsNew>?
 ) {
+
     fun isEmpty(): Boolean {
 
-        return version == "" && apk_url == "" && whatsNew == null
+        return version == "" && apk_url == "" && (whatsNew == null || whatsNew!!.isEmpty())
     }
 
     constructor() : this(
@@ -20,4 +21,15 @@ data class AppUpdate(
     )
 
     constructor(version: String, apk_url: String) : this()
+}
+
+data class WhatsNew(
+    var feature: String,
+    var image: String?
+) {
+
+    constructor() : this(
+        "",
+        ""
+    )
 }

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -21,31 +22,25 @@ import com.rohitthebest.manageyourrenters.data.AppUpdate
 import com.rohitthebest.manageyourrenters.data.RenterTypes
 import com.rohitthebest.manageyourrenters.databinding.ActivityHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.others.Constants.APP_UPDATE_SHARED_PREF_KEY
-import com.rohitthebest.manageyourrenters.others.Constants.APP_UPDATE_SHARED_PREF_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.APP_UPDATE_FIRESTORE_COLLECTION_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.APP_UPDATE_FIRESTORE_DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.APP_VERSION
-import com.rohitthebest.manageyourrenters.others.Constants.CHECKED_FOR_APP_UPDATE_SHARED_PREF_KEY
-import com.rohitthebest.manageyourrenters.others.Constants.CHECKED_FOR_APP_UPDATE_SHARED_PREF_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_BORROWERS
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_EMI
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_EXPENSE
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_FRAGMENT_NAME_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_HOUSE_RENTERS
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_MONTHLY_PAYMENTS
-import com.rohitthebest.manageyourrenters.services.AppUpdateService
 import com.rohitthebest.manageyourrenters.ui.ProfileBottomSheet
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.loadBooleanFromSharedPreference
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBooleanToSharedPreference
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.loadAnyValueFromSharedPreference
+import com.rohitthebest.manageyourrenters.utils.convertToJsonString
+import com.rohitthebest.manageyourrenters.utils.getDocumentFromFirestore
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 private const val TAG = "HomeActivity"
 
@@ -65,6 +60,8 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
     private lateinit var renterTypeList: ArrayList<RenterTypes>
     private lateinit var renterTypeAdapter: RenterTypeAdapter
 
+    private var appUpdate: AppUpdate? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -79,7 +76,6 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         if (mAuth.currentUser == null) {
 
             navigateToLoginActivity()
-
         }
 
         initListeners()
@@ -93,25 +89,29 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         handleShortcuts()
 
         // checking for app update
-        if (isInternetAvailable(this) && !loadBooleanFromSharedPreference(
-                this,
-                CHECKED_FOR_APP_UPDATE_SHARED_PREF_NAME,
-                CHECKED_FOR_APP_UPDATE_SHARED_PREF_KEY
-            )
+        if (isInternetAvailable(this)
         ) {
 
-            //starting service to check for updates
-            applicationContext.startService(
-                Intent(
-                    applicationContext,
-                    AppUpdateService::class.java
+            CoroutineScope(Dispatchers.IO).launch {
+
+                getDocumentFromFirestore(
+                    collection = APP_UPDATE_FIRESTORE_COLLECTION_NAME,
+                    documentKey = APP_UPDATE_FIRESTORE_DOCUMENT_KEY,
+                    successListener = { documentSnapshot ->
+
+                        appUpdate = documentSnapshot?.toObject(AppUpdate::class.java)
+                        Log.d(TAG, "onCreate: Successfully fetched app update $appUpdate")
+                    },
+                    failureListener = { ex ->
+
+                        ex.printStackTrace()
+                    }
                 )
-            )
 
-            lifecycleScope.launch {
+                withContext(Dispatchers.Main) {
 
-                delay(250)
-                compareAppVersionFromCloud()
+                    compareAppVersionFromCloud()
+                }
             }
         } else {
 
@@ -121,20 +121,14 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
     private fun compareAppVersionFromCloud() {
 
-        val appUpdate: AppUpdate? = loadAnyValueFromSharedPreference(
-            AppUpdate::class.java,
-            APP_UPDATE_SHARED_PREF_NAME,
-            APP_UPDATE_SHARED_PREF_KEY
-        )
-
-        if (appUpdate != null && !appUpdate.isEmpty()) {
+        if (appUpdate != null && !appUpdate!!.isEmpty()) {
 
             // compare the version
-            if (appUpdate.version != APP_VERSION) {
+            if (appUpdate?.version != APP_VERSION) {
 
                 Log.d(
                     TAG,
-                    "compareAppVersionFromCloud: Version $APP_VERSION does not match with firestore's version ${appUpdate.version}"
+                    "compareAppVersionFromCloud: Version $APP_VERSION does not match with firestore's version ${appUpdate?.version}"
                 )
                 binding.toolbar.menu.findItem(R.id.menu_app_update)
                     .setIcon(R.drawable.ic_update_icon_with_badge)
@@ -188,7 +182,15 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
         binding.toolbar.menu.findItem(R.id.menu_app_update).setOnMenuItemClickListener {
 
-            // todo : open whatsNew activity
+            if (appUpdate != null) {
+
+                val intent = Intent(this, WhatsNewActivity::class.java)
+                intent.putExtra(APP_UPDATE_FIRESTORE_DOCUMENT_KEY, appUpdate.convertToJsonString())
+
+                startActivity(intent)
+            } else {
+                showToast(this, getString(R.string.unable_to_fetch_details), Toast.LENGTH_LONG)
+            }
             true
         }
 
@@ -429,13 +431,6 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
     override fun onDestroy() {
         super.onDestroy()
-
-        saveBooleanToSharedPreference(
-            this,
-            CHECKED_FOR_APP_UPDATE_SHARED_PREF_NAME,
-            CHECKED_FOR_APP_UPDATE_SHARED_PREF_KEY,
-            false
-        )
 
         Log.d(TAG, "onDestroy: Changed the boolean value")
     }

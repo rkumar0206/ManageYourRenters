@@ -88,6 +88,11 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
         handleShortcuts()
 
+        checkForUpdates()
+    }
+
+    private fun checkForUpdates() {
+
         // checking for app update
         if (isInternetAvailable(this)
         ) {
@@ -426,13 +431,5 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         } catch (e: Exception) {
             Log.e(TAG, "saveData: ${e.message}")
         }
-
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        Log.d(TAG, "onDestroy: Changed the boolean value")
-    }
-
 }

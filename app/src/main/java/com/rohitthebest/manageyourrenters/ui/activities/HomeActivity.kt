@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -17,9 +18,13 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
+import com.rohitthebest.manageyourrenters.data.AppUpdate
 import com.rohitthebest.manageyourrenters.data.RenterTypes
 import com.rohitthebest.manageyourrenters.databinding.ActivityHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.APP_UPDATE_FIRESTORE_COLLECTION_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.APP_UPDATE_FIRESTORE_DOCUMENT_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.APP_VERSION
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_BORROWERS
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_EMI
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_EXPENSE
@@ -28,15 +33,14 @@ import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_HOUSE_RENTER
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.ui.ProfileBottomSheet
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
-import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBooleanToSharedPreference
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.convertToJsonString
+import com.rohitthebest.manageyourrenters.utils.getDocumentFromFirestore
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 private const val TAG = "HomeActivity"
 
@@ -56,6 +60,8 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
     private lateinit var renterTypeList: ArrayList<RenterTypes>
     private lateinit var renterTypeAdapter: RenterTypeAdapter
 
+    private var appUpdate: AppUpdate? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -70,11 +76,9 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         if (mAuth.currentUser == null) {
 
             navigateToLoginActivity()
-
         }
 
         initListeners()
-
 
         populateRenterTypeList()
 
@@ -83,6 +87,65 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         renterTypeAdapter.submitList(renterTypeList)
 
         handleShortcuts()
+
+        checkForUpdates()
+    }
+
+    private fun checkForUpdates() {
+
+        // checking for app update
+        if (isInternetAvailable(this)
+        ) {
+
+            CoroutineScope(Dispatchers.IO).launch {
+
+                getDocumentFromFirestore(
+                    collection = APP_UPDATE_FIRESTORE_COLLECTION_NAME,
+                    documentKey = APP_UPDATE_FIRESTORE_DOCUMENT_KEY,
+                    successListener = { documentSnapshot ->
+
+                        appUpdate = documentSnapshot?.toObject(AppUpdate::class.java)
+                        Log.d(TAG, "onCreate: Successfully fetched app update $appUpdate")
+                    },
+                    failureListener = { ex ->
+
+                        ex.printStackTrace()
+                    }
+                )
+
+                withContext(Dispatchers.Main) {
+
+                    compareAppVersionFromCloud()
+                }
+            }
+        } else {
+
+            compareAppVersionFromCloud()
+        }
+    }
+
+    private fun compareAppVersionFromCloud() {
+
+        if (appUpdate != null && !appUpdate!!.isEmpty()) {
+
+            // compare the version
+            if (appUpdate?.version != APP_VERSION) {
+
+                Log.d(
+                    TAG,
+                    "compareAppVersionFromCloud: Version $APP_VERSION does not match with firestore's version ${appUpdate?.version}"
+                )
+                binding.toolbar.menu.findItem(R.id.menu_app_update)
+                    .setIcon(R.drawable.ic_update_icon_with_badge)
+            } else {
+                binding.toolbar.menu.findItem(R.id.menu_app_update)
+                    .setIcon(R.drawable.ic_round_upgrade_24)
+            }
+        } else {
+
+            binding.toolbar.menu.findItem(R.id.menu_app_update)
+                .setIcon(R.drawable.ic_round_upgrade_24)
+        }
     }
 
     private fun handleShortcuts() {
@@ -119,6 +182,20 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         binding.toolbar.menu.findItem(R.id.menu_profile).setOnMenuItemClickListener {
 
             showBottomSheetProfileDialog()
+            true
+        }
+
+        binding.toolbar.menu.findItem(R.id.menu_app_update).setOnMenuItemClickListener {
+
+            if (appUpdate != null) {
+
+                val intent = Intent(this, WhatsNewActivity::class.java)
+                intent.putExtra(APP_UPDATE_FIRESTORE_DOCUMENT_KEY, appUpdate.convertToJsonString())
+
+                startActivity(intent)
+            } else {
+                showToast(this, getString(R.string.unable_to_fetch_details), Toast.LENGTH_LONG)
+            }
             true
         }
 
@@ -332,7 +409,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
         try {
 
-            Functions.saveBooleanToSharedPreference(
+            saveBooleanToSharedPreference(
                 this,
                 Constants.IS_SYNCED_SHARED_PREF_NAME,
                 Constants.IS_SYNCED_SHARED_PREF_KEY,
@@ -354,7 +431,5 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         } catch (e: Exception) {
             Log.e(TAG, "saveData: ${e.message}")
         }
-
     }
-
 }

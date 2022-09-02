@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.utils
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
@@ -207,4 +208,33 @@ suspend fun getDataFromFireStore(
         e.printStackTrace()
         null
     }
+}
+
+suspend fun getDocumentFromFirestore(
+    collection: String,
+    documentKey: String,
+    successListener: (DocumentSnapshot?) -> Unit,
+    failureListener: (Exception) -> Unit
+): DocumentSnapshot? {
+
+    return try {
+
+        FirebaseFirestore.getInstance()
+            .collection(collection)
+            .document(documentKey)
+            .get()
+            .addOnSuccessListener {
+                successListener(it)
+            }
+            .addOnFailureListener {
+                failureListener(it)
+            }
+            .await()
+
+    } catch (e: java.lang.Exception) {
+
+        e.printStackTrace()
+        null
+    }
+
 }

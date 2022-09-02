@@ -184,7 +184,7 @@ class Functions {
         }
 
         fun saveBooleanToSharedPreference(
-            activity: Activity,
+            context: Context,
             sharedPrefName: String,
             key: String,
             value: Boolean
@@ -192,7 +192,7 @@ class Functions {
 
             try {
                 val sharedPreferences =
-                    activity.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
+                    context.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
 
                 val edit = sharedPreferences.edit()
 

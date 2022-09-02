@@ -946,7 +946,20 @@ class Functions {
 
                     else -> ""
                 }
-                PendingIntent.getActivity(context, 0, notificationIntent, 0)
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+
+                    PendingIntent.getActivity(
+                        context,
+                        0,
+                        notificationIntent,
+                        PendingIntent.FLAG_IMMUTABLE
+                    )
+                } else {
+
+                    PendingIntent.getActivity(context, 0, notificationIntent, 0)
+                }
+
             }
         }
 

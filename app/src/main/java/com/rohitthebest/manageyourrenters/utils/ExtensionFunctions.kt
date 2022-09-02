@@ -1,6 +1,5 @@
 package com.rohitthebest.manageyourrenters.utils
 
-import android.app.Activity
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
@@ -59,7 +58,7 @@ fun View.invisible() {
     }
 }
 
-fun <T> Activity.saveAnyObjectToSharedPreference(
+fun <T> Context.saveAnyObjectToSharedPreference(
     sharedPrefName: String,
     key: String,
     value: T
@@ -83,7 +82,7 @@ fun <T> Activity.saveAnyObjectToSharedPreference(
     }
 }
 
-fun <T> Activity.loadAnyValueFromSharedPreference(
+fun <T> Context.loadAnyValueFromSharedPreference(
     type: Class<T>,
     sharedPrefName: String,
     key: String

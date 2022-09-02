@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable-v24/ic_outline_error_outline_24.xml" value="0.25052083333333336" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/badge.xml" value="0.152" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/expense_shortcut_icon.xml" value="0.24114583333333334" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_app_launcher_logo_foreground.xml" value="0.24114583333333334" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_attach_money_24.xml" value="0.13125" />
@@ -15,8 +16,11 @@
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_person_24.xml" value="0.13125" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_document.xml" value="0.25052083333333336" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_outline_drive_file_move_24.xml" value="0.1335" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_round_upgrade_24.xml" value="0.152" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_splash_image.xml" value="0.24114583333333334" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_update_icon_with_badge.xml" value="0.152" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/splash_screen.xml" value="0.24114583333333334" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/upload_with_badge.xml" value="0.152" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout-v26/fragment_deep_analyze_expense.xml" value="0.22083333333333333" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/activity_borrower.xml" value="0.2257405515832482" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/activity_graph.xml" value="0.23020833333333332" />
@@ -45,6 +49,7 @@
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_supporting_document_layout.xml" value="0.23020833333333332" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/calculate_interest_bottom_sheet_layout.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/choose_expense_category_bottom_sheet_layout.xml" value="0.22083333333333333" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/custom_action_item_layout_updates.xml" value="0.22083333333333333" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/custom_menu_bottomsheet_layout.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/emi_details_layout.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/emi_menu_bottomsheet_layout.xml" value="0.23020833333333332" />

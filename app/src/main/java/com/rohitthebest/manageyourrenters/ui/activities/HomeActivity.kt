@@ -17,21 +17,30 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
+import com.rohitthebest.manageyourrenters.data.AppUpdate
 import com.rohitthebest.manageyourrenters.data.RenterTypes
 import com.rohitthebest.manageyourrenters.databinding.ActivityHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.APP_UPDATE_SHARED_PREF_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.APP_UPDATE_SHARED_PREF_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.APP_VERSION
+import com.rohitthebest.manageyourrenters.others.Constants.CHECKED_FOR_APP_UPDATE_SHARED_PREF_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.CHECKED_FOR_APP_UPDATE_SHARED_PREF_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_BORROWERS
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_EMI
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_EXPENSE
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_FRAGMENT_NAME_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_HOUSE_RENTERS
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_MONTHLY_PAYMENTS
+import com.rohitthebest.manageyourrenters.services.AppUpdateService
 import com.rohitthebest.manageyourrenters.ui.ProfileBottomSheet
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
-import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.loadBooleanFromSharedPreference
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBooleanToSharedPreference
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.loadAnyValueFromSharedPreference
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -75,7 +84,6 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
         initListeners()
 
-
         populateRenterTypeList()
 
         renterTypeAdapter = RenterTypeAdapter()
@@ -83,6 +91,62 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         renterTypeAdapter.submitList(renterTypeList)
 
         handleShortcuts()
+
+        // checking for app update
+        if (isInternetAvailable(this) && !loadBooleanFromSharedPreference(
+                this,
+                CHECKED_FOR_APP_UPDATE_SHARED_PREF_NAME,
+                CHECKED_FOR_APP_UPDATE_SHARED_PREF_KEY
+            )
+        ) {
+
+            //starting service to check for updates
+            applicationContext.startService(
+                Intent(
+                    applicationContext,
+                    AppUpdateService::class.java
+                )
+            )
+
+            lifecycleScope.launch {
+
+                delay(250)
+                compareAppVersionFromCloud()
+            }
+        } else {
+
+            compareAppVersionFromCloud()
+        }
+    }
+
+    private fun compareAppVersionFromCloud() {
+
+        val appUpdate: AppUpdate? = loadAnyValueFromSharedPreference(
+            AppUpdate::class.java,
+            APP_UPDATE_SHARED_PREF_NAME,
+            APP_UPDATE_SHARED_PREF_KEY
+        )
+
+        if (appUpdate != null && !appUpdate.isEmpty()) {
+
+            // compare the version
+            if (appUpdate.version != APP_VERSION) {
+
+                Log.d(
+                    TAG,
+                    "compareAppVersionFromCloud: Version $APP_VERSION does not match with firestore's version ${appUpdate.version}"
+                )
+                binding.toolbar.menu.findItem(R.id.menu_app_update)
+                    .setIcon(R.drawable.ic_update_icon_with_badge)
+            } else {
+                binding.toolbar.menu.findItem(R.id.menu_app_update)
+                    .setIcon(R.drawable.ic_round_upgrade_24)
+            }
+        } else {
+
+            binding.toolbar.menu.findItem(R.id.menu_app_update)
+                .setIcon(R.drawable.ic_round_upgrade_24)
+        }
     }
 
     private fun handleShortcuts() {
@@ -119,6 +183,12 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         binding.toolbar.menu.findItem(R.id.menu_profile).setOnMenuItemClickListener {
 
             showBottomSheetProfileDialog()
+            true
+        }
+
+        binding.toolbar.menu.findItem(R.id.menu_app_update).setOnMenuItemClickListener {
+
+            // todo : open whatsNew activity
             true
         }
 
@@ -332,7 +402,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
         try {
 
-            Functions.saveBooleanToSharedPreference(
+            saveBooleanToSharedPreference(
                 this,
                 Constants.IS_SYNCED_SHARED_PREF_NAME,
                 Constants.IS_SYNCED_SHARED_PREF_KEY,
@@ -355,6 +425,19 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
             Log.e(TAG, "saveData: ${e.message}")
         }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        saveBooleanToSharedPreference(
+            this,
+            CHECKED_FOR_APP_UPDATE_SHARED_PREF_NAME,
+            CHECKED_FOR_APP_UPDATE_SHARED_PREF_KEY,
+            false
+        )
+
+        Log.d(TAG, "onDestroy: Changed the boolean value")
     }
 
 }

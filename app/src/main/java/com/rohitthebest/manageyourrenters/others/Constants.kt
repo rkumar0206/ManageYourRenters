@@ -11,7 +11,7 @@ object Constants {
     const val RC_SIGN_IN = 1001
     const val EDIT_TEXT_EMPTY_MESSAGE = "*This is a mandatory field...!!"
 
-    // databases name
+    // ----- databases name RELATED---------
     const val RENTER_AND_PAYMENT_DATABASE_NAME = "renter_and_payment_database.db"
     const val BORROWER_DATABASE_NAME = "borrowerdatabase.db"
     const val BORROWER_PAYMENT_DATABASE_NAME = "borrowerpaymentdatabase.db"
@@ -19,6 +19,7 @@ object Constants {
     const val EMI_DATABASE_NAME = "emi_database.db"
     const val EXPENSE_DATABASE_NAME = "expense_database.db"
     const val MONTHLY_PAYMENT_DATABASE_NAME = "monthly_payment_db"
+    //----------------------------
 
     const val NOTIFICATION_CHANNEL_ID = "NotificationChannelID"
 
@@ -29,17 +30,12 @@ object Constants {
     const val RANDOM_ID_KEY = "RANDOM_ID_KEY_sdjhdsdvjkbvbavbhbvhjbhjbvdb"
     const val KEY_LIST_KEY = "KEY_LIST_KEY_fdhvjkhjkvkjvkbvk"
     const val DELETE_FILE_FROM_FIREBASE_KEY = "DELETE_FILE_FROM_FIREBASE_KEY_sjvvbibisbvbaib"
-    const val FILE_URI_KEY = "sdjcjncjsbcjhbcu"
-    const val COLLECTION_TAG_KEY = "tagdcbcnkascbabua"
-    const val FILE_NAME_KEY = "FILE_cnsjcbhsbchsb"
-    const val IS_DOCUMENT_FOR_EDITING_KEY = "isDocumentForEditing"
 
     const val IS_SYNCED_SHARED_PREF_NAME = "IS_SYNCED_SHARED_PREF_NAME_fdkdnf"
     const val IS_SYNCED_SHARED_PREF_KEY = "IS_SYNCED_SHARED_PREF_KEY_fkjdvkjdbdnf"
     const val CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_NAME = "djbbbwebhbBKJBJBSHBHBJbbsjb"
     const val CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_KEY = "sbjsbbhjsbhbyguqyJBABBHJBkbnd"
 
-    const val SUPPORTING_DOCUMENT_BOTTOM_SHEET_DISMISS_LISTENER_KEY = "dcsnckjkscn"
     const val SUPPORTING_DOCUMENT_HELPER_MODEL_KEY = "dsbjsbjhbuyavvu"
 
     const val SHOW_EDIT_MENU = "SHOW_EDIT_MENU_sjcjwncjkn"
@@ -69,4 +65,12 @@ object Constants {
     const val SHORTCUT_MONTHLY_PAYMENTS = "com.rohitthebest.manageyourrenters.monthly_payments"
     const val SHORTCUT_EMI = "com.rohitthebest.manageyourrenters.emis"
 
+    // app update related
+    const val APP_VERSION = "3.6.0"
+    const val APP_UPDATE_FIRESTORE_COLLECTION_NAME = "AppUpdates"
+    const val APP_UPDATE_FIRESTORE_DOCUMENT_KEY = "app_update_info_6367_&*#%"
+    const val APP_UPDATE_SHARED_PREF_KEY = "3c6c5f40-0962-451e-81ef-1f168cf769d0"
+    const val APP_UPDATE_SHARED_PREF_NAME = "APP_UPDATE_SHARED_PREF"
+    const val CHECKED_FOR_APP_UPDATE_SHARED_PREF_NAME = "CHECKED_FOR_APP_UPDATE_SHARED_PREF"
+    const val CHECKED_FOR_APP_UPDATE_SHARED_PREF_KEY = "f296253c-3128-4f6f-8ddf-dbb49bae8999"
 }

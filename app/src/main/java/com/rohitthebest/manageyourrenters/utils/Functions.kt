@@ -482,7 +482,7 @@ class Functions {
             }
         }
 
-        private fun openLinkInBrowser(context: Context, url: String) {
+        fun openLinkInBrowser(context: Context, url: String) {
 
             if (isInternetAvailable(context)) {
 

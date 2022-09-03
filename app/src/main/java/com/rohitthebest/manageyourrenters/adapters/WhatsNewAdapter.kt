@@ -1,6 +1,9 @@
 package com.rohitthebest.manageyourrenters.adapters
 
 import android.graphics.Typeface
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.UnderlineSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -24,8 +27,15 @@ class WhatsNewAdapter :
 
         init {
 
-            binding.root.setOnClickListener {
+            binding.whatsNewTV.setOnClickListener {
 
+                if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
+
+                    mListener!!.onItemClick(getItem(absoluteAdapterPosition))
+                }
+            }
+
+            binding.whatsNewExpandBtn.setOnClickListener {
                 if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
 
                     mListener!!.onItemClick(getItem(absoluteAdapterPosition))
@@ -51,6 +61,22 @@ class WhatsNewAdapter :
                         whatsNewTV.setTypeface(null, Typeface.NORMAL)
                         whatsNewTV.textSize = 16f
                         whatsNewTV.text = new.feature
+                    }
+
+                    if (new.feature.startsWith("https") || new.feature.startsWith("http")) {
+
+                        whatsNewTV.changeTextColor(binding.root.context, R.color.blue_text_color)
+                        val span = UnderlineSpan()
+                        val spannableStringBuilder = SpannableStringBuilder(new.feature)
+
+                        spannableStringBuilder.setSpan(
+                            span,
+                            0,
+                            new.feature.length,
+                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+
+                        whatsNewTV.text = spannableStringBuilder
                     }
 
                     if (new.image.isValid()) {

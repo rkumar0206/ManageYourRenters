@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.databinding.ActivityWhatsNewBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.APP_VERSION
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.openLinkInBrowser
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
 import com.rohitthebest.manageyourrenters.utils.downloadFileFromUrl
@@ -100,6 +101,11 @@ class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
     }
 
     override fun onItemClick(whatsNew: WhatsNew) {
+
+        if (whatsNew.feature.startsWith("https") || whatsNew.feature.startsWith("http")) {
+
+            openLinkInBrowser(this, whatsNew.feature)
+        }
 
         // todo : show image in image activity or fragment
     }

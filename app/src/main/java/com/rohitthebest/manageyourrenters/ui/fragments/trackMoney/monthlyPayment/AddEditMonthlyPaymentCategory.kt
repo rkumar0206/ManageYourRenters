@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.unsplashAdapters.UnsplashSearchResultsAdapter
 import com.rohitthebest.manageyourrenters.data.UnsplashPhoto
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
 import com.rohitthebest.manageyourrenters.databinding.AddMonthlyPaymentCategoryLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditMonthlyPaymentCategoryBinding
 import com.rohitthebest.manageyourrenters.others.Constants

@@ -43,7 +43,7 @@ import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.B
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWER_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMI_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMIs
-import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE_CATEGORIES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENT_CATEGORIES
@@ -952,7 +952,7 @@ class Functions {
                     EMIs -> Constants.SHORTCUT_EMI
                     EMI_PAYMENTS -> Constants.SHORTCUT_EMI
                     EXPENSE_CATEGORIES -> Constants.SHORTCUT_EXPENSE
-                    EXPENSE -> Constants.SHORTCUT_EXPENSE
+                    EXPENSES -> Constants.SHORTCUT_EXPENSE
                     MONTHLY_PAYMENT_CATEGORIES -> Constants.SHORTCUT_MONTHLY_PAYMENTS
                     MONTHLY_PAYMENTS -> Constants.SHORTCUT_MONTHLY_PAYMENTS
 

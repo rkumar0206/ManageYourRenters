@@ -1,13 +1,6 @@
 package com.rohitthebest.manageyourrenters.utils
 
-import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
-import com.rohitthebest.manageyourrenters.database.model.EMI
-import com.rohitthebest.manageyourrenters.database.model.EMIPayment
-import com.rohitthebest.manageyourrenters.database.model.RenterPayment
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.*
 
 /**
  * This class helps to compare the main fields of

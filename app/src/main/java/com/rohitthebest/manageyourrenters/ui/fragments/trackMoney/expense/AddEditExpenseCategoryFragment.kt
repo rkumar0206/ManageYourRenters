@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.unsplashAdapters.UnsplashSearchResultsAdapter
 import com.rohitthebest.manageyourrenters.data.UnsplashPhoto
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.AddExpenseCategoryLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseCategoryBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE

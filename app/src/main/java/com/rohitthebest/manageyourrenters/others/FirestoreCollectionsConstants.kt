@@ -2,7 +2,7 @@ package com.rohitthebest.manageyourrenters.others
 
 object FirestoreCollectionsConstants {
 
-    const val EXPENSE = "Expenses"
+    const val EXPENSES = "Expenses"
     const val EXPENSE_CATEGORIES = "ExpenseCategories"
     const val MONTHLY_PAYMENTS = "MonthlyPayments"
     const val MONTHLY_PAYMENT_CATEGORIES = "MonthlyPaymentCategories"

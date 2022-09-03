@@ -1,7 +1,7 @@
 package com.rohitthebest.manageyourrenters.database.dao
 
 import androidx.room.*
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
+import com.rohitthebest.manageyourrenters.database.model.Expense
 import kotlinx.coroutines.flow.Flow
 
 @Dao

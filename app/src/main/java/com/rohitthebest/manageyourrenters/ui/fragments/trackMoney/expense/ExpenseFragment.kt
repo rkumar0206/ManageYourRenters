@@ -13,8 +13,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.ExpenseAdapter
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.Expense
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems

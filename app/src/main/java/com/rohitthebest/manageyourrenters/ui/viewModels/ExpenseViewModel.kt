@@ -3,9 +3,9 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
+import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -32,7 +32,7 @@ class ExpenseViewModel @Inject constructor(
 
                 uploadDocumentToFireStore(
                     context,
-                    EXPENSE,
+                    EXPENSES,
                     expense.key
                 )
 
@@ -61,7 +61,7 @@ class ExpenseViewModel @Inject constructor(
                 updateDocumentOnFireStore(
                     context,
                     compareExpenseModel(oldValue, newValue),
-                    EXPENSE,
+                    EXPENSES,
                     oldValue.key
                 )
 
@@ -83,7 +83,7 @@ class ExpenseViewModel @Inject constructor(
 
             deleteDocumentFromFireStore(
                 context,
-                EXPENSE,
+                EXPENSES,
                 expense.key
             )
         }
@@ -94,6 +94,10 @@ class ExpenseViewModel @Inject constructor(
 
     fun deleteAllExpenses() = viewModelScope.launch {
         expenseRepository.deleteAllExpenses()
+    }
+
+    fun deleteAllExpensesByIsSynced(isSynced: Boolean) = viewModelScope.launch {
+        expenseRepository.deleteExpenseByIsSynced(isSynced)
     }
 
     fun getAllExpenses() = expenseRepository.getAllExpenses().asLiveData()

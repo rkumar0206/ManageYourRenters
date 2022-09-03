@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.monthlyPaymentAdapters.MonthlyPaymentAdapter
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentMonthlyPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems

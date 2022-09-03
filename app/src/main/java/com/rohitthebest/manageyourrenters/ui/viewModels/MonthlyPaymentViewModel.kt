@@ -4,9 +4,9 @@ import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentDateTimeInfo
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentDateTimeInfo
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.*
@@ -111,6 +111,11 @@ class MonthlyPaymentViewModel @Inject constructor(
             repository.deleteMonthlyPayment(monthlyPayment)
             Functions.showToast(context, "Payment deleted")
         }
+
+    fun deleteAllMonthlyPaymentByIsSynced(isSynced: Boolean) = viewModelScope.launch {
+
+        repository.deleteAllMonthlyPaymentByIsSynced(isSynced)
+    }
 
     fun getAllMonthlyPaymentsByCategoryKey(categoryKey: String) =
         repository.getAllMonthlyPaymentsByCategoryKey(categoryKey).asLiveData()

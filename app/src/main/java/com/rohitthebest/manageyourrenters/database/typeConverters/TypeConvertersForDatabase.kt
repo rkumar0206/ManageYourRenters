@@ -4,9 +4,9 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.data.*
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentDateTimeInfo
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentDateTimeInfo
 import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
 import com.rohitthebest.manageyourrenters.utils.convertToJsonString
 

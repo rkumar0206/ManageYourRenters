@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.ChooseExpenseCategoryAdapter
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.ChooseExpenseCategoryBottomSheetLayoutBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import dagger.hilt.android.AndroidEntryPoint

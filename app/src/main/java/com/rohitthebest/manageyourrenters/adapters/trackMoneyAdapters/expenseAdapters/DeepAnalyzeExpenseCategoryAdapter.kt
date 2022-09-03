@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.ItemDeepAnalyzeExpenseCategoryBinding
 import com.rohitthebest.manageyourrenters.utils.Functions
 

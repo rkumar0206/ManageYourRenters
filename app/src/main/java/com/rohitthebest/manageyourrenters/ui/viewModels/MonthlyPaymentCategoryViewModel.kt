@@ -3,7 +3,7 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.*
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENT_CATEGORIES
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentCategoryRepository
@@ -151,7 +151,6 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
     }
 
     fun deleteAllMonthlyPaymentCategoriesByIsSynced(isSynced: Boolean) = viewModelScope.launch {
-        monthlyPaymentRepository.deleteAllMonthlyPaymentByIsSynced(isSynced)
         repository.deleteAllMonthlyPaymentCategoriesByIsSynced(isSynced)
     }
 

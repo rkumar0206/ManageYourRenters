@@ -1,7 +1,7 @@
 package com.rohitthebest.manageyourrenters.repositories
 
 import com.rohitthebest.manageyourrenters.database.dao.MonthlyPaymentDao
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
 import javax.inject.Inject
 
 class MonthlyPaymentRepository @Inject constructor(

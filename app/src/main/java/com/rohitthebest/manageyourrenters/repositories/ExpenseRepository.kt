@@ -1,7 +1,7 @@
 package com.rohitthebest.manageyourrenters.repositories
 
 import com.rohitthebest.manageyourrenters.database.dao.ExpenseDAO
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
+import com.rohitthebest.manageyourrenters.database.model.Expense
 import javax.inject.Inject
 
 class ExpenseRepository @Inject constructor(

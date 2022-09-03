@@ -3,8 +3,8 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.*
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
-import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE_CATEGORIES
 import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
@@ -129,7 +129,7 @@ class ExpenseCategoryViewModel @Inject constructor(
 
                     deleteAllDocumentsUsingKeyFromFirestore(
                         context,
-                        EXPENSE,
+                        EXPENSES,
                         convertStringListToJSON(expenseKeys)
                     )
                 }
@@ -144,6 +144,11 @@ class ExpenseCategoryViewModel @Inject constructor(
 
         expenseCategoryRepository.deleteAllExpenseCategories()
         expenseRepository.deleteAllExpenses()
+    }
+
+    fun deleteExpenseCategoryByIsSyncedValue(isSynced: Boolean) = viewModelScope.launch {
+
+        expenseCategoryRepository.deleteAllExpenseCategoriesByIsSynced(isSynced)
     }
 
     fun getExpenseCategoryByKey(key: String) =

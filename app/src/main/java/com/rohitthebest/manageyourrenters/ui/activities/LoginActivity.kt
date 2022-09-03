@@ -19,6 +19,17 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.*
 import com.rohitthebest.manageyourrenters.databinding.ActivityLoginBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWERS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWER_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMI_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMIs
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE_CATEGORIES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENT_CATEGORIES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.PARTIAL_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTERS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTER_PAYMENTS
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
@@ -41,6 +52,10 @@ class LoginActivity : AppCompatActivity() {
     private val partialPaymentViewModel by viewModels<PartialPaymentViewModel>()
     private val emiViewModel by viewModels<EMIViewModel>()
     private val emiPaymentViewModel by viewModels<EMIPaymentViewModel>()
+    private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
+    private val expenseViewModel by viewModels<ExpenseViewModel>()
+    private val monthlyPaymentCategoryViewModel by viewModels<MonthlyPaymentCategoryViewModel>()
+    private val monthlyPaymentViewModel by viewModels<MonthlyPaymentViewModel>()
 
     private lateinit var mAuth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -70,13 +85,6 @@ class LoginActivity : AppCompatActivity() {
             Constants.IS_SYNCED_SHARED_PREF_NAME,
             Constants.IS_SYNCED_SHARED_PREF_KEY
         )
-
-        if (mAuth.currentUser != null && !isSynced) {
-
-            // todo : call the methods while syncing with firestore
-            syncMonthlyPayments()
-            syncExpenses()
-        }
 
         initListeners()
     }
@@ -149,10 +157,7 @@ class LoginActivity : AppCompatActivity() {
                         Log.d(TAG, "signInWithCredential:success")
 
                         showToast(this, "SignIn successful")
-
-                        syncMonthlyPayments()
-                        syncExpenses()
-
+                        syncRenters()
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.exception)
@@ -170,24 +175,6 @@ class LoginActivity : AppCompatActivity() {
 
     //[START OF SYNC]
 
-    private fun syncMonthlyPayments() {
-
-        if (isInternetAvailable(this)) {
-
-            //todo :
-        }
-    }
-
-    private fun syncExpenses() {
-
-        if (isInternetAvailable(this)) {
-
-            // todo :
-        }
-
-        syncRenters()
-    }
-
     @SuppressLint("SetTextI18n")
     private fun syncRenters() {
 
@@ -204,7 +191,7 @@ class LoginActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.IO).launch {
 
                 val renters = getDataFromFireStore(
-                    collection = getString(R.string.renters),
+                    collection = RENTERS,
                     uid = getUid()!!
                 ) {
 
@@ -250,7 +237,7 @@ class LoginActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) {
 
             val renterPayments = getDataFromFireStore(
-                collection = getString(R.string.renter_payments),
+                collection = RENTER_PAYMENTS,
                 uid = getUid()!!
             ) {
                 lifecycleScope.launch {
@@ -294,7 +281,7 @@ class LoginActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) {
 
             val borrowers = getDataFromFireStore(
-                getString(R.string.borrowers),
+                BORROWERS,
                 getUid()!!,
             ) {
                 showToast(this@LoginActivity, "Something went wrong.")
@@ -334,7 +321,7 @@ class LoginActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) {
 
             val borrowerPayments = getDataFromFireStore(
-                getString(R.string.borrowerPayments),
+                BORROWER_PAYMENTS,
                 getUid()!!,
             ) {
 
@@ -375,7 +362,7 @@ class LoginActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) {
 
             val partialPayments = getDataFromFireStore(
-                getString(R.string.partialPayments),
+                PARTIAL_PAYMENTS,
                 getUid()!!
             ) {
                 showToast(this@LoginActivity, "Something went wrong.")
@@ -411,7 +398,7 @@ class LoginActivity : AppCompatActivity() {
         binding.showSyncingInfoTV.text = getString(R.string.sync_emis)
 
         val emis = getDataFromFireStore(
-            getString(R.string.emis),
+            EMIs,
             getUid()!!,
         ) {
             Log.e(TAG, "syncEMIS: $it")
@@ -438,7 +425,7 @@ class LoginActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
 
                     emiViewModel.deleteEMIsByIsSynced(true)
-                    saveIsSyncedValueAndNavigateToHomeActivity()
+                    syncExpenseCategory()
                 }
             }
         }
@@ -450,7 +437,7 @@ class LoginActivity : AppCompatActivity() {
         binding.showSyncingInfoTV.text = getString(R.string.sync_emi_payments)
 
         val emiPayments = getDataFromFireStore(
-            getString(R.string.emiPayments),
+            EMI_PAYMENTS,
             getUid()!!,
         ) {
             Log.e(TAG, "syncEMIPayments: $it")
@@ -469,7 +456,7 @@ class LoginActivity : AppCompatActivity() {
                     delay(50)
                     emiPaymentViewModel.insertAllEMIPayment(emiPayments.toObjects(EMIPayment::class.java))
 
-                    saveIsSyncedValueAndNavigateToHomeActivity()
+                    syncExpenseCategory()
                 }
 
             } else {
@@ -477,14 +464,179 @@ class LoginActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
 
                     emiPaymentViewModel.deleteEMIPaymentsByIsSynced(true)
+                    syncExpenseCategory()
+                }
+            }
+        }
+    }
+
+    private suspend fun syncExpenseCategory() {
+
+        binding.showSyncingInfoTV.text = getString(R.string.sync_expense)
+
+        val expenseCategory = getDataFromFireStore(
+            EXPENSE_CATEGORIES,
+            getUid()!!,
+        ) {
+            Log.d(TAG, "syncExpenseCategory: $it")
+            showToast(this@LoginActivity, "Something went wrong...")
+
+            saveIsSyncedValueAndNavigateToHomeActivity()
+        }
+
+        expenseCategory?.let {
+
+            if (expenseCategory.size() != 0) {
+
+                withContext(Dispatchers.Main) {
+
+                    expenseCategoryViewModel.deleteExpenseCategoryByIsSyncedValue(true)
+                    delay(50)
+                    expenseCategoryViewModel.insertAllExpenseCategory(
+                        expenseCategory.toObjects(
+                            ExpenseCategory::class.java
+                        )
+                    )
+
+                    syncExpenses()
+                }
+
+            } else {
+
+                withContext(Dispatchers.Main) {
+
+                    expenseCategoryViewModel.deleteExpenseCategoryByIsSyncedValue(true)
+                    syncMonthlyPaymentsCategory()
+                }
+            }
+        }
+    }
+
+    private suspend fun syncExpenses() {
+
+        val expenses = getDataFromFireStore(
+            EXPENSES,
+            getUid()!!,
+        ) {
+            Log.d(TAG, "syncExpenses: $it")
+            showToast(this@LoginActivity, "Something went wrong...")
+
+            saveIsSyncedValueAndNavigateToHomeActivity()
+        }
+
+        expenses?.let {
+
+            if (expenses.size() != 0) {
+
+                withContext(Dispatchers.Main) {
+
+                    expenseViewModel.deleteAllExpensesByIsSynced(true)
+                    delay(50)
+                    expenseViewModel.insertAllExpense(
+                        expenses.toObjects(
+                            Expense::class.java
+                        )
+                    )
+
+                    syncMonthlyPaymentsCategory()
+                }
+
+            } else {
+
+                withContext(Dispatchers.Main) {
+
+                    expenseViewModel.deleteAllExpensesByIsSynced(true)
+                    syncMonthlyPaymentsCategory()
+                }
+            }
+        }
+    }
+
+    private suspend fun syncMonthlyPaymentsCategory() {
+
+        binding.showSyncingInfoTV.text = getString(R.string.sync_monthly_payment)
+
+        val monthlyPaymentCategories = getDataFromFireStore(
+            MONTHLY_PAYMENT_CATEGORIES,
+            getUid()!!,
+        ) {
+
+            Log.d(TAG, "syncMonthlyPaymentsCategory: $it")
+            showToast(this@LoginActivity, "Something went wrong...")
+            saveIsSyncedValueAndNavigateToHomeActivity()
+        }
+
+        monthlyPaymentCategories?.let {
+
+            if (monthlyPaymentCategories.size() != 0) {
+
+                withContext(Dispatchers.Main) {
+
+                    monthlyPaymentCategoryViewModel.deleteAllMonthlyPaymentCategoriesByIsSynced(true)
+                    delay(50)
+                    monthlyPaymentCategoryViewModel.insertAllMonthlyPaymentCategory(
+                        monthlyPaymentCategories.toObjects(
+                            MonthlyPaymentCategory::class.java
+                        )
+                    )
+
+                    syncMonthlyPayments()
+                }
+
+            } else {
+
+                withContext(Dispatchers.Main) {
+
+                    monthlyPaymentCategoryViewModel.deleteAllMonthlyPaymentCategoriesByIsSynced(true)
                     saveIsSyncedValueAndNavigateToHomeActivity()
                 }
             }
         }
-
-
     }
 
+    private suspend fun syncMonthlyPayments() {
+
+        binding.showSyncingInfoTV.text = getString(R.string.sync_monthly_payment)
+
+        val monthlyPayments = getDataFromFireStore(
+            MONTHLY_PAYMENTS,
+            getUid()!!,
+        ) {
+
+            Log.d(TAG, "syncMonthlyPayments: $it")
+            showToast(this@LoginActivity, "Something went wrong...")
+            saveIsSyncedValueAndNavigateToHomeActivity()
+        }
+
+        monthlyPayments?.let {
+
+            if (monthlyPayments.size() != 0) {
+
+                withContext(Dispatchers.Main) {
+
+                    monthlyPaymentViewModel.deleteAllMonthlyPaymentByIsSynced(true)
+                    delay(50)
+                    monthlyPaymentViewModel.insertAllMonthlyPayment(
+                        monthlyPayments.toObjects(
+                            MonthlyPayment::class.java
+                        )
+                    )
+
+                    saveIsSyncedValueAndNavigateToHomeActivity()
+                }
+
+            } else {
+
+                withContext(Dispatchers.Main) {
+
+                    monthlyPaymentViewModel.deleteAllMonthlyPaymentByIsSynced(true)
+                    saveIsSyncedValueAndNavigateToHomeActivity()
+                }
+            }
+        }
+    }
+
+    //[END OF SYNC]
 
     private fun saveIsSyncedValueAndNavigateToHomeActivity() {
 

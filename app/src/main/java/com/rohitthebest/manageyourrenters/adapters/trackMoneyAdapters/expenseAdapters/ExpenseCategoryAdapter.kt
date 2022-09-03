@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.ItemExpenseCategoryBinding
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setImageToImageViewUsingGlide
 import com.rohitthebest.manageyourrenters.utils.hide

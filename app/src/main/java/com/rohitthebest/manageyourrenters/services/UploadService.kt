@@ -10,10 +10,6 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.*
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
@@ -22,7 +18,7 @@ import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.B
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWER_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMI_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMIs
-import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE_CATEGORIES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENT_CATEGORIES
@@ -137,7 +133,7 @@ class UploadService : Service() {
                     model = expenseCategoryRepository.getExpenseCategoryByKey(key).first()
                 }
 
-                EXPENSE -> {
+                EXPENSES -> {
                     model = expenseRepository.getExpenseByKey(key).first()
                 }
 
@@ -227,7 +223,7 @@ class UploadService : Service() {
                     expenseCategoryRepository.updateExpenseCategory(expenseCategory)
                 }
 
-                EXPENSE -> {
+                EXPENSES -> {
 
                     val expense = document as Expense
                     expense.isSynced = isSyncedValue

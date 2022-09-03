@@ -39,6 +39,16 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.NO_INTERNET_MESSAGE
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWERS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWER_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMI_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMIs
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE_CATEGORIES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENT_CATEGORIES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTERS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTER_PAYMENTS
 import com.rohitthebest.manageyourrenters.ui.activities.HomeActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -935,14 +945,16 @@ class Functions {
 
                 notificationIntent.action = when (modelCollectionName) {
 
-                    context.getString(R.string.borrowers) -> Constants.SHORTCUT_BORROWERS
-                    context.getString(R.string.renters) -> Constants.SHORTCUT_HOUSE_RENTERS
-                    context.getString(R.string.borrowerPayments) -> Constants.SHORTCUT_BORROWERS
-                    context.getString(R.string.renter_payments) -> Constants.SHORTCUT_HOUSE_RENTERS
-                    context.getString(R.string.emis) -> Constants.SHORTCUT_EMI
-                    context.getString(R.string.emiPayments) -> Constants.SHORTCUT_EMI
-                    context.getString(R.string.expenses) -> Constants.SHORTCUT_EXPENSE
-                    context.getString(R.string.monthly_payments) -> Constants.SHORTCUT_MONTHLY_PAYMENTS
+                    BORROWERS -> Constants.SHORTCUT_BORROWERS
+                    RENTERS -> Constants.SHORTCUT_HOUSE_RENTERS
+                    BORROWER_PAYMENTS -> Constants.SHORTCUT_BORROWERS
+                    RENTER_PAYMENTS -> Constants.SHORTCUT_HOUSE_RENTERS
+                    EMIs -> Constants.SHORTCUT_EMI
+                    EMI_PAYMENTS -> Constants.SHORTCUT_EMI
+                    EXPENSE_CATEGORIES -> Constants.SHORTCUT_EXPENSE
+                    EXPENSE -> Constants.SHORTCUT_EXPENSE
+                    MONTHLY_PAYMENT_CATEGORIES -> Constants.SHORTCUT_MONTHLY_PAYMENTS
+                    MONTHLY_PAYMENTS -> Constants.SHORTCUT_MONTHLY_PAYMENTS
 
                     else -> ""
                 }

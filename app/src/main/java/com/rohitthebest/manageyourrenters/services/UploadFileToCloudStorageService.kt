@@ -17,6 +17,12 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWERS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWER_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMI_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMIs
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTERS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTER_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.*
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
@@ -190,7 +196,7 @@ class UploadFileToCloudStorageService : Service() {
         // insert to local database
         when (supportingDocumentHelperModel.modelName) {
 
-            getString(R.string.borrowers) -> {
+            BORROWERS -> {
 
                 val borrower =
                     borrowerRepository.getBorrowerByKey(documentKey).first()
@@ -203,7 +209,7 @@ class UploadFileToCloudStorageService : Service() {
                 updateFinalNotificationAndStopService()
             }
 
-            getString(R.string.renters) -> {
+            RENTERS -> {
 
                 val renter = renterRepository.getRenterByKey(documentKey).first()
 
@@ -214,7 +220,7 @@ class UploadFileToCloudStorageService : Service() {
                 updateFinalNotificationAndStopService()
             }
 
-            getString(R.string.borrowerPayments) -> {
+            BORROWER_PAYMENTS -> {
 
                 val payment = borrowerPaymentRepository.getBorrowerPaymentByKey(documentKey).first()
 
@@ -225,7 +231,7 @@ class UploadFileToCloudStorageService : Service() {
                 updateFinalNotificationAndStopService()
             }
 
-            getString(R.string.renter_payments) -> {
+            RENTER_PAYMENTS -> {
 
                 val payment = renterPaymentRepository.getPaymentByPaymentKey(documentKey).first()
 
@@ -236,7 +242,7 @@ class UploadFileToCloudStorageService : Service() {
                 updateFinalNotificationAndStopService()
             }
 
-            getString(R.string.emis) -> {
+            EMIs -> {
 
                 val emi = emiRepository.getEMIByKey(documentKey).first()
 
@@ -247,7 +253,7 @@ class UploadFileToCloudStorageService : Service() {
                 updateFinalNotificationAndStopService()
             }
 
-            getString(R.string.emiPayments) -> {
+            EMI_PAYMENTS -> {
 
                 val emiPayment = emiPaymentRepository.getEMIPaymentByKey(documentKey).first()
 

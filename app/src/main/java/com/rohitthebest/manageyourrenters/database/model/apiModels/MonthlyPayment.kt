@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.database.model.apiModels
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
+import java.io.Serializable
 
 @Entity(tableName = "monthly_payment_table")
 data class MonthlyPayment(
@@ -16,7 +17,7 @@ data class MonthlyPayment(
     var monthlyPaymentDateTimeInfo: MonthlyPaymentDateTimeInfo? = null,
     var uid: String,
     var isSynced: Boolean = true
-) {
+) : Serializable {
 
     constructor() : this(
         "",
@@ -44,7 +45,7 @@ data class MonthlyPaymentDateTimeInfo(
     var toBillDate: Long,
     var numberOfDays: Int
 
-) {
+) : Serializable {
 
     constructor() : this(
         0,

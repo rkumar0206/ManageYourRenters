@@ -4,11 +4,12 @@ import android.app.Application
 import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.*
-import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.EMI
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMI_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMIs
 import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.EMIRepository
 import com.rohitthebest.manageyourrenters.utils.*
@@ -59,14 +60,14 @@ class EMIViewModel @Inject constructor(
 
             uploadDocumentToFireStore(
                 context,
-                context.getString(R.string.emis),
+                EMIs,
                 emi.key
             )
 
             if (supportingDocumentHelperModel != null && supportingDocumentHelperModel.documentType != DocumentType.URL
             ) {
                 supportingDocumentHelperModel.modelName =
-                    context.getString(R.string.emis)
+                    EMIs
                 uploadFileToFirebaseCloudStorage(
                     context, supportingDocumentHelperModel, emi.key
                 )
@@ -96,7 +97,7 @@ class EMIViewModel @Inject constructor(
 
                 uploadDocumentToFireStore(
                     context,
-                    context.getString(R.string.emis),
+                    EMIs,
                     emi.key
                 )
             } else {
@@ -107,7 +108,7 @@ class EMIViewModel @Inject constructor(
                     updateDocumentOnFireStore(
                         context,
                         map,
-                        context.getString(R.string.emis),
+                        EMIs,
                         emi.key
                     )
                 }
@@ -153,7 +154,7 @@ class EMIViewModel @Inject constructor(
             updateEMI(oldEMI, emi)
         } else {
 
-            supportDocumentHelper.modelName = context.getString(R.string.emis)
+            supportDocumentHelper.modelName = EMIs
 
             if (!emi.isSynced) {
                 insertEMI(emi, supportDocumentHelper)
@@ -197,7 +198,7 @@ class EMIViewModel @Inject constructor(
             // delete all emi payments from firestore
             deleteAllDocumentsUsingKeyFromFirestore(
                 context,
-                context.getString(R.string.emiPayments),
+                EMI_PAYMENTS,
                 convertStringListToJSON(keys)
             )
 
@@ -214,7 +215,7 @@ class EMIViewModel @Inject constructor(
         // delete the emi from the firestore
         deleteDocumentFromFireStore(
             context,
-            context.getString(R.string.emis),
+            EMIs,
             emi.key
         )
 

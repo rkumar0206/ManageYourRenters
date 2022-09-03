@@ -164,6 +164,8 @@
     <string name="document">Document</string>
     <string name="sync_emis">syncing emis…</string>
     <string name="sync_emi_payments">syncing emi payments…</string>
+    <string name="sync_expense">syncing Expenses…</string>
+    <string name="sync_monthly_payment">syncing monthly payment…</string>
     <string name="duesOfLastPayment_message">There are no dues and no money given in advance.</string>
     <string name="expenses">Expenses</string>
 

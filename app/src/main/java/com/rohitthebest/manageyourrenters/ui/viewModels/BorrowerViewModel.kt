@@ -3,12 +3,14 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.*
-import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWERS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWER_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.PARTIAL_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
 import com.rohitthebest.manageyourrenters.repositories.PartialPaymentRepository
@@ -65,7 +67,7 @@ class BorrowerViewModel @Inject constructor(
 
             uploadDocumentToFireStore(
                 context,
-                context.getString(R.string.borrowers),
+                BORROWERS,
                 borrower.key
             )
 
@@ -73,7 +75,7 @@ class BorrowerViewModel @Inject constructor(
                 && supportDocumentHelper.documentType != DocumentType.URL
             ) {
 
-                supportDocumentHelper.modelName = context.getString(R.string.borrowers)
+                supportDocumentHelper.modelName = BORROWERS
                 uploadFileToFirebaseCloudStorage(
                     context, supportDocumentHelper, borrower.key
                 )
@@ -102,7 +104,7 @@ class BorrowerViewModel @Inject constructor(
 
             uploadDocumentToFireStore(
                 context,
-                context.getString(R.string.borrowers),
+                BORROWERS,
                 borrower.key
             )
         } else {
@@ -146,7 +148,7 @@ class BorrowerViewModel @Inject constructor(
             updateBorrower(borrower)
         } else {
 
-            supportDocumentHelper.modelName = context.getString(R.string.borrowers)
+            supportDocumentHelper.modelName = BORROWERS
 
             if (!borrower.isSynced) {
                 insertBorrower(borrower, supportDocumentHelper)
@@ -165,7 +167,7 @@ class BorrowerViewModel @Inject constructor(
 
             deleteDocumentFromFireStore(
                 context,
-                context.getString(R.string.borrowers),
+                BORROWERS,
                 borrower.key
             )
 
@@ -196,7 +198,7 @@ class BorrowerViewModel @Inject constructor(
 
                 deleteAllDocumentsUsingKeyFromFirestore(
                     context,
-                    context.getString(R.string.borrowerPayments),
+                    BORROWER_PAYMENTS,
                     convertStringListToJSON(keys)
                 )
             }
@@ -209,7 +211,7 @@ class BorrowerViewModel @Inject constructor(
 
                 deleteAllDocumentsUsingKeyFromFirestore(
                     context,
-                    context.getString(R.string.partialPayments),
+                    PARTIAL_PAYMENTS,
                     convertStringListToJSON(partialPaymentKeys)
                 )
             }

@@ -10,8 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.Expense
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.AddExpenseLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
@@ -221,7 +221,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
         } else {
 
-            expense = receivedExpense
+            expense = receivedExpense.copy()
 
             val oldDate = receivedExpense.created
             val oldAmount = receivedExpense.amount
@@ -268,18 +268,20 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
     private fun saveExpenseInDatabase(expense: Expense) {
 
+        val oldValue = receivedExpenseCategory.copy()
         receivedExpenseCategory.modified = System.currentTimeMillis()
 
         expenseCategoryViewModel.updateExpenseCategory(
-            receivedExpenseCategory,
-            false
+            oldValue,
+            receivedExpenseCategory
         )
 
         if (!isMessageReceivedForEditing) {
 
             expenseViewModel.insertExpense(expense)
         } else {
-            expenseViewModel.updateExpense(expense)
+
+            expenseViewModel.updateExpense(receivedExpense, expense)
         }
 
         Log.d(TAG, "saveExpenseInDatabase: expense saved -> $expense")

@@ -1,7 +1,7 @@
 package com.rohitthebest.manageyourrenters.repositories
 
 import com.rohitthebest.manageyourrenters.database.dao.ExpenseDAO
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
+import com.rohitthebest.manageyourrenters.database.model.Expense
 import javax.inject.Inject
 
 class ExpenseRepository @Inject constructor(
@@ -66,4 +66,7 @@ class ExpenseRepository @Inject constructor(
     fun getExpenseByKey(expenseKey: String) = dao.getExpenseByKey(expenseKey)
 
     fun getExpensesByDateRange(date1: Long, date2: Long) = dao.getExpensesByDateRange(date1, date2)
+
+    suspend fun getKeysByExpenseCategoryKey(expenseCategoryKey: String) =
+        dao.getKeysByExpenseCategoryKey(expenseCategoryKey)
 }

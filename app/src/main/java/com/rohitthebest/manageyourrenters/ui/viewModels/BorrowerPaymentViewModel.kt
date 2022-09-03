@@ -4,12 +4,13 @@ import android.app.Application
 import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.*
-import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.InterestCalculatorFields
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWER_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.PARTIAL_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.PartialPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.*
@@ -66,14 +67,14 @@ class BorrowerPaymentViewModel @Inject constructor(
 
                 uploadDocumentToFireStore(
                     context,
-                    context.getString(R.string.borrowerPayments),
+                    BORROWER_PAYMENTS,
                     borrowerPayment.key
                 )
 
                 if (supportingDocumentHelperModel != null && supportingDocumentHelperModel.documentType != DocumentType.URL
                 ) {
                     supportingDocumentHelperModel.modelName =
-                        context.getString(R.string.borrowerPayments)
+                        BORROWER_PAYMENTS
                     uploadFileToFirebaseCloudStorage(
                         context, supportingDocumentHelperModel, borrowerPayment.key
                     )
@@ -106,7 +107,7 @@ class BorrowerPaymentViewModel @Inject constructor(
 
                 uploadDocumentToFireStore(
                     context,
-                    context.getString(R.string.borrowerPayments),
+                    BORROWER_PAYMENTS,
                     borrowerPayment.key
                 )
             } else {
@@ -119,7 +120,7 @@ class BorrowerPaymentViewModel @Inject constructor(
                     updateDocumentOnFireStore(
                         context,
                         map,
-                        context.getString(R.string.borrowerPayments),
+                        BORROWER_PAYMENTS,
                         borrowerPayment.key
                     )
                 }
@@ -146,7 +147,7 @@ class BorrowerPaymentViewModel @Inject constructor(
 
                 deleteDocumentFromFireStore(
                     context,
-                    context.getString(R.string.borrowerPayments),
+                    BORROWER_PAYMENTS,
                     borrowerPayment.key
                 )
 
@@ -165,7 +166,7 @@ class BorrowerPaymentViewModel @Inject constructor(
 
                     deleteAllDocumentsUsingKeyFromFirestore(
                         context,
-                        context.getString(R.string.partialPayments),
+                        PARTIAL_PAYMENTS,
                         convertStringListToJSON(partialPaymentKeys)
                     )
                 }
@@ -212,7 +213,7 @@ class BorrowerPaymentViewModel @Inject constructor(
             updateBorrowerPayment(oldBorrowerPayment, borrowerPayment)
         } else {
 
-            supportDocumentHelper.modelName = context.getString(R.string.borrowerPayments)
+            supportDocumentHelper.modelName = BORROWER_PAYMENTS
 
             if (!oldBorrowerPayment.isSynced) {
                 insertBorrowerPayment(borrowerPayment, supportDocumentHelper)

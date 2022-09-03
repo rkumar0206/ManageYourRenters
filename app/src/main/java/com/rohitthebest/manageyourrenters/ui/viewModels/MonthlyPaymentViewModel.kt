@@ -3,16 +3,13 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.*
-import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentDateTimeInfo
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentDateTimeInfo
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
-import com.rohitthebest.manageyourrenters.utils.Functions
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
-import com.rohitthebest.manageyourrenters.utils.isValid
-import com.rohitthebest.manageyourrenters.utils.monthlyPaymentServiceHelper
+import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -52,12 +49,14 @@ class MonthlyPaymentViewModel @Inject constructor(
 
             if (Functions.isInternetAvailable(context)) {
 
-                monthlyPaymentServiceHelper(
-                    context,
-                    monthlyPayment.key,
-                    context.getString(R.string.post)
-                )
                 monthlyPayment.isSynced = true
+
+                uploadDocumentToFireStore(
+                    context,
+                    MONTHLY_PAYMENTS,
+                    monthlyPayment.key
+                )
+
             } else {
 
                 monthlyPayment.isSynced = false
@@ -71,25 +70,27 @@ class MonthlyPaymentViewModel @Inject constructor(
         repository.insertAllMonthlyPayment(monthlyPayments)
     }
 
-    fun updateMonthlyPayment(monthlyPayment: MonthlyPayment) =
+    fun updateMonthlyPayment(oldValue: MonthlyPayment, newValue: MonthlyPayment) =
         viewModelScope.launch {
 
             val context = getApplication<Application>().applicationContext
 
             if (Functions.isInternetAvailable(context)) {
 
-                monthlyPaymentServiceHelper(
+                updateDocumentOnFireStore(
                     context,
-                    monthlyPayment.key,
-                    context.getString(R.string.put)
+                    compareMonthlyPaymentModel(oldValue, newValue),
+                    MONTHLY_PAYMENTS,
+                    oldValue.key
                 )
-                monthlyPayment.isSynced = true
+
+                newValue.isSynced = true
             } else {
 
-                monthlyPayment.isSynced = false
+                newValue.isSynced = false
             }
 
-            repository.updateMonthlyPayment(monthlyPayment)
+            repository.updateMonthlyPayment(newValue)
             Functions.showToast(context, "Payment updated")
         }
 
@@ -100,16 +101,21 @@ class MonthlyPaymentViewModel @Inject constructor(
 
             if (Functions.isInternetAvailable(context)) {
 
-                monthlyPaymentServiceHelper(
+                deleteDocumentFromFireStore(
                     context,
-                    monthlyPayment.key,
-                    context.getString(R.string.delete_one)
+                    MONTHLY_PAYMENTS,
+                    monthlyPayment.key
                 )
             }
 
             repository.deleteMonthlyPayment(monthlyPayment)
             Functions.showToast(context, "Payment deleted")
         }
+
+    fun deleteAllMonthlyPaymentByIsSynced(isSynced: Boolean) = viewModelScope.launch {
+
+        repository.deleteAllMonthlyPaymentByIsSynced(isSynced)
+    }
 
     fun getAllMonthlyPaymentsByCategoryKey(categoryKey: String) =
         repository.getAllMonthlyPaymentsByCategoryKey(categoryKey).asLiveData()

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.unsplashAdapters.UnsplashSearchResultsAdapter
 import com.rohitthebest.manageyourrenters.data.UnsplashPhoto
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.AddExpenseCategoryLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseCategoryBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
@@ -302,7 +302,7 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
 
         } else {
 
-            expenseCategory = receivedExpenseCategory
+            expenseCategory = receivedExpenseCategory.copy()
 
             // add conditions for editing to happen
             if (
@@ -342,7 +342,7 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
             Log.i(TAG, "saveToDatabase: $expenseCategory")
         } else {
 
-            expenseCategoryViewModel.updateExpenseCategory(expenseCategory)
+            expenseCategoryViewModel.updateExpenseCategory(receivedExpenseCategory, expenseCategory)
         }
 
         requireActivity().onBackPressed()

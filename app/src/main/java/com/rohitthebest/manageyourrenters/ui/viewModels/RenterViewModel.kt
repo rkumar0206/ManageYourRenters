@@ -10,6 +10,8 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.DeletedRenter
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTERS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTER_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.DeletedRenterRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
@@ -65,7 +67,7 @@ class RenterViewModel @Inject constructor(
 
             uploadDocumentToFireStore(
                 context,
-                context.getString(R.string.renters),
+                RENTERS,
                 renter.key!!
             )
 
@@ -73,7 +75,7 @@ class RenterViewModel @Inject constructor(
                 && supportDocumentHelper.documentType != DocumentType.URL
             ) {
 
-                supportDocumentHelper.modelName = context.getString(R.string.renters)
+                supportDocumentHelper.modelName = RENTERS
                 uploadFileToFirebaseCloudStorage(
                     context, supportDocumentHelper, renter.key!!
                 )
@@ -97,7 +99,7 @@ class RenterViewModel @Inject constructor(
 
             uploadDocumentToFireStore(
                 context,
-                context.getString(R.string.renters),
+                RENTERS,
                 renter.key!!
             )
         } else {
@@ -145,7 +147,7 @@ class RenterViewModel @Inject constructor(
             updateRenter(renter)
         } else {
 
-            supportDocumentHelper.modelName = context.getString(R.string.renters)
+            supportDocumentHelper.modelName = RENTERS
             if (renter.isSynced != context.getString(R.string.t)) {
                 insertRenter(renter, supportDocumentHelper)
                 return
@@ -166,7 +168,7 @@ class RenterViewModel @Inject constructor(
 
             deleteDocumentFromFireStore(
                 context,
-                context.getString(R.string.renters),
+                RENTERS,
                 renter.key!!
             )
 
@@ -196,7 +198,7 @@ class RenterViewModel @Inject constructor(
 
                 deleteAllDocumentsUsingKeyFromFirestore(
                     context,
-                    context.getString(R.string.renter_payments),
+                    RENTER_PAYMENTS,
                     convertStringListToJSON(keys)
                 )
             }

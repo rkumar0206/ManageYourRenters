@@ -1,7 +1,7 @@
 package com.rohitthebest.manageyourrenters.database.dao
 
 import androidx.room.*
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
+import com.rohitthebest.manageyourrenters.database.model.Expense
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -73,4 +73,6 @@ interface ExpenseDAO {
     @Query("SELECT * FROM expense_table WHERE categoryKey = :expenseCategoryKey ORDER BY created DESC")
     fun getExpensesByExpenseCategoryKey(expenseCategoryKey: String): Flow<List<Expense>>
 
+    @Query("SELECT `key` FROM expense_table WHERE categoryKey = :expenseCategoryKey")
+    suspend fun getKeysByExpenseCategoryKey(expenseCategoryKey: String): List<String>
 }

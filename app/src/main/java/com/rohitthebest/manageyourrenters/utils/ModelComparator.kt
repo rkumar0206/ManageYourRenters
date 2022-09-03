@@ -1,9 +1,6 @@
 package com.rohitthebest.manageyourrenters.utils
 
-import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
-import com.rohitthebest.manageyourrenters.database.model.EMI
-import com.rohitthebest.manageyourrenters.database.model.EMIPayment
-import com.rohitthebest.manageyourrenters.database.model.RenterPayment
+import com.rohitthebest.manageyourrenters.database.model.*
 
 /**
  * This class helps to compare the main fields of
@@ -108,6 +105,74 @@ fun compareEMIPaymentModel(
         newData.isSupportingDocAdded
     if (oldData.supportingDocument != newData.supportingDocument) map["supportingDocument"] =
         newData.supportingDocument
+
+    return map
+}
+
+fun compareExpenseCategoryModel(
+    oldData: ExpenseCategory,
+    newData: ExpenseCategory
+): HashMap<String, Any?> {
+
+    val map: HashMap<String, Any?> = HashMap()
+
+    if (oldData.created != newData.created) map["created"] = newData.created
+    if (oldData.modified != newData.modified) map["modified"] = newData.modified
+    if (oldData.categoryDescription != newData.categoryDescription) map["categoryDescription"] =
+        newData.categoryDescription
+    if (oldData.categoryName != newData.categoryName) map["categoryName"] = newData.categoryName
+    if (oldData.imageUrl != newData.imageUrl) map["imageUrl"] = newData.imageUrl
+
+    return map
+}
+
+fun compareExpenseModel(
+    oldData: Expense,
+    newData: Expense
+): HashMap<String, Any?> {
+
+    val map: HashMap<String, Any?> = HashMap()
+
+    if (oldData.created != newData.created) map["created"] = newData.created
+    if (oldData.modified != newData.modified) map["modified"] = newData.modified
+    if (oldData.amount != newData.amount) map["amount"] = newData.amount
+    if (oldData.spentOn != newData.spentOn) map["spentOn"] = newData.spentOn
+    if (oldData.categoryKey != newData.categoryKey) map["categoryKey"] = newData.categoryKey
+
+    return map
+}
+
+fun compareMonthlyPaymentModel(
+    oldData: MonthlyPayment,
+    newData: MonthlyPayment
+): HashMap<String, Any?> {
+
+    val map: HashMap<String, Any?> = HashMap()
+
+    if (oldData.created != newData.created) map["created"] = newData.created
+    if (oldData.modified != newData.modified) map["modified"] = newData.modified
+    if (oldData.amount != newData.amount) map["amount"] = newData.amount
+    if (oldData.monthlyPaymentDateTimeInfo != newData.monthlyPaymentDateTimeInfo) map["monthlyPaymentDateTimeInfo"] =
+        newData.monthlyPaymentDateTimeInfo
+    if (oldData.categoryKey != newData.categoryKey) map["categoryKey"] = newData.categoryKey
+    if (oldData.message != newData.message) map["message"] = newData.message
+
+    return map
+}
+
+fun compareMonthlyPaymentCategoryModel(
+    oldData: MonthlyPaymentCategory,
+    newData: MonthlyPaymentCategory
+): HashMap<String, Any?> {
+
+    val map: HashMap<String, Any?> = HashMap()
+
+    if (oldData.created != newData.created) map["created"] = newData.created
+    if (oldData.modified != newData.modified) map["modified"] = newData.modified
+    if (oldData.categoryDescription != newData.categoryDescription) map["categoryDescription"] =
+        newData.categoryDescription
+    if (oldData.categoryName != newData.categoryName) map["categoryName"] = newData.categoryName
+    if (oldData.imageUrl != newData.imageUrl) map["imageUrl"] = newData.imageUrl
 
     return map
 }

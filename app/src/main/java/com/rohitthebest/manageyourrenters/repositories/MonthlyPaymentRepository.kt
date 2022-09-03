@@ -37,4 +37,8 @@ class MonthlyPaymentRepository @Inject constructor(
 
     fun getLastMonthlyPayment(monthlyPaymentCategoryKey: String) =
         dao.getLastMonthlyPayment(monthlyPaymentCategoryKey)
+
+    fun getKeysByMonthlyPaymentCategoryKey(categoryKey: String) =
+        dao.getKeysByMonthlyPaymentCategoryKey(categoryKey)
+
 }

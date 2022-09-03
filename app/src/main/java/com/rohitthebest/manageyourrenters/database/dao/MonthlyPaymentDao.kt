@@ -39,4 +39,7 @@ interface MonthlyPaymentDao {
 
     @Query("SELECT * FROM monthly_payment_table WHERE categoryKey= :monthlyPaymentCategoryKey ORDER BY created DESC LIMIT 1")
     fun getLastMonthlyPayment(monthlyPaymentCategoryKey: String): Flow<MonthlyPayment>
+
+    @Query("SELECT `key` FROM monthly_payment_table WHERE categoryKey= :categoryKey")
+    fun getKeysByMonthlyPaymentCategoryKey(categoryKey: String): List<String>
 }

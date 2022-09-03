@@ -19,8 +19,6 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.*
 import com.rohitthebest.manageyourrenters.databinding.ActivityLoginBinding
 import com.rohitthebest.manageyourrenters.others.Constants
-import com.rohitthebest.manageyourrenters.services.GetAllExpenseAndExpenseCategoryService
-import com.rohitthebest.manageyourrenters.services.SyncAllMonthlyPaymentsAndCategoriesService
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
@@ -75,6 +73,7 @@ class LoginActivity : AppCompatActivity() {
 
         if (mAuth.currentUser != null && !isSynced) {
 
+            // todo : call the methods while syncing with firestore
             syncMonthlyPayments()
             syncExpenses()
         }
@@ -175,10 +174,7 @@ class LoginActivity : AppCompatActivity() {
 
         if (isInternetAvailable(this)) {
 
-            val intent =
-                Intent(applicationContext, SyncAllMonthlyPaymentsAndCategoriesService::class.java)
-
-            this.startService(intent)
+            //todo :
         }
     }
 
@@ -186,10 +182,7 @@ class LoginActivity : AppCompatActivity() {
 
         if (isInternetAvailable(this)) {
 
-            val intent =
-                Intent(applicationContext, GetAllExpenseAndExpenseCategoryService::class.java)
-
-            this.startService(intent)
+            // todo :
         }
 
         syncRenters()

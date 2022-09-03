@@ -302,7 +302,7 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
 
         } else {
 
-            expenseCategory = receivedExpenseCategory
+            expenseCategory = receivedExpenseCategory.copy()
 
             // add conditions for editing to happen
             if (
@@ -342,7 +342,7 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
             Log.i(TAG, "saveToDatabase: $expenseCategory")
         } else {
 
-            expenseCategoryViewModel.updateExpenseCategory(expenseCategory)
+            expenseCategoryViewModel.updateExpenseCategory(receivedExpenseCategory, expenseCategory)
         }
 
         requireActivity().onBackPressed()

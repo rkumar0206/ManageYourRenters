@@ -4,17 +4,12 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.rohitthebest.manageyourrenters.api.services.ExpenseAPI
-import com.rohitthebest.manageyourrenters.api.services.ExpenseCategoryAPI
-import com.rohitthebest.manageyourrenters.api.services.MonthlyPaymentAPI
-import com.rohitthebest.manageyourrenters.api.services.MonthlyPaymentCategoryAPI
 import com.rohitthebest.manageyourrenters.api.unsplash.UnsplashAPI
 import com.rohitthebest.manageyourrenters.database.databases.*
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EMI_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_DATABASE_NAME
-import com.rohitthebest.manageyourrenters.others.Constants.MANAGE_YOUR_RENTERS_API_BASE_URL
 import com.rohitthebest.manageyourrenters.others.Constants.MONTHLY_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.PARTIAL_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.RENTER_AND_PAYMENT_DATABASE_NAME
@@ -251,60 +246,6 @@ object Module {
             .readTimeout(60, TimeUnit.SECONDS)
             .build()
     }
-
-    @ManageYourRentersBackendRetrofit
-    @Provides
-    @Singleton
-    fun provideManageYourRentersBackendRetrofit(
-        okHttpClient: OkHttpClient
-    ): Retrofit = Retrofit.Builder()
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl(MANAGE_YOUR_RENTERS_API_BASE_URL)
-        .build()
-
-    @Provides
-    @Singleton
-    fun provideExpenseCategoryAPI(
-        @ManageYourRentersBackendRetrofit retrofit: Retrofit
-    ): ExpenseCategoryAPI = retrofit.create(ExpenseCategoryAPI::class.java)
-
-
-    /*   @Provides
-       @Singleton
-       fun provideExpenseCategoryRepositoryAPI(
-           expenseCategoryAPI: ExpenseCategoryAPI
-       ) = ExpenseCategoryRepositoryAPI(expenseCategoryAPI)
-
-   */
-    // ======================================================================================
-
-    // ------------------------------ Expense API -----------------------------------
-
-    @Provides
-    @Singleton
-    fun provideExpenseAPI(
-        @ManageYourRentersBackendRetrofit retrofit: Retrofit
-    ): ExpenseAPI = retrofit.create(ExpenseAPI::class.java)
-    // ======================================================================================
-
-
-    // ------------------------- Monthly Payments API -------------------
-
-    @Provides
-    @Singleton
-    fun provideMonthlyPaymentCategoryAPI(
-        @ManageYourRentersBackendRetrofit retrofit: Retrofit
-    ): MonthlyPaymentCategoryAPI = retrofit.create(MonthlyPaymentCategoryAPI::class.java)
-
-    @Provides
-    @Singleton
-    fun provideMonthlyPaymentAPI(
-        @ManageYourRentersBackendRetrofit retrofit: Retrofit
-    ): MonthlyPaymentAPI = retrofit.create(MonthlyPaymentAPI::class.java)
-
-    // ==========================================================
-
 
     // ----------------------------- Unsplash API ----------------------------------------
 

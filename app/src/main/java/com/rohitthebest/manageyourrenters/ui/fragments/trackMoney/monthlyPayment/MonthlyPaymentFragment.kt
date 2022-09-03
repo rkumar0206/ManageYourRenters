@@ -204,10 +204,10 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
                 )
                 monthlyPaymentAdapter.notifyItemChanged(monthlyPaymentForMenusAdapterPosition)
 
+                val oldValue = receivedMonthlyPaymentCategory.copy()
                 receivedMonthlyPaymentCategory.modified = System.currentTimeMillis()
-
                 monthlyPaymentCategoryViewModel.updateMonthlyPaymentCategory(
-                    receivedMonthlyPaymentCategory, false
+                    oldValue, receivedMonthlyPaymentCategory
                 )
 
             } else {

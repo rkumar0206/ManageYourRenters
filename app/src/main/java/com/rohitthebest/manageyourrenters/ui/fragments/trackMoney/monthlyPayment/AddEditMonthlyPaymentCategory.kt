@@ -243,7 +243,7 @@ class AddEditMonthlyPaymentCategory :
 
         } else {
 
-            monthlyPaymentCategory = receivedMonthlyPaymentCategory
+            monthlyPaymentCategory = receivedMonthlyPaymentCategory.copy()
 
             // add conditions for editing to happen
             if (
@@ -284,6 +284,7 @@ class AddEditMonthlyPaymentCategory :
         } else {
 
             monthlyPaymentCategoryViewModel.updateMonthlyPaymentCategory(
+                receivedMonthlyPaymentCategory,
                 monthlyPaymentCategory
             )
         }

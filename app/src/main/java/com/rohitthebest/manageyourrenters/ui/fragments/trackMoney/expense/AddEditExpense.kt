@@ -221,7 +221,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
         } else {
 
-            expense = receivedExpense
+            expense = receivedExpense.copy()
 
             val oldDate = receivedExpense.created
             val oldAmount = receivedExpense.amount
@@ -268,18 +268,20 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
     private fun saveExpenseInDatabase(expense: Expense) {
 
+        val oldValue = receivedExpenseCategory.copy()
         receivedExpenseCategory.modified = System.currentTimeMillis()
 
         expenseCategoryViewModel.updateExpenseCategory(
-            receivedExpenseCategory,
-            false
+            oldValue,
+            receivedExpenseCategory
         )
 
         if (!isMessageReceivedForEditing) {
 
             expenseViewModel.insertExpense(expense)
         } else {
-            expenseViewModel.updateExpense(expense)
+
+            expenseViewModel.updateExpense(receivedExpense, expense)
         }
 
         Log.d(TAG, "saveExpenseInDatabase: expense saved -> $expense")

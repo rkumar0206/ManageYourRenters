@@ -2,17 +2,14 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.app.Application
 import android.os.Parcelable
-import android.util.Log
 import androidx.lifecycle.*
-import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENT_CATEGORIES
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
-import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.deleteFileFromFirebaseStorage
-import com.rohitthebest.manageyourrenters.utils.isValid
-import com.rohitthebest.manageyourrenters.utils.monthlyPaymentCategoryServiceHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -57,12 +54,10 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
 
                 monthlyPaymentCategory.isSynced = true
 
-                Log.d(TAG, "insertMonthlyPaymentCategory: ")
-
-                monthlyPaymentCategoryServiceHelper(
+                uploadDocumentToFireStore(
                     context,
-                    monthlyPaymentCategory.key,
-                    context.getString(R.string.post)
+                    MONTHLY_PAYMENT_CATEGORIES,
+                    monthlyPaymentCategory.key
                 )
 
             } else {
@@ -81,32 +76,29 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
         }
 
     fun updateMonthlyPaymentCategory(
-        monthlyPaymentCategory: MonthlyPaymentCategory,
-        shouldUpload: Boolean = true
+        oldValue: MonthlyPaymentCategory,
+        newValue: MonthlyPaymentCategory
     ) =
         viewModelScope.launch {
 
             val context = getApplication<Application>().applicationContext
 
-            if (isInternetAvailable(context) && shouldUpload) {
+            if (isInternetAvailable(context)) {
 
-                monthlyPaymentCategory.isSynced = true
+                newValue.isSynced = true
 
-                monthlyPaymentCategoryServiceHelper(
+                updateDocumentOnFireStore(
                     context,
-                    monthlyPaymentCategory.key,
-                    context.getString(R.string.put)
+                    compareMonthlyPaymentCategoryModel(oldValue, newValue),
+                    MONTHLY_PAYMENT_CATEGORIES,
+                    oldValue.key
                 )
             } else {
 
-                if (shouldUpload) {
-
-                    monthlyPaymentCategory.isSynced = false
-                }
-
+                newValue.isSynced = false
             }
 
-            repository.updateMonthlyPaymentCategory(monthlyPaymentCategory)
+            repository.updateMonthlyPaymentCategory(newValue)
         }
 
     fun deleteMonthlyPaymentCategory(
@@ -118,10 +110,10 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
 
             if (isInternetAvailable(context)) {
 
-                monthlyPaymentCategoryServiceHelper(
+                deleteDocumentFromFireStore(
                     context,
-                    monthlyPaymentCategory.key,
-                    context.getString(R.string.delete_one)
+                    MONTHLY_PAYMENT_CATEGORIES,
+                    monthlyPaymentCategory.key
                 )
 
                 // check if the image is saved to the firebase storage, if found, delete
@@ -135,8 +127,21 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
                         )
                     }
                 }
+
+                val monthlyPaymentKeys =
+                    monthlyPaymentRepository.getKeysByMonthlyPaymentCategoryKey(
+                        monthlyPaymentCategory.key
+                    )
+
+                deleteAllDocumentsUsingKeyFromFirestore(
+                    context,
+                    MONTHLY_PAYMENTS,
+                    convertStringListToJSON(monthlyPaymentKeys)
+                )
+
             }
 
+            monthlyPaymentRepository.deleteAllMonthlyPaymentsByCategoryKey(monthlyPaymentCategory.key)
             repository.deleteMonthlyPaymentCategory(monthlyPaymentCategory)
         }
 
@@ -146,7 +151,6 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
     }
 
     fun deleteAllMonthlyPaymentCategoriesByIsSynced(isSynced: Boolean) = viewModelScope.launch {
-        monthlyPaymentRepository.deleteAllMonthlyPaymentByIsSynced(isSynced)
         repository.deleteAllMonthlyPaymentCategoriesByIsSynced(isSynced)
     }
 

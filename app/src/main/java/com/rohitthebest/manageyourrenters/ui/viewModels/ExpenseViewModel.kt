@@ -3,14 +3,12 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
+import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
-import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
-import com.rohitthebest.manageyourrenters.utils.expenseServiceHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -32,11 +30,12 @@ class ExpenseViewModel @Inject constructor(
 
             if (isInternetAvailable(context)) {
 
-                expenseServiceHelper(
+                uploadDocumentToFireStore(
                     context,
-                    expense.key,
-                    context.getString(R.string.post)
+                    EXPENSES,
+                    expense.key
                 )
+
             } else {
 
                 expense.isSynced = false
@@ -52,24 +51,26 @@ class ExpenseViewModel @Inject constructor(
         expenseRepository.insertAllExpense(expenses)
     }
 
-    fun updateExpense(expense: Expense) =
+    fun updateExpense(oldValue: Expense, newValue: Expense) =
         viewModelScope.launch {
 
             val context = getApplication<Application>().applicationContext
 
             if (isInternetAvailable(context)) {
 
-                expenseServiceHelper(
+                updateDocumentOnFireStore(
                     context,
-                    expense.key,
-                    context.getString(R.string.put)
+                    compareExpenseModel(oldValue, newValue),
+                    EXPENSES,
+                    oldValue.key
                 )
+
             } else {
 
-                expense.isSynced = false
+                newValue.isSynced = false
             }
 
-            expenseRepository.updateExpense(expense)
+            expenseRepository.updateExpense(newValue)
 
             Functions.showToast(context, "Expense updated")
         }
@@ -80,10 +81,10 @@ class ExpenseViewModel @Inject constructor(
 
         if (isInternetAvailable(context)) {
 
-            expenseServiceHelper(
+            deleteDocumentFromFireStore(
                 context,
-                expense.key,
-                context.getString(R.string.delete_one)
+                EXPENSES,
+                expense.key
             )
         }
 
@@ -93,6 +94,10 @@ class ExpenseViewModel @Inject constructor(
 
     fun deleteAllExpenses() = viewModelScope.launch {
         expenseRepository.deleteAllExpenses()
+    }
+
+    fun deleteAllExpensesByIsSynced(isSynced: Boolean) = viewModelScope.launch {
+        expenseRepository.deleteExpenseByIsSynced(isSynced)
     }
 
     fun getAllExpenses() = expenseRepository.getAllExpenses().asLiveData()

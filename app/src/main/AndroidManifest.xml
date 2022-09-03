@@ -52,12 +52,6 @@
         <service android:name=".services.DeleteAllDocumentsService" />
         <service android:name=".services.UploadDocumentListToFireStoreService" />
         <service android:name=".services.DeleteFileFromFirebaseStorageService" />
-        <service android:name=".services.ExpenseCategoryService" />
-        <service android:name=".services.ExpenseService" />
-        <service android:name=".services.GetAllExpenseAndExpenseCategoryService" />
-        <service android:name=".services.MonthlyPaymentCategoryService" />
-        <service android:name=".services.MonthlyPaymentService" />
-        <service android:name=".services.SyncAllMonthlyPaymentsAndCategoriesService" />
         <service android:name=".services.UploadFileToCloudStorageService" />
 
         <meta-data

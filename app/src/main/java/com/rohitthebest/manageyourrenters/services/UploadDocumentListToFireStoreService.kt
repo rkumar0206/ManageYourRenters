@@ -9,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.PARTIAL_PAYMENTS
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.fromStringToPartialPaymentList
 import com.rohitthebest.manageyourrenters.utils.uploadFilesOnFirestore
@@ -51,7 +52,7 @@ class UploadDocumentListToFireStoreService : Service() {
 
         when (collection) {
 
-            getString(R.string.partialPayments) -> {
+            PARTIAL_PAYMENTS -> {
 
                 Log.d(TAG, "onStartCommand: $uploadData")
 

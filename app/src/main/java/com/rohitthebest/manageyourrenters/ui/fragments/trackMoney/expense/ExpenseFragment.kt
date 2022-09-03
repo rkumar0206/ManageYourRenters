@@ -13,8 +13,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.ExpenseAdapter
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.Expense
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
@@ -370,10 +370,12 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     override fun onCategoryClicked(expenseCategory: ExpenseCategory) {
 
+        val oldValue = expenseForMenuItems.copy()
+
         expenseForMenuItems.categoryKey = expenseCategory.key
         expenseForMenuItems.modified = System.currentTimeMillis()
 
-        expenseViewModel.updateExpense(expenseForMenuItems)
+        expenseViewModel.updateExpense(oldValue, expenseForMenuItems)
         expenseAdapter.notifyItemChanged(expenseForMenuPosition)
     }
 
@@ -420,9 +422,13 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                     expenseViewModel.insertExpense(expenseForMenuItems)
                     expenseAdapter.notifyItemChanged(expenseForMenuPosition)
 
+                    // update expense category modified value
+                    val oldValue = receivedExpenseCategory.copy()
                     receivedExpenseCategory.modified = System.currentTimeMillis()
-
-                    expenseCategoryViewModel.updateExpenseCategory(receivedExpenseCategory, false)
+                    expenseCategoryViewModel.updateExpenseCategory(
+                        oldValue,
+                        receivedExpenseCategory
+                    )
 
                 } else {
 

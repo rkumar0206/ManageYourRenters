@@ -14,6 +14,16 @@ import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWERS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWER_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMI_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMIs
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE_CATEGORIES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENT_CATEGORIES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTERS
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTER_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.*
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.insertToFireStore
@@ -46,6 +56,18 @@ class UploadService : Service() {
 
     @Inject
     lateinit var emiPaymentRepository: EMIPaymentRepository
+
+    @Inject
+    lateinit var expenseCategoryRepository: ExpenseCategoryRepository
+
+    @Inject
+    lateinit var expenseRepository: ExpenseRepository
+
+    @Inject
+    lateinit var monthlyPaymentCategoryRepository: MonthlyPaymentCategoryRepository
+
+    @Inject
+    lateinit var monthlyPaymentRepository: MonthlyPaymentRepository
 
 
     @SuppressLint("UnspecifiedImmutableFlag")
@@ -83,28 +105,45 @@ class UploadService : Service() {
 
             when (collection) {
 
-                getString(R.string.renters) -> {
+                RENTERS -> {
                     model = renterRepository.getRenterByKey(key).first()
                 }
 
-                getString(R.string.renter_payments) -> {
+                RENTER_PAYMENTS -> {
                     model = renterPaymentRepository.getPaymentByPaymentKey(key).first()
                 }
 
-                getString(R.string.borrowers) -> {
+                BORROWERS -> {
                     model = borrowerRepository.getBorrowerByKey(key).first()
                 }
 
-                getString(R.string.borrowerPayments) -> {
+                BORROWER_PAYMENTS -> {
                     model = borrowerPaymentRepository.getBorrowerPaymentByKey(key).first()
                 }
 
-                getString(R.string.emis) -> {
+                EMIs -> {
                     model = emiRepository.getEMIByKey(key).first()
                 }
 
-                getString(R.string.emiPayments) -> {
+                EMI_PAYMENTS -> {
                     model = emiPaymentRepository.getEMIPaymentByKey(key).first()
+                }
+
+                EXPENSE_CATEGORIES -> {
+                    model = expenseCategoryRepository.getExpenseCategoryByKey(key).first()
+                }
+
+                EXPENSES -> {
+                    model = expenseRepository.getExpenseByKey(key).first()
+                }
+
+                MONTHLY_PAYMENT_CATEGORIES -> {
+                    model = monthlyPaymentCategoryRepository.getMonthlyPaymentCategoryUsingKey(key)
+                        .first()
+                }
+
+                MONTHLY_PAYMENTS -> {
+                    model = monthlyPaymentRepository.getMonthlyPaymentByKey(key).first()
                 }
 
                 else -> {
@@ -176,6 +215,32 @@ class UploadService : Service() {
                     val emiPayment = document as EMIPayment
                     emiPayment.isSynced = isSyncedValue
                     emiPaymentRepository.updateEMIPayment(emiPayment)
+                }
+
+                EXPENSE_CATEGORIES -> {
+                    val expenseCategory = document as ExpenseCategory
+                    expenseCategory.isSynced = isSyncedValue
+                    expenseCategoryRepository.updateExpenseCategory(expenseCategory)
+                }
+
+                EXPENSES -> {
+
+                    val expense = document as Expense
+                    expense.isSynced = isSyncedValue
+                    expenseRepository.updateExpense(expense)
+                }
+
+                MONTHLY_PAYMENT_CATEGORIES -> {
+
+                    val category = document as MonthlyPaymentCategory
+                    category.isSynced = isSyncedValue
+                    monthlyPaymentCategoryRepository.updateMonthlyPaymentCategory(category)
+                }
+                MONTHLY_PAYMENTS -> {
+
+                    val monthlyPayment = document as MonthlyPayment
+                    monthlyPayment.isSynced = isSyncedValue
+                    monthlyPaymentRepository.updateMonthlyPayment(monthlyPayment)
                 }
 
                 else -> stopSelf()

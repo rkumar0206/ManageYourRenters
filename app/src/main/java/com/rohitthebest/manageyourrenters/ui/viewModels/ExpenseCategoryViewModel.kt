@@ -3,15 +3,13 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.*
-import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE_CATEGORIES
 import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
-import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.deleteFileFromFirebaseStorage
-import com.rohitthebest.manageyourrenters.utils.expenseCategoryServiceHelper
-import com.rohitthebest.manageyourrenters.utils.isValid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,7 +31,7 @@ class ExpenseCategoryViewModel @Inject constructor(
 
     fun saveExpenseCategoryRvState(rvState: Parcelable?) {
 
-        state.set(EXPENSE_CATEGORY_RV_KEY, rvState)
+        state[EXPENSE_CATEGORY_RV_KEY] = rvState
     }
 
     private val _expenseCategoryRvState: MutableLiveData<Parcelable> = state.getLiveData(
@@ -54,12 +52,12 @@ class ExpenseCategoryViewModel @Inject constructor(
 
             expenseCategory.isSynced = true
 
-            // this method invokes the expense category foreground service to upload the category
-            expenseCategoryServiceHelper(
+            uploadDocumentToFireStore(
                 context,
-                expenseCategory.key,
-                context.getString(R.string.post)
+                EXPENSE_CATEGORIES,
+                expenseCategory.key
             )
+
         } else {
 
                 expenseCategory.isSynced = false
@@ -75,30 +73,29 @@ class ExpenseCategoryViewModel @Inject constructor(
     }
 
     fun updateExpenseCategory(
-        expenseCategory: ExpenseCategory,
-        shouldUpload: Boolean = true
+        oldValue: ExpenseCategory,
+        newValue: ExpenseCategory
     ) =
 
         viewModelScope.launch {
             val context = getApplication<Application>().applicationContext
 
-            if (isInternetAvailable(context) && shouldUpload) {
+            if (isInternetAvailable(context)) {
 
-                expenseCategory.isSynced = true
+                newValue.isSynced = true
 
-                expenseCategoryServiceHelper(
+                updateDocumentOnFireStore(
                     context,
-                    expenseCategory.key,
-                    context.getString(R.string.put)
+                    compareExpenseCategoryModel(oldValue, newValue),
+                    EXPENSE_CATEGORIES,
+                    newValue.key
                 )
             } else {
 
-                if (shouldUpload) {
-                    expenseCategory.isSynced = false
-                }
+                newValue.isSynced = false
             }
 
-            expenseCategoryRepository.updateExpenseCategory(expenseCategory)
+            expenseCategoryRepository.updateExpenseCategory(newValue)
         }
 
     fun deleteExpenseCategory(expenseCategory: ExpenseCategory) =
@@ -108,10 +105,10 @@ class ExpenseCategoryViewModel @Inject constructor(
 
             if (isInternetAvailable(context)) {
 
-                expenseCategoryServiceHelper(
+                deleteDocumentFromFireStore(
                     context,
-                    expenseCategory.key,
-                    context.getString(R.string.delete_one)
+                    EXPENSE_CATEGORIES,
+                    expenseCategory.key
                 )
 
                 // check if the image is saved to the firebase storage, if found, delete
@@ -125,8 +122,21 @@ class ExpenseCategoryViewModel @Inject constructor(
                         )
                     }
                 }
+
+                val expenseKeys = expenseRepository.getKeysByExpenseCategoryKey(expenseCategory.key)
+
+                if (expenseKeys.isNotEmpty()) {
+
+                    deleteAllDocumentsUsingKeyFromFirestore(
+                        context,
+                        EXPENSES,
+                        convertStringListToJSON(expenseKeys)
+                    )
+                }
+
             }
 
+            expenseRepository.deleteExpenseByExpenseCategoryKey(expenseCategory.key)
             expenseCategoryRepository.deleteExpenseCategory(expenseCategory)
         }
 
@@ -134,6 +144,11 @@ class ExpenseCategoryViewModel @Inject constructor(
 
         expenseCategoryRepository.deleteAllExpenseCategories()
         expenseRepository.deleteAllExpenses()
+    }
+
+    fun deleteExpenseCategoryByIsSyncedValue(isSynced: Boolean) = viewModelScope.launch {
+
+        expenseCategoryRepository.deleteAllExpenseCategoriesByIsSynced(isSynced)
     }
 
     fun getExpenseCategoryByKey(key: String) =

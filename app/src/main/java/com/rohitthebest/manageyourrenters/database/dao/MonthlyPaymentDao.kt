@@ -1,7 +1,7 @@
 package com.rohitthebest.manageyourrenters.database.dao
 
 import androidx.room.*
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -39,4 +39,7 @@ interface MonthlyPaymentDao {
 
     @Query("SELECT * FROM monthly_payment_table WHERE categoryKey= :monthlyPaymentCategoryKey ORDER BY created DESC LIMIT 1")
     fun getLastMonthlyPayment(monthlyPaymentCategoryKey: String): Flow<MonthlyPayment>
+
+    @Query("SELECT `key` FROM monthly_payment_table WHERE categoryKey= :categoryKey")
+    suspend fun getKeysByMonthlyPaymentCategoryKey(categoryKey: String): List<String>
 }

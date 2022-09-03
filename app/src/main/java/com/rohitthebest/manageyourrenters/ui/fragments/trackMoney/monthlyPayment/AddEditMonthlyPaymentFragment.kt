@@ -9,9 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentCategory
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPaymentDateTimeInfo
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentDateTimeInfo
 import com.rohitthebest.manageyourrenters.databinding.AddEditMonthlyPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditMonthlyPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
@@ -180,8 +180,8 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         } else {
 
             // update
-            monthlyPaymentDateTimeInfo = receivedMonthlyPayment.monthlyPaymentDateTimeInfo!!
-            receivedMonthlyPayment
+            monthlyPaymentDateTimeInfo = receivedMonthlyPayment.monthlyPaymentDateTimeInfo!!.copy()
+            receivedMonthlyPayment.copy()
         }
 
         monthlyPaymentDateTimeInfo.apply {
@@ -215,11 +215,12 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
     private fun saveMonthlyPaymentToDatabase(monthlyPayment: MonthlyPayment) {
 
+        val oldValue = receivedMonthlyPaymentCategory.copy()
         receivedMonthlyPaymentCategory.modified = System.currentTimeMillis()
 
         monthlyPaymentCategoryViewModel.updateMonthlyPaymentCategory(
-            receivedMonthlyPaymentCategory,
-            false
+            oldValue,
+            receivedMonthlyPaymentCategory
         )
 
         if (!isMessageReceivedForEditing) {
@@ -227,7 +228,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
             monthlyPaymentViewModel.insertMonthlyPayment(monthlyPayment)
         } else {
 
-            monthlyPaymentViewModel.updateMonthlyPayment(monthlyPayment)
+            monthlyPaymentViewModel.updateMonthlyPayment(receivedMonthlyPayment, monthlyPayment)
         }
 
         Log.d(TAG, "saveMonthlyPaymentToDatabase: $monthlyPayment")

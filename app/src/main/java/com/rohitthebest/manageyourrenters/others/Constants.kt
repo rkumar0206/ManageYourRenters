@@ -1,10 +1,7 @@
 package com.rohitthebest.manageyourrenters.others
 
-import com.rohitthebest.manageyourrenters.BuildConfig.MANAGE_YOUR_RENTERS_BASE_URL
-
 object Constants {
 
-    const val MANAGE_YOUR_RENTERS_API_BASE_URL = MANAGE_YOUR_RENTERS_BASE_URL
     const val UNSPLASH_BASE_URL = "https://api.unsplash.com/"
 
     const val NO_INTERNET_MESSAGE = "Please check your Internet connection!!!"
@@ -45,12 +42,6 @@ object Constants {
     const val SHOW_MOVE_MENU = "MOVE_SAdhbhfbABJnbhsb"
     const val SHOW_COPY_MENU = "COPY_SANJABABJnbhhsb"
     const val COPY_MENU_TEXT = "COPY-TEXT_SwwAdsdrBAbuh=hsb"
-
-    const val REQUEST_METHOD_KEY = "sacnakjnkankan"
-    const val EXPENSE_CATEGORY_KEY = "acjakjcakjbcabb"
-    const val EXPENSE_KEY = "ajcakjckackjabkbnslsn"
-    const val MONTHLY_PAYMENT_CATEGORY_KEY = "dcbsbhsbhdbhd"
-    const val MONTHLY_PAYMENT_KEY = "acjbbdbahbjha"
 
     const val NETWORK_PAGE_SIZE_UNSPLASH = 30
     const val SHORTCUT_FRAGMENT_NAME_KEY = "sdcjnsknkanckbajcbabacjk"

@@ -9,6 +9,7 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTER_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.RenterPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
 import com.rohitthebest.manageyourrenters.utils.*
@@ -60,14 +61,14 @@ class RenterPaymentViewModel @Inject constructor(
             renterPayment.isSynced = true
             uploadDocumentToFireStore(
                 context,
-                context.getString(R.string.renter_payments),
+                RENTER_PAYMENTS,
                 renterPayment.key
             )
 
             if (supportingDocumentHelperModel != null && supportingDocumentHelperModel.documentType != DocumentType.URL) {
 
                 supportingDocumentHelperModel.modelName =
-                    context.getString(R.string.renter_payments)
+                    RENTER_PAYMENTS
 
                 uploadFileToFirebaseCloudStorage(
                     context,
@@ -161,7 +162,7 @@ class RenterPaymentViewModel @Inject constructor(
 
                 uploadDocumentToFireStore(
                     context,
-                    context.getString(R.string.renter_payments),
+                    RENTER_PAYMENTS,
                     renterPayment.key
                 )
             } else {
@@ -171,7 +172,7 @@ class RenterPaymentViewModel @Inject constructor(
                     updateDocumentOnFireStore(
                         context,
                         map,
-                        context.getString(R.string.renter_payments),
+                        RENTER_PAYMENTS,
                         renterPayment.key
                     )
                 }
@@ -199,7 +200,7 @@ class RenterPaymentViewModel @Inject constructor(
 
             deleteDocumentFromFireStore(
                 context,
-                context.getString(R.string.renter_payments),
+                RENTER_PAYMENTS,
                 renterPayment.key
             )
 
@@ -257,7 +258,7 @@ class RenterPaymentViewModel @Inject constructor(
             updatePayment(oldRenterPayment, renterPayment)
         } else {
 
-            supportDocumentHelper.modelName = context.getString(R.string.renter_payments)
+            supportDocumentHelper.modelName = RENTER_PAYMENTS
 
             if (!oldRenterPayment.isSynced) {
                 insertPayment(renterPayment, supportDocumentHelper)
@@ -292,7 +293,7 @@ class RenterPaymentViewModel @Inject constructor(
 
                 deleteAllDocumentsUsingKeyFromFirestore(
                     context,
-                    context.getString(R.string.renter_payments),
+                    RENTER_PAYMENTS,
                     convertStringListToJSON(keys)
                 )
             }

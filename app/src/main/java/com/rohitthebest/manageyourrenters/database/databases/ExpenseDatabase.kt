@@ -4,8 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.rohitthebest.manageyourrenters.database.dao.ExpenseCategoryDAO
 import com.rohitthebest.manageyourrenters.database.dao.ExpenseDAO
-import com.rohitthebest.manageyourrenters.database.model.apiModels.Expense
-import com.rohitthebest.manageyourrenters.database.model.apiModels.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.Expense
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 
 @Database(
     entities = [ExpenseCategory::class, Expense::class],

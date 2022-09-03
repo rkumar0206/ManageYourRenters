@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.utils.MDUtil.getStringArray
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
-import com.rohitthebest.manageyourrenters.database.model.apiModels.MonthlyPayment
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
 import com.rohitthebest.manageyourrenters.databinding.ItemMonthlyPaymentBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 

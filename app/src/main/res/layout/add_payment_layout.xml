@@ -416,7 +416,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -468,7 +468,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 app:counterEnabled="true"
-                app:counterMaxLength="7"
+                app:counterMaxLength="12"
                 app:errorEnabled="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -482,7 +482,7 @@
                     android:backgroundTint="@color/white"
                     android:hint="@string/house_rent"
                     android:inputType="numberDecimal"
-                    android:maxLength="7" />
+                    android:maxLength="12" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
@@ -505,7 +505,7 @@
 
             <View
                 android:id="@+id/divider10"
-                android:layout_width="377dp"
+                android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_marginTop="2dp"
                 android:background="?android:attr/listDivider"
@@ -523,8 +523,7 @@
                 android:textColor="@color/textColor1"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@+id/calculateElectrictyBtn"
-                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider10" />
 
@@ -532,11 +531,12 @@
                 android:id="@+id/divider11"
                 android:layout_width="377dp"
                 android:layout_height="1dp"
+                android:layout_marginTop="5dp"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/calculateElectrictyBtn" />
+                app:layout_constraintTop_toBottomOf="@id/textView13" />
 
             <TextView
                 android:id="@+id/textView14"
@@ -688,19 +688,6 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider15" />
-
-            <ImageButton
-                android:id="@+id/calculateElectrictyBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:backgroundTint="@android:color/transparent"
-                android:contentDescription="@string/imagebutton"
-                android:minHeight="48dp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView13"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/textView13"
-                app:srcCompat="@drawable/ic_baseline_calculate_24" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
@@ -946,7 +933,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="2dp"
                 app:counterEnabled="true"
-                app:counterMaxLength="7"
+                app:counterMaxLength="12"
                 app:errorEnabled="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -960,7 +947,7 @@
                     android:backgroundTint="@color/white"
                     android:hint="@string/amount_paid"
                     android:inputType="numberDecimal"
-                    android:maxLength="7"
+                    android:maxLength="12"
                     android:textColor="@color/color_green" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -1014,12 +1001,13 @@
 
     <Button
         android:id="@+id/seeTotalBtn"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/see_total"
+        android:text="@string/total_"
         app:layout_constraintEnd_toStartOf="@+id/totalTV"
+        app:layout_constraintStart_toStartOf="@+id/cardView5"
         app:layout_constraintTop_toBottomOf="@+id/divider27"
         tools:visibility="visible" />
 
@@ -1028,9 +1016,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
+        android:ellipsize="end"
         android:padding="4dp"
         android:text="@string/_0"
-        android:textSize="24sp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/seeTotalBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/seeTotalBtn" />

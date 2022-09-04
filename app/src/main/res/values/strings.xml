@@ -288,10 +288,12 @@
     <string name="update_to_version">Update to %1$s</string>
     <string name="version">Version</string>
     <string name="whats_new">Whats New</string>
-    <string name="unable_to_fetch_details">Unable to fetch details</string>
+    <string name="unable_to_fetch_details">Unable to fetch details. No internet connection</string>
     <string name="download_apk">Download APK</string>
     <string name="download">Download</string>
     <string name="unable_to_load_image">Unable to load the image!!</string>
+    <string name="checking_for_updates">Checking for updates…</string>
+    <string name="update_avaliable">Update available…</string>
 
     <string-array name="interest_time_schedule">
 

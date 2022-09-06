@@ -213,7 +213,7 @@ class MonthlyPaymentCategoryFragment : Fragment(R.layout.fragment_monthly_paymen
         searchView.clearFocus()
         searchView.setQuery("", true)
 
-        searchView.searchText { s ->
+        searchView.onTextChanged { s ->
 
             if (s?.isEmpty()!!) {
 

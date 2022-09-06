@@ -265,8 +265,7 @@ fun Uri.getFileNameAndSize(contentResolver: ContentResolver): Pair<String, Long>
     return null
 }
 
-inline fun SearchView.searchText(
-
+inline fun SearchView.onTextChanged(
     crossinline onTextChanged: (newText: String?) -> Unit
 ) {
 
@@ -277,6 +276,24 @@ inline fun SearchView.searchText(
         override fun onQueryTextChange(newText: String?): Boolean {
 
             onTextChanged(newText)
+            return true
+        }
+
+    })
+}
+
+inline fun SearchView.onTextSubmit(
+    crossinline onTextSubmit: (newText: String?) -> Unit
+) {
+
+    this.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(query: String?): Boolean {
+
+            onTextSubmit(query)
+            return true
+        }
+
+        override fun onQueryTextChange(newText: String?): Boolean {
             return true
         }
 

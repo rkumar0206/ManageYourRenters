@@ -215,7 +215,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         val searchView =
             binding.toolbar.menu.findItem(R.id.menu_expense_search).actionView as SearchView
 
-        searchView.searchText { s ->
+        searchView.onTextChanged { s ->
 
             if (s?.isEmpty()!!) {
 

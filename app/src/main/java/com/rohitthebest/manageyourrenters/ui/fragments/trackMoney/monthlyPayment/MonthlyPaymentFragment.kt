@@ -308,7 +308,7 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
         searchView.clearFocus()
         searchView.setQuery("", true)
 
-        searchView.searchText { s ->
+        searchView.onTextChanged { s ->
 
             if (s?.isEmpty()!!) {
 

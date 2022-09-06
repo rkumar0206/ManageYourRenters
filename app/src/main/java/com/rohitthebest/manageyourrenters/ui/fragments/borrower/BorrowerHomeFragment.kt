@@ -126,7 +126,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         val searchView =
             binding.individualRenterToolbar.menu.findItem(R.id.menu_search).actionView as SearchView
 
-        searchView.searchText { newText ->
+        searchView.onTextChanged { newText ->
 
             if (borrowerList.isEmpty()) {
 

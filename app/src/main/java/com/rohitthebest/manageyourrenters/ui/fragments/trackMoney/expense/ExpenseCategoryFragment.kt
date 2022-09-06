@@ -224,7 +224,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
         searchView.clearFocus()
         searchView.setQuery("", true)
 
-        searchView.searchText { s ->
+        searchView.onTextChanged { s ->
 
             if (s?.isEmpty()!!) {
 

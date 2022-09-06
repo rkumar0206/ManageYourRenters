@@ -339,7 +339,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
         val searchView =
             binding.emiFragmentToolbar.menu.findItem(R.id.menu_search).actionView as SearchView
 
-        searchView.searchText { s ->
+        searchView.onTextChanged { s ->
 
             if (s?.trim()?.isEmpty()!!) {
 

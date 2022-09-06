@@ -294,6 +294,7 @@
     <string name="unable_to_load_image">Unable to load the image!!</string>
     <string name="checking_for_updates">Checking for updates…</string>
     <string name="update_avaliable">Update available…</string>
+    <string name="no_matching_results_found">No matching results found!!</string>
 
     <string-array name="interest_time_schedule">
 

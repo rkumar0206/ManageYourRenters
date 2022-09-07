@@ -115,33 +115,28 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private fun getAllRentersList() {
 
-        try {
+        renterViewModel.getAllRentersList().observe(viewLifecycleOwner) { renters ->
 
-            renterViewModel.getAllRentersList().observe(viewLifecycleOwner) { renters ->
+            if (searchView != null && searchView!!.query.toString().isValid()) {
 
-                if (searchView != null && searchView!!.query.toString().isValid()) {
+                setUpSearchEditText(renters)
+            } else {
 
+                if (renters.isNotEmpty()) {
+
+                    hideNoRentersAddedTV()
                     setUpSearchEditText(renters)
                 } else {
-
-                    if (renters.isNotEmpty()) {
-
-                        hideNoRentersAddedTV()
-                        setUpSearchEditText(renters)
-                    } else {
-                        binding.noRentersAddedTV.text = getString(R.string.no_renters_added_message)
-                        showNoRentersAddedTV()
-                    }
+                    binding.noRentersAddedTV.text = getString(R.string.no_renters_added_message)
+                    showNoRentersAddedTV()
+                }
 
                     mAdapter.submitList(renters)
                 }
-                // saving the recycler view position
                 binding.rentersRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
                 binding.homeProgressBar.hide()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+
     }
 
     private fun setUpSearchEditText(renters: List<Renter>) {
@@ -175,6 +170,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             binding.rentersRV.scrollToPosition(0)
             mAdapter.submitList(renters)
+            hideNoRentersAddedTV()
         } else {
 
             val filteredList = renters.filter { renter ->
@@ -188,10 +184,11 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                         )
             }
 
-            if (renters.isNotEmpty()) {
+            if (filteredList.isNotEmpty()) {
                 hideNoRentersAddedTV()
             } else {
-                binding.noRentersAddedTV.text = getString(R.string.no_matching_results_found)
+                binding.noRentersAddedTV.text =
+                    getString(R.string.no_matching_results_found_message)
                 showNoRentersAddedTV()
             }
 

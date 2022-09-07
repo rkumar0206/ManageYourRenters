@@ -2,7 +2,6 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
@@ -45,6 +44,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
     private lateinit var emiAdapter: EMIAdapter
 
     private var rvStateParcelable: Parcelable? = null
+    private var searchView: SearchView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -315,47 +315,67 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
         emiViewModel.getAllEMIs().observe(viewLifecycleOwner) { emiList ->
 
-            Log.d(TAG, "getEMIs: $emiList")
+            if (searchView != null && searchView!!.query.toString().isValid()) {
 
-            if (emiList.isEmpty()) {
-
-                setNoEMIAddedMessageTVVisibility(true)
+                setUpSearchView(emiList)
             } else {
 
-                setNoEMIAddedMessageTVVisibility(false)
+                if (emiList.isNotEmpty()) {
+
+                    setNoEMIAddedMessageTVVisibility(false)
+                    setUpSearchView(emiList)
+                } else {
+
+                    binding.noEmiAddedMessageTV.text = getString(R.string.no_EMI_added_message)
+                    setNoEMIAddedMessageTVVisibility(true)
+                }
+                emiAdapter.submitList(emiList)
             }
-
-            emiAdapter.submitList(emiList)
             binding.emiRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
-
-            setUpSearchView(emiList)
 
             setProgressBarVisibility(false)
         }
     }
 
-    private fun setUpSearchView(emiList: List<EMI>?) {
+    private fun setUpSearchView(emiList: List<EMI>) {
 
-        val searchView =
+        searchView =
             binding.emiFragmentToolbar.menu.findItem(R.id.menu_search).actionView as SearchView
 
-        searchView.onTextChanged { s ->
+        if (searchView != null) {
 
-            if (s?.trim()?.isEmpty()!!) {
+            if (searchView!!.query.toString().isValid()) {
+                searchEMI(searchView!!.query.toString(), emiList)
+            }
+            searchView!!.onTextSubmit { query -> searchEMI(query, emiList) }
 
-                binding.emiRV.scrollToPosition(0)
-                emiAdapter.submitList(emiList)
-            } else {
+            searchView!!.onTextChanged { query -> searchEMI(query, emiList) }
+        }
+    }
 
-                val filteredList = emiList?.filter { emi ->
+    private fun searchEMI(query: String?, emiList: List<EMI>) {
 
-                    emi.emiName.lowercase().contains(s.lowercase().trim())
-                }
+        if (query?.trim()?.isEmpty()!!) {
 
-                emiAdapter.submitList(filteredList)
+            binding.emiRV.scrollToPosition(0)
+            emiAdapter.submitList(emiList)
+            setNoEMIAddedMessageTVVisibility(false)
+        } else {
 
+            val filteredList = emiList.filter { emi ->
+
+                emi.emiName.lowercase().contains(query.lowercase().trim())
             }
 
+            if (filteredList.isNotEmpty()) {
+                setNoEMIAddedMessageTVVisibility(false)
+            } else {
+                binding.noEmiAddedMessageTV.text =
+                    getString(R.string.no_matching_results_found_message)
+                setNoEMIAddedMessageTVVisibility(true)
+            }
+
+            emiAdapter.submitList(filteredList)
         }
 
     }

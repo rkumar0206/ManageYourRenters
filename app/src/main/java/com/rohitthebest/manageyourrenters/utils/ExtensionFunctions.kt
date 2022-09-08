@@ -26,6 +26,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.rohitthebest.manageyourrenters.R
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import java.io.ByteArrayOutputStream
 
 fun View.show() {
@@ -298,6 +300,23 @@ inline fun SearchView.onTextSubmit(
         }
 
     })
+}
+
+suspend inline fun Job?.executeAfterDelay(
+    timeMillis: Long = 300,
+    crossinline executeMethod: () -> Unit
+) {
+
+    try {
+        if (this != null && this.isActive) {
+            this.cancel()
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    } finally {
+        delay(timeMillis)
+        executeMethod()
+    }
 }
 
 

@@ -22,6 +22,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -220,7 +221,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
                 binding.progressbar.hide()
             }
     }
-
+    private var searchTextDelayJob: Job? = null
     private fun setUpSearchView(expenseCategories: List<ExpenseCategory>) {
 
         searchView =
@@ -232,7 +233,14 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
                 searchExpenseCategory(sv.query.toString(), expenseCategories)
             }
             sv.onTextSubmit { query -> searchExpenseCategory(query, expenseCategories) }
-            sv.onTextChanged { query -> searchExpenseCategory(query, expenseCategories) }
+            sv.onTextChanged { query ->
+
+                searchTextDelayJob = lifecycleScope.launch {
+                    searchTextDelayJob?.executeAfterDelay {
+                        searchExpenseCategory(query, expenseCategories)
+                    }
+                }
+            }
         }
     }
 

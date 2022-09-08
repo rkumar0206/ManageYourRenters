@@ -26,6 +26,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.onViewOrDown
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -337,6 +338,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
         }
     }
 
+    private var searchTextDelayJob: Job? = null
     private fun setUpSearchView(emiList: List<EMI>) {
 
         searchView =
@@ -349,7 +351,14 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
             }
             sv.onTextSubmit { query -> searchEMI(query, emiList) }
 
-            sv.onTextChanged { query -> searchEMI(query, emiList) }
+            sv.onTextChanged { query ->
+                searchTextDelayJob = lifecycleScope.launch {
+
+                    searchTextDelayJob?.executeAfterDelay {
+                        searchEMI(query, emiList)
+                    }
+                }
+            }
         }
     }
 

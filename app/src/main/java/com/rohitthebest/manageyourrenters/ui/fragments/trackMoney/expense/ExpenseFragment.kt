@@ -28,6 +28,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showDateAndT
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -214,6 +215,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         binding.progressbar.hide()
     }
 
+    private var searchTextDelayJob: Job? = null
     private fun setUpSearchMenuButton(expenses: List<Expense>) {
 
         searchView =
@@ -228,8 +230,14 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             searchExpense(sv.query.toString(), expenses)
 
             sv.onTextSubmit { query -> searchExpense(query, expenses) }
-            sv.onTextChanged { query -> searchExpense(query, expenses) }
+            sv.onTextChanged { query ->
 
+                searchTextDelayJob = lifecycleScope.launch {
+                    searchTextDelayJob.executeAfterDelay {
+                        searchExpense(query, expenses)
+                    }
+                }
+            }
         }
     }
 

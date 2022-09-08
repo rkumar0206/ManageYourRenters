@@ -34,7 +34,7 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/no_monthly_payment_category_TV"
+        android:id="@+id/no_monthly_payment_category_added_TV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

@@ -35,6 +35,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -216,6 +217,8 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         }
     }
 
+    private var searchTextDelayJob: Job? = null
+
     private fun initializeSearchView(paymentList: List<RenterPayment>) {
 
         try {
@@ -228,8 +231,15 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                     searchRenterPayment(sv.query.toString(), paymentList)
                 }
                 sv.onTextSubmit { query -> searchRenterPayment(query, paymentList) }
-                sv.onTextChanged { query -> searchRenterPayment(query, paymentList) }
+                sv.onTextChanged { query ->
 
+                    searchTextDelayJob = lifecycleScope.launch {
+
+                        searchTextDelayJob?.executeAfterDelay {
+                            searchRenterPayment(query, paymentList)
+                        }
+                    }
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()

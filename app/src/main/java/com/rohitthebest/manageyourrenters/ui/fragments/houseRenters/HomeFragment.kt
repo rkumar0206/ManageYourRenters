@@ -38,6 +38,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showMobileNu
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -131,13 +132,15 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     showNoRentersAddedTV()
                 }
 
-                    mAdapter.submitList(renters)
-                }
-                binding.rentersRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
-                binding.homeProgressBar.hide()
+                mAdapter.submitList(renters)
             }
+            binding.rentersRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
+            binding.homeProgressBar.hide()
+        }
 
     }
+
+    private var searchTextDelayJob: Job? = null
 
     private fun setUpSearchEditText(renters: List<Renter>) {
 
@@ -158,7 +161,11 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             sv.onTextChanged { query ->
 
-                searchRenter(query, renters)
+                searchTextDelayJob = lifecycleScope.launch {
+                    searchTextDelayJob?.executeAfterDelay {
+                        searchRenter(query, renters)
+                    }
+                }
             }
         }
     }

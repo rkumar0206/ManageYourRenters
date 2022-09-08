@@ -26,6 +26,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -126,6 +127,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         }
     }
 
+    private var searchTextDelayJob: Job? = null
     private fun initSearchViewMenu(borrowerList: List<Borrower>) {
 
         searchView =
@@ -143,7 +145,12 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
             }
 
             searchView!!.onTextChanged { newText ->
-                searchBorrower(newText, borrowerList)
+
+                searchTextDelayJob = lifecycleScope.launch {
+                    searchTextDelayJob?.executeAfterDelay {
+                        searchBorrower(newText, borrowerList)
+                    }
+                }
             }
         }
     }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +19,7 @@ import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentCategoryViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -35,6 +37,7 @@ class MonthlyPaymentCategoryFragment : Fragment(R.layout.fragment_monthly_paymen
     private var rvStateParcelable: Parcelable? = null
 
     private lateinit var monthlyPaymentCategoryAdapter: MonthlyPaymentCategoryAdapter
+    private var searchView: SearchView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -184,53 +187,99 @@ class MonthlyPaymentCategoryFragment : Fragment(R.layout.fragment_monthly_paymen
         monthlyPaymentCategoryViewModel.getAllMonthlyPaymentCategories()
             .observe(viewLifecycleOwner) { categories ->
 
-                if (categories.isNotEmpty()) {
+                if (searchView != null && searchView!!.query.toString().isValid()) {
 
-                    binding.noMonthlyPaymentCategoryTV.hide()
-                    binding.monthlyPaymentCategoryRV.show()
                     setUpSearchView(categories)
                 } else {
 
-                    binding.noMonthlyPaymentCategoryTV.show()
-                    binding.monthlyPaymentCategoryRV.hide()
+                    if (categories.isNotEmpty()) {
+
+                        setNoMonthlyPaymentCategoryMessageTvVisibility(false)
+                        setUpSearchView(categories)
+                    } else {
+
+                        binding.noMonthlyPaymentCategoryAddedTV.text =
+                            getString(R.string.no_monthly_payment_category_added_message)
+                        setNoMonthlyPaymentCategoryMessageTvVisibility(true)
+                    }
+                    monthlyPaymentCategoryAdapter.submitList(categories)
                 }
-
-                binding.progressbar.hide()
-
-                monthlyPaymentCategoryAdapter.submitList(categories)
-
                 binding.monthlyPaymentCategoryRV.layoutManager?.onRestoreInstanceState(
                     rvStateParcelable
                 )
+                binding.progressbar.hide()
             }
     }
 
-    private fun setUpSearchView(monthlyPaymentCategories: List<MonthlyPaymentCategory>?) {
+    private var searchTextDelayJob: Job? = null
+    private fun setUpSearchView(monthlyPaymentCategories: List<MonthlyPaymentCategory>) {
 
-        val searchView =
+        searchView =
             binding.toolbar.menu.findItem(R.id.menu_search_monthly_payment_category).actionView as SearchView
 
-        searchView.clearFocus()
-        searchView.setQuery("", true)
+        searchView?.let { sv ->
 
-        searchView.onTextChanged { s ->
+            if (sv.query.toString().isValid()) {
+                searchMonthlyPaymentCategory(sv.query.toString(), monthlyPaymentCategories)
+            }
 
-            if (s?.isEmpty()!!) {
+            sv.onTextSubmit { query ->
+                searchMonthlyPaymentCategory(
+                    query,
+                    monthlyPaymentCategories
+                )
+            }
+            sv.onTextChanged { query ->
 
-                binding.monthlyPaymentCategoryRV.scrollToPosition(0)
-                monthlyPaymentCategoryAdapter.submitList(monthlyPaymentCategories)
-            } else {
-
-                val filteredList = monthlyPaymentCategories?.filter { monthlyPaymentCategory ->
-
-                    monthlyPaymentCategory.categoryName.lowercase(Locale.ROOT).contains(
-                        s.toString().trim().lowercase(Locale.ROOT)
-                    )
+                searchTextDelayJob = lifecycleScope.launch {
+                    searchTextDelayJob?.executeAfterDelay {
+                        searchMonthlyPaymentCategory(query, monthlyPaymentCategories)
+                    }
                 }
-
-                monthlyPaymentCategoryAdapter.submitList(filteredList)
             }
         }
+    }
+
+    private fun searchMonthlyPaymentCategory(
+        query: String?,
+        monthlyPaymentCategories: List<MonthlyPaymentCategory>
+    ) {
+
+        if (query?.isEmpty()!!) {
+
+            binding.monthlyPaymentCategoryRV.scrollToPosition(0)
+            monthlyPaymentCategoryAdapter.submitList(monthlyPaymentCategories)
+
+            if (monthlyPaymentCategories.isNotEmpty()) {
+
+                setNoMonthlyPaymentCategoryMessageTvVisibility(false)
+            } else {
+
+                binding.noMonthlyPaymentCategoryAddedTV.text =
+                    getString(R.string.no_monthly_payment_category_added_message)
+                setNoMonthlyPaymentCategoryMessageTvVisibility(true)
+            }
+
+        } else {
+
+            val filteredList = monthlyPaymentCategories.filter { monthlyPaymentCategory ->
+
+                monthlyPaymentCategory.categoryName.lowercase(Locale.ROOT).contains(
+                    query.toString().trim().lowercase(Locale.ROOT)
+                )
+            }
+
+            if (filteredList.isNotEmpty()) {
+
+                setNoMonthlyPaymentCategoryMessageTvVisibility(false)
+            } else {
+
+                binding.noMonthlyPaymentCategoryAddedTV.text = getString(R.string.no_records_found)
+                setNoMonthlyPaymentCategoryMessageTvVisibility(true)
+            }
+            monthlyPaymentCategoryAdapter.submitList(filteredList)
+        }
+
     }
 
     private fun initListeners() {
@@ -244,6 +293,13 @@ class MonthlyPaymentCategoryFragment : Fragment(R.layout.fragment_monthly_paymen
             findNavController().navigate(R.id.action_monthlyPaymentCategoryFragment_to_addEditMonthlyPaymentCategory)
         }
     }
+
+    private fun setNoMonthlyPaymentCategoryMessageTvVisibility(isVisible: Boolean) {
+
+        binding.monthlyPaymentCategoryRV.isVisible = !isVisible
+        binding.noMonthlyPaymentCategoryAddedTV.isVisible = isVisible
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

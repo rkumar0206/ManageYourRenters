@@ -226,15 +226,14 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
         searchView =
             binding.toolbar.menu.findItem(R.id.menu_search_expense_category).actionView as SearchView
 
-        if (searchView != null) {
+        searchView?.let { sv ->
 
-            if (searchView!!.query.toString().isValid()) {
-                searchExpenseCategory(searchView!!.query.toString(), expenseCategories)
+            if (sv.query.toString().isValid()) {
+                searchExpenseCategory(sv.query.toString(), expenseCategories)
             }
-            searchView!!.onTextSubmit { query -> searchExpenseCategory(query, expenseCategories) }
-            searchView!!.onTextChanged { query -> searchExpenseCategory(query, expenseCategories) }
+            sv.onTextSubmit { query -> searchExpenseCategory(query, expenseCategories) }
+            sv.onTextChanged { query -> searchExpenseCategory(query, expenseCategories) }
         }
-
     }
 
     private fun searchExpenseCategory(query: String?, expenseCategories: List<ExpenseCategory>) {
@@ -243,7 +242,13 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
             binding.expenseCategoryRV.scrollToPosition(0)
             expenseCategoryAdapter.submitList(expenseCategories)
-            setNoExpenseCategoryMessageTvVisibility(false)
+            if (expenseCategories.isNotEmpty()) {
+                setNoExpenseCategoryMessageTvVisibility(false)
+            } else {
+                binding.noExpenseCategoryTV.text =
+                    getString(R.string.no_expense_category_added_message)
+                setNoExpenseCategoryMessageTvVisibility(true)
+            }
         } else {
 
             val filteredList = expenseCategories.filter { expenseCategory ->

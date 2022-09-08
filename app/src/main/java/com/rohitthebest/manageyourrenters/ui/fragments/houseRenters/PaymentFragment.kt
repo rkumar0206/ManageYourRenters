@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -131,7 +132,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
             receivedRenter = renter
 
             updateCurrentDueOrAdvanceTV()
-
         }
     }
 
@@ -290,20 +290,31 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         renterPaymentForMenus = payment
         adapterItemPosition = position
 
-        requireActivity().supportFragmentManager.let {
+        receivedRenter?.key?.let { renterKey ->
+            renterPaymentViewModel.getLastRenterPayment(renterKey)
+                .observe(viewLifecycleOwner) { renterPayment ->
 
-            val bundle = Bundle()
+                    requireActivity().supportFragmentManager.let { fm ->
 
-            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !payment.isSynced)
-            bundle.putBoolean(Constants.SHOW_DELETE_MENU, position == 0)
-            bundle.putBoolean(Constants.SHOW_EDIT_MENU, false)
-            bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
+                        val bundle = Bundle()
 
-            CustomMenuItems.newInstance(
-                bundle
-            ).apply {
-                show(it, TAG)
-            }.setOnClickListener(this)
+                        bundle.putBoolean(Constants.SHOW_SYNC_MENU, !payment.isSynced)
+                        bundle.putBoolean(Constants.SHOW_EDIT_MENU, false)
+                        bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
+
+                        // showing delete payment menu if it is the last payment
+                        bundle.putBoolean(
+                            Constants.SHOW_DELETE_MENU,
+                            renterPayment.key == renterPaymentForMenus.key
+                        )
+
+                        CustomMenuItems.newInstance(
+                            bundle
+                        ).apply {
+                            show(fm, TAG)
+                        }.setOnClickListener(this)
+                    }
+                }
         }
     }
 
@@ -469,8 +480,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         } else {
             showToast(requireContext(), getString(R.string.no_supporting_doc_added))
         }
-
-
     }
 
     override fun onSyncMenuClick() {
@@ -548,7 +557,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
             binding.deleteAllPaymentsBtn.id -> {
 
-                if (binding.noPaymentsTV.visibility == View.VISIBLE) {
+                if (binding.noPaymentsTV.isVisible) {
 
                     showToast(requireContext(), "No Payments added!!!")
                 } else {

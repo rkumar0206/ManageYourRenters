@@ -342,14 +342,14 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
         searchView =
             binding.emiFragmentToolbar.menu.findItem(R.id.menu_search).actionView as SearchView
 
-        if (searchView != null) {
+        searchView?.let { sv ->
 
-            if (searchView!!.query.toString().isValid()) {
-                searchEMI(searchView!!.query.toString(), emiList)
+            if (sv.query.toString().isValid()) {
+                searchEMI(sv.query.toString(), emiList)
             }
-            searchView!!.onTextSubmit { query -> searchEMI(query, emiList) }
+            sv.onTextSubmit { query -> searchEMI(query, emiList) }
 
-            searchView!!.onTextChanged { query -> searchEMI(query, emiList) }
+            sv.onTextChanged { query -> searchEMI(query, emiList) }
         }
     }
 
@@ -359,7 +359,12 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
             binding.emiRV.scrollToPosition(0)
             emiAdapter.submitList(emiList)
-            setNoEMIAddedMessageTVVisibility(false)
+            if (emiList.isNotEmpty()) {
+                setNoEMIAddedMessageTVVisibility(false)
+            } else {
+                binding.noEmiAddedMessageTV.text = getString(R.string.no_EMI_added_message)
+                setNoEMIAddedMessageTVVisibility(true)
+            }
         } else {
 
             val filteredList = emiList.filter { emi ->

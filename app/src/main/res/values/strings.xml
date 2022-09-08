@@ -174,7 +174,7 @@
     <string name="post">POST</string>
     <string name="put">PUT</string>
     <string name="delete_one">DELETE</string>
-    <string name="no_expense_category_added_message">Click (+) button to add Expense Category.\nExample : Shopping, Lunch, etc…</string>
+    <string name="no_expense_category_added_message">Click (+) button to add Expense Category.\nExample : Shopping, Snacks, etc…</string>
     <string name="add_expense_category">Add expense category</string>
     <string name="expense_category">Expense Category</string>
     <string name="add_image">Add Image</string>

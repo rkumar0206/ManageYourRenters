@@ -1,9 +1,9 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -61,6 +61,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     private var sortBy: SortExpense = SortExpense.BY_CREATED
     private var isArgumentEmpty = false
+    private var searchView: SearchView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -160,7 +161,9 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                     // adding number of milliseconds in one day to the endDate for accurate result
 
                     expenseViewModel.getExpenseByDateRangeAndExpenseCategoryKey(
-                        receivedExpenseCategoryKey, startDate, (endDate + 86400000L)
+                        receivedExpenseCategoryKey,
+                        startDate,
+                        (endDate + Constants.ONE_DAY_MILLISECONDS)
                     ).observe(viewLifecycleOwner) { expenses ->
 
                         handleExpenseList(expenses)
@@ -179,7 +182,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             } else if (sortBy == SortExpense.BY_DATE_RANGE) {
 
                 expenseViewModel.getExpensesByDateRange(
-                    startDate, (endDate + 86400000L)
+                    startDate, (endDate + Constants.ONE_DAY_MILLISECONDS)
                 ).observe(viewLifecycleOwner) { expenses ->
 
                     handleExpenseList(expenses)
@@ -191,48 +194,78 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     private fun handleExpenseList(expenses: List<Expense>) {
 
-        if (expenses.isNotEmpty()) {
+        if (searchView != null && searchView!!.query.toString().isValid()) {
 
-            binding.noExpenseCategoryTV.hide()
-            binding.expenseRV.show()
+            setUpSearchMenuButton(expenses)
         } else {
 
-            binding.noExpenseCategoryTV.show()
-            binding.expenseRV.hide()
+            if (expenses.isNotEmpty()) {
+
+                setNoExpenseAddedVisibility(false)
+                setUpSearchMenuButton(expenses)
+            } else {
+
+                binding.noExpenseCategoryTV.text = getString(R.string.no_expense_added_message)
+                setNoExpenseAddedVisibility(true)
+            }
+            expenseAdapter.submitList(expenses)
         }
-
-        Log.d(TAG, "observeExpenses: $expenses")
-
-        expenseAdapter.submitList(expenses)
-
-        setUpSearchMenuButton(expenses)
 
         binding.progressbar.hide()
     }
 
     private fun setUpSearchMenuButton(expenses: List<Expense>) {
 
-        val searchView =
+        searchView =
             binding.toolbar.menu.findItem(R.id.menu_expense_search).actionView as SearchView
 
-        searchView.onTextChanged { s ->
+        searchView?.let { sv ->
 
-            if (s?.isEmpty()!!) {
-
-                binding.expenseRV.scrollToPosition(0)
-                expenseAdapter.submitList(expenses)
-            } else {
-
-                val filteredList = expenses.filter { expense ->
-
-                    expense.spentOn.lowercase(Locale.ROOT)
-                        .contains(s.trim().lowercase(Locale.ROOT)) || expense.amount.toString()
-                        .lowercase(Locale.ROOT).contains(s.trim().lowercase(Locale.ROOT))
-                }
-
-                expenseAdapter.submitList(filteredList)
+            if (sv.query.toString().isValid()) {
+                searchExpense(sv.query.toString(), expenses)
             }
+
+            searchExpense(sv.query.toString(), expenses)
+
+            sv.onTextSubmit { query -> searchExpense(query, expenses) }
+            sv.onTextChanged { query -> searchExpense(query, expenses) }
+
         }
+    }
+
+    private fun searchExpense(query: String?, expenses: List<Expense>) {
+
+        if (query?.isEmpty()!!) {
+
+            binding.expenseRV.scrollToPosition(0)
+            expenseAdapter.submitList(expenses)
+
+            if (expenses.isEmpty()) {
+
+                binding.noExpenseCategoryTV.text = getString(R.string.no_expense_added_message)
+                setNoExpenseAddedVisibility(true)
+            } else {
+                setNoExpenseAddedVisibility(false)
+            }
+        } else {
+
+            val filteredList = expenses.filter { expense ->
+
+                expense.spentOn.lowercase(Locale.ROOT)
+                    .contains(query.trim().lowercase(Locale.ROOT)) || expense.amount.toString()
+                    .lowercase(Locale.ROOT).contains(query.trim().lowercase(Locale.ROOT))
+            }
+
+            if (filteredList.isNotEmpty()) {
+                setNoExpenseAddedVisibility(false)
+            } else {
+                binding.noExpenseCategoryTV.text =
+                    getString(R.string.no_matching_results_found_message)
+                setNoExpenseAddedVisibility(true)
+            }
+            expenseAdapter.submitList(filteredList)
+        }
+
     }
 
     private fun setUpRecyclerView() {
@@ -498,7 +531,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
                 expenseViewModel.getTotalExpenseAmountByCategoryKeyAndDateRange(
                     receivedExpenseCategoryKey,
-                    startDate, endDate + 86400000L
+                    startDate, endDate + Constants.ONE_DAY_MILLISECONDS
                 ).observe(viewLifecycleOwner) { totalAmount ->
 
                     val title = "${receivedExpenseCategory.categoryName}\nFrom ${
@@ -535,7 +568,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             } else if (sortBy == SortExpense.BY_DATE_RANGE) {
 
                 expenseViewModel.getTotalExpenseAmountByDateRange(
-                    startDate, (endDate + 86400000L)
+                    startDate, (endDate + Constants.ONE_DAY_MILLISECONDS)
                 ).observe(viewLifecycleOwner) { totalAmount ->
 
                     val title = "From ${
@@ -694,6 +727,13 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             delay(200)
             observeExpenses()
         }
+    }
+
+    private fun setNoExpenseAddedVisibility(isVisible: Boolean) {
+
+
+        binding.expenseRV.isVisible = !isVisible
+        binding.noExpenseCategoryTV.isVisible = isVisible
     }
 
     override fun onDestroyView() {

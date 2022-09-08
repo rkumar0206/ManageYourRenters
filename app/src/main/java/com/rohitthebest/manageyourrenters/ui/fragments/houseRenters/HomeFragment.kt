@@ -145,19 +145,18 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         searchView =
             binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_search_home).actionView as SearchView
 
-        if (searchView != null) {
+        searchView?.let { sv ->
 
-            if (searchView!!.query.toString().isValid()) {
-                Log.d(TAG, "setUpSearchEditText: query : ${searchView!!.query}")
-                searchRenter(searchView!!.query.toString(), renters)
+            if (sv.query.toString().isValid()) {
+                searchRenter(sv.query.toString(), renters)
             }
 
-            searchView!!.onTextSubmit { query ->
+            sv.onTextSubmit { query ->
 
                 searchRenter(query, renters)
             }
 
-            searchView!!.onTextChanged { query ->
+            sv.onTextChanged { query ->
 
                 searchRenter(query, renters)
             }
@@ -170,7 +169,11 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             binding.rentersRV.scrollToPosition(0)
             mAdapter.submitList(renters)
-            hideNoRentersAddedTV()
+            if (renters.isNotEmpty()) {
+                hideNoRentersAddedTV()
+            } else {
+                showNoRentersAddedTV()
+            }
         } else {
 
             val filteredList = renters.filter { renter ->

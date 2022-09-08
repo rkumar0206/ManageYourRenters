@@ -117,10 +117,10 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
             if (it.isEmpty()) {
 
-                shouldShowNoEMIPaymentAddedTV(true)
+                setNoEMIPaymentAddedTvVisibility(true)
             } else {
 
-                shouldShowNoEMIPaymentAddedTV(false)
+                setNoEMIPaymentAddedTvVisibility(false)
             }
 
             if (this::receivedEMI.isInitialized) {
@@ -430,7 +430,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
         binding.progressBar.isVisible = isVisible
     }
 
-    private fun shouldShowNoEMIPaymentAddedTV(isVisible: Boolean) {
+    private fun setNoEMIPaymentAddedTvVisibility(isVisible: Boolean) {
 
         binding.noEmiPaymentAddedMessageTV.isVisible = isVisible
         binding.emiPaymentsRV.isVisible = !isVisible

@@ -606,37 +606,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
         }
     }
 
-    private fun deleteAllPaymentsAfterWarningMessage() {
-
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Delete all payments?")
-            .setMessage(getString(R.string.delete_warning_message))
-            .setPositiveButton("Delete All") { dialogInterface, _ ->
-
-                if (isInternetAvailable(requireContext())) {
-
-                    renterPaymentViewModel.deleteAllPaymentsOfRenter(
-                        receivedRenter?.key!!
-                    )
-
-                    showToast(
-                        requireContext(),
-                        "Deleted all the payments of ${receivedRenter?.name}"
-                    )
-                } else {
-                    showNoInternetMessage(requireContext())
-                }
-                dialogInterface.dismiss()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-
-    }
-
     private fun setNoPaymentsTvVisibility(isVisible: Boolean) {
 
         binding.noPaymentsTV.isVisible = isVisible

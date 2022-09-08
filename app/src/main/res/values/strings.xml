@@ -295,6 +295,10 @@
     <string name="checking_for_updates">Checking for updates…</string>
     <string name="update_avaliable">Update available…</string>
     <string name="no_matching_results_found_message">No matching results found!!</string>
+    <string name="no_renter_payment_added_message">CLick (+) to add payments for %1$s</string>
+    <string name="no_dues_or_advance">No Dues/Advance</string>
+    <string name="total_advance">Total Advance : %1$s</string>
+    <string name="total_dues">Total Dues : %1$s</string>
 
     <string-array name="interest_time_schedule">
 

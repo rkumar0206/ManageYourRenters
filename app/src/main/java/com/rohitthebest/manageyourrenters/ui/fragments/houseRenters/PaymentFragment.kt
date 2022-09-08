@@ -7,6 +7,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -59,6 +61,7 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     private var rvStateParcelable: Parcelable? = null
 
     private var monthList: List<String> = emptyList()
+    private var searchView: SearchView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -95,7 +98,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                 rvStateParcelable = it
             }
         }
-
     }
 
 
@@ -116,7 +118,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
                     delay(300)
                     getPaymentListOfRenter()
                 }
-
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -130,7 +131,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
             Log.d(TAG, "getTheRenter: ")
 
             receivedRenter = renter
-
             updateCurrentDueOrAdvanceTV()
         }
     }
@@ -144,17 +144,26 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                     Log.d(TAG, "getPaymentListOfRenter: ")
 
-                    if (paymentList.isNotEmpty()) {
+                    if (searchView != null && searchView!!.query.toString().isValid()) {
 
-                        hideNoPaymentsTV()
                         initializeSearchView(paymentList)
-
                     } else {
 
-                        showNoPaymentsTV()
-                    }
+                        if (paymentList.isNotEmpty()) {
 
-                    paymentAdapter.submitList(paymentList)
+                            setNoPaymentsTvVisibility(false)
+                            initializeSearchView(paymentList)
+                        } else {
+
+                            binding.noPaymentsTV.text = getString(
+                                R.string.no_renter_payment_added_message,
+                                receivedRenter?.name
+                            )
+                            setNoPaymentsTvVisibility(true)
+                        }
+
+                        paymentAdapter.submitList(paymentList)
+                    }
                     binding.paymentRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
                     rvStateParcelable = null
                     hideProgressBar()
@@ -170,86 +179,124 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
         Log.d(TAG, "updateCurrentDueOrAdvanceTV: ")
 
-        val currentDueOrAdvance =
-            "${receivedRenter?.name} : ${abs(receivedRenter?.dueOrAdvanceAmount!!).format(2)}"
+        val currentDueOrAdvance = abs(receivedRenter?.dueOrAdvanceAmount!!).format(2)
 
         when {
 
             receivedRenter?.dueOrAdvanceAmount!! < 0.0 -> {
 
-                binding.dueOrAdvancedTV.changeTextColor(requireContext(), R.color.color_orange)
-                binding.dueOrAdvancedTV.text =
-                    "Current due of $currentDueOrAdvance"
+                binding.toolbar.setSubtitleTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.color_orange
+                    )
+                )
+                binding.toolbar.subtitle = getString(R.string.total_dues, currentDueOrAdvance)
             }
             receivedRenter?.dueOrAdvanceAmount!! > 0.0 -> {
 
-                binding.dueOrAdvancedTV.changeTextColor(requireContext(), R.color.color_green)
-                binding.dueOrAdvancedTV.text =
-                    "Current advance of $currentDueOrAdvance"
+                binding.toolbar.setSubtitleTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.color_green
+                    )
+                )
+                binding.toolbar.subtitle = getString(R.string.total_advance, currentDueOrAdvance)
             }
             else -> {
 
-                binding.dueOrAdvancedTV.changeTextColor(requireContext(), R.color.color_green)
-                binding.dueOrAdvancedTV.text =
-                    "There is no due / advance of ${receivedRenter?.name}"
+                binding.toolbar.setSubtitleTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.color_green
+                    )
+                )
+                binding.toolbar.subtitle = getString(R.string.no_dues_or_advance)
             }
         }
     }
 
-    private fun initializeSearchView(paymentList: List<RenterPayment>?) {
+    private fun initializeSearchView(paymentList: List<RenterPayment>) {
 
         try {
+            searchView =
+                binding.toolbar.menu.findItem(R.id.menu_search).actionView as SearchView
 
-            binding.paymentSV.onTextChangedListener { s ->
+            searchView?.let { sv ->
 
-                if (s?.isEmpty()!!) {
-
-                    binding.paymentRV.scrollToPosition(0)
-                    paymentAdapter.submitList(paymentList)
-                } else {
-
-                    val filteredList = paymentList?.filter { payment ->
-
-                        var from: String? = ""
-                        var till: String? = ""
-                        var month = ""
-
-                        if (payment.billPeriodInfo.billPeriodType == BillPeriodType.BY_DATE) {
-
-                            from =
-                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    payment.billPeriodInfo.renterBillDateType?.fromBillDate
-                                )
-
-                            till =
-                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    payment.billPeriodInfo.renterBillDateType?.toBillDate
-                                )
-                        } else {
-
-                            month =
-                                monthList[payment.billPeriodInfo.renterBillMonthType?.forBillMonth?.minus(
-                                    1
-                                )!!]
-                        }
-
-                        month.lowercase(Locale.ROOT).contains(
-
-                            s.toString().trim().lowercase(Locale.ROOT)
-                        ) ||
-                                from?.contains(s.toString().trim())!!
-                                ||
-                                till?.contains(s.toString().trim())!!
-
-                    }
-
-                    paymentAdapter.submitList(filteredList)
+                if (sv.query.toString().isValid()) {
+                    searchRenterPayment(sv.query.toString(), paymentList)
                 }
+                sv.onTextSubmit { query -> searchRenterPayment(query, paymentList) }
+                sv.onTextChanged { query -> searchRenterPayment(query, paymentList) }
 
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun searchRenterPayment(query: String?, paymentList: List<RenterPayment>) {
+
+        if (query?.isEmpty()!!) {
+
+            binding.paymentRV.scrollToPosition(0)
+            paymentAdapter.submitList(paymentList)
+            if (paymentList.isNotEmpty()) {
+                setNoPaymentsTvVisibility(false)
+            } else {
+                binding.noPaymentsTV.text =
+                    getString(R.string.no_renter_payment_added_message, receivedRenter?.name)
+                setNoPaymentsTvVisibility(isVisible = true)
+            }
+        } else {
+
+            val filteredList = paymentList.filter { payment ->
+
+                var from: String? = ""
+                var till: String? = ""
+                var month = ""
+
+                if (payment.billPeriodInfo.billPeriodType == BillPeriodType.BY_DATE) {
+
+                    from =
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            payment.billPeriodInfo.renterBillDateType?.fromBillDate
+                        )
+
+                    till =
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            payment.billPeriodInfo.renterBillDateType?.toBillDate
+                        )
+                } else {
+
+                    month =
+                        monthList[payment.billPeriodInfo.renterBillMonthType?.forBillMonth?.minus(
+                            1
+                        )!!]
+                }
+
+                month.lowercase(Locale.ROOT).contains(
+
+                    query.toString().trim().lowercase(Locale.ROOT)
+                ) ||
+                        from?.contains(query.toString().trim())!!
+                        ||
+                        till?.contains(query.toString().trim())!!
+
+            }
+
+            if (filteredList.isNotEmpty()) {
+                setNoPaymentsTvVisibility(false)
+            } else {
+                binding.noPaymentsTV.text =
+                    getString(R.string.no_matching_results_found_message)
+                setNoPaymentsTvVisibility(true)
+            }
+
+            paymentAdapter.submitList(filteredList)
+        }
+
     }
 
     private fun setUpRecyclerView() {
@@ -284,35 +331,41 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     private lateinit var renterPaymentForMenus: RenterPayment
     private var adapterItemPosition = 0
+    private var isRefreshEnabled = true
 
     override fun onMenuBtnClicked(payment: RenterPayment, position: Int) {
 
         renterPaymentForMenus = payment
         adapterItemPosition = position
+        isRefreshEnabled = true
 
         receivedRenter?.key?.let { renterKey ->
             renterPaymentViewModel.getLastRenterPayment(renterKey)
                 .observe(viewLifecycleOwner) { renterPayment ->
 
-                    requireActivity().supportFragmentManager.let { fm ->
+                    if (isRefreshEnabled) {
+                        requireActivity().supportFragmentManager.let { fm ->
 
-                        val bundle = Bundle()
+                            val bundle = Bundle()
 
-                        bundle.putBoolean(Constants.SHOW_SYNC_MENU, !payment.isSynced)
-                        bundle.putBoolean(Constants.SHOW_EDIT_MENU, false)
-                        bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
+                            bundle.putBoolean(Constants.SHOW_SYNC_MENU, !payment.isSynced)
+                            bundle.putBoolean(Constants.SHOW_EDIT_MENU, false)
+                            bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
 
-                        // showing delete payment menu if it is the last payment
-                        bundle.putBoolean(
-                            Constants.SHOW_DELETE_MENU,
-                            renterPayment.key == renterPaymentForMenus.key
-                        )
+                            // showing delete payment menu if it is the last payment
+                            bundle.putBoolean(
+                                Constants.SHOW_DELETE_MENU,
+                                renterPayment.key == renterPaymentForMenus.key
+                            )
 
-                        CustomMenuItems.newInstance(
-                            bundle
-                        ).apply {
-                            show(fm, TAG)
-                        }.setOnClickListener(this)
+                            CustomMenuItems.newInstance(
+                                bundle
+                            ).apply {
+                                show(fm, TAG)
+                            }.setOnClickListener(this)
+
+                            isRefreshEnabled = false
+                        }
                     }
                 }
         }
@@ -528,12 +581,9 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     private fun initListener() {
 
         binding.addPyamentFAB.setOnClickListener(this)
-        binding.deleteAllPaymentsBtn.setOnClickListener(this)
-        binding.paymentBackBtn.setOnClickListener(this)
-
-        binding.paymentRV.changeVisibilityOfFABOnScrolled(
-            binding.addPyamentFAB
-        )
+        binding.toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressed()
+        }
     }
 
     override fun onClick(v: View?) {
@@ -543,7 +593,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
             binding.addPyamentFAB.id -> {
 
                 try {
-
                     val action =
                         PaymentFragmentDirections.actionPaymentFragmentToAddPaymentFragment(
                             convertRenterToJSONString(receivedRenter!!)
@@ -553,22 +602,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
                     e.printStackTrace()
                 }
-            }
-
-            binding.deleteAllPaymentsBtn.id -> {
-
-                if (binding.noPaymentsTV.isVisible) {
-
-                    showToast(requireContext(), "No Payments added!!!")
-                } else {
-
-                    deleteAllPaymentsAfterWarningMessage()
-                }
-            }
-
-            binding.paymentBackBtn.id -> {
-
-                requireActivity().onBackPressed()
             }
         }
     }
@@ -604,37 +637,17 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
     }
 
-    private fun showNoPaymentsTV() {
+    private fun setNoPaymentsTvVisibility(isVisible: Boolean) {
 
-        try {
-
-            binding.noPaymentsTV.show()
-            binding.paymentRV.hide()
-            binding.paymentAppBarLL.hide()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun hideNoPaymentsTV() {
-
-        try {
-
-            binding.noPaymentsTV.hide()
-            binding.paymentRV.show()
-            binding.paymentAppBarLL.show()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        binding.noPaymentsTV.isVisible = isVisible
+        binding.paymentRV.isVisible = !isVisible
     }
 
     private fun showProgressBar() {
 
         try {
-
             binding.paymentFragProgressBar.show()
         } catch (e: java.lang.Exception) {
-
             e.printStackTrace()
         }
     }
@@ -642,7 +655,6 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
     private fun hideProgressBar() {
 
         try {
-
             binding.paymentFragProgressBar.hide()
         } catch (e: java.lang.Exception) {
 

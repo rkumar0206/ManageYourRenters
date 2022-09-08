@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
@@ -25,6 +26,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -43,6 +45,8 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
     private lateinit var borrowerAdapter: BorrowerAdapter
 
     private var rvStateParcelable: Parcelable? = null
+
+    private var searchView: SearchView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -102,47 +106,79 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
         borrowerViewModel.getAllBorrower()
 
-        borrowerViewModel.allBorrowersList.observe(viewLifecycleOwner) {
+        borrowerViewModel.allBorrowersList.observe(viewLifecycleOwner) { borrowers ->
 
-            if (it.isEmpty()) {
-
-                showNoBorrowersAddedTV(true)
+            if (searchView != null && searchView!!.query.toString().isValid()) {
+                initSearchViewMenu(borrowers)
             } else {
+                if (borrowers.isNotEmpty()) {
 
-                showNoBorrowersAddedTV(false)
+                    showNoBorrowersAddedTV(false)
+                    initSearchViewMenu(borrowers)
+                } else {
+                    binding.noBorrowersAddedMessageTV.text =
+                        getString(R.string.no_borrowers_message)
+                    showNoBorrowersAddedTV(true)
+                }
+                borrowerAdapter.submitList(borrowers)
             }
-
-            borrowerAdapter.submitList(it)
             binding.individualRentersRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
-
-            initSearchViewMenu(it)
-
             binding.refreshLayout.isRefreshing = false
         }
     }
 
+    private var searchTextDelayJob: Job? = null
     private fun initSearchViewMenu(borrowerList: List<Borrower>) {
 
-        val searchView =
+        searchView =
             binding.individualRenterToolbar.menu.findItem(R.id.menu_search).actionView as SearchView
 
-        searchView.searchText { newText ->
+        if (searchView != null) {
 
-            if (borrowerList.isEmpty()) {
-
-                binding.individualRentersRV.scrollToPosition(0)
-                borrowerAdapter.submitList(borrowerList)
-            } else {
-
-                val filteredList = borrowerList.filter { borrower ->
-
-                    borrower.name.lowercase(Locale.ROOT)
-                        .contains(newText.toString().trim().lowercase(Locale.ROOT))
-                }
-
-                borrowerAdapter.submitList(filteredList)
+            if (searchView!!.query.toString().isValid()) {
+                Log.d(TAG, "setUpSearchEditText: query : ${searchView!!.query}")
+                searchBorrower(searchView!!.query.toString(), borrowerList)
             }
 
+            searchView!!.onTextSubmit { newText ->
+                searchBorrower(newText, borrowerList)
+            }
+
+            searchView!!.onTextChanged { newText ->
+
+                searchTextDelayJob = lifecycleScope.launch {
+                    searchTextDelayJob?.executeAfterDelay {
+                        searchBorrower(newText, borrowerList)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun searchBorrower(query: String?, borrowerList: List<Borrower>) {
+
+        if (query?.isEmpty()!!) {
+
+            binding.individualRentersRV.scrollToPosition(0)
+            borrowerAdapter.submitList(borrowerList)
+            showNoBorrowersAddedTV(false)
+        } else {
+
+            val filteredList = borrowerList.filter { borrower ->
+
+                borrower.name.lowercase(Locale.ROOT)
+                    .contains(query.toString().trim().lowercase(Locale.ROOT))
+            }
+            if (filteredList.isNotEmpty()) {
+
+                showNoBorrowersAddedTV(false)
+            } else {
+                binding.noBorrowersAddedMessageTV.text =
+                    getString(R.string.no_matching_results_found_message)
+                showNoBorrowersAddedTV(true)
+            }
+
+            borrowerAdapter.submitList(filteredList)
         }
     }
 

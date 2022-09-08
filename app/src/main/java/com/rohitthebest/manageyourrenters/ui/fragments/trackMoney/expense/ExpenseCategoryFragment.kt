@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +22,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -39,6 +41,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
     private lateinit var expenseCategoryAdapter: ExpenseCategoryAdapter
 
     private var rvStateParcelable: Parcelable? = null
+    private var searchView: SearchView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -197,54 +200,82 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
         expenseCategoryViewModel.getAllExpenseCategories()
             .observe(viewLifecycleOwner) { expenseCategories ->
 
-                if (expenseCategories.isNotEmpty()) {
+                if (searchView != null && searchView!!.query.toString().isValid()) {
 
-                    binding.noExpenseCategoryTV.hide()
-                    binding.expenseCategoryRV.show()
                     setUpSearchView(expenseCategories)
                 } else {
 
-                    binding.noExpenseCategoryTV.show()
-                    binding.expenseCategoryRV.hide()
+                    if (expenseCategories.isNotEmpty()) {
+
+                        setNoExpenseCategoryMessageTvVisibility(false)
+                        setUpSearchView(expenseCategories)
+                    } else {
+                        binding.noExpenseCategoryTV.text =
+                            getString(R.string.no_expense_category_added_message)
+                        setNoExpenseCategoryMessageTvVisibility(true)
+                    }
+
+                    expenseCategoryAdapter.submitList(expenseCategories)
                 }
-
-                binding.progressbar.hide()
-
-                expenseCategoryAdapter.submitList(expenseCategories)
-
                 binding.expenseCategoryRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
+                binding.progressbar.hide()
             }
     }
+    private var searchTextDelayJob: Job? = null
+    private fun setUpSearchView(expenseCategories: List<ExpenseCategory>) {
 
-    private fun setUpSearchView(expenseCategories: List<ExpenseCategory>?) {
-
-        val searchView =
+        searchView =
             binding.toolbar.menu.findItem(R.id.menu_search_expense_category).actionView as SearchView
 
-        searchView.clearFocus()
-        searchView.setQuery("", true)
+        searchView?.let { sv ->
 
-        searchView.searchText { s ->
+            if (sv.query.toString().isValid()) {
+                searchExpenseCategory(sv.query.toString(), expenseCategories)
+            }
+            sv.onTextSubmit { query -> searchExpenseCategory(query, expenseCategories) }
+            sv.onTextChanged { query ->
 
-            if (s?.isEmpty()!!) {
-
-                binding.expenseCategoryRV.scrollToPosition(0)
-                expenseCategoryAdapter.submitList(expenseCategories)
-            } else {
-
-                val filteredList = expenseCategories?.filter { expenseCategory ->
-
-                    expenseCategory.categoryName.lowercase(Locale.ROOT).contains(
-                        s.toString().trim().lowercase(Locale.ROOT)
-                    )
+                searchTextDelayJob = lifecycleScope.launch {
+                    searchTextDelayJob?.executeAfterDelay {
+                        searchExpenseCategory(query, expenseCategories)
+                    }
                 }
+            }
+        }
+    }
 
-                expenseCategoryAdapter.submitList(filteredList)
+    private fun searchExpenseCategory(query: String?, expenseCategories: List<ExpenseCategory>) {
 
+        if (query?.isEmpty()!!) {
+
+            binding.expenseCategoryRV.scrollToPosition(0)
+            expenseCategoryAdapter.submitList(expenseCategories)
+            if (expenseCategories.isNotEmpty()) {
+                setNoExpenseCategoryMessageTvVisibility(false)
+            } else {
+                binding.noExpenseCategoryTV.text =
+                    getString(R.string.no_expense_category_added_message)
+                setNoExpenseCategoryMessageTvVisibility(true)
+            }
+        } else {
+
+            val filteredList = expenseCategories.filter { expenseCategory ->
+
+                expenseCategory.categoryName.lowercase(Locale.ROOT).contains(
+                    query.toString().trim().lowercase(Locale.ROOT)
+                )
+            }
+            if (filteredList.isNotEmpty()) {
+                setNoExpenseCategoryMessageTvVisibility(false)
+            } else {
+                binding.noExpenseCategoryTV.text =
+                    getString(R.string.no_matching_results_found_message)
+                setNoExpenseCategoryMessageTvVisibility(true)
             }
 
-        }
+            expenseCategoryAdapter.submitList(filteredList)
 
+        }
     }
 
     private fun initListeners() {
@@ -274,6 +305,12 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
             true
         }
+    }
+
+    private fun setNoExpenseCategoryMessageTvVisibility(isVisible: Boolean) {
+
+        binding.expenseCategoryRV.isVisible = !isVisible
+        binding.noExpenseCategoryTV.isVisible = isVisible
     }
 
     override fun onDestroyView() {

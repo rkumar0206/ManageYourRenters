@@ -299,27 +299,11 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         expenseCategoryViewModel.getExpenseCategoryByKey(expense.categoryKey)
             .observe(viewLifecycleOwner) { expenseCategory ->
 
-                val msg =
-                    "\nDate : ${
-                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                            expense.created, "dd-MM-yyyy hh:mm a"
-                        )
-                    }\n\n" +
-                            "Amount : ${expense.amount}\n\n" +
-                            "Spent On : ${expense.spentOn}\n\n" +
-                            "Category : ${expenseCategory.categoryName}"
-
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Expense info")
-                    .setMessage(msg)
-                    .setPositiveButton("Ok") { dialog, _ ->
-
-                        dialog.dismiss()
-                    }
-                    .create()
-                    .show()
+                expense.showDetailedInfoInAlertDialog(
+                    requireContext(),
+                    expenseCategory.categoryName
+                )
             }
-
     }
 
     private lateinit var expenseForMenuItems: Expense

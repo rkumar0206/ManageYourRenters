@@ -279,7 +279,7 @@
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.MonthlyGraphFragment"
         android:label="MonthlyGraphFragment"
         tools:layout="@layout/fragment_monthly_graph" />
-    <fragment
+    <dialog
         android:id="@+id/showExpenseBottomSheetFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.ShowExpenseBottomSheetFragment"
         android:label="ShowExpenseBottomSheetFragment"
@@ -296,5 +296,5 @@
             android:name="date2"
             android:defaultValue="0L"
             app:argType="long" />
-    </fragment>
+    </dialog>
 </navigation>

@@ -57,6 +57,6 @@ object Constants {
     const val SHORTCUT_EMI = "com.rohitthebest.manageyourrenters.emis"
 
     // app update related
-    const val APP_VERSION = "4.1.2"
+    const val APP_VERSION = "4.2.0"
     const val APP_UPDATE_FIRESTORE_DOCUMENT_KEY = "latest_app_version"
 }

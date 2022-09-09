@@ -299,6 +299,7 @@
     <string name="no_dues_or_advance">No Dues/Advance</string>
     <string name="total_advance">Total Advance : %1$s</string>
     <string name="total_dues">Total Dues : %1$s</string>
+    <string name="enter_file_name">Enter file name</string>
 
     <string-array name="interest_time_schedule">
 

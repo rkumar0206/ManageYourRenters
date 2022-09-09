@@ -1,4 +1,4 @@
-# ManageYourRenters - [Click for latest release](https://github.com/rkumar0206/ManageYourRenters/releases/tag/4.1.1)
+# ManageYourRenters - [Click for latest release](https://github.com/rkumar0206/ManageYourRenters/releases)
 
 ## Key Features 👇
 

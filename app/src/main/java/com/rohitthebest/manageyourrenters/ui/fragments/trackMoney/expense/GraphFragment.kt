@@ -187,9 +187,15 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
         }
 
-        binding.dateRangeTv.setOnClickListener { view ->
+        binding.dateRangeCv.setOnClickListener {
 
-            showMenuForSelectingCustomTime(view)
+            val action =
+                GraphFragmentDirections.actionGraphFragmentToShowExpenseBottomSheetFragment(
+                    if (selectedCustomDateRangeMenu == CustomDateRange.ALL_TIME) CustomDateRange.ALL_TIME else CustomDateRange.CUSTOM_DATE_RANGE,
+                    d1,
+                    d2
+                )
+            findNavController().navigate(action)
         }
     }
 

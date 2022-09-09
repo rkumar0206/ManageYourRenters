@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.CompoundButton
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
@@ -75,6 +77,21 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
         getMessage()
         initListeners()
         textWatchers()
+        setUpRenterAddressET()
+    }
+
+    private fun setUpRenterAddressET() {
+
+        renterViewModel.getAllDistinctAddress().observe(viewLifecycleOwner) { addresses ->
+
+            val adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                addresses
+            )
+
+            includeBinding.renterAddressET.setAdapter(adapter)
+        }
     }
 
     private fun getMessage() {
@@ -132,7 +149,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
                 renter.roomNumber
             )
 
-            includeBinding.renterAddressET.editText?.setText(
+            includeBinding.renterAddressET.setText(
                 renter.address
             )
 
@@ -270,7 +287,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             otherDocumentName = includeBinding.otherDocumentNameET.text.toString().trim()
             otherDocumentNumber = includeBinding.otherDocumentNumber.text.toString().trim()
             roomNumber = includeBinding.renterRoomNumberET.editText?.text.toString().trim()
-            address = includeBinding.renterAddressET.editText?.text.toString().trim()
+            address = includeBinding.renterAddressET.text.toString().trim()
             uid = getUid()!!
 
             renterId = if (!isMessageReceivesForEditing) {
@@ -370,9 +387,9 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             return false
         }
 
-        if (!includeBinding.renterAddressET.editText?.isTextValid()!!) {
+        if (!includeBinding.renterAddressET.isTextValid()) {
 
-            includeBinding.renterAddressET.error = EDIT_TEXT_EMPTY_MESSAGE
+            setAddressErrorTvVisibility(true)
             return false
         }
 
@@ -397,6 +414,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
         return includeBinding.renterNameET.error == null
                 && includeBinding.renterRoomNumberET.error == null
                 && includeBinding.renterAddressET.error == null
+                && !includeBinding.addressErrorTV.isVisible
                 && includeBinding.renterMobileNumberET.isTextValid()
 
     }
@@ -443,14 +461,15 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
 
         }
 
-        includeBinding.renterAddressET.editText?.onTextChangedListener { s ->
+        includeBinding.renterAddressET.onTextChangedListener { s ->
 
             if (s?.isEmpty()!!) {
 
-                includeBinding.renterAddressET.error = EDIT_TEXT_EMPTY_MESSAGE
+                setAddressErrorTvVisibility(true)
             } else {
 
                 includeBinding.renterAddressET.error = null
+                if (includeBinding.addressErrorTV.isVisible) setAddressErrorTvVisibility(false)
             }
 
         }
@@ -475,6 +494,20 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             includeBinding.mobileNumErrorTV.text = ""
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    private fun setAddressErrorTvVisibility(
+        isVisible: Boolean,
+        errorText: String = EDIT_TEXT_EMPTY_MESSAGE
+    ) {
+
+        includeBinding.addressErrorTV.text = errorText
+
+        if (!isVisible) {
+            includeBinding.addressErrorTV.invisible()
+        } else {
+            includeBinding.addressErrorTV.isVisible = isVisible
         }
     }
 

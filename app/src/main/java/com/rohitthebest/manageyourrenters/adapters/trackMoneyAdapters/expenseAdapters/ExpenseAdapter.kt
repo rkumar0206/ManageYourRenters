@@ -16,7 +16,10 @@ import com.rohitthebest.manageyourrenters.utils.show
 import org.ocpsoft.prettytime.PrettyTime
 import java.util.*
 
-class ExpenseAdapter(val categoryName: String = "") :
+class ExpenseAdapter(
+    val categoryName: String = "",
+    val isCalledFromGraphFragment: Boolean = false
+) :
     ListAdapter<Expense, ExpenseAdapter.ExpenseViewHolder>(DiffUtilCallback()) {
 
     private var mListener: OnClickListener? = null
@@ -94,6 +97,12 @@ class ExpenseAdapter(val categoryName: String = "") :
                             expenseSpentOnTV.hide()
                         }
                     }
+
+                    if (isCalledFromGraphFragment) {
+                        // hide menu button
+                        expenseMenuBtn.hide()
+                    }
+
                 }
             }
         }

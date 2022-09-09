@@ -54,4 +54,8 @@ interface RenterDao {
         startDate: Long,
         endDate: Long
     ): Flow<Map<String, List<Double>>>
+
+    @Query("SELECT DISTINCT address FROM renter_table")
+    fun getAllDistinctAddress(): Flow<List<String>>
+
 }

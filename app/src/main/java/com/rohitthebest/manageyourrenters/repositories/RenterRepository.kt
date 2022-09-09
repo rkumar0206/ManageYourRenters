@@ -35,4 +35,6 @@ class RenterRepository @Inject constructor(
         startDate: Long,
         endDate: Long
     ) = dao.getRentersWithTheirAmountPaidByDateCreated(startDate, endDate)
+
+    fun getAllDistinctAddress() = dao.getAllDistinctAddress()
 }

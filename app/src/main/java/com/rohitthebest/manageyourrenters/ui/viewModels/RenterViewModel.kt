@@ -331,9 +331,11 @@ class RenterViewModel @Inject constructor(
                         map[deletedRenter.renterInfo.name] = listOfAmountPaid
                     }
 
-            }
+                }
 
             _renterNameWithTheirAmountPaid.value = map
         }
     }
+
+    fun getAllDistinctAddress() = repo.getAllDistinctAddress().asLiveData()
 }

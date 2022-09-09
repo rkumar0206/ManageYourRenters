@@ -48,6 +48,9 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
     private var mListener: OnBottomSheetDismissListener? = null
 
     private var isDocumentAdded = false
+    private var recentUrlName = ""
+    private var imageFileName = ""
+    private var pdfFileName = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -125,9 +128,13 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
 
             DocumentType.PDF -> {
                 includeBinding.docTypeRG.check(includeBinding.pdfRB.id)
+                pdfFileName = supportingDoc.documentName
                 onCheckedChanged(includeBinding.docTypeRG, includeBinding.pdfRB.id)
             }
-            DocumentType.IMAGE -> includeBinding.docTypeRG.check(includeBinding.imageRB.id)
+            DocumentType.IMAGE -> {
+                imageFileName = supportingDoc.documentName
+                includeBinding.docTypeRG.check(includeBinding.imageRB.id)
+            }
             DocumentType.URL -> {
                 recentUrlName = supportingDoc.documentName
                 includeBinding.urlET.setText(supportingDoc.documentUrl)
@@ -330,10 +337,12 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
 
                 //pdf uri
                 pdfUri = uri
+                pdfFileName = ""
             } else {
 
                 // image uri
                 imageUri = uri
+                imageFileName = ""
             }
 
             val fileNameAndSize = it.getFileNameAndSize(requireActivity().contentResolver)
@@ -356,8 +365,6 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
         }
     }
     //[END OF LAUNCHERS]
-
-    private var recentUrlName = ""
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
 
@@ -411,7 +418,7 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
                 imageUri?.getFileNameAndSize(requireActivity().contentResolver)
 
             includeBinding.fileNameET
-                .setText(fileNameAndSize?.first)
+                .setText(if (imageFileName.isValid()) imageFileName else fileNameAndSize?.first)
 
             fileSize = fileNameAndSize?.second!!
         } else {
@@ -425,7 +432,7 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
     private fun handlePdfChoice() {
 
         docType = DocumentType.PDF
-        includeBinding.fileNameET.hint = "Enter file name"
+        includeBinding.fileNameET.hint = getString(R.string.enter_file_name)
         showUrlEditText(false)
 
         if (pdfUri != null) {
@@ -438,7 +445,7 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
                 pdfUri?.getFileNameAndSize(requireActivity().contentResolver)
 
             includeBinding.fileNameET
-                .setText(fileNameAndSize?.first)
+                .setText(if (pdfFileName.isValid()) pdfFileName else fileNameAndSize?.first)
 
             fileSize = fileNameAndSize?.second!!
 

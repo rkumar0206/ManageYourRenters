@@ -26,6 +26,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.rohitthebest.manageyourrenters.R
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import java.io.ByteArrayOutputStream
 
 fun View.show() {
@@ -265,8 +267,7 @@ fun Uri.getFileNameAndSize(contentResolver: ContentResolver): Pair<String, Long>
     return null
 }
 
-inline fun SearchView.searchText(
-
+inline fun SearchView.onTextChanged(
     crossinline onTextChanged: (newText: String?) -> Unit
 ) {
 
@@ -281,6 +282,41 @@ inline fun SearchView.searchText(
         }
 
     })
+}
+
+inline fun SearchView.onTextSubmit(
+    crossinline onTextSubmit: (newText: String?) -> Unit
+) {
+
+    this.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(query: String?): Boolean {
+
+            onTextSubmit(query)
+            return true
+        }
+
+        override fun onQueryTextChange(newText: String?): Boolean {
+            return true
+        }
+
+    })
+}
+
+suspend inline fun Job?.executeAfterDelay(
+    timeMillis: Long = 300,
+    crossinline executeMethod: () -> Unit
+) {
+
+    try {
+        if (this != null && this.isActive) {
+            this.cancel()
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    } finally {
+        delay(timeMillis)
+        executeMethod()
+    }
 }
 
 

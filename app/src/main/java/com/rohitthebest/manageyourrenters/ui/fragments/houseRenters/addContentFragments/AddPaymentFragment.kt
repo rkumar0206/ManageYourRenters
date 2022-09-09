@@ -2,8 +2,6 @@ package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.addContentF
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -35,10 +33,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlin.math.abs
 
 private const val TAG = "AddPaymentFragment"
@@ -394,7 +389,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
 
         includeBinding.seeTotalBtn.setOnClickListener(this)
-        includeBinding.calculateElectrictyBtn.setOnClickListener(this)
 
         includeBinding.fromDateTV.setOnClickListener(this)
         includeBinding.dateRangePickerBtn.setOnClickListener(this)
@@ -449,11 +443,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             includeBinding.seeTotalBtn.id -> {
 
                 includeBinding.amountPaidET.editText?.setText(calculateTotalBill())
-            }
-
-            includeBinding.calculateElectrictyBtn.id -> {
-
-                calculateElectricBill()
             }
 
             includeBinding.dateContainer.id -> {
@@ -655,7 +644,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private var netDemand: Double = 0.0
 
     @SuppressLint("SetTextI18n")
-    private fun calculateTotalBill(): String {
+    private fun calculateTotalBill(shouldUpdateAmountPaidTV: Boolean = false): String {
 
         calculateElectricBill()
 
@@ -691,9 +680,14 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         ) {
 
             includeBinding.amountPaidET.editText?.setText("0.0")
+            updateAmountPaidET("0.0")
             0.0
         } else {
+            if (shouldUpdateAmountPaidTV) {
 
+                includeBinding.amountPaidET.editText?.setText(netDemand.toString())
+                updateAmountPaidET(netDemand.toString())
+            }
             includeBinding.amountPaidET.editText?.text.toString().trim().toDouble()
         }
 
@@ -992,56 +986,86 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun textWatcher() {
 
-        includeBinding.houseRentET.editText?.addTextChangedListener(object : TextWatcher {
+        includeBinding.houseRentET.editText?.onTextChangedListener { s ->
+            if (s?.isEmpty()!!) {
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                includeBinding.houseRentET.error = EDIT_TEXT_EMPTY_MESSAGE
+            } else {
 
-                if (s?.isEmpty()!!) {
+                includeBinding.houseRentET.error = null
+            }
+            calculateTotalBillJob()
+        }
 
-                    includeBinding.houseRentET.error = EDIT_TEXT_EMPTY_MESSAGE
-                } else {
+        includeBinding.parkingET.editText?.onTextChangedListener {
+            calculateTotalBillJob()
+        }
 
-                    includeBinding.houseRentET.error = null
+        includeBinding.extraAmountET.onTextChangedListener {
+            calculateTotalBillJob()
+        }
+
+        includeBinding.previousReadingET.onTextChangedListener {
+            calculateTotalBillJob()
+        }
+
+        includeBinding.currentReadingET.onTextChangedListener {
+            calculateTotalBillJob()
+        }
+
+        includeBinding.rateET.onTextChangedListener {
+            calculateTotalBillJob()
+        }
+
+        includeBinding.amountPaidET.editText?.onTextChangedListener { s ->
+
+            updateAmountPaidET(s.toString())
+        }
+    }
+
+    private fun updateAmountPaidET(amountPaid: String) {
+
+        if (amountPaid.trim().isNotEmpty()) {
+            when {
+                amountPaid.trim().toDouble() < netDemand -> {
+
+                    includeBinding.amountPaidET.editText?.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(), R.color.color_orange
+                        )
+                    )
+                }
+                else -> {
+                    includeBinding.amountPaidET.editText?.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(), R.color.color_green
+                        )
+                    )
                 }
             }
+        }
 
-            override fun afterTextChanged(s: Editable?) {}
-        })
+    }
 
-        includeBinding.amountPaidET.editText?.addTextChangedListener(object : TextWatcher {
+    private var delayCalculateBillJob: Job? = null
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+    private fun calculateTotalBillJob() {
 
-                if (s?.toString()?.trim()?.isNotEmpty()!!) {
+        try {
+            if (delayCalculateBillJob != null && delayCalculateBillJob!!.isActive) {
 
-                    when {
-
-                        s.toString().trim().toDouble() < netDemand -> {
-
-                            includeBinding.amountPaidET.editText?.setTextColor(
-                                ContextCompat.getColor(
-                                    requireContext(), R.color.color_orange
-                                )
-                            )
-                        }
-
-                        else -> {
-
-                            includeBinding.amountPaidET.editText?.setTextColor(
-                                ContextCompat.getColor(
-                                    requireContext(), R.color.color_green
-                                )
-                            )
-                        }
-
-                    }
-                }
+                delayCalculateBillJob!!.cancel()
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
 
-            override fun afterTextChanged(s: Editable?) {}
-        })
+            delayCalculateBillJob = lifecycleScope.launch {
+
+                delay(300)
+                calculateTotalBill(true)
+            }
+        }
     }
 
     private fun showByMonthAndHideByDateView() {

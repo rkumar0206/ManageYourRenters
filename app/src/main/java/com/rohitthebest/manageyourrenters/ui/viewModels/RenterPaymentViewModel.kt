@@ -270,37 +270,6 @@ class RenterPaymentViewModel @Inject constructor(
         }
     }
 
-
-    fun deleteAllPaymentsOfRenter(renterKey: String) = viewModelScope.launch {
-
-        val context = getApplication<Application>().applicationContext
-
-        if (isInternetAvailable(context)) {
-
-            val keysAndSupportingDocs =
-                paymentRepository.getPaymentKeysAndSupportingDocumentByRenterKey(renterKey)
-
-            val keys = keysAndSupportingDocs.map { it.key }
-            val supportingDocument = keysAndSupportingDocs.map { it.supportingDocument }
-                .filter { it != null && it.documentType != DocumentType.URL }
-
-            supportingDocument.forEach { supportingDoc ->
-
-                supportingDoc?.let { deleteFileFromFirebaseStorage(context, it.documentUrl) }
-            }
-
-            if (keysAndSupportingDocs.isNotEmpty()) {
-
-                deleteAllDocumentsUsingKeyFromFirestore(
-                    context,
-                    RENTER_PAYMENTS,
-                    convertStringListToJSON(keys)
-                )
-            }
-        }
-        paymentRepository.deleteAllPaymentsOfRenter(renterKey)
-    }
-
     fun deleteAllRenterPayments() = viewModelScope.launch {
 
         paymentRepository.deleteAllRenterPayments()

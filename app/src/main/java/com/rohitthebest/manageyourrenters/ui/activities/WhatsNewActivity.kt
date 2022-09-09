@@ -42,7 +42,7 @@ class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
             if (appUpdate?.version == APP_VERSION) {
 
                 binding.appUpdateBtn.hide()
-                binding.textView86.text = "Whats New ($APP_VERSION)"
+                binding.textView86.text = "Using latest version ($APP_VERSION)"
             } else {
                 binding.appUpdateBtn.show()
                 binding.appUpdateBtn.text =

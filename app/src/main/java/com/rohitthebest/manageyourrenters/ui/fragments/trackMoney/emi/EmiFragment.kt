@@ -2,7 +2,6 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
@@ -27,6 +26,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.onViewOrDown
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -45,6 +45,7 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
     private lateinit var emiAdapter: EMIAdapter
 
     private var rvStateParcelable: Parcelable? = null
+    private var searchView: SearchView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -315,47 +316,80 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
         emiViewModel.getAllEMIs().observe(viewLifecycleOwner) { emiList ->
 
-            Log.d(TAG, "getEMIs: $emiList")
+            if (searchView != null && searchView!!.query.toString().isValid()) {
 
-            if (emiList.isEmpty()) {
-
-                setNoEMIAddedMessageTVVisibility(true)
+                setUpSearchView(emiList)
             } else {
 
-                setNoEMIAddedMessageTVVisibility(false)
+                if (emiList.isNotEmpty()) {
+
+                    setNoEMIAddedMessageTVVisibility(false)
+                    setUpSearchView(emiList)
+                } else {
+
+                    binding.noEmiAddedMessageTV.text = getString(R.string.no_EMI_added_message)
+                    setNoEMIAddedMessageTVVisibility(true)
+                }
+                emiAdapter.submitList(emiList)
             }
-
-            emiAdapter.submitList(emiList)
             binding.emiRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
-
-            setUpSearchView(emiList)
 
             setProgressBarVisibility(false)
         }
     }
 
-    private fun setUpSearchView(emiList: List<EMI>?) {
+    private var searchTextDelayJob: Job? = null
+    private fun setUpSearchView(emiList: List<EMI>) {
 
-        val searchView =
+        searchView =
             binding.emiFragmentToolbar.menu.findItem(R.id.menu_search).actionView as SearchView
 
-        searchView.searchText { s ->
+        searchView?.let { sv ->
 
-            if (s?.trim()?.isEmpty()!!) {
+            if (sv.query.toString().isValid()) {
+                searchEMI(sv.query.toString(), emiList)
+            }
+            sv.onTextSubmit { query -> searchEMI(query, emiList) }
 
-                binding.emiRV.scrollToPosition(0)
-                emiAdapter.submitList(emiList)
-            } else {
+            sv.onTextChanged { query ->
+                searchTextDelayJob = lifecycleScope.launch {
 
-                val filteredList = emiList?.filter { emi ->
-
-                    emi.emiName.lowercase().contains(s.lowercase().trim())
+                    searchTextDelayJob?.executeAfterDelay {
+                        searchEMI(query, emiList)
+                    }
                 }
+            }
+        }
+    }
 
-                emiAdapter.submitList(filteredList)
+    private fun searchEMI(query: String?, emiList: List<EMI>) {
 
+        if (query?.trim()?.isEmpty()!!) {
+
+            binding.emiRV.scrollToPosition(0)
+            emiAdapter.submitList(emiList)
+            if (emiList.isNotEmpty()) {
+                setNoEMIAddedMessageTVVisibility(false)
+            } else {
+                binding.noEmiAddedMessageTV.text = getString(R.string.no_EMI_added_message)
+                setNoEMIAddedMessageTVVisibility(true)
+            }
+        } else {
+
+            val filteredList = emiList.filter { emi ->
+
+                emi.emiName.lowercase().contains(query.lowercase().trim())
             }
 
+            if (filteredList.isNotEmpty()) {
+                setNoEMIAddedMessageTVVisibility(false)
+            } else {
+                binding.noEmiAddedMessageTV.text =
+                    getString(R.string.no_matching_results_found_message)
+                setNoEMIAddedMessageTVVisibility(true)
+            }
+
+            emiAdapter.submitList(filteredList)
         }
 
     }

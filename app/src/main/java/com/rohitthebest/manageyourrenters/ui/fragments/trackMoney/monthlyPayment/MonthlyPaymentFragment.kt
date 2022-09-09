@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -25,6 +26,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -47,6 +49,7 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
     private lateinit var monthlyPaymentAdapter: MonthlyPaymentAdapter
 
     private var rvStateParcelable: Parcelable? = null
+    private var searchView: SearchView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -286,53 +289,103 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
         monthlyPaymentViewModel.getAllMonthlyPaymentsByCategoryKey(receivedMonthlyPaymentCategoryKey)
             .observe(viewLifecycleOwner) { payments ->
 
-                if (payments.isNotEmpty()) {
-                    binding.noMonthlyPaymentCategoryTV.hide()
+                if (searchView != null && searchView!!.query.toString().isValid()) {
+
                     setUpSearchView(payments)
                 } else {
 
-                    binding.noMonthlyPaymentCategoryTV.show()
-                }
+                    if (payments.isNotEmpty()) {
+                        setNoMonthlyPaymentMessageTvVisibility(false)
+                        setUpSearchView(payments)
+                    } else {
 
-                monthlyPaymentAdapter.submitList(payments)
+                        binding.noMonthlyPaymentAddedTV.text =
+                            getString(R.string.no_monthly_payment_added_message)
+                        setNoMonthlyPaymentMessageTvVisibility(true)
+                    }
+
+                    monthlyPaymentAdapter.submitList(payments)
+                }
                 binding.monthlyPaymentRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
 
                 binding.progressbar.hide()
             }
     }
 
-    private fun setUpSearchView(payments: List<MonthlyPayment>?) {
+    private var searchTextDelayJob: Job? = null
+    private fun setUpSearchView(payments: List<MonthlyPayment>) {
 
-        val searchView = binding.toolbar.menu.findItem(R.id.menu_search).actionView as SearchView
+        searchView = binding.toolbar.menu.findItem(R.id.menu_search).actionView as SearchView
 
-        searchView.clearFocus()
-        searchView.setQuery("", true)
+        searchView?.let { sv ->
 
-        searchView.searchText { s ->
+            if (sv.query.toString().isValid()) {
+                searchMonthlyPayments(sv.query.toString(), payments)
+            }
 
-            if (s?.isEmpty()!!) {
+            sv.onTextSubmit { query -> searchMonthlyPayments(query, payments) }
 
-                binding.monthlyPaymentRV.scrollToPosition(0)
-                monthlyPaymentAdapter.submitList(payments)
-            } else {
-
-                val filteredList = payments?.filter { monthlyPayment ->
-
-                    val periodString =
-                        monthlyPaymentViewModel.buildMonthlyPaymentPeriodString(
-                            monthlyPayment.monthlyPaymentDateTimeInfo,
-                            getMonthList(requireContext())
-                        )
-
-                    periodString.lowercase(Locale.ROOT).contains(
-                        s.toString().trim().lowercase(Locale.ROOT)
-                    ) || monthlyPayment.amount.toString().contains(s.toString().trim())
+            sv.onTextChanged { query ->
+                searchTextDelayJob = lifecycleScope.launch {
+                    searchTextDelayJob?.executeAfterDelay {
+                        searchMonthlyPayments(query, payments)
+                    }
                 }
-
-                monthlyPaymentAdapter.submitList(filteredList)
             }
         }
     }
+
+    private fun searchMonthlyPayments(query: String?, payments: List<MonthlyPayment>) {
+
+        if (query?.isEmpty()!!) {
+
+            binding.monthlyPaymentRV.scrollToPosition(0)
+            monthlyPaymentAdapter.submitList(payments)
+
+            if (payments.isNotEmpty()) {
+
+                setNoMonthlyPaymentMessageTvVisibility(false)
+            } else {
+
+                binding.noMonthlyPaymentAddedTV.text =
+                    getString(R.string.no_monthly_payment_added_message)
+                setNoMonthlyPaymentMessageTvVisibility(true)
+            }
+
+        } else {
+
+            val filteredList = payments.filter { monthlyPayment ->
+
+                val periodString =
+                    monthlyPaymentViewModel.buildMonthlyPaymentPeriodString(
+                        monthlyPayment.monthlyPaymentDateTimeInfo,
+                        getMonthList(requireContext())
+                    )
+
+                periodString.lowercase(Locale.ROOT).contains(
+                    query.toString().trim().lowercase(Locale.ROOT)
+                ) || monthlyPayment.amount.toString().contains(query.toString().trim())
+            }
+
+            if (filteredList.isNotEmpty()) {
+
+                setNoMonthlyPaymentMessageTvVisibility(false)
+            } else {
+
+                binding.noMonthlyPaymentAddedTV.text = getString(R.string.no_records_found)
+                setNoMonthlyPaymentMessageTvVisibility(true)
+            }
+
+            monthlyPaymentAdapter.submitList(filteredList)
+        }
+    }
+
+    private fun setNoMonthlyPaymentMessageTvVisibility(isVisible: Boolean) {
+
+        binding.monthlyPaymentRV.isVisible = !isVisible
+        binding.noMonthlyPaymentAddedTV.isVisible = isVisible
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

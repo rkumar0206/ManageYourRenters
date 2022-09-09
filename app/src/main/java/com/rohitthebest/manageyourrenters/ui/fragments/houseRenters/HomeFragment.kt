@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -37,6 +38,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showMobileNu
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -60,6 +62,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     private var rvStateParcelable: Parcelable? = null
 
     private var isRevenueObserveEnabled = false
+
+    private var searchView: SearchView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -112,57 +116,93 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private fun getAllRentersList() {
 
-        try {
+        renterViewModel.getAllRentersList().observe(viewLifecycleOwner) { renters ->
 
-            renterViewModel.getAllRentersList().observe(viewLifecycleOwner) { renters ->
+            if (searchView != null && searchView!!.query.toString().isValid()) {
+
+                setUpSearchEditText(renters)
+            } else {
 
                 if (renters.isNotEmpty()) {
 
                     hideNoRentersAddedTV()
                     setUpSearchEditText(renters)
                 } else {
-
+                    binding.noRentersAddedTV.text = getString(R.string.no_renters_added_message)
                     showNoRentersAddedTV()
                 }
 
                 mAdapter.submitList(renters)
-                binding.rentersRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
-
-                binding.homeProgressBar.hide()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+            binding.rentersRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
+            binding.homeProgressBar.hide()
+        }
+
+    }
+
+    private var searchTextDelayJob: Job? = null
+
+    private fun setUpSearchEditText(renters: List<Renter>) {
+
+        Log.d(TAG, "setUpSearchEditText: ")
+        searchView =
+            binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_search_home).actionView as SearchView
+
+        searchView?.let { sv ->
+
+            if (sv.query.toString().isValid()) {
+                searchRenter(sv.query.toString(), renters)
+            }
+
+            sv.onTextSubmit { query ->
+
+                searchRenter(query, renters)
+            }
+
+            sv.onTextChanged { query ->
+
+                searchTextDelayJob = lifecycleScope.launch {
+                    searchTextDelayJob?.executeAfterDelay {
+                        searchRenter(query, renters)
+                    }
+                }
+            }
         }
     }
 
-    private fun setUpSearchEditText(it: List<Renter>?) {
+    private fun searchRenter(query: String?, renters: List<Renter>) {
 
-        val searchView =
-            binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_search_home).actionView as SearchView
+        if (query?.isEmpty()!!) {
 
-        searchView.searchText { s ->
-
-            if (s?.isEmpty()!!) {
-
-                binding.rentersRV.scrollToPosition(0)
-                mAdapter.submitList(it)
+            binding.rentersRV.scrollToPosition(0)
+            mAdapter.submitList(renters)
+            if (renters.isNotEmpty()) {
+                hideNoRentersAddedTV()
             } else {
+                showNoRentersAddedTV()
+            }
+        } else {
 
-                val filteredList = it?.filter { renter ->
+            val filteredList = renters.filter { renter ->
 
-                    renter.name.lowercase(Locale.ROOT).contains(
-                        s.toString().trim().lowercase(Locale.ROOT)
-                    )
-                            ||
-                            renter.roomNumber.lowercase(Locale.ROOT).contains(
-                                s.toString().trim().lowercase(Locale.ROOT)
-                            )
-                }
-
-                mAdapter.submitList(filteredList)
-
+                renter.name.lowercase(Locale.ROOT).contains(
+                    query.toString().trim().lowercase(Locale.ROOT)
+                )
+                        ||
+                        renter.roomNumber.lowercase(Locale.ROOT).contains(
+                            query.toString().trim().lowercase(Locale.ROOT)
+                        )
             }
 
+            if (filteredList.isNotEmpty()) {
+                hideNoRentersAddedTV()
+            } else {
+                binding.noRentersAddedTV.text =
+                    getString(R.string.no_matching_results_found_message)
+                showNoRentersAddedTV()
+            }
+
+            mAdapter.submitList(filteredList)
         }
     }
 

@@ -189,7 +189,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
         binding.dateRangeTv.setOnClickListener { view ->
 
-            showMenuForSelectingCustomTime(view)
+            //todo : open expenses in bottomsheet
         }
     }
 

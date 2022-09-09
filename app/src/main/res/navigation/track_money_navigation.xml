@@ -201,6 +201,9 @@
         <action
             android:id="@+id/action_graphFragment_to_monthlyGraphFragment"
             app:destination="@id/monthlyGraphFragment" />
+        <action
+            android:id="@+id/action_graphFragment_to_showExpenseBottomSheetFragment"
+            app:destination="@id/showExpenseBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/deepAnalyzeExpenseFragment"
@@ -274,5 +277,24 @@
     <fragment
         android:id="@+id/monthlyGraphFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.MonthlyGraphFragment"
-        android:label="MonthlyGraphFragment" />
+        android:label="MonthlyGraphFragment"
+        tools:layout="@layout/fragment_monthly_graph" />
+    <fragment
+        android:id="@+id/showExpenseBottomSheetFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.ShowExpenseBottomSheetFragment"
+        android:label="ShowExpenseBottomSheetFragment"
+        tools:layout="@layout/fragment_show_expense_bottom_sheet">
+        <argument
+            android:name="dateRangeMessage"
+            android:defaultValue="ALL_TIME"
+            app:argType="com.rohitthebest.manageyourrenters.data.CustomDateRange" />
+        <argument
+            android:name="date1"
+            android:defaultValue="0L"
+            app:argType="long" />
+        <argument
+            android:name="date2"
+            android:defaultValue="0L"
+            app:argType="long" />
+    </fragment>
 </navigation>

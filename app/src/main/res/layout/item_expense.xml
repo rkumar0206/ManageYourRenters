@@ -112,7 +112,8 @@
                 android:minHeight="48dp"
                 app:layout_constraintEnd_toEndOf="@+id/expenseAmountTV"
                 app:layout_constraintTop_toBottomOf="@+id/divider68"
-                app:srcCompat="@drawable/ic_baseline_more_vert_24" />
+                app:srcCompat="@drawable/ic_baseline_more_vert_24"
+                tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -20,6 +21,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowPaymentAdapter
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.StatusEnum
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
@@ -602,15 +604,25 @@ class PaymentFragment : Fragment(), View.OnClickListener, ShowPaymentAdapter.OnC
 
             binding.addPyamentFAB.id -> {
 
-                try {
-                    val action =
-                        PaymentFragmentDirections.actionPaymentFragmentToAddPaymentFragment(
-                            convertRenterToJSONString(receivedRenter!!)
-                        )
-                    findNavController().navigate(action)
-                } catch (e: Exception) {
+                receivedRenter?.let { renter ->
 
-                    e.printStackTrace()
+                    if (renter.status == StatusEnum.ACTIVE) {
+                        try {
+                            val action =
+                                PaymentFragmentDirections.actionPaymentFragmentToAddPaymentFragment(
+                                    convertRenterToJSONString(renter)
+                                )
+                            findNavController().navigate(action)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    } else {
+                        showToast(
+                            requireContext(),
+                            getString(R.string.renter_is_marked_as_inactive),
+                            Toast.LENGTH_LONG
+                        )
+                    }
                 }
             }
         }

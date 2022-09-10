@@ -25,7 +25,7 @@ interface RenterDao {
     @Query("DELETE FROM renter_table WHERE isSynced = :isSynced")
     suspend fun deleteRenterByIsSynced(isSynced: String)
 
-    @Query("SELECT * FROM renter_table ORDER BY modified DESC, timeStamp DESC")
+    @Query("SELECT * FROM renter_table ORDER BY status, modified DESC, timeStamp DESC")
     fun getAllRentersList(): Flow<List<Renter>>
 
     @Query("SELECT COUNT(id) FROM renter_table")

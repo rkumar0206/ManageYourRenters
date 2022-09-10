@@ -58,7 +58,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private var mAuth: FirebaseAuth? = null
 
-    private lateinit var mAdapter: ShowRentersAdapter
+    private lateinit var rentersAdapter: ShowRentersAdapter
 
     private var rvStateParcelable: Parcelable? = null
 
@@ -83,7 +83,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         mAuth = Firebase.auth
 
-        mAdapter = ShowRentersAdapter()
+        rentersAdapter = ShowRentersAdapter()
 
         binding.homeProgressBar.show()
 
@@ -133,7 +133,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     showNoRentersAddedTV()
                 }
 
-                mAdapter.submitList(renters)
+                rentersAdapter.submitList(renters)
             }
             binding.rentersRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
             binding.homeProgressBar.hide()
@@ -176,7 +176,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         if (query?.isEmpty()!!) {
 
             binding.rentersRV.scrollToPosition(0)
-            mAdapter.submitList(renters)
+            rentersAdapter.submitList(renters)
             if (renters.isNotEmpty()) {
                 hideNoRentersAddedTV()
             } else {
@@ -203,7 +203,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                 showNoRentersAddedTV()
             }
 
-            mAdapter.submitList(filteredList)
+            rentersAdapter.submitList(filteredList)
         }
     }
 
@@ -213,14 +213,14 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             binding.rentersRV.apply {
 
-                adapter = mAdapter
+                adapter = rentersAdapter
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true)
                 changeVisibilityOfFABOnScrolled(binding.addRenterFAB)
             }
 
 
-            mAdapter.setOnClickListener(this)
+            rentersAdapter.setOnClickListener(this)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -228,10 +228,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     override fun onRenterClicked(renter: Renter) {
 
-        val action = HomeFragmentDirections.actionHomeFragmentToPaymentFragment(
-            renter.key
-            //convertRenterToJSONString(renter)
-        )
+        val action = HomeFragmentDirections.actionHomeFragmentToPaymentFragment(renter.key)
         findNavController().navigate(action)
     }
 
@@ -438,7 +435,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                         renterForMenus,
                         renterForMenus.copy(isSynced = getString(R.string.t))
                     )
-                    mAdapter.notifyItemChanged(currentAdapterPosition)
+                    rentersAdapter.notifyItemChanged(currentAdapterPosition)
                 }
 
             } else {
@@ -478,12 +475,12 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                 newRenterValue.status =
                     if (renter.status == StatusEnum.ACTIVE) StatusEnum.INACVTIVE else StatusEnum.ACTIVE
 
+                newRenterValue.modified = System.currentTimeMillis()
                 renterViewModel.updateRenter(renter, newRenterValue)
 
-                lifecycleScope.launch {
-                    delay(100)
-                    mAdapter.notifyItemChanged(position)
-                }
+                // todo : fix issue : not changing the status in UI
+                rentersAdapter.notifyItemChanged(position)
+
                 dialog.dismiss()
             }
             .setNegativeButton("Cancel") { dialog, _ ->
@@ -493,6 +490,14 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
             .create()
             .show()
 
+    }
+
+    override fun onDetailsButtonClicked(renter: Renter) {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onPaymentButtonClicked(renter: Renter) {
+        onRenterClicked(renter)
     }
 
     private fun hideNoRentersAddedTV() {

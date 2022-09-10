@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    app:cardBackgroundColor="@color/color_green"
+    app:cardCornerRadius="5dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/renterAdapterCV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="1.8dp"
+        app:cardCornerRadius="5dp"
+        app:rippleColor="@color/rippleColor">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageButton
+                android:id="@+id/adapterRenterStatusBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/divider_color"
+                android:contentDescription="@string/edit"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/adapterRenterNameTV"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/adapterRenterNameTV"
+                app:srcCompat="@drawable/ic_baseline_status_active" />
+
+            <TextView
+                android:id="@+id/adapterRoomNumTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="2dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:padding="4dp"
+                android:textColor="@color/dark_blue"
+                android:textSize="19sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/adapterRenterNameTV"
+                app:layout_constraintTop_toBottomOf="@+id/adapterRenterNameTV"
+                tools:text="1st floor 1st room" />
+
+            <TextView
+                android:id="@+id/adapterRenterNameTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:padding="4dp"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/adapterRenterStatusBtn"
+                app:layout_constraintStart_toEndOf="@+id/renter_profile_image_IV"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Rohit Kumar Singh" />
+
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/renterDetailsBtn"
+                android:layout_width="70dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:cardBackgroundColor="#EAEAEA"
+                app:cardCornerRadius="50dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/renterMenuBtn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider65">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="3dp"
+                    android:text="@string/details"
+                    android:textColor="@color/blue_text_color"
+                    android:textSize="12sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/renterMenuBtn"
+                android:layout_width="70dp"
+                android:layout_height="25dp"
+                app:cardBackgroundColor="#EAEAEA"
+                app:cardCornerRadius="50dp"
+                app:layout_constraintEnd_toStartOf="@+id/renterPaymentsBtn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/renterDetailsBtn"
+                app:layout_constraintTop_toTopOf="@+id/renterDetailsBtn">
+
+                <TextView
+                    android:id="@+id/renterMenuTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="3dp"
+                    android:text="@string/menu"
+                    android:textColor="@color/blue_text_color"
+                    android:textSize="12sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/renterPaymentsBtn"
+                android:layout_width="70dp"
+                android:layout_height="25dp"
+                app:cardBackgroundColor="#EAEAEA"
+                app:cardCornerRadius="50dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/renterMenuBtn"
+                app:layout_constraintTop_toTopOf="@+id/renterMenuBtn">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="3dp"
+                    android:text="@string/payments"
+                    android:textColor="@color/blue_text_color"
+                    android:textSize="12sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <ImageView
+                android:id="@+id/renter_profile_image_IV"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/people_profile_1" />
+
+
+            <View
+                android:id="@+id/divider65"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="3dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="@+id/adapterRoomNumTV"
+                app:layout_constraintStart_toStartOf="@+id/renter_profile_image_IV"
+                app:layout_constraintTop_toBottomOf="@+id/adapterRoomNumTV" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+</androidx.cardview.widget.CardView>

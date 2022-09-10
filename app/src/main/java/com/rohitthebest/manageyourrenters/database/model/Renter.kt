@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
+import com.rohitthebest.manageyourrenters.data.StatusEnum
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 
 @Entity(tableName = "renter_table")
@@ -25,7 +26,8 @@ data class Renter(
     var key: String?,
     var isSupportingDocAdded: Boolean = false,
     var supportingDocument: SupportingDocument? = null,
-    var isSynced: String = "false"
+    var isSynced: String = "false",
+    var status: StatusEnum = StatusEnum.ACTIVE
 ) {
 
     @Exclude
@@ -49,7 +51,8 @@ data class Renter(
         "",
         false,
         null,
-        "false"
+        "false",
+        StatusEnum.ACTIVE
     )
 
 }

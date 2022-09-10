@@ -9,6 +9,7 @@ import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
 import com.rohitthebest.manageyourrenters.utils.convertToJsonString
+import com.rohitthebest.manageyourrenters.utils.isValid
 
 class TypeConvertersForDatabase {
 
@@ -94,6 +95,21 @@ class TypeConvertersForDatabase {
     fun fromStringToRenterPayment(str: String): RenterPayment {
 
         return str.convertJsonToObject(RenterPayment::class.java)!!
+    }
+
+    @TypeConverter
+    fun fromStatusEnumToString(status: StatusEnum): String {
+
+        return Gson().toJson(status)
+    }
+
+    @TypeConverter
+    fun fromStringToStatusEnum(str: String): StatusEnum {
+
+        if (!str.isValid()) {
+            return StatusEnum.ACTIVE
+        }
+        return Gson().fromJson(str, object : TypeToken<StatusEnum>() {}.type)
     }
 
     @TypeConverter

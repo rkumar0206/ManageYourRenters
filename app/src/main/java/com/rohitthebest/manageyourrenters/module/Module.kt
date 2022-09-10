@@ -56,6 +56,12 @@ object Module {
         }
     }
 
+    private val migrationRenter_7_8 = object : Migration(7, 8) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE 'renter_table' ADD COLUMN 'status' TEXT NOT NULL DEFAULT ''")
+        }
+    }
+
     @Provides
     @Singleton
     fun provideRenterDatabase(
@@ -65,7 +71,7 @@ object Module {
         RenterAndPaymentDatabase::class.java,
         RENTER_AND_PAYMENT_DATABASE_NAME
     )
-        .addMigrations(migrationRenter_5_6, migration_6_7)
+        .addMigrations(migrationRenter_5_6, migration_6_7, migrationRenter_7_8)
         .build()
 
     @Provides

@@ -9,8 +9,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.StatusEnum
 import com.rohitthebest.manageyourrenters.database.model.Renter
-import com.rohitthebest.manageyourrenters.databinding.AdapterShowRenterBinding
+import com.rohitthebest.manageyourrenters.databinding.AdapterRenterBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
 
@@ -19,7 +20,7 @@ class ShowRentersAdapter :
 
     private var mListener: OnClickListener? = null
 
-    inner class RenterViewHolder(val binding: AdapterShowRenterBinding) :
+    inner class RenterViewHolder(val binding: AdapterRenterBinding) :
         RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
 
@@ -27,7 +28,8 @@ class ShowRentersAdapter :
 
             binding.renterAdapterCV.setOnClickListener(this)
             binding.adapterRenterEditBtn.setOnClickListener(this)
-            binding.adapterRenterMobileTV.setOnClickListener(this)
+            //binding.adapterRenterMobileTV.setOnClickListener(this)
+            binding.adapterRenterStatusBtn.setOnClickListener(this)
         }
 
         @SuppressLint("SetTextI18n")
@@ -57,17 +59,23 @@ class ShowRentersAdapter :
                         renter.timeStamp
                     )
                 }"
-                binding.adapterRenterMobileTV.text = renter.mobileNumber
-                binding.adapterRenterEmailTV.text = renter.emailId
-                binding.adapterDocumnetNameTV.text = if (renter.otherDocumentName != "") {
+                //binding.adapterRenterMobileTV.text = renter.mobileNumber
+                //binding.adapterRenterEmailTV.text = renter.emailId
+//                binding.adapterDocumnetNameTV.text = if (renter.otherDocumentName != "") {
+//
+//                    "${renter.otherDocumentName} : "
+//                } else {
+//
+//                    "Other document : "
+//                }
+                //binding.adapterRenterDocNumTV.text = renter.otherDocumentNumber
+                //binding.adapterRenterAddressTV.text = renter.address
 
-                    "${renter.otherDocumentName} : "
-                } else {
+                when (renter.status) {
 
-                    "Other document : "
+                    StatusEnum.ACTIVE -> adapterRenterStatusBtn.setImageResource(R.drawable.ic_baseline_status_active)
+                    StatusEnum.INACVTIVE -> adapterRenterStatusBtn.setImageResource(R.drawable.ic_baseline_status_inactive)
                 }
-                binding.adapterRenterDocNumTV.text = renter.otherDocumentNumber
-                binding.adapterRenterAddressTV.text = renter.address
 
                 if (renter.isSynced == binding.root.context.getString(R.string.t)) {
 
@@ -112,17 +120,27 @@ class ShowRentersAdapter :
                     }
 
                 }
-
-                binding.adapterRenterMobileTV.id -> {
+                binding.adapterRenterStatusBtn.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
 
-                        mListener!!.onMobileNumberClicked(
-                            getItem(absoluteAdapterPosition).mobileNumber,
-                            binding.adapterRenterMobileTV
+                        mListener!!.onStatusButtonClicked(
+                            getItem(absoluteAdapterPosition),
+                            absoluteAdapterPosition
                         )
                     }
                 }
+
+//                binding.adapterRenterMobileTV.id -> {
+//
+//                    if (checkForNullability(absoluteAdapterPosition)) {
+//
+//                        mListener!!.onMobileNumberClicked(
+//                            getItem(absoluteAdapterPosition).mobileNumber,
+//                            binding.adapterRenterMobileTV
+//                        )
+//                    }
+//                }
             }
 
         }
@@ -153,7 +171,7 @@ class ShowRentersAdapter :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RenterViewHolder {
 
         val binding =
-            AdapterShowRenterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            AdapterRenterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
         return RenterViewHolder(binding)
     }
@@ -171,6 +189,7 @@ class ShowRentersAdapter :
         fun onRenterClicked(renter: Renter)
         fun onMenuButtonClicked(renter: Renter, position: Int)
         fun onMobileNumberClicked(mobileNumber: String, view: View)
+        fun onStatusButtonClicked(renter: Renter, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

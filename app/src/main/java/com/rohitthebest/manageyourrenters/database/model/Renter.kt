@@ -6,10 +6,12 @@ import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.rohitthebest.manageyourrenters.data.StatusEnum
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import java.io.Serializable
 
 @Entity(tableName = "renter_table")
 @IgnoreExtraProperties
 data class Renter(
+    @Exclude @PrimaryKey(autoGenerate = true) var id: Int? = null,
     var timeStamp: Long? = System.currentTimeMillis(),
     var modified: Long = System.currentTimeMillis(),
     var name: String,
@@ -28,13 +30,10 @@ data class Renter(
     var supportingDocument: SupportingDocument? = null,
     var isSynced: String = "false",
     var status: StatusEnum = StatusEnum.ACTIVE
-) {
-
-    @Exclude
-    @PrimaryKey(autoGenerate = true)
-    var id : Int? = null
+) : Serializable {
 
     constructor() : this(
+        null,
         System.currentTimeMillis(),
         System.currentTimeMillis(),
         "",

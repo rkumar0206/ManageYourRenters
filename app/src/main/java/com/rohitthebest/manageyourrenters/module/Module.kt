@@ -28,9 +28,6 @@ import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Qualifier
-annotation class ManageYourRentersBackendRetrofit
-
-@Qualifier
 annotation class UnsplashImageRetrofit
 
 @Module

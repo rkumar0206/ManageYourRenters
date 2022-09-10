@@ -274,7 +274,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
 
         if (isMessageReceivesForEditing) {
 
-            renter = receivedRenter!!
+            renter = receivedRenter!!.copy()
         }
 
         renter.modified = System.currentTimeMillis()
@@ -366,7 +366,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             showToast(requireContext(), "Renter added")
         } else {
             // update
-            renterViewModel.updateRenter(renter)
+            renterViewModel.updateRenter(receivedRenter!!, renter)
             showToast(requireContext(), "Renter info updated")
         }
 

@@ -89,26 +89,30 @@ class RenterViewModel @Inject constructor(
     }
 
 
-    fun updateRenter(renter: Renter) = viewModelScope.launch {
+    fun updateRenter(
+        oldValue: Renter,
+        newValue: Renter
+    ) = viewModelScope.launch {
 
         val context = getApplication<Application>().applicationContext
 
-        if (isInternetAvailable(context)) {
+        if (isInternetAvailable(context) && compareRenterModel(oldValue, newValue).isNotEmpty()) {
 
-            renter.isSynced = context.getString(R.string.t)
+            newValue.isSynced = context.getString(R.string.t)
 
-            uploadDocumentToFireStore(
+            updateDocumentOnFireStore(
                 context,
+                compareRenterModel(oldValue, newValue),
                 RENTERS,
-                renter.key!!
+                oldValue.key!!
             )
+
         } else {
 
-            renter.isSynced = context.getString(R.string.f)
+            newValue.isSynced = context.getString(R.string.f)
         }
 
-        repo.updateRenter(renter)
-
+        repo.updateRenter(newValue)
     }
 
     fun insertRenters(renters: List<Renter>) = viewModelScope.launch {
@@ -141,10 +145,12 @@ class RenterViewModel @Inject constructor(
                 supportDocumentHelper.documentType
             )
 
+            val oldValue = renter.copy()
+
             renter.isSupportingDocAdded = true
             renter.supportingDocument = supportingDoc
 
-            updateRenter(renter)
+            updateRenter(oldValue, renter)
         } else {
 
             supportDocumentHelper.modelName = RENTERS

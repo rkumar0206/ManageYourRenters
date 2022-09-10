@@ -300,6 +300,9 @@
     <string name="total_advance">Total Advance : %1$s</string>
     <string name="total_dues">Total Dues : %1$s</string>
     <string name="enter_file_name">Enter file name</string>
+    <string name="renter_status_message">Status is %1$s.\nWhen changed to %2$s you %3$s add payments for this renter.</string>
+    <string name="renter_is_marked_as_inactive">This renter is INACTIVE.</string>
+
 
     <string-array name="interest_time_schedule">
 

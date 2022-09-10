@@ -21,6 +21,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowRentersAdapter
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.StatusEnum
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
@@ -410,9 +411,12 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     )
                 }
             }
-            renterForMenus.supportingDocument = null
-            renterForMenus.isSupportingDocAdded = false
-            renterViewModel.updateRenter(renterForMenus)
+
+            val newRenterValue = renterForMenus.copy()
+
+            newRenterValue.supportingDocument = null
+            newRenterValue.isSupportingDocAdded = false
+            renterViewModel.updateRenter(renterForMenus, newRenterValue)
             showToast(requireContext(), "Supporting Document deleted")
 
         } else {
@@ -430,7 +434,10 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     showToast(requireContext(), "Already Synced")
                 } else {
 
-                    renterViewModel.updateRenter(renterForMenus)
+                    renterViewModel.updateRenter(
+                        renterForMenus,
+                        renterForMenus.copy(isSynced = getString(R.string.t))
+                    )
                     mAdapter.notifyItemChanged(currentAdapterPosition)
                 }
 
@@ -447,6 +454,45 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     override fun onMobileNumberClicked(mobileNumber: String, view: View) {
 
         showMobileNumberOptionMenu(requireActivity(), view, mobileNumber)
+    }
+
+    override fun onStatusButtonClicked(renter: Renter, position: Int) {
+
+        var msg = ""
+
+        if (renter.status == StatusEnum.ACTIVE) {
+
+            msg = getString(R.string.renter_status_message, "ACTIVE", "INACTIVE", "cannot")
+        } else if (renter.status == StatusEnum.INACVTIVE) {
+
+            msg = getString(R.string.renter_status_message, "INACTIVE", "ACTIVE", "can")
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Change status?")
+            .setMessage(msg)
+            .setPositiveButton("Change") { dialog, _ ->
+
+                val newRenterValue = renter.copy()
+
+                newRenterValue.status =
+                    if (renter.status == StatusEnum.ACTIVE) StatusEnum.INACVTIVE else StatusEnum.ACTIVE
+
+                renterViewModel.updateRenter(renter, newRenterValue)
+
+                lifecycleScope.launch {
+                    delay(100)
+                    mAdapter.notifyItemChanged(position)
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+
     }
 
     private fun hideNoRentersAddedTV() {

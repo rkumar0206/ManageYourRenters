@@ -176,3 +176,36 @@ fun compareMonthlyPaymentCategoryModel(
 
     return map
 }
+
+fun compareRenterModel(
+    oldData: Renter,
+    newData: Renter
+): HashMap<String, Any?> {
+
+    val map: HashMap<String, Any?> = HashMap()
+
+    if (oldData.timeStamp != newData.timeStamp) map["timeStamp"] = newData.timeStamp
+    if (oldData.modified != newData.modified) map["modified"] = newData.modified
+    if (oldData.name != newData.name) map["name"] = newData.name
+    if (oldData.mobileNumber != newData.mobileNumber) map["mobileNumber"] = newData.mobileNumber
+    if (oldData.emailId != newData.emailId) map["emailId"] = newData.emailId
+    if (oldData.otherDocumentName != newData.otherDocumentName) map["otherDocumentName"] =
+        newData.otherDocumentName
+    if (oldData.otherDocumentNumber != newData.otherDocumentNumber) map["otherDocumentNumber"] =
+        newData.otherDocumentNumber
+    if (oldData.roomNumber != newData.roomNumber) map["roomNumber"] = newData.roomNumber
+    if (oldData.address != newData.address) map["address"] = newData.address
+    if (oldData.dueOrAdvanceAmount != newData.dueOrAdvanceAmount) map["dueOrAdvanceAmount"] =
+        newData.dueOrAdvanceAmount
+    if (oldData.renterId != newData.renterId) map["renterId"] = newData.renterId
+    if (oldData.renterPassword != newData.renterPassword) map["renterPassword"] =
+        newData.renterPassword
+    if (oldData.isSupportingDocAdded != newData.isSupportingDocAdded) map["supportingDocAdded"] =
+        newData.isSupportingDocAdded
+    if (oldData.supportingDocument != newData.supportingDocument) map["supportingDocument"] =
+        newData.supportingDocument
+    if (oldData.status != newData.status) map["status"] = newData.status
+    if (oldData.isSynced != newData.isSynced) map["synced"] = newData.isSynced
+
+    return map
+}

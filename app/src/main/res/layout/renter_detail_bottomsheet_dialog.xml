@@ -11,6 +11,7 @@
         android:background="@color/white">
 
         <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:navigationIcon="@drawable/ic_cancel"
@@ -19,12 +20,13 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/include"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <include layout="@layout/renter_detail_bottomsheet_dialog_layout" />
+        <include
+            android:id="@+id/include"
+            layout="@layout/renter_detail_bottomsheet_dialog_layout" />
 
     </androidx.core.widget.NestedScrollView>
 

@@ -35,7 +35,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getPairOfDat
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showDateRangePickerDialog
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showMobileNumberOptionMenu
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -448,11 +447,6 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     //[END OF MENU CLICK LISTENERS]
 
-    override fun onMobileNumberClicked(mobileNumber: String, view: View) {
-
-        showMobileNumberOptionMenu(requireActivity(), view, mobileNumber)
-    }
-
     override fun onStatusButtonClicked(renter: Renter, position: Int) {
 
         var msg = ""
@@ -492,7 +486,10 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     }
 
     override fun onDetailsButtonClicked(renter: Renter) {
-        //TODO("Not yet implemented")
+        val action = HomeFragmentDirections.actionHomeFragmentToRenterDetailBottomSheetDialog(
+            renter.key
+        )
+        findNavController().navigate(action)
     }
 
     override fun onPaymentButtonClicked(renter: Renter) {

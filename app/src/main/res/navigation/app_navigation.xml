@@ -35,6 +35,9 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_homeFragment_to_renterDetailBottomSheetDialog"
+            app:destination="@id/renterDetailBottomSheetDialog" />
     </fragment>
     <fragment
         android:id="@+id/addRenterFragment"
@@ -109,4 +112,14 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
     </fragment>
+    <dialog
+        android:id="@+id/renterDetailBottomSheetDialog"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.RenterDetailBottomSheetDialog"
+        android:label="RenterDetailBottomSheetDialog"
+        tools:layout="@layout/renter_detail_bottomsheet_dialog">
+        <argument
+            android:name="renterKey"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
 </navigation>

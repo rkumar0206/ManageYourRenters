@@ -23,6 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:contentDescription="@string/image"
             app:srcCompat="@drawable/people_profile_1" />
     </androidx.cardview.widget.CardView>
 
@@ -36,7 +37,7 @@
         android:ellipsize="middle"
         android:fontFamily="@font/amaranth"
         android:maxLines="1"
-        android:text="Rohit Kumar Singh"
+        tools:text="Rohit Kumar Singh"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,6 +54,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/renterNameTV"
         app:layout_constraintStart_toEndOf="@+id/renterNameTV"
         app:layout_constraintTop_toTopOf="@+id/renterNameTV"
+        android:contentDescription="@string/imagebutton"
         app:srcCompat="@drawable/ic_baseline_status_active" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -70,7 +72,7 @@
         android:drawablePadding="5dp"
         android:gravity="center_vertical"
         android:padding="2dp"
-        android:text="Email"
+        android:text="@string/email"
         android:textSize="12sp"
         app:drawableStartCompat="@drawable/ic_baseline_email_24"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
@@ -112,7 +114,7 @@
         android:drawablePadding="5dp"
         android:gravity="center_vertical"
         android:padding="2dp"
-        android:text="Identification Document"
+        android:text="@string/identification_document"
         android:textSize="12sp"
         app:drawableStartCompat="@drawable/ic_baseline_identification_doc_24"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
@@ -126,7 +128,7 @@
         android:drawablePadding="5dp"
         android:gravity="center_vertical"
         android:padding="2dp"
-        android:text="Supporting document"
+        android:text="@string/supporting_doc"
         android:textSize="12sp"
         app:drawableStartCompat="@drawable/ic_baseline_file_present_24"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
@@ -298,7 +300,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="45dp" />
+        app:layout_constraintGuide_begin="48dp" />
 
     <TextView
         android:id="@+id/renterRoomTV"

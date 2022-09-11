@@ -306,6 +306,11 @@
     <string name="inactive">INACTIVE</string>
     <string name="details">Details</string>
     <string name="options">Options</string>
+    <string name="something_went_wrong">Something went wrong!!!</string>
+    <string name="BLANK_DASH">----</string>
+    <string name="email">Email</string>
+    <string name="identification_document">Identification Document</string>
+    <string name="supporting_doc">Supporting document</string>
 
 
     <string-array name="interest_time_schedule">

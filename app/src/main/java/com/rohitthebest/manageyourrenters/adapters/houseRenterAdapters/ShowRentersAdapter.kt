@@ -173,7 +173,6 @@ class ShowRentersAdapter :
 
         fun onRenterClicked(renter: Renter)
         fun onMenuButtonClicked(renter: Renter, position: Int)
-        fun onMobileNumberClicked(mobileNumber: String, view: View)
         fun onStatusButtonClicked(renter: Renter, position: Int)
         fun onDetailsButtonClicked(renter: Renter)
         fun onPaymentButtonClicked(renter: Renter)

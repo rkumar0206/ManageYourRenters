@@ -305,7 +305,7 @@
     <string name="active">ACTIVE</string>
     <string name="inactive">INACTIVE</string>
     <string name="details">Details</string>
-    <string name="menu">Menu</string>
+    <string name="options">Options</string>
 
 
     <string-array name="interest_time_schedule">

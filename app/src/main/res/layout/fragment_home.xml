@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.fragments.houseRenters.HomeFragment"
     android:id="@+id/homeCoordinatorL"
-    android:background="#E4E4E4"
+    android:background="@color/activity_fragment_background"
     >
 
     <com.google.android.material.appbar.AppBarLayout

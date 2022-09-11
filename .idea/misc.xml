@@ -8,12 +8,18 @@
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/expense_shortcut_icon.xml" value="0.24114583333333334" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_app_launcher_logo_foreground.xml" value="0.24114583333333334" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_attach_money_24.xml" value="0.13125" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_call_24.xml" value="0.2315" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_circle_24.xml" value="0.167" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_cloud_download_24.xml" value="0.1335" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_content_copy_24.xml" value="0.1335" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_date_range_24.xml" value="0.24114583333333334" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_date_range_24_coloured.xml" value="0.24114583333333334" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_edit_24.xml" value="0.1215" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_email_24.xml" value="0.2315" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_file_present_24.xml" value="0.2315" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_house_24.xml" value="0.13125" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_identification_doc_24.xml" value="0.2315" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_location_on_24.xml" value="0.2315" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_person_24.xml" value="0.13125" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_status_inactive.xml" value="0.1" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/drawable/ic_baseline_status_online.xml" value="0.167" />
@@ -99,6 +105,8 @@
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/item_monthly_payment.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/item_monthly_payment_category.xml" value="0.22083333333333333" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/item_unsplash_photo.xml" value="0.23020833333333332" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/renter_detail_bottomsheet_dialog.xml" value="0.264" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/renter_detail_bottomsheet_dialog_layout.xml" value="0.2" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/show_bill_layout.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/supporting_document_layout.xml" value="0.23020833333333332" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/user_info_with_sign_out_layout.xml" value="0.23020833333333332" />

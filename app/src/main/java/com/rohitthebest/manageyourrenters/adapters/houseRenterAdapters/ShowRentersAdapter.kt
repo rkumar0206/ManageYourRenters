@@ -1,7 +1,6 @@
 package com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,15 +38,10 @@ class ShowRentersAdapter :
 
             binding.apply {
 
-                Log.d(
-                    TAG,
-                    "setData: renter name : ${renter.name},  status original : ${renter.status}"
-                )
+
                 if (renter.status == StatusEnum.ACTIVE) {
-                    Log.d(TAG, "setData: renterStatus : ACTIVE")
                     adapterRenterStatusBtn.setImageResource(R.drawable.ic_baseline_status_active)
                 } else {
-                    Log.d(TAG, "setData: renterStatus : INACTIVE")
                     adapterRenterStatusBtn.setImageResource(R.drawable.ic_baseline_status_inactive)
                 }
 

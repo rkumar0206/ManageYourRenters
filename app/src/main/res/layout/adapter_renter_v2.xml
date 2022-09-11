@@ -115,7 +115,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:padding="3dp"
-                    android:text="@string/menu"
+                    android:text="@string/options"
                     android:textColor="@color/blue_text_color"
                     android:textSize="12sp" />
 

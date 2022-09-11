@@ -14,10 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.bottomsheets.BottomSheet
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.database.model.Renter
@@ -696,30 +692,30 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun showBillInBottomSheet() {
 
-        try {
-            MaterialDialog(requireContext(), BottomSheet()).show {
-
-                title(text = "Your Bill")
-
-                customView(
-                    R.layout.show_bill_layout,
-                    scrollable = true,
-                    noVerticalPadding = true
-                )
-
-                initializeValues(this.getCustomView())
-            }.positiveButton(text = "Add Payment") {
-
-                initPayment()
-
-            }.negativeButton(text = "Edit") {
-
-                it.dismiss()
-            }
-        } catch (e: Exception) {
-
-            e.printStackTrace()
-        }
+//        try {
+//            MaterialDialog(requireContext(), BottomSheet()).show {
+//
+//                title(text = "Your Bill")
+//
+//                customView(
+//                    R.layout.show_bill_layout,
+//                    scrollable = true,
+//                    noVerticalPadding = true
+//                )
+//
+//                initializeValues(this.getCustomView())
+//            }.positiveButton(text = "Add Payment") {
+//
+//                initPayment()
+//
+//            }.negativeButton(text = "Edit") {
+//
+//                it.dismiss()
+//            }
+//        } catch (e: Exception) {
+//
+//            e.printStackTrace()
+//        }
     }
 
     @SuppressLint("SetTextI18n")

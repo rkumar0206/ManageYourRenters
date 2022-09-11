@@ -12,7 +12,7 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
-import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditRenterBinding
+import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditBorrowerBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
@@ -35,7 +35,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
     CompoundButton.OnCheckedChangeListener,
     SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
-    private var _binding: FragmentAddEditRenterBinding? = null
+    private var _binding: FragmentAddEditBorrowerBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var includeBinding: AddRenterLayoutBinding
@@ -50,7 +50,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentAddEditRenterBinding.bind(view)
+        _binding = FragmentAddEditBorrowerBinding.bind(view)
 
         includeBinding = binding.include
 
@@ -118,7 +118,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
                 b.name
             )
 
-            includeBinding.renterMobileNumberET.setText(
+            includeBinding.renterMobileNumberET.editText?.setText(
                 b.mobileNumber.substring(3)
             )
 
@@ -166,7 +166,6 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
         }
 
         includeBinding.dateAddedCalendarPickBtn.setOnClickListener(this)
-        includeBinding.mobileNumCodePicker.registerCarrierNumberEditText(includeBinding.renterMobileNumberET)
         includeBinding.addSupportingDocCB.setOnCheckedChangeListener(this)
         includeBinding.viewEditSupportingDoc.setOnClickListener(this)
     }
@@ -265,7 +264,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
             modified = System.currentTimeMillis()
 
             name = includeBinding.renterNameET.editText?.text.toString().trim()
-            mobileNumber = includeBinding.mobileNumCodePicker.fullNumberWithPlus
+            mobileNumber = includeBinding.renterMobileNumberET.editText?.text.toString().trim()
             emailId = includeBinding.renterEmailET.editText?.text.toString().trim()
             otherDocumentName = includeBinding.otherDocumentNameET.text.toString().trim()
             otherDocumentNumber = includeBinding.otherDocumentNumber.text.toString().trim()
@@ -349,28 +348,15 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
             return false
         }
 
-        if (!includeBinding.renterMobileNumberET.isTextValid()) {
+        if (!includeBinding.renterMobileNumberET.editText.isTextValid()) {
 
-            showMobileErrorTV()
+            includeBinding.renterMobileNumberET.error = Constants.EDIT_TEXT_EMPTY_MESSAGE
             return false
         }
 
 
-        if (!isMessageReceivedForEditing) {
-
-            if (!includeBinding.mobileNumCodePicker.isValidFullNumber) {
-
-                showToast(
-                    requireContext(),
-                    getString(R.string.mobileNumberErrorMessage),
-                    Toast.LENGTH_LONG
-                )
-                return false
-            }
-        }
-
         return includeBinding.renterNameET.error == null
-                && includeBinding.renterMobileNumberET.isTextValid()
+                && includeBinding.renterMobileNumberET.error == null
 
     }
 
@@ -388,44 +374,18 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
 
         }
 
-        includeBinding.renterMobileNumberET.onTextChangedListener { s ->
+        includeBinding.renterMobileNumberET.editText?.onTextChangedListener { s ->
 
             if (s?.isEmpty()!!) {
 
-                showMobileErrorTV()
-            } else if (!includeBinding.mobileNumCodePicker.isValidFullNumber) {
-
-                showMobileErrorTV()
-                includeBinding.mobileNumErrorTV.text = getString(R.string.mobileNumberErrorMessage)
-
+                includeBinding.renterMobileNumberET.error = Constants.EDIT_TEXT_EMPTY_MESSAGE
             } else {
 
-                hideMobileErrorTV()
+                includeBinding.renterMobileNumberET.error = null
             }
         }
     }
 
-    private fun showMobileErrorTV() {
-
-        try {
-
-            includeBinding.mobileNumErrorTV.show()
-            includeBinding.mobileNumErrorTV.text = Constants.EDIT_TEXT_EMPTY_MESSAGE
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun hideMobileErrorTV() {
-
-        try {
-
-            includeBinding.mobileNumErrorTV.hide()
-            includeBinding.mobileNumErrorTV.text = ""
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -22,7 +22,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentManager
-import com.afollestad.materialdialogs.utils.MDUtil.getStringArray
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -655,7 +654,7 @@ class Functions {
 
         fun getMonthList(context: Context): List<String> {
 
-            return context.getStringArray(R.array.months).toList()
+            return context.resources.getStringArray(R.array.months).toList()
         }
 
         inline fun showCustomDateRangeOptionMenu(

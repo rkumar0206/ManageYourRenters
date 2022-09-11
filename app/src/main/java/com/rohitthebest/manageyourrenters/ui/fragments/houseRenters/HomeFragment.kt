@@ -65,7 +65,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     private var isRevenueObserveEnabled = false
 
     private var searchView: SearchView? = null
-
+    private var listSize = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -119,6 +119,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         renterViewModel.getAllRentersList().observe(viewLifecycleOwner) { renters ->
 
+            listSize = renters.size
+            Log.d(TAG, "getAllRentersList: ${renters.filter { it.name.contains("Gopal") }}")
             if (searchView != null && searchView!!.query.toString().isValid()) {
 
                 setUpSearchEditText(renters)
@@ -409,11 +411,11 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                 }
             }
 
-            val newRenterValue = renterForMenus.copy()
+            val oldRenterValue = renterForMenus.copy()
 
-            newRenterValue.supportingDocument = null
-            newRenterValue.isSupportingDocAdded = false
-            renterViewModel.updateRenter(renterForMenus, newRenterValue)
+            renterForMenus.supportingDocument = null
+            renterForMenus.isSupportingDocAdded = false
+            renterViewModel.updateRenter(oldRenterValue, renterForMenus)
             showToast(requireContext(), "Supporting Document deleted")
 
         } else {
@@ -431,10 +433,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     showToast(requireContext(), "Already Synced")
                 } else {
 
-                    renterViewModel.updateRenter(
-                        renterForMenus,
-                        renterForMenus.copy(isSynced = getString(R.string.t))
-                    )
+                    renterForMenus.isSynced = getString(R.string.t)
+                    renterViewModel.insertRenter(renterForMenus)
                     rentersAdapter.notifyItemChanged(currentAdapterPosition)
                 }
 
@@ -470,15 +470,14 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
             .setMessage(msg)
             .setPositiveButton("Change") { dialog, _ ->
 
-                val newRenterValue = renter.copy()
+                val oldRenterValue = renter.copy()
 
-                newRenterValue.status =
+                renter.status =
                     if (renter.status == StatusEnum.ACTIVE) StatusEnum.INACVTIVE else StatusEnum.ACTIVE
 
-                newRenterValue.modified = System.currentTimeMillis()
-                renterViewModel.updateRenter(renter, newRenterValue)
+                renter.modified = System.currentTimeMillis()
+                renterViewModel.updateRenter(oldRenterValue, renter)
 
-                // todo : fix issue : not changing the status in UI
                 rentersAdapter.notifyItemChanged(position)
 
                 dialog.dismiss()

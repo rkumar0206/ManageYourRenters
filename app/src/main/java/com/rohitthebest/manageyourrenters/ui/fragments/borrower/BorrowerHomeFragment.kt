@@ -252,21 +252,13 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
             requireContext(),
             positiveButtonListener = {
 
-                if (!borrowerForMenus.isSynced) {
+                if (isInternetAvailable(requireContext())) {
 
                     borrowerViewModel.deleteBorrower(
                         borrowerForMenus
                     )
                 } else {
-
-                    if (isInternetAvailable(requireContext())) {
-
-                        borrowerViewModel.deleteBorrower(
-                            borrowerForMenus
-                        )
-                    } else {
-                        showNoInternetMessage(requireContext())
-                    }
+                    showNoInternetMessage(requireContext())
                 }
 
                 it.dismiss()
@@ -422,15 +414,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                 } else {
 
                     borrowerForMenus.isSynced = true
-
-                    uploadDocumentToFireStore(
-                        requireContext(),
-                        getString(R.string.borrowers),
-                        borrowerForMenus.key
-                    )
-
-                    borrowerViewModel.updateBorrower(borrowerForMenus)
-
+                    borrowerViewModel.insertBorrower(borrowerForMenus)
                     borrowerAdapter.notifyItemChanged(currentAdapterPosition)
                 }
 

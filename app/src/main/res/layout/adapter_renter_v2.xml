@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="6dp"
+    android:layout_marginStart="5dp"
+    android:layout_marginTop="1dp"
+    android:layout_marginEnd="5dp"
+    android:layout_marginBottom="2dp"
     app:cardBackgroundColor="@color/color_green"
     app:cardCornerRadius="5dp">
 
@@ -24,7 +27,7 @@
                 android:id="@+id/adapterRenterStatusBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/divider_color"
+                android:backgroundTint="#79EDEDED"
                 android:contentDescription="@string/edit"
                 android:minWidth="48dp"
                 android:minHeight="48dp"
@@ -58,6 +61,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="2dp"
                 android:ellipsize="end"
+                android:fontFamily="@font/amaranth"
                 android:maxLines="1"
                 android:padding="4dp"
                 android:textColor="@color/black"
@@ -141,10 +145,12 @@
 
             <ImageView
                 android:id="@+id/renter_profile_image_IV"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/adapterRoomNumTV"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/people_profile_1" />
@@ -154,7 +160,7 @@
                 android:id="@+id/divider65"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="2dp"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintEnd_toEndOf="@+id/adapterRoomNumTV"
                 app:layout_constraintStart_toStartOf="@+id/renter_profile_image_IV"

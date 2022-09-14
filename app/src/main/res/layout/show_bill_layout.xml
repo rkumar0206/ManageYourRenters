@@ -67,7 +67,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider18"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -206,7 +206,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView12"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -558,12 +558,12 @@
                 android:id="@+id/divider34"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="8dp"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/showBill_paidInAdvanceInlastPay" />
+                app:layout_constraintTop_toBottomOf="@+id/textView61" />
 
             <TextView
                 android:id="@+id/show_billDueOrArrearTV"
@@ -591,7 +591,7 @@
                 android:id="@+id/textView61"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:padding="2dp"
                 android:text="@string/net_demand"
@@ -599,23 +599,22 @@
                 android:textSize="19sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toStartOf="@+id/divider27"
-                app:layout_constraintTop_toBottomOf="@+id/divider28" />
+                app:layout_constraintTop_toBottomOf="@id/divider29" />
 
             <TextView
                 android:id="@+id/showBill_netDemand"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
                 android:ellipsize="end"
-                android:gravity="center"
+                android:gravity="end"
                 android:maxLines="1"
                 android:padding="2dp"
                 android:text="@string/_0_0"
                 android:textSize="17sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/textView61"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/showBill_paidInAdvanceInlastPayAmount"
                 app:layout_constraintStart_toEndOf="@+id/divider27"
                 app:layout_constraintTop_toTopOf="@+id/textView61" />
 
@@ -623,13 +622,11 @@
                 android:id="@+id/divider29"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="14dp"
                 android:background="?android:attr/listDivider"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView61" />
+                app:layout_constraintTop_toBottomOf="@+id/showBill_paidInAdvanceInlastPay" />
 
             <TextView
                 android:id="@+id/showBill_dueAmount"

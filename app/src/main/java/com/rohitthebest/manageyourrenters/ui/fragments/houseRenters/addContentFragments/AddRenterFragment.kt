@@ -23,7 +23,7 @@ import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogF
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterOrBorrowerId
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
@@ -291,14 +291,13 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             uid = getUid()!!
 
             renterId = if (!isMessageReceivesForEditing) {
-                System.currentTimeMillis().toStringM(36)
+                generateRenterOrBorrowerId(name, roomNumber)
             } else {
                 receivedRenter?.renterId!!
             }
 
             renterPassword = if (!isMessageReceivesForEditing) {
-
-                generateRenterPassword(renterId, mobileNumber)
+                System.currentTimeMillis().toStringM(36)
             } else {
                 receivedRenter?.renterPassword!!
             }
@@ -375,15 +374,15 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
 
     private fun isValidForm(): Boolean {
 
-        if (!includeBinding.renterNameET.editText?.isTextValid()!!) {
-
-            includeBinding.renterNameET.error = EDIT_TEXT_EMPTY_MESSAGE
-            return false
-        }
-
         if (!includeBinding.renterRoomNumberET.editText?.isTextValid()!!) {
 
             includeBinding.renterRoomNumberET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
+        if (!includeBinding.renterNameET.editText?.isTextValid()!!) {
+
+            includeBinding.renterNameET.error = EDIT_TEXT_EMPTY_MESSAGE
             return false
         }
 

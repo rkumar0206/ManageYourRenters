@@ -19,7 +19,6 @@ import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogF
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -31,7 +30,7 @@ import dagger.hilt.android.AndroidEntryPoint
 private const val TAG = "AddEditBorrowerFragment"
 
 @AndroidEntryPoint
-class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), View.OnClickListener,
+class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_borrower), View.OnClickListener,
     CompoundButton.OnCheckedChangeListener,
     SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
 
@@ -272,10 +271,13 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_renter), Vie
             uid = getUid()!!
 
             borrowerId = if (!isMessageReceivedForEditing)
-                System.currentTimeMillis().toStringM(36) else receivedBorrower?.borrowerId!!
+                Functions.generateRenterOrBorrowerId(
+                    name,
+                    ""
+                ) else receivedBorrower?.borrowerId!!
 
             borrowerPassword =
-                if (!isMessageReceivedForEditing) generateRenterPassword(borrowerId, mobileNumber)
+                if (!isMessageReceivedForEditing) System.currentTimeMillis().toStringM(36)
                 else receivedBorrower?.borrowerPassword!!
 
             key = if (!isMessageReceivedForEditing) generateKey("_${uid}") else receivedBorrowerKey

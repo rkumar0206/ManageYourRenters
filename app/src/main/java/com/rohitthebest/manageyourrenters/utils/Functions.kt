@@ -176,20 +176,31 @@ class Functions {
         }
 
 
-        fun generateRenterPassword(renterID: String?, mobileNum: String): String {
+        fun generateRenterOrBorrowerId(name: String, num: String): String {
 
-            val firstFour = renterID?.subSequence(
-                (renterID.length / 2),
-                renterID.length
-            ).toString()
+            var id: String = if (name.length > 4) {
 
-            val lastFour = mobileNum.subSequence(
-                (mobileNum.length / 2) + 1,
-                mobileNum.length
-            ).toString()
-            Log.i(TAG, "Generating password -> SUCCESS...")
-            return "$firstFour$lastFour#"
+                name.substring(0, 5)
+            } else {
+                name
+            }
 
+            id += if (!num.isValid()) {
+
+                Random.nextLong(80000, 90000).toStringM(36).substring(0, 4)
+            } else {
+
+                if (num.length > 4) {
+
+                    num.substring(0, 4)
+                } else {
+                    num
+                }
+            }
+
+            id += "_${Random.nextInt(100, 999)}"
+
+            return id
         }
 
         fun saveBooleanToSharedPreference(

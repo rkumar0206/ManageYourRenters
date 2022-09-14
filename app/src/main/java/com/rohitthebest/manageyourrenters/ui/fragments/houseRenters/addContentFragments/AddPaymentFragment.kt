@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.RadioGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -22,6 +21,7 @@ import com.rohitthebest.manageyourrenters.databinding.AddPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.others.Constants.RENTER_PAYMENT_CONFIRMATION_BILL_KEY
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -37,7 +37,8 @@ private const val TAG = "AddPaymentFragment"
 @AndroidEntryPoint
 class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnCheckedChangeListener,
     CompoundButton.OnCheckedChangeListener,
-    SupportingDocumentDialogFragment.OnBottomSheetDismissListener {
+    SupportingDocumentDialogFragment.OnBottomSheetDismissListener,
+    ShowBillForConfirmationBottomSheetFragment.OnPaymentConfirmationBottomSheetDismissListener {
 
     private val paymentViewModel: RenterPaymentViewModel by viewModels()
 
@@ -66,12 +67,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private var lastPaymentInfo: RenterPayment? = null
     private var duesOrAdvanceAmount: Double = 0.0
-    private var presentDue: Double? = 0.0
-    private var presentPaidInAdvance: Double? = 0.0
-
     private var isPaymentAdded = false
 
     private lateinit var supportingDocmtHelperModel: SupportingDocumentHelperModel
+
+    private lateinit var payment: RenterPayment
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -177,8 +177,10 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             periodType = BillPeriodType.BY_MONTH
 
-            billMonth = monthList[0]
-            billMonthNumber = 1
+            val currentMonthIndex = WorkingWithDateAndTime.getCurrentMonth()
+            billMonth = monthList[currentMonthIndex]
+            billMonthNumber = currentMonthIndex + 1
+            includeBinding.monthSelectSpinner.setSelection(currentMonthIndex)
 
             fromDateTimestamp = currentTimestamp
             tillDateTimeStamp = currentTimestamp
@@ -692,170 +694,21 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun showBillInBottomSheet() {
 
-//        try {
-//            MaterialDialog(requireContext(), BottomSheet()).show {
-//
-//                title(text = "Your Bill")
-//
-//                customView(
-//                    R.layout.show_bill_layout,
-//                    scrollable = true,
-//                    noVerticalPadding = true
-//                )
-//
-//                initializeValues(this.getCustomView())
-//            }.positiveButton(text = "Add Payment") {
-//
-//                initPayment()
-//
-//            }.negativeButton(text = "Edit") {
-//
-//                it.dismiss()
-//            }
-//        } catch (e: Exception) {
-//
-//            e.printStackTrace()
-//        }
-    }
+        initPayment()
 
-    @SuppressLint("SetTextI18n")
-    private fun initializeValues(customView: View) {
+        val bundle = Bundle()
+        bundle.putString(
+            RENTER_PAYMENT_CONFIRMATION_BILL_KEY,
+            payment.convertToJsonString()
+        )
 
-        //renter info
-        customView.findViewById<TextView>(R.id.showBill_renterName).text = receivedRenter?.name
-        customView.findViewById<TextView>(R.id.showBill_renterMobile).text =
-            receivedRenter?.mobileNumber
-        customView.findViewById<TextView>(R.id.showBill_renterAddress).text =
-            receivedRenter?.address
+        requireActivity().supportFragmentManager.let {
 
-        //billing parameter
-        customView.findViewById<TextView>(R.id.showBill_billDate)
-            .setDateInTextView(currentTimestamp)
-        customView.findViewById<TextView>(R.id.showBill_billTime)
-            .setDateInTextView(currentTimestamp, "hh:mm a")
-        customView.findViewById<TextView>(R.id.showBill_billPeriod).text =
-            if (includeBinding.periodTypeRG.checkedRadioButtonId == includeBinding.byMonthRB.id) {
-
-                "$billMonth, $selectedYear"
-            } else {
-                "${
-                    includeBinding.fromDateTV.text.toString().trim()
-                } to ${includeBinding.tillDateTV.text.toString().trim()}"
-            }
-
-        //electricity
-        customView.findViewById<TextView>(R.id.showBill_previousReading).text =
-            "${String.format("%.2f", previousReading)} unit(s)"
-        customView.findViewById<TextView>(R.id.showBill_currentReading).text =
-            "${String.format("%.2f", currentReading)} unit(s)"
-        customView.findViewById<TextView>(R.id.showBill_rate).text =
-            "${String.format("%.2f", rate)} per/unit"
-        customView.findViewById<TextView>(R.id.showBill_difference).text =
-            "${String.format("%.2f", difference)} unit(s)"
-        customView.findViewById<TextView>(R.id.showBill_electricity_total).text =
-            "$currencySymbol ${String.format("%.2f", totalElectricBill)}"
-
-        //total rent
-        customView.findViewById<TextView>(R.id.showBill_houseRent).text =
-            "$currencySymbol ${String.format("%.2f", houseRent)}"
-
-        customView.findViewById<TextView>(R.id.showBill_parking).text =
-            "$currencySymbol ${String.format("%.2f", parkingBill)}"
-
-        customView.findViewById<TextView>(R.id.showBill_electricity).text =
-            "$currencySymbol ${String.format("%.2f", totalElectricBill)}"
-
-        customView.findViewById<TextView>(R.id.showBill_extraFieldName).text =
-            if (includeBinding.extraFieldNameET.text.toString().trim() == "") {
-
-                "Extra"
-            } else {
-                includeBinding.extraFieldNameET.text.toString().trim()
-            }
-
-        customView.findViewById<TextView>(R.id.showBill_extraFieldAmount).text =
-            if (includeBinding.extraAmountET.text.toString().trim() == "") {
-
-                "$currencySymbol 0.0"
-            } else {
-
-                "$currencySymbol ${
-                    String.format(
-                        "%.2f",
-                        includeBinding.extraAmountET.text.toString().trim().toDouble()
-                    )
-                }"
-            }
-
-        customView.findViewById<TextView>(R.id.showBill_AmountPaid)
-            .changeTextColor(requireContext(), R.color.color_green)
-
-        customView.findViewById<TextView>(R.id.showBill_AmountPaid).text =
-            "$currencySymbol ${String.format("%.2f", amountPaid)}"
-
-        when {
-            duesOrAdvanceAmount < 0.0 -> {
-
-                customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
-                    "+ $currencySymbol ${String.format("%.2f", abs(duesOrAdvanceAmount))}"
-
-                customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
-                    "- $currencySymbol 0.0"
-
-            }
-            duesOrAdvanceAmount > 0.0 -> {
-
-                customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
-                    "+ $currencySymbol 0.0"
-
-                customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
-                    "- $currencySymbol ${String.format("%.2f", duesOrAdvanceAmount)}"
-            }
-            else -> {
-
-                customView.findViewById<TextView>(R.id.showBill_dueOfLastPayAmount).text =
-                    "+ $currencySymbol 0.0"
-
-                customView.findViewById<TextView>(R.id.showBill_paidInAdvanceInlastPayAmount).text =
-                    "- $currencySymbol 0.0"
-            }
+            ShowBillForConfirmationBottomSheetFragment.newInstance(bundle)
+                .apply {
+                    show(it, TAG)
+                }.setOnPaymentConfirmationBottomSheetDismissListener(this)
         }
-
-        customView.findViewById<TextView>(R.id.showBill_dueAmount).text =
-            when {
-                amountPaid < netDemand -> {
-
-                    customView.findViewById<TextView>(R.id.showBill_AmountPaid)
-                        .changeTextColor(requireContext(), R.color.color_orange)
-                    presentDue = netDemand - amountPaid
-
-                    "$currencySymbol ${String.format("%.2f", presentDue)}"
-                }
-                amountPaid > netDemand -> {
-
-                    presentPaidInAdvance = amountPaid - netDemand
-
-                    customView.findViewById<TextView>(R.id.show_billDueOrArrearTV).text =
-                        getString(R.string.paid_in_advance)
-
-                    "$currencySymbol ${String.format("%.2f", presentPaidInAdvance)}"
-                }
-                else -> {
-                    "$currencySymbol 0.0"
-                }
-            }
-
-        customView.findViewById<TextView>(R.id.showBill_netDemand).text =
-            "$currencySymbol ${netDemand.format(2)}"
-
-        customView.findViewById<TextView>(R.id.paymentMessageTV).text =
-            if (includeBinding.addNoteET.text.toString().trim().isValid()) {
-
-                includeBinding.addNoteET.text.toString().trim()
-            } else {
-
-                "No message"
-            }
     }
 
     private fun initPayment() {
@@ -903,7 +756,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 null
             }
 
-            val payment = RenterPayment(
+            payment = RenterPayment(
                 key = generateKey(appendString = "_${getUid()}"),
                 created = currentTimestamp,
                 modified = currentTimestamp,
@@ -940,6 +793,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     null
                 }
             )
+        }
+    }
+
+    override fun onPaymentConfirmationBottomSheetDismissed(isSaveBtnClicked: Boolean) {
+
+        if (isSaveBtnClicked) {
 
             if (payment.isSupportingDocAdded
                 && supportingDocmtHelperModel.documentType != DocumentType.URL
@@ -1098,5 +957,4 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
         _binding = null
     }
-
 }

@@ -262,7 +262,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                 }
 
                 it.dismiss()
-                borrowerAdapter.notifyItemRemoved(currentAdapterPosition)
             },
             negativeButtonListener = {
 

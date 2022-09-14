@@ -12,11 +12,8 @@ import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.RenterDetailBottomsheetDialogBinding
 import com.rohitthebest.manageyourrenters.databinding.RenterDetailBottomsheetDialogLayoutBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
-import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
-import com.rohitthebest.manageyourrenters.utils.changeTextColor
-import com.rohitthebest.manageyourrenters.utils.hide
-import com.rohitthebest.manageyourrenters.utils.isValid
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -92,6 +89,8 @@ class RenterDetailBottomSheetDialog : BottomSheetDialogFragment() {
             if (receivedRenter.status == StatusEnum.ACTIVE) renterStatus.setImageResource(R.drawable.ic_baseline_status_active)
             else renterStatus.setImageResource(R.drawable.ic_baseline_status_inactive)
 
+            renterAddedOnTV.text =
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(receivedRenter.timeStamp)
             renterRoomTV.text = receivedRenter.roomNumber
 
             //email

@@ -38,7 +38,6 @@ class ShowRentersAdapter :
 
             binding.apply {
 
-
                 if (renter.status == StatusEnum.ACTIVE) {
                     adapterRenterStatusBtn.setImageResource(R.drawable.ic_baseline_status_active)
                 } else {
@@ -47,35 +46,35 @@ class ShowRentersAdapter :
 
                 if (renter.dueOrAdvanceAmount < 0.0) {
 
-                    binding.adapterRenterNameTV.changeTextColor(
-                        binding.root.context,
+                    adapterRenterNameTV.changeTextColor(
+                        root.context,
                         R.color.color_orange
                     )
 
                 } else {
 
-                    binding.adapterRenterNameTV.changeTextColor(
-                        binding.root.context,
+                    adapterRenterNameTV.changeTextColor(
+                        root.context,
                         R.color.primaryTextColor
                     )
                 }
 
-                binding.adapterRenterNameTV.text = renter.name
-                binding.adapterRoomNumTV.text = renter.roomNumber
+                adapterRenterNameTV.text = renter.name
+                adapterRoomNumTV.text = renter.roomNumber
 
                 if (renter.isSynced == binding.root.context.getString(R.string.t)) {
 
-                    binding.root.setCardBackgroundColor(
+                    root.setCardBackgroundColor(
                         ContextCompat.getColor(
-                            binding.root.context,
+                            root.context,
                             R.color.color_green
                         )
                     )
                 } else {
 
-                    binding.root.setCardBackgroundColor(
+                    root.setCardBackgroundColor(
                         ContextCompat.getColor(
-                            binding.root.context,
+                            root.context,
                             R.color.color_orange
                         )
                     )

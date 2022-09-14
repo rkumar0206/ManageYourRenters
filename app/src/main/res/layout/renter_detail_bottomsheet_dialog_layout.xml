@@ -68,13 +68,27 @@
         android:id="@+id/textView88"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="5dp"
         android:drawablePadding="5dp"
         android:gravity="center_vertical"
         android:padding="2dp"
         android:text="@string/email"
         android:textSize="12sp"
         app:drawableStartCompat="@drawable/ic_baseline_email_24"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/divider94" />
+
+    <TextView
+        android:id="@+id/textView87"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:drawablePadding="5dp"
+        android:gravity="center_vertical"
+        android:padding="2dp"
+        android:text="@string/added_on"
+        android:textSize="12sp"
+        app:drawableStartCompat="@drawable/ic_baseline_date_range_24"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toBottomOf="@+id/renterRoomTV" />
 
@@ -148,6 +162,20 @@
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/textView88"
         tools:text="rkumar0206mnirks@gmail.com" />
+
+    <TextView
+        android:id="@+id/renterAddedOnTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/amaranth"
+        android:padding="2dp"
+        android:textColor="@color/primaryTextColor"
+        android:textIsSelectable="true"
+        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:layout_constraintTop_toBottomOf="@+id/textView87"
+        tools:text="@string/_02_06_2000" />
 
     <TextView
         android:id="@+id/renterMobileTV"
@@ -232,6 +260,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/textView88"
         app:layout_constraintTop_toBottomOf="@+id/renterEmailTV" />
+
+    <View
+        android:id="@+id/divider94"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textView88"
+        app:layout_constraintTop_toBottomOf="@+id/renterAddedOnTV" />
 
     <View
         android:id="@+id/divider81"

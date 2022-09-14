@@ -156,6 +156,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/adapterRoomNumTV"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                android:contentDescription="@string/profile"
                 app:srcCompat="@drawable/people_profile_1" />
 
 

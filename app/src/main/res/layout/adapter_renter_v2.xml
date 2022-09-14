@@ -41,7 +41,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:layout_marginEnd="2dp"
                 android:ellipsize="end"
                 android:maxLines="2"
@@ -77,10 +77,11 @@
                 android:id="@+id/renterDetailsBtn"
                 android:layout_width="70dp"
                 android:layout_height="25dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="10dp"
                 app:cardBackgroundColor="#EAEAEA"
                 app:cardCornerRadius="50dp"
+                app:cardElevation="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/renterMenuBtn"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -93,7 +94,7 @@
                     android:layout_gravity="center"
                     android:padding="3dp"
                     android:text="@string/details"
-                    android:textColor="@color/blue_text_color"
+                    android:textColor="#1565C0"
                     android:textSize="12sp" />
 
             </com.google.android.material.card.MaterialCardView>
@@ -104,6 +105,7 @@
                 android:layout_height="25dp"
                 app:cardBackgroundColor="#EAEAEA"
                 app:cardCornerRadius="50dp"
+                app:cardElevation="5dp"
                 app:layout_constraintEnd_toStartOf="@+id/renterPaymentsBtn"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/renterDetailsBtn"
@@ -116,7 +118,7 @@
                     android:layout_gravity="center"
                     android:padding="3dp"
                     android:text="@string/options"
-                    android:textColor="@color/blue_text_color"
+                    android:textColor="#1565C0"
                     android:textSize="12sp" />
 
             </com.google.android.material.card.MaterialCardView>
@@ -127,6 +129,7 @@
                 android:layout_height="25dp"
                 app:cardBackgroundColor="#EAEAEA"
                 app:cardCornerRadius="50dp"
+                app:cardElevation="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/renterMenuBtn"
@@ -138,7 +141,7 @@
                     android:layout_gravity="center"
                     android:padding="3dp"
                     android:text="@string/payments"
-                    android:textColor="@color/blue_text_color"
+                    android:textColor="#1565C0"
                     android:textSize="12sp" />
 
             </com.google.android.material.card.MaterialCardView>
@@ -160,7 +163,7 @@
                 android:id="@+id/divider65"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="12dp"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintEnd_toEndOf="@+id/adapterRoomNumTV"
                 app:layout_constraintStart_toStartOf="@+id/renter_profile_image_IV"

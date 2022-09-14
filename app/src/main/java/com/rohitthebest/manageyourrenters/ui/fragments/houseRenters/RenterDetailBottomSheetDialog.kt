@@ -148,7 +148,7 @@ class RenterDetailBottomSheetDialog : BottomSheetDialogFragment() {
 
         includeBinding.renterMobileTV.setOnClickListener {
 
-            if (receivedRenter.emailId.isValid()) {
+            if (receivedRenter.mobileNumber.isValid()) {
 
                 Functions.showMobileNumberOptionMenu(
                     requireActivity(),

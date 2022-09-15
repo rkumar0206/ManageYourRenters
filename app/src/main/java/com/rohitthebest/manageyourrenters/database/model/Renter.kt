@@ -29,7 +29,10 @@ data class Renter(
     var isSupportingDocAdded: Boolean = false,
     var supportingDocument: SupportingDocument? = null,
     var isSynced: String = "false",
-    var status: StatusEnum = StatusEnum.ACTIVE
+    var status: StatusEnum = StatusEnum.ACTIVE,
+    var imageUrl: String = "",
+    var occupation: String = "",
+    var noOfFamilyMembers: Int = 0
 ) : Serializable {
 
     constructor() : this(
@@ -51,7 +54,10 @@ data class Renter(
         false,
         null,
         "false",
-        StatusEnum.ACTIVE
+        StatusEnum.ACTIVE,
+        "",
+        "",
+        0
     )
 
 }

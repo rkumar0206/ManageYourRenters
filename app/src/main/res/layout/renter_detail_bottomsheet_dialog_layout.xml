@@ -15,7 +15,7 @@
         app:cardCornerRadius="1000dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -31,19 +31,17 @@
         android:id="@+id/renterNameTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="6dp"
-        android:layout_marginEnd="16dp"
         android:ellipsize="middle"
         android:fontFamily="@font/amaranth"
         android:maxLines="1"
-        tools:text="Rohit Kumar Singh"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/renterRoomTV"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView6" />
+        app:layout_constraintStart_toStartOf="@+id/renterRoomTV"
+        app:layout_constraintTop_toBottomOf="@+id/cardView6"
+        tools:text="Rohit Kumar Singh" />
 
     <ImageButton
         android:id="@+id/renterStatus"
@@ -347,15 +345,18 @@
         android:id="@+id/renterRoomTV"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="5dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="16dp"
         android:ellipsize="middle"
         android:gravity="center"
         android:maxLines="1"
+        android:padding="3dp"
         android:textColor="@color/purple_500"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/renterNameTV"
-        tools:text="First floor 2nd room" />
+        tools:text="First floor 2nd room"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

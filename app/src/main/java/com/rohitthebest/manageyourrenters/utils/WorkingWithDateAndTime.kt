@@ -144,6 +144,8 @@ object WorkingWithDateAndTime {
         return cal
     }
 
+    fun Long.getCalendarInstance(): Calendar = convertMillisecondsToCalendarInstance(this)
+
     /**
      * Get the date (day), month, year from the time in milliseconds
      */

@@ -131,7 +131,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             )
 
             includeBinding.renterMobileNumberET.editText?.setText(
-                renter.mobileNumber.substring(3)
+                renter.mobileNumber
             )
 
             includeBinding.renterEmailET.editText?.setText(
@@ -153,6 +153,9 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             includeBinding.renterAddressET.setText(
                 renter.address
             )
+
+            includeBinding.renterOccupation.editText?.setText(renter.occupation)
+            includeBinding.renterNoOfMembers.editText?.setText(renter.noOfFamilyMembers.toString())
 
             includeBinding.dateAddedTV.text =
                 WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(

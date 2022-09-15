@@ -315,6 +315,8 @@
     <string name="renter_details">Renter Details</string>
     <string name="borrower_details">Borrower Details</string>
     <string name="occupation_optional">Occupation (Optional)</string>
+    <string name="number_of_family_members_optional">Number of family members (Optional)</string>
+    <string name="occupation">Occupation</string>
     <string name="number_of_family_members">Number of family members</string>
 
 

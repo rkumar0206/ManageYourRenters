@@ -119,6 +119,34 @@
         app:layout_constraintTop_toBottomOf="@+id/divider81" />
 
     <TextView
+        android:id="@+id/textView84"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:drawablePadding="5dp"
+        android:gravity="center_vertical"
+        android:padding="2dp"
+        android:text="@string/occupation"
+        android:textSize="12sp"
+        app:drawableStartCompat="@drawable/ic_baseline_work_24"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/divider83" />
+
+    <TextView
+        android:id="@+id/textView91"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:drawablePadding="5dp"
+        android:gravity="center_vertical"
+        android:padding="2dp"
+        android:text="@string/number_of_family_members"
+        android:textSize="12sp"
+        app:drawableStartCompat="@drawable/ic_baseline_people_24"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/divider102" />
+
+    <TextView
         android:id="@+id/textView96"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -130,7 +158,7 @@
         android:textSize="12sp"
         app:drawableStartCompat="@drawable/ic_baseline_identification_doc_24"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/divider83" />
+        app:layout_constraintTop_toBottomOf="@id/divider103" />
 
     <TextView
         android:id="@+id/textView99"
@@ -203,6 +231,32 @@
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/textView94"
         tools:text="Vidyanagar west near NamanVidya School, Harmu, Ranchi" />
+
+    <TextView
+        android:id="@+id/renterOccupationTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:padding="2dp"
+        android:textColor="@color/primaryTextColor"
+        android:textIsSelectable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:layout_constraintTop_toBottomOf="@+id/textView84"
+        tools:text="Buiseness man" />
+
+    <TextView
+        android:id="@+id/renterNoOfFamilyMembersTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:padding="2dp"
+        android:textColor="@color/primaryTextColor"
+        android:textIsSelectable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:layout_constraintTop_toBottomOf="@+id/textView91"
+        tools:text="5" />
 
     <TextView
         android:id="@+id/renterIdentificationDocNameTV"
@@ -297,6 +351,30 @@
         app:layout_constraintTop_toBottomOf="@+id/renterAddressTV" />
 
     <View
+        android:id="@+id/divider102"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textView88"
+        app:layout_constraintTop_toBottomOf="@+id/renterOccupationTV" />
+
+    <View
+        android:id="@+id/divider103"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textView88"
+        app:layout_constraintTop_toBottomOf="@+id/renterNoOfFamilyMembersTV" />
+
+    <View
         android:id="@+id/divider85"
         android:layout_width="0dp"
         android:layout_height="1dp"
@@ -313,7 +391,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="100dp"
         android:layout_marginEnd="8dp"
         android:background="?android:attr/listDivider"
         android:visibility="invisible"

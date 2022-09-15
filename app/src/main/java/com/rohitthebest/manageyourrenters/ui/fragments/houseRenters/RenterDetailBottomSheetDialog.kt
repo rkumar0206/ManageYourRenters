@@ -100,7 +100,10 @@ class RenterDetailBottomSheetDialog : BottomSheetDialogFragment() {
             //mobile
             if (receivedRenter.mobileNumber.isValid()) renterMobileTV.text =
                 receivedRenter.mobileNumber
-            else renterMobileTV.text = getString(R.string.BLANK_DASH)
+            else {
+                renterMobileTV.text = getString(R.string.BLANK_DASH)
+                renterMobileTV.changeTextColor(requireContext(), R.color.primaryTextColor)
+            }
 
             //address
             if (receivedRenter.address.isValid()) renterAddressTV.text = receivedRenter.address
@@ -116,6 +119,14 @@ class RenterDetailBottomSheetDialog : BottomSheetDialogFragment() {
                 renterIdentificationDocNameTV.hide()
                 renterIdentificationDocNumberTV.text = getString(R.string.BLANK_DASH)
             }
+
+            if (receivedRenter.occupation.isValid()) {
+                renterOccupationTV.text = receivedRenter.occupation
+            } else {
+                renterOccupationTV.text = getString(R.string.BLANK_DASH)
+            }
+
+            renterNoOfFamilyMembersTV.text = receivedRenter.noOfFamilyMembers.toString()
 
             // supporting document
             if (receivedRenter.isSupportingDocAdded && receivedRenter.supportingDocument != null) renterSupportingDocUrlTV.text =

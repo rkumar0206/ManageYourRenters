@@ -18,7 +18,7 @@
             android:layout_height="match_parent"
             app:menu="@menu/add_person_menu"
             app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-            app:title="@string/add_renter" />
+            app:title="@string/add_borrower" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -29,7 +29,7 @@
 
         <include
             android:id="@+id/include"
-            layout="@layout/add_renter_layout" />
+            layout="@layout/add_borrower_layout" />
 
     </androidx.core.widget.NestedScrollView>
 

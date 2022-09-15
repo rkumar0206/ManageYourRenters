@@ -11,7 +11,7 @@ import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Borrower
-import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
+import com.rohitthebest.manageyourrenters.databinding.AddBorrowerLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditBorrowerBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY
@@ -22,7 +22,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.toStringM
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +36,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_borrower), V
     private var _binding: FragmentAddEditBorrowerBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var includeBinding: AddRenterLayoutBinding
+    private lateinit var includeBinding: AddBorrowerLayoutBinding
     private var selectedDate: Long = 0L
     private var isMessageReceivedForEditing = false
     private var receivedBorrower: Borrower? = null
@@ -54,16 +53,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_borrower), V
         includeBinding = binding.include
 
         selectedDate = System.currentTimeMillis()
-        includeBinding.dateAddedTV.text =
-            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                selectedDate
-            )
         supportingDocmtHelperModel = SupportingDocumentHelperModel()
-
-        // removing the views that is not required here
-        includeBinding.renterRoomNumberET.hide()
-        includeBinding.renterAddressET.hide()
-
         binding.addRenterToolbar.title = getString(R.string.add_borrower)
 
         initListeners()
@@ -112,31 +102,14 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_borrower), V
         receivedBorrower?.let { b ->
 
             binding.addRenterToolbar.title = getString(R.string.edit_borrower)
+            binding.addRenterToolbar.menu.findItem(R.id.menu_add_person)
+                .setIcon(R.drawable.ic_baseline_save_24)
 
-            includeBinding.renterNameET.editText?.setText(
-                b.name
-            )
-
-            includeBinding.renterMobileNumberET.editText?.setText(
-                b.mobileNumber.substring(3)
-            )
-
-            includeBinding.renterEmailET.editText?.setText(
-                b.emailId
-            )
-
-            includeBinding.otherDocumentNameET.setText(
-                b.otherDocumentName
-            )
-
-            includeBinding.otherDocumentNumber.setText(
-                b.otherDocumentNumber
-            )
-
-            includeBinding.dateAddedTV.text =
-                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                    b.created
-                )
+            includeBinding.borrowerNameET.editText?.setText(b.name)
+            includeBinding.borrowerMobileNumberET.editText?.setText(b.mobileNumber)
+            includeBinding.borrowerEmailET.editText?.setText(b.emailId)
+            includeBinding.otherDocumentNameET.setText(b.otherDocumentName)
+            includeBinding.otherDocumentNumber.setText(b.otherDocumentNumber)
 
             selectedDate = b.created
         }
@@ -164,7 +137,6 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_borrower), V
             true
         }
 
-        includeBinding.dateAddedCalendarPickBtn.setOnClickListener(this)
         includeBinding.addSupportingDocCB.setOnCheckedChangeListener(this)
         includeBinding.viewEditSupportingDoc.setOnClickListener(this)
     }
@@ -223,23 +195,6 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_borrower), V
 
         when (v?.id) {
 
-            includeBinding.dateAddedCalendarPickBtn.id -> {
-
-                showCalendarDialog(
-                    selectedDate,
-                    { requireActivity().supportFragmentManager },
-                    {
-
-                        selectedDate = it
-
-                        includeBinding.dateAddedTV.text =
-                            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                selectedDate
-                            )
-                    }
-                )
-            }
-
             includeBinding.viewEditSupportingDoc.id -> {
 
                 showSupportDocumentBottomSheetDialog()
@@ -262,9 +217,9 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_borrower), V
             created = selectedDate
             modified = System.currentTimeMillis()
 
-            name = includeBinding.renterNameET.editText?.text.toString().trim()
-            mobileNumber = includeBinding.renterMobileNumberET.editText?.text.toString().trim()
-            emailId = includeBinding.renterEmailET.editText?.text.toString().trim()
+            name = includeBinding.borrowerNameET.editText?.text.toString().trim()
+            mobileNumber = includeBinding.borrowerMobileNumberET.editText?.text.toString().trim()
+            emailId = includeBinding.borrowerEmailET.editText?.text.toString().trim()
             otherDocumentName = includeBinding.otherDocumentNameET.text.toString().trim()
             otherDocumentNumber = includeBinding.otherDocumentNumber.text.toString().trim()
 
@@ -344,47 +299,28 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_borrower), V
 
     private fun isValidForm(): Boolean {
 
-        if (!includeBinding.renterNameET.editText?.isTextValid()!!) {
+        if (!includeBinding.borrowerNameET.editText?.isTextValid()!!) {
 
-            includeBinding.renterNameET.error = Constants.EDIT_TEXT_EMPTY_MESSAGE
+            includeBinding.borrowerNameET.error = Constants.EDIT_TEXT_EMPTY_MESSAGE
             return false
         }
 
-        if (!includeBinding.renterMobileNumberET.editText.isTextValid()) {
-
-            includeBinding.renterMobileNumberET.error = Constants.EDIT_TEXT_EMPTY_MESSAGE
-            return false
-        }
-
-
-        return includeBinding.renterNameET.error == null
-                && includeBinding.renterMobileNumberET.error == null
+        return includeBinding.borrowerNameET.error == null
 
     }
 
     private fun textWatchers() {
 
-        includeBinding.renterNameET.editText?.onTextChangedListener { s ->
+        includeBinding.borrowerNameET.editText?.onTextChangedListener { s ->
 
             if (s?.isEmpty()!!) {
 
-                includeBinding.renterNameET.error = Constants.EDIT_TEXT_EMPTY_MESSAGE
+                includeBinding.borrowerNameET.error = Constants.EDIT_TEXT_EMPTY_MESSAGE
             } else {
 
-                includeBinding.renterNameET.error = null
+                includeBinding.borrowerNameET.error = null
             }
 
-        }
-
-        includeBinding.renterMobileNumberET.editText?.onTextChangedListener { s ->
-
-            if (s?.isEmpty()!!) {
-
-                includeBinding.renterMobileNumberET.error = Constants.EDIT_TEXT_EMPTY_MESSAGE
-            } else {
-
-                includeBinding.renterMobileNumberET.error = null
-            }
         }
     }
 

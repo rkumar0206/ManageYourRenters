@@ -313,6 +313,7 @@
     <string name="supporting_doc">Supporting document</string>
     <string name="room_details">Room Details</string>
     <string name="renter_details">Renter Details</string>
+    <string name="borrower_details">Borrower Details</string>
 
 
     <string-array name="interest_time_schedule">

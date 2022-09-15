@@ -229,6 +229,14 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         }
     }
 
+    override fun onDetailsButtonClicked(borrowerKey: String) {
+        val action =
+            BorrowerHomeFragmentDirections.actionBorrowerHomeFragmentToBorrowerDetailBottomSheetDialog(
+                borrowerKey
+            )
+        findNavController().navigate(action)
+    }
+
     //[START OF MENU CLICK LISTENERS]
 
     override fun onEditMenuClick() {
@@ -427,14 +435,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     //[END OF MENU CLICK LISTENERS]
 
-    override fun onMobileNumberClicked(mobileNumber: String, view: View) {
-
-        Functions.showMobileNumberOptionMenu(
-            requireActivity(),
-            view,
-            mobileNumber
-        )
-    }
 
     private fun showNoBorrowersAddedTV(isVisible: Boolean) {
 

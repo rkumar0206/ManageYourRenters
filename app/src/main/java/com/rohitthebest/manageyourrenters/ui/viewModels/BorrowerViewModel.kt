@@ -239,12 +239,16 @@ class BorrowerViewModel @Inject constructor(
 
     val allBorrowersList: LiveData<List<Borrower>> get() = _allBorrowersList
 
-    fun getAllBorrower() {
+    fun getAllBorrower(borrowerKey: String? = null) {
 
         // Adding the interest amount to the borrower total due amount dynamically when user request for borrower list
         viewModelScope.launch {
 
-            val allBorrowers = borrowerRepository.getAllBorrower().first()
+            val allBorrowers = if (borrowerKey == null) {
+                borrowerRepository.getAllBorrower().first()
+            } else {
+                listOf(borrowerRepository.getBorrowerByKey(borrowerKey).first())
+            }
 
             allBorrowers.forEach { borrower ->
 
@@ -302,5 +306,4 @@ class BorrowerViewModel @Inject constructor(
 
     fun getBorrowerByKey(borrowerKey: String) =
         borrowerRepository.getBorrowerByKey(borrowerKey).asLiveData()
-
 }

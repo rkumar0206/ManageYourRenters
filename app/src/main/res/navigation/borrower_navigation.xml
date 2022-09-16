@@ -27,6 +27,9 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_borrowerHomeFragment_to_borrowerDetailBottomSheetDialog"
+            app:destination="@id/borrowerDetailBottomSheetDialog" />
 
     </fragment>
     <fragment
@@ -97,6 +100,16 @@
         tools:layout="@layout/fragment_calculate_interest">
         <argument
             android:name="interestCalcualatorFields"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
+    <dialog
+        android:id="@+id/borrowerDetailBottomSheetDialog"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.borrower.BorrowerDetailBottomSheetDialog"
+        android:label="BorrowerDetailBottomSheetDialog"
+        tools:layout="@layout/borrower_detail_bottomsheet_dialog">
+        <argument
+            android:name="borrowerKeyMessage"
             app:argType="string"
             app:nullable="true" />
     </dialog>

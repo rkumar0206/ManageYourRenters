@@ -836,6 +836,7 @@
                 android:importantForAutofill="no"
                 android:inputType="textPersonName"
                 android:minHeight="48dp"
+                android:maxLength="200"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/textView19"
                 app:layout_constraintStart_toStartOf="parent"

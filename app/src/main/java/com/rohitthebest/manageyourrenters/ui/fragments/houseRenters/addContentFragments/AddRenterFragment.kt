@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.CompoundButton
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
@@ -16,7 +15,7 @@ import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Renter
-import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutBinding
+import com.rohitthebest.manageyourrenters.databinding.AddRenterLayoutV2Binding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditRenterBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
@@ -24,7 +23,7 @@ import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogF
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterPassword
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateRenterOrBorrowerId
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
@@ -43,7 +42,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
     private var _binding: FragmentAddEditRenterBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var includeBinding: AddRenterLayoutBinding
+    private lateinit var includeBinding: AddRenterLayoutV2Binding
     private var selectedDate: Long = 0L
 
     //received for editing vars
@@ -123,14 +122,16 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
 
         receivedRenter?.let { renter ->
 
+            binding.addRenterToolbar.menu.findItem(R.id.menu_add_person)
+                .setIcon(R.drawable.ic_baseline_save_24)
             binding.addRenterToolbar.title = "Edit Renter"
 
             includeBinding.renterNameET.editText?.setText(
                 renter.name
             )
 
-            includeBinding.renterMobileNumberET.setText(
-                renter.mobileNumber.substring(3)
+            includeBinding.renterMobileNumberET.editText?.setText(
+                renter.mobileNumber
             )
 
             includeBinding.renterEmailET.editText?.setText(
@@ -152,6 +153,9 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             includeBinding.renterAddressET.setText(
                 renter.address
             )
+
+            includeBinding.renterOccupation.editText?.setText(renter.occupation)
+            includeBinding.renterNoOfMembers.editText?.setText(renter.noOfFamilyMembers.toString())
 
             includeBinding.dateAddedTV.text =
                 WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
@@ -183,7 +187,6 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
         }
 
         includeBinding.dateAddedCalendarPickBtn.setOnClickListener(this)
-        includeBinding.mobileNumCodePicker.registerCarrierNumberEditText(includeBinding.renterMobileNumberET)
         includeBinding.addSupportingDocCB.setOnCheckedChangeListener(this)
         includeBinding.viewEditSupportingDoc.setOnClickListener(this)
     }
@@ -274,7 +277,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
 
         if (isMessageReceivesForEditing) {
 
-            renter = receivedRenter!!
+            renter = receivedRenter!!.copy()
         }
 
         renter.modified = System.currentTimeMillis()
@@ -282,23 +285,26 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
         renter.apply {
             timeStamp = selectedDate
             name = includeBinding.renterNameET.editText?.text.toString().trim()
-            mobileNumber = includeBinding.mobileNumCodePicker.fullNumberWithPlus
+            mobileNumber = includeBinding.renterMobileNumberET.editText?.text.toString().trim()
             emailId = includeBinding.renterEmailET.editText?.text.toString().trim()
             otherDocumentName = includeBinding.otherDocumentNameET.text.toString().trim()
             otherDocumentNumber = includeBinding.otherDocumentNumber.text.toString().trim()
             roomNumber = includeBinding.renterRoomNumberET.editText?.text.toString().trim()
             address = includeBinding.renterAddressET.text.toString().trim()
+            imageUrl = ""
+            occupation = includeBinding.renterOccupation.editText?.text.toString().trim()
+            noOfFamilyMembers =
+                includeBinding.renterNoOfMembers.editText?.text.toString().trim().toInt()
             uid = getUid()!!
 
             renterId = if (!isMessageReceivesForEditing) {
-                System.currentTimeMillis().toStringM(36)
+                generateRenterOrBorrowerId(name, roomNumber)
             } else {
                 receivedRenter?.renterId!!
             }
 
             renterPassword = if (!isMessageReceivesForEditing) {
-
-                generateRenterPassword(renterId, mobileNumber)
+                System.currentTimeMillis().toStringM(36)
             } else {
                 receivedRenter?.renterPassword!!
             }
@@ -366,7 +372,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             showToast(requireContext(), "Renter added")
         } else {
             // update
-            renterViewModel.updateRenter(renter)
+            renterViewModel.updateRenter(receivedRenter!!, renter)
             showToast(requireContext(), "Renter info updated")
         }
 
@@ -375,47 +381,41 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
 
     private fun isValidForm(): Boolean {
 
-        if (!includeBinding.renterNameET.editText?.isTextValid()!!) {
-
-            includeBinding.renterNameET.error = EDIT_TEXT_EMPTY_MESSAGE
-            return false
-        }
-
-        if (!includeBinding.renterMobileNumberET.isTextValid()) {
-
-            showMobileErrorTV()
-            return false
-        }
-
-        if (!includeBinding.renterAddressET.isTextValid()) {
-
-            setAddressErrorTvVisibility(true)
-            return false
-        }
-
         if (!includeBinding.renterRoomNumberET.editText?.isTextValid()!!) {
 
             includeBinding.renterRoomNumberET.error = EDIT_TEXT_EMPTY_MESSAGE
             return false
         }
 
-        if (!isMessageReceivesForEditing) {
+        if (!includeBinding.renterNameET.editText?.isTextValid()!!) {
 
-            if (!includeBinding.mobileNumCodePicker.isValidFullNumber) {
+            includeBinding.renterNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
 
-                showToast(
-                    requireContext(),
-                    getString(R.string.mobileNumberErrorMessage),
-                    Toast.LENGTH_LONG
-                )
+        if (includeBinding.otherDocumentNameET.isTextValid()) {
+
+            if (!includeBinding.otherDocumentNumber.isTextValid()) {
+
+                includeBinding.otherDocumentNumber.requestFocus()
+                showToast(requireContext(), "Add document number")
                 return false
             }
         }
+
+        if (includeBinding.otherDocumentNumber.isTextValid()) {
+
+            if (!includeBinding.otherDocumentNameET.isTextValid()) {
+
+                includeBinding.otherDocumentNameET.requestFocus()
+                showToast(requireContext(), "Add document name")
+                return false
+            }
+        }
+
+
         return includeBinding.renterNameET.error == null
                 && includeBinding.renterRoomNumberET.error == null
-                && includeBinding.renterAddressET.error == null
-                && !includeBinding.addressErrorTV.isVisible
-                && includeBinding.renterMobileNumberET.isTextValid()
 
     }
 
@@ -433,22 +433,6 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
 
         }
 
-        includeBinding.renterMobileNumberET.onTextChangedListener { s ->
-
-            if (s?.isEmpty()!!) {
-
-                showMobileErrorTV()
-            } else if (!includeBinding.mobileNumCodePicker.isValidFullNumber) {
-
-                showMobileErrorTV()
-                includeBinding.mobileNumErrorTV.text = getString(R.string.mobileNumberErrorMessage)
-
-            } else {
-
-                hideMobileErrorTV()
-            }
-        }
-
         includeBinding.renterRoomNumberET.editText?.onTextChangedListener { s ->
 
             if (s?.isEmpty()!!) {
@@ -460,56 +444,8 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             }
 
         }
-
-        includeBinding.renterAddressET.onTextChangedListener { s ->
-
-            if (s?.isEmpty()!!) {
-
-                setAddressErrorTvVisibility(true)
-            } else {
-
-                includeBinding.renterAddressET.error = null
-                if (includeBinding.addressErrorTV.isVisible) setAddressErrorTvVisibility(false)
-            }
-
-        }
     }
 
-    private fun showMobileErrorTV() {
-
-        try {
-
-            includeBinding.mobileNumErrorTV.show()
-            includeBinding.mobileNumErrorTV.text = EDIT_TEXT_EMPTY_MESSAGE
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun hideMobileErrorTV() {
-
-        try {
-
-            includeBinding.mobileNumErrorTV.hide()
-            includeBinding.mobileNumErrorTV.text = ""
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun setAddressErrorTvVisibility(
-        isVisible: Boolean,
-        errorText: String = EDIT_TEXT_EMPTY_MESSAGE
-    ) {
-
-        includeBinding.addressErrorTV.text = errorText
-
-        if (!isVisible) {
-            includeBinding.addressErrorTV.invisible()
-        } else {
-            includeBinding.addressErrorTV.isVisible = isVisible
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

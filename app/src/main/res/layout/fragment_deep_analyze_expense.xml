@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
         android:contentDescription="@string/clear_selection_fab"
-        android:src="@drawable/ic_clear_black_24dp"
+        android:src="@drawable/ic_cancel"
         android:tooltipText="Clear selection"
         app:fabSize="mini"
         app:layout_constraintEnd_toStartOf="@+id/selectAllFAB"

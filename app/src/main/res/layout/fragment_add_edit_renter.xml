@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/activity_fragment_background"
     tools:context=".ui.fragments.houseRenters.addContentFragments.AddRenterFragment">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -29,7 +30,7 @@
 
         <include
             android:id="@+id/include"
-            layout="@layout/add_renter_layout" />
+            layout="@layout/add_renter_layout_v2" />
 
     </androidx.core.widget.NestedScrollView>
 

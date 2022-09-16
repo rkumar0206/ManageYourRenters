@@ -6,6 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.fragments.houseRenters.HomeFragment"
     android:id="@+id/homeCoordinatorL"
+    android:background="@color/activity_fragment_background"
     >
 
     <com.google.android.material.appbar.AppBarLayout
@@ -34,12 +35,12 @@
         android:id="@+id/rentersRV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="2dp"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:listitem="@layout/adapter_show_renter"
+        tools:listitem="@layout/adapter_renter_v2"
         tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -10,25 +10,25 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Borrower
-import com.rohitthebest.manageyourrenters.databinding.AdapterShowRenterBinding
+import com.rohitthebest.manageyourrenters.databinding.AdapterBorrowerBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.format
-import com.rohitthebest.manageyourrenters.utils.hide
 
 class BorrowerAdapter :
     ListAdapter<Borrower, BorrowerAdapter.BorrowerViewHolder>(DiffUtilCallback()) {
 
     private var mListener: OnClickListener? = null
 
-    inner class BorrowerViewHolder(val binding: AdapterShowRenterBinding) :
+    inner class BorrowerViewHolder(val binding: AdapterBorrowerBinding) :
         RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         init {
 
-            binding.renterAdapterCV.setOnClickListener(this)
-            binding.adapterRenterEditBtn.setOnClickListener(this)
-            binding.adapterRenterMobileTV.setOnClickListener(this)
+            binding.borrowerAdapterCV.setOnClickListener(this)
+            binding.borrowerMenuBtn.setOnClickListener(this)
+            binding.borrowerDetailsBtn.setOnClickListener(this)
+            binding.borrowerPaymentsBtn.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {
@@ -37,12 +37,12 @@ class BorrowerAdapter :
 
                 when (v?.id) {
 
-                    binding.renterAdapterCV.id -> {
+                    binding.borrowerAdapterCV.id -> {
 
                         mListener!!.onBorrowerClicked(getItem(absoluteAdapterPosition).key)
                     }
 
-                    binding.adapterRenterEditBtn.id -> {
+                    binding.borrowerMenuBtn.id -> {
 
                         mListener!!.onMenuButtonClicked(
                             getItem(absoluteAdapterPosition),
@@ -50,12 +50,13 @@ class BorrowerAdapter :
                         )
                     }
 
-                    binding.adapterRenterMobileTV.id -> {
+                    binding.borrowerDetailsBtn.id -> {
 
-                        mListener!!.onMobileNumberClicked(
-                            getItem(absoluteAdapterPosition).mobileNumber,
-                            binding.adapterRenterMobileTV
-                        )
+                        mListener!!.onDetailsButtonClicked(getItem(absoluteAdapterPosition).key)
+                    }
+
+                    binding.borrowerPaymentsBtn.id -> {
+                        mListener!!.onBorrowerClicked(getItem(absoluteAdapterPosition).key)
                     }
                 }
             }
@@ -69,19 +70,16 @@ class BorrowerAdapter :
 
                 binding.apply {
 
-                    textView23.hide()
-                    adapterRenterAddressTV.hide()
-
                     if (b.totalDueAmount > 0) {
 
                         // using room num tv for showing total due
-                        adapterRoomNumTV.changeTextColor(
+                        adapterTotalDueTV.changeTextColor(
                             binding.root.context,
                             R.color.color_orange
                         )
                     } else {
 
-                        adapterRoomNumTV.changeTextColor(
+                        adapterTotalDueTV.changeTextColor(
                             binding.root.context,
                             R.color.color_green
                         )
@@ -89,20 +87,10 @@ class BorrowerAdapter :
 
 
                     // using room number textView for showing the due amount of the borrower
-                    adapterRoomNumTV.text = "Total Due : ₹ ${b.totalDueAmount.format(2)}"
+                    adapterTotalDueTV.text = "Total Due : ₹ ${b.totalDueAmount.format(2)}"
 
-                    adapterRenterNameTV.text = b.name
-                    adapterRenterEmailTV.text = b.emailId
-                    adapterDocumnetNameTV.text = if (b.otherDocumentName != "") {
-
-                        "${b.otherDocumentName} : "
-                    } else {
-
-                        "Other document : "
-                    }
-                    adapterRenterDocNumTV.text = b.otherDocumentNumber
-                    adapterRenterMobileTV.text = b.mobileNumber
-                    adapterRenterTimeTV.text = "Added on : ${
+                    adapterBorrowerNameTV.text = b.name
+                    borrowerAddedOnTV.text = "Added on : ${
                         WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             b.created
                         )
@@ -152,7 +140,7 @@ class BorrowerAdapter :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BorrowerViewHolder {
 
         val binding =
-            AdapterShowRenterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            AdapterBorrowerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
         return BorrowerViewHolder(binding)
     }
@@ -166,7 +154,7 @@ class BorrowerAdapter :
 
         fun onBorrowerClicked(borrowerKey: String)
         fun onMenuButtonClicked(borrower: Borrower, position: Int)
-        fun onMobileNumberClicked(mobileNumber: String, view: View)
+        fun onDetailsButtonClicked(borrowerKey: String)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

@@ -316,27 +316,13 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
                 if (borrowerPaymentForMenus != null) {
 
-                    if (!borrowerPaymentForMenus!!.isSynced) {
+                    if (isInternetAvailable(requireContext())) {
 
-                        borrowerPaymentViewModel.deleteBorrowerPayment(
-                            borrowerPaymentForMenus!!
-                        )
-
+                        borrowerPaymentViewModel.deleteBorrowerPayment(borrowerPaymentForMenus!!)
                     } else {
-
-                        if (isInternetAvailable(requireContext())) {
-
-                            borrowerPaymentViewModel.deleteBorrowerPayment(
-                                borrowerPaymentForMenus!!
-                            )
-
-                        } else {
-
-                            showNoInternetMessage(requireContext())
-                        }
+                        showNoInternetMessage(requireContext())
                     }
                 }
-
                 it.dismiss()
             },
             {
@@ -489,10 +475,8 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
             if (isInternetAvailable(requireContext())) {
 
-                borrowerPaymentViewModel.updateBorrowerPayment(
-                    borrowerPaymentForMenus!!,
-                    borrowerPaymentForMenus!!
-                )
+                borrowerPaymentForMenus?.isSynced = true
+                borrowerPaymentViewModel.insertBorrowerPayment(borrowerPaymentForMenus!!)
                 borrowerPaymentAdapter.notifyItemChanged(adapterItemPosition)
 
             } else {

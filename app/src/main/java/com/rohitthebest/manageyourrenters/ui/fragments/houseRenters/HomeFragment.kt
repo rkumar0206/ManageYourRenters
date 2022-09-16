@@ -21,6 +21,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowRentersAdapter
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.data.DocumentType
+import com.rohitthebest.manageyourrenters.data.StatusEnum
 import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
@@ -34,7 +35,6 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getPairOfDat
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showDateRangePickerDialog
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showMobileNumberOptionMenu
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,14 +57,14 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private var mAuth: FirebaseAuth? = null
 
-    private lateinit var mAdapter: ShowRentersAdapter
+    private lateinit var rentersAdapter: ShowRentersAdapter
 
     private var rvStateParcelable: Parcelable? = null
 
     private var isRevenueObserveEnabled = false
 
     private var searchView: SearchView? = null
-
+    private var listSize = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -82,7 +82,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         mAuth = Firebase.auth
 
-        mAdapter = ShowRentersAdapter()
+        rentersAdapter = ShowRentersAdapter()
 
         binding.homeProgressBar.show()
 
@@ -118,6 +118,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
         renterViewModel.getAllRentersList().observe(viewLifecycleOwner) { renters ->
 
+            listSize = renters.size
+            Log.d(TAG, "getAllRentersList: ${renters.filter { it.name.contains("Gopal") }}")
             if (searchView != null && searchView!!.query.toString().isValid()) {
 
                 setUpSearchEditText(renters)
@@ -132,7 +134,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     showNoRentersAddedTV()
                 }
 
-                mAdapter.submitList(renters)
+                rentersAdapter.submitList(renters)
             }
             binding.rentersRV.layoutManager?.onRestoreInstanceState(rvStateParcelable)
             binding.homeProgressBar.hide()
@@ -175,7 +177,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         if (query?.isEmpty()!!) {
 
             binding.rentersRV.scrollToPosition(0)
-            mAdapter.submitList(renters)
+            rentersAdapter.submitList(renters)
             if (renters.isNotEmpty()) {
                 hideNoRentersAddedTV()
             } else {
@@ -202,7 +204,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                 showNoRentersAddedTV()
             }
 
-            mAdapter.submitList(filteredList)
+            rentersAdapter.submitList(filteredList)
         }
     }
 
@@ -212,14 +214,14 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             binding.rentersRV.apply {
 
-                adapter = mAdapter
+                adapter = rentersAdapter
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true)
                 changeVisibilityOfFABOnScrolled(binding.addRenterFAB)
             }
 
 
-            mAdapter.setOnClickListener(this)
+            rentersAdapter.setOnClickListener(this)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -227,10 +229,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     override fun onRenterClicked(renter: Renter) {
 
-        val action = HomeFragmentDirections.actionHomeFragmentToPaymentFragment(
-            renter.key
-            //convertRenterToJSONString(renter)
-        )
+        val action = HomeFragmentDirections.actionHomeFragmentToPaymentFragment(renter.key)
         findNavController().navigate(action)
     }
 
@@ -410,9 +409,12 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     )
                 }
             }
+
+            val oldRenterValue = renterForMenus.copy()
+
             renterForMenus.supportingDocument = null
             renterForMenus.isSupportingDocAdded = false
-            renterViewModel.updateRenter(renterForMenus)
+            renterViewModel.updateRenter(oldRenterValue, renterForMenus)
             showToast(requireContext(), "Supporting Document deleted")
 
         } else {
@@ -430,8 +432,9 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
                     showToast(requireContext(), "Already Synced")
                 } else {
 
-                    renterViewModel.updateRenter(renterForMenus)
-                    mAdapter.notifyItemChanged(currentAdapterPosition)
+                    renterForMenus.isSynced = getString(R.string.t)
+                    renterViewModel.insertRenter(renterForMenus)
+                    rentersAdapter.notifyItemChanged(currentAdapterPosition)
                 }
 
             } else {
@@ -444,9 +447,53 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     //[END OF MENU CLICK LISTENERS]
 
-    override fun onMobileNumberClicked(mobileNumber: String, view: View) {
+    override fun onStatusButtonClicked(renter: Renter, position: Int) {
 
-        showMobileNumberOptionMenu(requireActivity(), view, mobileNumber)
+        var msg = ""
+
+        if (renter.status == StatusEnum.ACTIVE) {
+
+            msg = getString(R.string.renter_status_message, "ACTIVE", "INACTIVE", "cannot")
+        } else if (renter.status == StatusEnum.INACVTIVE) {
+
+            msg = getString(R.string.renter_status_message, "INACTIVE", "ACTIVE", "can")
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Change status?")
+            .setMessage(msg)
+            .setPositiveButton("Change") { dialog, _ ->
+
+                val oldRenterValue = renter.copy()
+
+                renter.status =
+                    if (renter.status == StatusEnum.ACTIVE) StatusEnum.INACVTIVE else StatusEnum.ACTIVE
+
+                renter.modified = System.currentTimeMillis()
+                renterViewModel.updateRenter(oldRenterValue, renter)
+
+                rentersAdapter.notifyItemChanged(position)
+
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+
+    }
+
+    override fun onDetailsButtonClicked(renter: Renter) {
+        val action = HomeFragmentDirections.actionHomeFragmentToRenterDetailBottomSheetDialog(
+            renter.key
+        )
+        findNavController().navigate(action)
+    }
+
+    override fun onPaymentButtonClicked(renter: Renter) {
+        onRenterClicked(renter)
     }
 
     private fun hideNoRentersAddedTV() {

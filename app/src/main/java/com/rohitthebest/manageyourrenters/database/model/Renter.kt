@@ -4,11 +4,14 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
+import com.rohitthebest.manageyourrenters.data.StatusEnum
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
+import java.io.Serializable
 
 @Entity(tableName = "renter_table")
 @IgnoreExtraProperties
 data class Renter(
+    @Exclude @PrimaryKey(autoGenerate = true) var id: Int? = null,
     var timeStamp: Long? = System.currentTimeMillis(),
     var modified: Long = System.currentTimeMillis(),
     var name: String,
@@ -25,14 +28,15 @@ data class Renter(
     var key: String?,
     var isSupportingDocAdded: Boolean = false,
     var supportingDocument: SupportingDocument? = null,
-    var isSynced: String = "false"
-) {
-
-    @Exclude
-    @PrimaryKey(autoGenerate = true)
-    var id : Int? = null
+    var isSynced: String = "false",
+    var status: StatusEnum = StatusEnum.ACTIVE,
+    var imageUrl: String = "",
+    var occupation: String = "",
+    var noOfFamilyMembers: Int = 0
+) : Serializable {
 
     constructor() : this(
+        null,
         System.currentTimeMillis(),
         System.currentTimeMillis(),
         "",
@@ -49,7 +53,11 @@ data class Renter(
         "",
         false,
         null,
-        "false"
+        "false",
+        StatusEnum.ACTIVE,
+        "",
+        "",
+        0
     )
 
 }

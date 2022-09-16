@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.afollestad.materialdialogs.utils.MDUtil.getStringArray
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
@@ -25,7 +24,7 @@ class MonthlyPaymentAdapter :
 
         init {
 
-            monthList = binding.root.context.getStringArray(R.array.months).toList()
+            monthList = binding.root.context.resources.getStringArray(R.array.months).toList()
 
             binding.rootL.setOnClickListener {
                 if (checkForNullability()) {

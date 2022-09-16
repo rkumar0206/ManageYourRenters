@@ -383,7 +383,6 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
             if (isInternetAvailable(requireContext())) {
 
-                // inserting as update is not allowed for emiPayment
                 emiPaymentViewModel.updateEMIPayment(emiPaymentForMenus, emiPaymentForMenus)
                 emiPaymentAdapter.notifyItemChanged(adapterPosition)
             } else {

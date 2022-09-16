@@ -40,7 +40,8 @@ class PartialPaymentAdapter(val currencySymbol: String = "₹") :
                 binding.apply {
 
                     partialPaymentDateTV.setDateInTextView(
-                        pPayment.created
+                        pPayment.created,
+                        "dd-MM-yyyy, hh:mm a"
                     )
 
                     partialPaymentTV.text = "$currencySymbol ${pPayment.amount}"

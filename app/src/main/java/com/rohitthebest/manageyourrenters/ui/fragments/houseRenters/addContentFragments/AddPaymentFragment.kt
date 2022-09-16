@@ -223,6 +223,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 includeBinding.parkingET.editText?.setText(lastPaymentInfo?.parkingRent.toString())
 
+                if (lastPaymentInfo!!.extras?.fieldName.isValid()) {
+
+                    includeBinding.extraFieldNameET.setText(lastPaymentInfo!!.extras?.fieldName)
+                    includeBinding.extraAmountET.setText(lastPaymentInfo!!.extras?.fieldAmount.toString())
+                }
+
                 initializeLastPaymentsDuesAndAdvance()
 
             } else {

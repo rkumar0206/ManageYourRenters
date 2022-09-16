@@ -126,7 +126,7 @@
     <string name="no_borrowers_message">Press add (+) below to add the details of the borrower</string>
     <string name="addemicategoryfab">addEmiCategoryfab</string>
     <string name="emi_name">EMI name</string>
-    <string name="enter_a_name_for_the_emi_for_example_car_emi_bike_emi_etc">* enter a name for the EMI. For example : car emi, bike emi, etc.</string>
+    <string name="enter_a_name_for_the_emi_for_example_car_emi_bike_emi_etc">* enter a name for the EMI. For example : CAR, HOUSE, etc.</string>
     <string name="time">Time</string>
     <string name="start_date_of_the_emi">Start date of the EMI</string>
     <string name="total_number_of_months">Total number of months</string>

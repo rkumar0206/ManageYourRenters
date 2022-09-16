@@ -47,7 +47,7 @@
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/adapter_choose_expense_category.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/adapter_deleted_renter.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/adapter_emi.xml" value="0.2" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/adapter_emi_payment.xml" value="0.25" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/adapter_emi_payment.xml" value="0.176" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/adapter_monthly_payment.xml" value="0.11041666666666666" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/adapter_renter.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/adapter_renter_v2.xml" value="0.2" />
@@ -57,13 +57,13 @@
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_borrower_layout.xml" value="0.2" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_borrower_payment_layout.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_edit_monthly_payment_layout.xml" value="0.264" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_emi_layout.xml" value="0.264" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_emi_layout.xml" value="0.2" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_emi_payment_layout.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_expense_category_layout.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_expense_layout.xml" value="0.23020833333333332" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_monthly_payment_category_layout.xml" value="0.22083333333333333" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_partial_payment_layout.xml" value="0.22083333333333333" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_payment_layout.xml" value="0.264" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_payment_layout.xml" value="0.2" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_renter_layout.xml" value="0.176" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_renter_layout_v2.xml" value="0.176" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/add_supporting_document_layout.xml" value="0.23020833333333332" />
@@ -82,7 +82,7 @@
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_add_edit_borrower.xml" value="0.176" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_add_edit_monthly_payment.xml" value="0.22083333333333333" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_add_edit_renter.xml" value="0.152" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_add_emi.xml" value="0.23020833333333332" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_add_emi.xml" value="0.2" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_add_emi_payment.xml" value="0.23020833333333332" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_add_expense.xml" value="0.23020833333333332" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_add_expense_category.xml" value="0.23020833333333332" />
@@ -93,29 +93,31 @@
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_borrower_home.xml" value="0.176" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_borrower_payment.xml" value="0.21654749744637386" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_calculate_interest.xml" value="0.2171875" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_deep_analyze_expense.xml" value="0.264" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_deep_analyze_expense.xml" value="0.176" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_deleted_renters.xml" value="0.2" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_emi.xml" value="0.23020833333333332" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_emi.xml" value="0.176" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_emi_details_bottomsheet.xml" value="0.23020833333333332" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_emi_payment.xml" value="0.23020833333333332" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_emi_payment.xml" value="0.176" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_expense.xml" value="0.23020833333333332" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_expense_category.xml" value="0.264" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_expense_category.xml" value="0.176" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_graph.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_home.xml" value="0.23020833333333332" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_monthly_graph.xml" value="0.2" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_monthly_payment.xml" value="0.264" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_monthly_payment.xml" value="0.2" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_monthly_payment_category.xml" value="0.22083333333333333" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_payment.xml" value="0.2" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_renter_bill.xml" value="0.22083333333333333" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_track_money_home.xml" value="0.23020833333333332" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_show_expense_bottom_sheet.xml" value="0.1394736842105263" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/fragment_track_money_home.xml" value="0.2" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/item_deep_analyze_expense_category.xml" value="0.22083333333333333" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/item_expense.xml" value="0.4" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/item_expense.xml" value="0.2" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/item_expense_category.xml" value="0.23020833333333332" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/item_monthly_payment.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/item_monthly_payment_category.xml" value="0.22083333333333333" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/item_unsplash_photo.xml" value="0.23020833333333332" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/renter_detail_bottomsheet_dialog.xml" value="0.2" />
-        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/renter_detail_bottomsheet_dialog_layout.xml" value="0.2" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/renter_detail_bottomsheet_dialog_layout.xml" value="0.152" />
+        <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/renter_type_item_layout.xml" value="0.2" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/show_bill_layout.xml" value="0.264" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/show_renter_payment_bill_bottomsheet_dialog.xml" value="0.20703125" />
         <entry key="..\:/Users/Rohit/AndroidStudioProjects/ManageYourRenters/app/src/main/res/layout/supporting_document_layout.xml" value="0.23020833333333332" />

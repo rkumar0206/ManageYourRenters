@@ -13,9 +13,9 @@
         android:layout_height="100dp"
         android:layout_marginTop="24dp"
         app:cardCornerRadius="1000dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/renterRoomTV"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintStart_toStartOf="@+id/renterRoomTV"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView

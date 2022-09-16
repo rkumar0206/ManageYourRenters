@@ -126,7 +126,7 @@
     <string name="no_borrowers_message">Press add (+) below to add the details of the borrower</string>
     <string name="addemicategoryfab">addEmiCategoryfab</string>
     <string name="emi_name">EMI name</string>
-    <string name="enter_a_name_for_the_emi_for_example_car_emi_bike_emi_etc">* enter a name for the EMI. For example : car emi, bike emi, etc.</string>
+    <string name="enter_a_name_for_the_emi_for_example_car_emi_bike_emi_etc">* enter a name for the EMI. For example : CAR, HOUSE, etc.</string>
     <string name="time">Time</string>
     <string name="start_date_of_the_emi">Start date of the EMI</string>
     <string name="total_number_of_months">Total number of months</string>
@@ -254,7 +254,7 @@
     <string name="enter_number">Enter number</string>
     <string name="number_of_days_with_value">Number of days : %1$s</string>
     <string name="internet_required_message_for_uploading_doc">Internet connection is needed for uploading the supporting the document</string>
-    <string name="added_on">Added On :</string>
+    <string name="added_on">Added On</string>
     <string name="show_calendar_button">show calendar button</string>
     <string name="view_edit">View / Edit</string>
     <string name="cancelled">Cancelled</string>
@@ -302,6 +302,22 @@
     <string name="enter_file_name">Enter file name</string>
     <string name="renter_status_message">Status is %1$s.\nWhen changed to %2$s you %3$s add payments for this renter.</string>
     <string name="renter_is_marked_as_inactive">This renter is INACTIVE.</string>
+    <string name="active">ACTIVE</string>
+    <string name="inactive">INACTIVE</string>
+    <string name="details">Details</string>
+    <string name="options">Options</string>
+    <string name="something_went_wrong">Something went wrong!!!</string>
+    <string name="BLANK_DASH">----</string>
+    <string name="email">Email</string>
+    <string name="identification_document">Identification Document</string>
+    <string name="supporting_doc">Supporting document</string>
+    <string name="room_details">Room Details</string>
+    <string name="renter_details">Renter Details</string>
+    <string name="borrower_details">Borrower Details</string>
+    <string name="occupation_optional">Occupation (Optional)</string>
+    <string name="number_of_family_members_optional">Number of family members (Optional)</string>
+    <string name="occupation">Occupation</string>
+    <string name="number_of_family_members">Number of family members</string>
 
 
     <string-array name="interest_time_schedule">

@@ -11,24 +11,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.StatusEnum
 import com.rohitthebest.manageyourrenters.database.model.Renter
-import com.rohitthebest.manageyourrenters.databinding.AdapterRenterBinding
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.databinding.AdapterRenterV2Binding
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
 
+private const val TAG = "ShowRentersAdapter"
 class ShowRentersAdapter :
     ListAdapter<Renter, ShowRentersAdapter.RenterViewHolder>(DiffUtilCallback()) {
 
     private var mListener: OnClickListener? = null
 
-    inner class RenterViewHolder(val binding: AdapterRenterBinding) :
+    inner class RenterViewHolder(val binding: AdapterRenterV2Binding) :
         RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
 
         init {
 
             binding.renterAdapterCV.setOnClickListener(this)
-            binding.adapterRenterEditBtn.setOnClickListener(this)
-            //binding.adapterRenterMobileTV.setOnClickListener(this)
+            binding.renterDetailsBtn.setOnClickListener(this)
+            binding.renterMenuBtn.setOnClickListener(this)
+            binding.renterPaymentsBtn.setOnClickListener(this)
             binding.adapterRenterStatusBtn.setOnClickListener(this)
         }
 
@@ -37,59 +38,43 @@ class ShowRentersAdapter :
 
             binding.apply {
 
+                if (renter.status == StatusEnum.ACTIVE) {
+                    adapterRenterStatusBtn.setImageResource(R.drawable.ic_baseline_status_active)
+                } else {
+                    adapterRenterStatusBtn.setImageResource(R.drawable.ic_baseline_status_inactive)
+                }
+
                 if (renter.dueOrAdvanceAmount < 0.0) {
 
-                    binding.adapterRenterNameTV.changeTextColor(
-                        binding.root.context,
+                    adapterRenterNameTV.changeTextColor(
+                        root.context,
                         R.color.color_orange
                     )
 
                 } else {
 
-                    binding.adapterRenterNameTV.changeTextColor(
-                        binding.root.context,
+                    adapterRenterNameTV.changeTextColor(
+                        root.context,
                         R.color.primaryTextColor
                     )
                 }
 
-                binding.adapterRenterNameTV.text = renter.name
-                binding.adapterRoomNumTV.text = renter.roomNumber
-                binding.adapterRenterTimeTV.text = "Added on : ${
-                    WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                        renter.timeStamp
-                    )
-                }"
-                //binding.adapterRenterMobileTV.text = renter.mobileNumber
-                //binding.adapterRenterEmailTV.text = renter.emailId
-//                binding.adapterDocumnetNameTV.text = if (renter.otherDocumentName != "") {
-//
-//                    "${renter.otherDocumentName} : "
-//                } else {
-//
-//                    "Other document : "
-//                }
-                //binding.adapterRenterDocNumTV.text = renter.otherDocumentNumber
-                //binding.adapterRenterAddressTV.text = renter.address
-
-                when (renter.status) {
-
-                    StatusEnum.ACTIVE -> adapterRenterStatusBtn.setImageResource(R.drawable.ic_baseline_status_active)
-                    StatusEnum.INACVTIVE -> adapterRenterStatusBtn.setImageResource(R.drawable.ic_baseline_status_inactive)
-                }
+                adapterRenterNameTV.text = renter.name
+                adapterRoomNumTV.text = renter.roomNumber
 
                 if (renter.isSynced == binding.root.context.getString(R.string.t)) {
 
-                    binding.root.setCardBackgroundColor(
+                    root.setCardBackgroundColor(
                         ContextCompat.getColor(
-                            binding.root.context,
+                            root.context,
                             R.color.color_green
                         )
                     )
                 } else {
 
-                    binding.root.setCardBackgroundColor(
+                    root.setCardBackgroundColor(
                         ContextCompat.getColor(
-                            binding.root.context,
+                            root.context,
                             R.color.color_orange
                         )
                     )
@@ -104,15 +89,13 @@ class ShowRentersAdapter :
                 binding.renterAdapterCV.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
-
                         mListener!!.onRenterClicked(getItem(absoluteAdapterPosition))
                     }
                 }
 
-                binding.adapterRenterEditBtn.id -> {
+                binding.renterMenuBtn.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
-
                         mListener!!.onMenuButtonClicked(
                             getItem(absoluteAdapterPosition),
                             absoluteAdapterPosition
@@ -123,7 +106,6 @@ class ShowRentersAdapter :
                 binding.adapterRenterStatusBtn.id -> {
 
                     if (checkForNullability(absoluteAdapterPosition)) {
-
                         mListener!!.onStatusButtonClicked(
                             getItem(absoluteAdapterPosition),
                             absoluteAdapterPosition
@@ -131,18 +113,20 @@ class ShowRentersAdapter :
                     }
                 }
 
-//                binding.adapterRenterMobileTV.id -> {
-//
-//                    if (checkForNullability(absoluteAdapterPosition)) {
-//
-//                        mListener!!.onMobileNumberClicked(
-//                            getItem(absoluteAdapterPosition).mobileNumber,
-//                            binding.adapterRenterMobileTV
-//                        )
-//                    }
-//                }
-            }
+                binding.renterDetailsBtn.id -> {
 
+                    if (checkForNullability(absoluteAdapterPosition)) {
+                        mListener!!.onDetailsButtonClicked(getItem(absoluteAdapterPosition))
+                    }
+                }
+
+                binding.renterPaymentsBtn.id -> {
+
+                    if (checkForNullability(absoluteAdapterPosition)) {
+                        mListener!!.onPaymentButtonClicked(getItem(absoluteAdapterPosition))
+                    }
+                }
+            }
         }
 
         private fun checkForNullability(position: Int): Boolean {
@@ -171,7 +155,7 @@ class ShowRentersAdapter :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RenterViewHolder {
 
         val binding =
-            AdapterRenterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            AdapterRenterV2Binding.inflate(LayoutInflater.from(parent.context), parent, false)
 
         return RenterViewHolder(binding)
     }
@@ -188,8 +172,9 @@ class ShowRentersAdapter :
 
         fun onRenterClicked(renter: Renter)
         fun onMenuButtonClicked(renter: Renter, position: Int)
-        fun onMobileNumberClicked(mobileNumber: String, view: View)
         fun onStatusButtonClicked(renter: Renter, position: Int)
+        fun onDetailsButtonClicked(renter: Renter)
+        fun onPaymentButtonClicked(renter: Renter)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

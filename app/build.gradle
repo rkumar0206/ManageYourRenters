@@ -82,13 +82,13 @@ dependencies {
     //attaches coroutines with firebase
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1'
 
-    implementation 'com.google.firebase:firebase-auth-ktx:21.0.7'
-    implementation 'com.google.firebase:firebase-firestore:24.2.2'
-    implementation 'com.google.firebase:firebase-storage:20.0.1'
-    implementation 'com.google.firebase:firebase-analytics:21.1.0'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.0.8'
+    implementation 'com.google.firebase:firebase-firestore:24.3.0'
+    implementation 'com.google.firebase:firebase-storage:20.0.2'
+    implementation 'com.google.firebase:firebase-analytics:21.1.1'
 
     //for google signIn button
-    implementation 'com.google.android.gms:play-services-auth:20.2.0'
+    implementation 'com.google.android.gms:play-services-auth:20.3.0'
 
     def room_version = "2.4.1"
 
@@ -140,9 +140,6 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
     implementation "androidx.navigation:navigation-ui-ktx:2.3.5"
     
-    //Country Code Picker Library
-    implementation 'com.hbb20:ccp:2.4.0'
-
     //sentry
     implementation 'io.sentry:sentry-android:5.5.2'
 
@@ -159,9 +156,6 @@ dependencies {
 
     //paging 3.0
     implementation "androidx.paging:paging-runtime-ktx:3.1.0"
-
-    //bottomSheet Dialog
-    implementation 'com.afollestad.material-dialogs:bottomsheets:3.3.0'
 
     // pretty time library
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.4.Final'

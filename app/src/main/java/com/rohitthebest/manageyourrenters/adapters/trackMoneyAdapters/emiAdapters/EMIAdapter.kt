@@ -49,7 +49,7 @@ class EMIAdapter : ListAdapter<EMI, EMIAdapter.EMIViewHolder>(DiffUtilCallback()
                 binding.apply {
 
                     emiNameTV.text = e.emiName
-                    emiAddedOnTV.text = "Added on : ${
+                    emiAddedOnTV.text = "Started from : ${
                         WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             e.created
                         )

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="5dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginEnd="5dp"
+    android:layout_marginBottom="2dp"
+    app:cardBackgroundColor="@color/color_green"
+    app:cardCornerRadius="5dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/borrowerAdapterCV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="1.8dp"
+        app:cardCornerRadius="5dp"
+        app:rippleColor="@color/rippleColor">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/adapterTotalDueTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="2dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:padding="4dp"
+                android:textColor="@color/color_Red"
+                android:textSize="19sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/adapterBorrowerNameTV"
+                app:layout_constraintTop_toBottomOf="@+id/adapterBorrowerNameTV"
+                tools:text="Total Due : 8500" />
+
+            <TextView
+                android:id="@+id/adapterBorrowerNameTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/amaranth"
+                android:maxLines="1"
+                android:padding="4dp"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Rohit Kumar Singh" />
+
+            <TextView
+                android:id="@+id/borrowerAddedOnTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="3dp"
+                android:padding="2dp"
+                android:textColor="@color/textColor1"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@+id/adapterBorrowerNameTV"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/adapterBorrowerNameTV"
+                tools:ignore="SmallSp"
+                tools:text="Added on : 02-06-2020" />
+
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/borrowerDetailsBtn"
+                android:layout_width="70dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="#EAEAEA"
+                app:cardCornerRadius="50dp"
+                app:cardElevation="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/borrowerMenuBtn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider65">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="3dp"
+                    android:text="@string/details"
+                    android:textColor="#1565C0"
+                    android:textSize="12sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/borrowerMenuBtn"
+                android:layout_width="70dp"
+                android:layout_height="25dp"
+                app:cardBackgroundColor="#EAEAEA"
+                app:cardCornerRadius="50dp"
+                app:cardElevation="5dp"
+                app:layout_constraintEnd_toStartOf="@+id/borrowerPaymentsBtn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/borrowerDetailsBtn"
+                app:layout_constraintTop_toTopOf="@+id/borrowerDetailsBtn">
+
+                <TextView
+                    android:id="@+id/borrowerMenuTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="3dp"
+                    android:text="@string/options"
+                    android:textColor="#1565C0"
+                    android:textSize="12sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/borrowerPaymentsBtn"
+                android:layout_width="70dp"
+                android:layout_height="25dp"
+                app:cardBackgroundColor="#EAEAEA"
+                app:cardCornerRadius="50dp"
+                app:cardElevation="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/borrowerMenuBtn"
+                app:layout_constraintTop_toTopOf="@+id/borrowerMenuBtn">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="3dp"
+                    android:text="@string/payments"
+                    android:textColor="#1565C0"
+                    android:textSize="12sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <View
+                android:id="@+id/divider65"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="@+id/adapterTotalDueTV"
+                app:layout_constraintTop_toBottomOf="@+id/adapterTotalDueTV" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+</androidx.cardview.widget.CardView>

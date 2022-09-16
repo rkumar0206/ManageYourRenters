@@ -32,8 +32,9 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.calculateNum
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showCalendarDialog
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showDateAndTimePickerDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime.getCalendarInstance
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -99,7 +100,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
         includeBinding.addPartialPaymentDateTV.setDateInTextView(
             selectedDate,
-            "dd-MMMM-yyyy"
+            "dd-MM-yyyy, hh:mm a"
         )
     }
 
@@ -193,16 +194,16 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
             || v?.id == includeBinding.addPartialPaymentDateTV.id
         ) {
 
-            showCalendarDialog(
-                selectedDate,
-                {
-                    requireActivity().supportFragmentManager
-                },
-                {
-                    selectedDate = it
-                    initDate()
-                }
-            )
+            showDateAndTimePickerDialog(
+                requireContext(),
+                selectedDate.getCalendarInstance(),
+                false,
+                0L,
+            ) { calendar ->
+
+                selectedDate = calendar.timeInMillis
+                initDate()
+            }
         }
 
         when (v?.id) {

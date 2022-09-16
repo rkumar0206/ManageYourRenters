@@ -2,13 +2,14 @@ package com.rohitthebest.manageyourrenters.database.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 
 @IgnoreExtraProperties
 @Entity(tableName = "borrower_table")
 data class Borrower(
-    @PrimaryKey(autoGenerate = true) var id: Int?,
+    @Exclude @PrimaryKey(autoGenerate = true) var id: Int?,
     var created: Long = System.currentTimeMillis(),
     var modified: Long = System.currentTimeMillis(),
     var borrowerId: String,  // it is the id which will be used by the borrower to access his account

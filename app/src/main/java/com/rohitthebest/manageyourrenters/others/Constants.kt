@@ -34,6 +34,7 @@ object Constants {
     const val CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_KEY = "sbjsbbhjsbhbyguqyJBABBHJBkbnd"
 
     const val SUPPORTING_DOCUMENT_HELPER_MODEL_KEY = "dsbjsbjhbuyavvu"
+    const val RENTER_PAYMENT_CONFIRMATION_BILL_KEY = "BNZBNJBHVDLK&hjbxjhbskxknxB"
 
     const val SHOW_EDIT_MENU = "SHOW_EDIT_MENU_sjcjwncjkn"
     const val SHOW_DOCUMENTS_MENU = "SHOW_DOCUMENTS_MENU_sjcjwncacacn"

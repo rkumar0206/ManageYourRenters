@@ -14,7 +14,7 @@
             android:id="@+id/calculateIntToolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:navigationIcon="@drawable/ic_clear_black_24dp"
+            app:navigationIcon="@drawable/ic_cancel"
             app:title="@string/calculate_interest" />
 
     </com.google.android.material.appbar.AppBarLayout>

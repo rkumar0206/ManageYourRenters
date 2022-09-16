@@ -229,6 +229,14 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         }
     }
 
+    override fun onDetailsButtonClicked(borrowerKey: String) {
+        val action =
+            BorrowerHomeFragmentDirections.actionBorrowerHomeFragmentToBorrowerDetailBottomSheetDialog(
+                borrowerKey
+            )
+        findNavController().navigate(action)
+    }
+
     //[START OF MENU CLICK LISTENERS]
 
     override fun onEditMenuClick() {
@@ -252,25 +260,16 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
             requireContext(),
             positiveButtonListener = {
 
-                if (!borrowerForMenus.isSynced) {
+                if (isInternetAvailable(requireContext())) {
 
                     borrowerViewModel.deleteBorrower(
                         borrowerForMenus
                     )
                 } else {
-
-                    if (isInternetAvailable(requireContext())) {
-
-                        borrowerViewModel.deleteBorrower(
-                            borrowerForMenus
-                        )
-                    } else {
-                        showNoInternetMessage(requireContext())
-                    }
+                    showNoInternetMessage(requireContext())
                 }
 
                 it.dismiss()
-                borrowerAdapter.notifyItemRemoved(currentAdapterPosition)
             },
             negativeButtonListener = {
 
@@ -422,15 +421,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
                 } else {
 
                     borrowerForMenus.isSynced = true
-
-                    uploadDocumentToFireStore(
-                        requireContext(),
-                        getString(R.string.borrowers),
-                        borrowerForMenus.key
-                    )
-
-                    borrowerViewModel.updateBorrower(borrowerForMenus)
-
+                    borrowerViewModel.insertBorrower(borrowerForMenus)
                     borrowerAdapter.notifyItemChanged(currentAdapterPosition)
                 }
 
@@ -444,14 +435,6 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
 
     //[END OF MENU CLICK LISTENERS]
 
-    override fun onMobileNumberClicked(mobileNumber: String, view: View) {
-
-        Functions.showMobileNumberOptionMenu(
-            requireActivity(),
-            view,
-            mobileNumber
-        )
-    }
 
     private fun showNoBorrowersAddedTV(isVisible: Boolean) {
 

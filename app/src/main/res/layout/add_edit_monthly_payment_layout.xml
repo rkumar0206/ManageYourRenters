@@ -375,7 +375,7 @@
                     app:layout_constraintTop_toTopOf="@+id/textView7" />
 
                 <View
-                    android:id="@+id/divider7"
+                    android:id="@+id/divider79879"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_marginTop="4dp"
@@ -446,7 +446,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/divider7"
+                    app:layout_constraintTop_toBottomOf="@+id/divider79879"
                     app:srcCompat="@drawable/ic_baseline_date_range_24" />
 
                 <TextView

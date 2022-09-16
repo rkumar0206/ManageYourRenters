@@ -597,7 +597,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
         Functions.showCustomDateRangeOptionMenu(
             requireActivity(),
-            binding.toolbar
+            binding.divider105
         ) { selectedOption ->
 
             when (selectedOption) {

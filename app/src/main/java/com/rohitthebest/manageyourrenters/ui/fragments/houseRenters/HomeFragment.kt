@@ -557,9 +557,10 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
     private var d2 = System.currentTimeMillis()
     private var revenueTitle = ""
 
-    override fun onMenuItemClick(menu: MenuItem?): Boolean {
 
-        return when (menu?.itemId) {
+    override fun onMenuItemClick(menu: MenuItem): Boolean {
+
+        return when (menu.itemId) {
 
             R.id.menu_total_number_of_renters -> {
 

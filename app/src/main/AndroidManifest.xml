@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.rohitthebest.manageyourrenters">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -53,6 +52,7 @@
         <service android:name=".services.UploadDocumentListToFireStoreService" />
         <service android:name=".services.DeleteFileFromFirebaseStorageService" />
         <service android:name=".services.UploadFileToCloudStorageService" />
+        <service android:name=".services.SyncDocumentsFromFirestoreService" />
 
         <meta-data
             android:name="io.sentry.dsn"

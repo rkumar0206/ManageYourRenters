@@ -140,6 +140,7 @@ class LoginActivity : AppCompatActivity() {
                     // [END_EXCLUDE]
                 }
         } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

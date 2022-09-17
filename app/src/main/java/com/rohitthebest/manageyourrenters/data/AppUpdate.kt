@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.data
 
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 
 @IgnoreExtraProperties
@@ -9,6 +10,7 @@ data class AppUpdate(
     var whatsNew: ArrayList<WhatsNew>?
 ) {
 
+    @Exclude
     fun isEmpty(): Boolean {
 
         return version == "" && apk_url == "" && (whatsNew == null || whatsNew!!.isEmpty())
@@ -20,7 +22,7 @@ data class AppUpdate(
         null
     )
 
-    constructor(version: String, apk_url: String) : this()
+    //constructor(version: String, apk_url: String) : this()
 }
 
 data class WhatsNew(

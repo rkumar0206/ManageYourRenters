@@ -32,9 +32,8 @@ class TrackMoneyActivity : AppCompatActivity() {
             val navController = navHostFragment.navController
 
             val bundle = Bundle()
-            bundle.putString("shortcutFragmentNameKey", fragmentName)
-            navController.setGraph(navController.graph, bundle)
 
+            navController.setGraph(R.navigation.track_money_navigation, bundle)
         }
 
     }

@@ -56,10 +56,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    android {
-        lintOptions {
-            baseline file("lint-baseline.xml")
-        }
+
+    lintOptions {
+        baseline file("lint-baseline.xml")
     }
 
     buildFeatures {

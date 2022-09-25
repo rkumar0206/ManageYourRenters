@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.activities
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import com.rohitthebest.manageyourrenters.R
@@ -26,6 +27,8 @@ class TrackMoneyActivity : AppCompatActivity() {
 
         if (fragmentName.isValid()) {
 
+            Log.d("shortcut", "onCreate: fragmentName : $fragmentName")
+
             val navHostFragment =
                 supportFragmentManager.findFragmentById(binding.navHostFragment.id) as NavHostFragment
 
@@ -33,8 +36,7 @@ class TrackMoneyActivity : AppCompatActivity() {
 
             val bundle = Bundle()
             bundle.putString("shortcutFragmentNameKey", fragmentName)
-            navController.setGraph(navController.graph, bundle)
-
+            navController.setGraph(R.navigation.track_money_navigation, bundle)
         }
 
     }

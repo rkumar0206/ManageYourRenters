@@ -118,7 +118,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
                 withContext(Dispatchers.Main) {
 
                     compareAppVersionFromCloud()
-                    if (shouldOpenWhatsNewActivity && (appUpdate != null || !appUpdate!!.isEmpty())) {
+                    if (shouldOpenWhatsNewActivity && (appUpdate != null && !appUpdate!!.isEmpty())) {
                         openWhatsNewActivity()
                     }
                 }
@@ -417,6 +417,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
             changeIsSyncedValue()
 
         } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

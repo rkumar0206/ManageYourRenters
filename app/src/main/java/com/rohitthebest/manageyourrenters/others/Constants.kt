@@ -1,5 +1,7 @@
 package com.rohitthebest.manageyourrenters.others
 
+import com.rohitthebest.manageyourrenters.BuildConfig
+
 object Constants {
 
     const val UNSPLASH_BASE_URL = "https://api.unsplash.com/"
@@ -57,6 +59,6 @@ object Constants {
     const val SHORTCUT_EMI = "com.rohitthebest.manageyourrenters.emis"
 
     // app update related
-    const val APP_VERSION = "5.0.0"
+    const val APP_VERSION = BuildConfig.VERSION_NAME
     const val APP_UPDATE_FIRESTORE_DOCUMENT_KEY = "latest_app_version"
 }

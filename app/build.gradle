@@ -34,13 +34,13 @@ android {
         applicationId "com.rohitthebest.manageyourrenters"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 1
-        versionName "1.0"
+        versionCode 5
+        versionName "5.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField ("String", "MANAGE_YOUR_RENTERS_BASE_URL", getManageYourRentersBaseUrl())
-        buildConfigField ("String", "UNSPLASH_CLIENT_ID", getUnsplashClientId())
+        buildConfigField("String", "MANAGE_YOUR_RENTERS_BASE_URL", getManageYourRentersBaseUrl())
+        buildConfigField("String", "UNSPLASH_CLIENT_ID", getUnsplashClientId())
     }
 
     buildTypes {

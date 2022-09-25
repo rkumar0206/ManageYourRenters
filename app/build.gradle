@@ -79,8 +79,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     // for taking permissions and doing some of the stuffs that was done with Intent before
-    implementation "androidx.activity:activity-ktx:1.5.1"
-    implementation "androidx.fragment:fragment-ktx:1.5.2"
+    implementation "androidx.activity:activity-ktx:1.6.0"
+    implementation "androidx.fragment:fragment-ktx:1.5.3"
 
     //Firebase
     implementation 'com.firebaseui:firebase-ui-firestore:4.3.2'

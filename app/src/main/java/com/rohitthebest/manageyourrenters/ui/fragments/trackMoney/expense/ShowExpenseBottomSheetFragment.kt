@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAda
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.databinding.FragmentShowExpenseBottomSheetBinding
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -88,7 +89,7 @@ class ShowExpenseBottomSheetFragment : BottomSheetDialogFragment(), ExpenseAdapt
 
             dateRangeEnum = args?.dateRangeMessage!!
             date1 = args.date1
-            date2 = args.date2
+            date2 = args.date2 + Constants.ONE_DAY_MILLISECONDS
 
             if (dateRangeEnum == CustomDateRange.ALL_TIME) {
 

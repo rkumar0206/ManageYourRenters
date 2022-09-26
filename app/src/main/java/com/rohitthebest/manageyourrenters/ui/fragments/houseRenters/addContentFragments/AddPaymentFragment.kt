@@ -551,6 +551,9 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             return false
         }
 
+        // todo : validate date range
+        // todo : validate month range
+
         return includeBinding.houseRentET.error == null
     }
 

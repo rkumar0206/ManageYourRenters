@@ -279,6 +279,8 @@
     <string name="renter_payment_extras">%1$s\u0020:\u0020%2$s\u0020%3$s</string>
     <string name="renter_payment_net_demand">Net demand\u0020:\u0020%1$s\u0020%2$s</string>
     <string name="renter_payment_amount_paid">Amount paid\u0020:\u0020%1$s\u0020%2$s</string>
+    <string name="renter_bill_period_field_month">%1$s,\u0020%2$s\u0020to\u0020%3$s,\u0020%4$s</string>
+    <string name="renter_bill_period_field_date">%1$s\u0020to\u0020%2$s</string>
     <string name="already_synced">Already Synced</string>
     <string name="payment_info">Payment info</string>
     <string name="move_to_category">Move to other category</string>
@@ -324,6 +326,13 @@
     <string name="number_of_family_members_optional">Number of family members (Optional)</string>
     <string name="occupation">Occupation</string>
     <string name="number_of_family_members">Number of family members</string>
+    <string name="number_of_months">Number of months : </string>
+    <string name="number_of_days">Number of days : </string>
+    <string name="renter_bill_electricity_units">%1$s\u0020unit(s)</string>
+    <string name="renter_bill_electricity_rate">%1$s\u0020per/unit</string>
+    <string name="currency_amount">%1$s\u0020%2$s</string>
+    <string name="sign_currency_amount">%1$s\u0020%2$s\u0020%3$s</string>
+    <string name="extra">Extra</string>
 
 
     <string-array name="interest_time_schedule">

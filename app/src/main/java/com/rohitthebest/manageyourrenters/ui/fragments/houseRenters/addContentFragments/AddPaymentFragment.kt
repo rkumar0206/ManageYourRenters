@@ -533,6 +533,24 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             return false
         }
 
+        if (includeBinding.extraFieldNameET.isTextValid()
+            && !includeBinding.extraAmountET.isTextValid()
+        ) {
+
+            includeBinding.extraAmountET.requestFocus()
+            includeBinding.extraAmountET.error = "Required"
+            return false
+        }
+
+        if (includeBinding.extraAmountET.isTextValid() &&
+            !includeBinding.extraFieldNameET.isTextValid()
+        ) {
+
+            includeBinding.extraFieldNameET.requestFocus()
+            includeBinding.extraFieldNameET.error = "Required"
+            return false
+        }
+
         return includeBinding.houseRentET.error == null
     }
 
@@ -878,7 +896,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             hideByMonthAndShowByDateView()
         }
-
     }
 
     private fun textWatcher() {
@@ -900,6 +917,15 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         includeBinding.extraAmountET.onTextChangedListener {
             calculateTotalBillJob()
+            if (it?.isNotEmpty()!!) {
+                includeBinding.extraAmountET.error = null
+            }
+        }
+
+        includeBinding.extraFieldNameET.onTextChangedListener {
+            if (it?.isNotEmpty()!!) {
+                includeBinding.extraFieldNameET.error = null
+            }
         }
 
         includeBinding.previousReadingET.onTextChangedListener {

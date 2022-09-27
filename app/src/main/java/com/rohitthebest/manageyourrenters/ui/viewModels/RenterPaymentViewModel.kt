@@ -4,9 +4,7 @@ import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.data.DocumentType
-import com.rohitthebest.manageyourrenters.data.SupportingDocument
-import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
+import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTER_PAYMENTS
@@ -15,9 +13,13 @@ import com.rohitthebest.manageyourrenters.repositories.RenterRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
+private const val TAG = "RenterPaymentViewModel"
 
 @HiltViewModel
 class RenterPaymentViewModel @Inject constructor(
@@ -292,4 +294,90 @@ class RenterPaymentViewModel @Inject constructor(
     fun getAllRenterPayments() = paymentRepository.getAllRenterPayments().asLiveData()
 
     fun getTotalRevenueOfAllTime() = paymentRepository.getTotalRevenueOfAllTime().asLiveData()
+
+    // for date type, not checking the if the date is in between two dates
+    // as user may add payment for any date
+    // so here checking if record with exact date is present in db or not
+    suspend fun validateByDateField(
+        renterKey: String,
+        renterBillDateType: RenterBillDateType
+    ): Boolean {
+
+        return withContext(Dispatchers.IO) {
+
+            val renterDateTypeList = paymentRepository.getAllPaymentsListOfRenter(renterKey)
+                .first()
+                .filter { it.billPeriodInfo.billPeriodType == BillPeriodType.BY_DATE }
+                .map { it.billPeriodInfo.renterBillDateType }
+
+            val recordExists = renterDateTypeList
+                .any {
+
+                    val fromBillDateDb =
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            it?.fromBillDate, "dd-MM-yyyy"
+                        )
+
+                    val toBillDateDb =
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            it?.toBillDate, "dd-MM-yyyy"
+                        )
+
+                    val fromBillDateArg =
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            renterBillDateType.fromBillDate, "dd-MM-yyyy"
+                        )
+
+                    val toBillDateArg =
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            renterBillDateType.toBillDate, "dd-MM-yyyy"
+                        )
+
+                    fromBillDateDb == fromBillDateArg
+                            && toBillDateDb == toBillDateArg
+                }
+
+            // if recordExists = true (record already present with selected date)
+            !recordExists
+        }
+    }
+
+    // for month type, checking if any month is coming between two previously added month range
+    suspend fun validateByMonthField(
+        renterKey: String,
+        renterBillMonthType: RenterBillMonthType
+    ): Boolean {
+
+        return withContext(Dispatchers.IO) {
+
+            val renterMonthTypeList = paymentRepository.getAllPaymentsListOfRenter(renterKey)
+                .first()
+                .filter { it.billPeriodInfo.billPeriodType == BillPeriodType.BY_MONTH }
+                .map { it.billPeriodInfo.renterBillMonthType }
+
+            val recordExists = renterMonthTypeList.any {
+
+                val dbFrom = WorkingWithDateAndTime.getTimeInMillisForYearMonthAndDate(
+                    Triple(it!!.forBillYear, it.forBillMonth, 1)
+                )
+
+                val dbTo = WorkingWithDateAndTime.getTimeInMillisForYearMonthAndDate(
+                    Triple(it.toBillYear, it.toBillMonth, 1)
+                )
+
+                val argFrom = WorkingWithDateAndTime.getTimeInMillisForYearMonthAndDate(
+                    Triple(renterBillMonthType.forBillYear, renterBillMonthType.forBillMonth, 1)
+                )
+
+                val argTo = WorkingWithDateAndTime.getTimeInMillisForYearMonthAndDate(
+                    Triple(renterBillMonthType.toBillYear, renterBillMonthType.toBillMonth, 1)
+                )
+
+                (argFrom in dbFrom..dbTo) || (argTo in dbFrom..dbTo)
+            }
+
+            // if record exists then then passed range is not valid
+            !recordExists
+        }
+    }
 }

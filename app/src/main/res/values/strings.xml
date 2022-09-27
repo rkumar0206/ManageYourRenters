@@ -333,6 +333,8 @@
     <string name="currency_amount">%1$s\u0020%2$s</string>
     <string name="sign_currency_amount">%1$s\u0020%2$s\u0020%3$s</string>
     <string name="extra">Extra</string>
+    <string name="renter_payment_date_range_error_message">A payment with selected date range is already present!!</string>
+    <string name="renter_payment_month_range_error_message">A payment with selected month range is already present!!</string>
 
 
     <string-array name="interest_time_schedule">

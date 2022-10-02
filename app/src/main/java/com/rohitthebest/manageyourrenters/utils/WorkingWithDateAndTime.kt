@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.utils
 import android.annotation.SuppressLint
 import android.util.Log
 import java.sql.Timestamp
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -22,40 +23,32 @@ object WorkingWithDateAndTime {
         return formattedDate.format(date!!)
     }
 
-/*
+    @Throws(ParseException::class)
     fun getDateFromDateInString(dateInString: String?, pattern: String): Date? {
 
         val dateFormat = SimpleDateFormat(pattern)
         var myDate: Date? = null
 
-        try {
-            if (dateInString != null) {
-                myDate = dateFormat.parse(dateInString)
-            }
-        } catch (e: ParseException) {
-            e.printStackTrace()
+        if (dateInString != null) {
+            myDate = dateFormat.parse(dateInString)
         }
 
         return myDate
     }
-*/
 
-/*
+    @Throws(ParseException::class)
     fun getTimeInMillisFromDateInString(dateInString: String, pattern: String): Long? {
 
         val myDate = getDateFromDateInString(dateInString, pattern)
 
         return myDate?.time
-
     }
-*/
 
-/*
     fun convertDateToPattern(date: Date?, pattern: String? = "dd-MM-yyyy"): String? {
 
         var sdf: SimpleDateFormat? = null
-        if (pattern != null || pattern != "") {
-            sdf = SimpleDateFormat(pattern!!)
+        if (pattern != null && pattern != "") {
+            sdf = SimpleDateFormat(pattern)
         }
         return if (date != null) {
             sdf?.format(date)
@@ -63,7 +56,6 @@ object WorkingWithDateAndTime {
             null
         }
     }
-*/
 
     fun getCurrentYear(): Int {
 
@@ -92,14 +84,21 @@ object WorkingWithDateAndTime {
     ): Int {
 
         val start = Calendar.getInstance()
-        start.set(startMonthYear.second, startMonthYear.first, 1)
+        start.set(startMonthYear.second, startMonthYear.first - 1, 1)
         val end = Calendar.getInstance()
-        end.set(endMonthYear.second, endMonthYear.first, 1)
+        end.set(endMonthYear.second, endMonthYear.first - 1, 1)
 
         val yearsInBetween = end.get(Calendar.YEAR) - start.get(Calendar.YEAR)
         val monthDiff = end.get(Calendar.MONTH) - start.get(Calendar.MONTH)
 
         return yearsInBetween * 12 + monthDiff + 1
+    }
+
+    fun getTimeInMillisForYearMonthAndDate(yearMonthDay: Triple<Int, Int, Int>): Long {
+
+        val cal = Calendar.getInstance()
+        cal.set(yearMonthDay.first, yearMonthDay.second - 1, yearMonthDay.third)
+        return cal.timeInMillis
     }
 
     /**

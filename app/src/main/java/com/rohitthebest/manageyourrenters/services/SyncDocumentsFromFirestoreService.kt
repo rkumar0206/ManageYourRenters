@@ -6,6 +6,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.*
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
@@ -54,8 +55,12 @@ class SyncDocumentsFromFirestoreService : Service() {
     @Inject
     lateinit var monthlyPaymentRepository: MonthlyPaymentRepository
 
+    private var uid = ""
+
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
+        uid = Functions.getUid()!!
 
         val job1 = CoroutineScope(Dispatchers.IO).launch {
             syncRenterAndRenterPayment()
@@ -117,7 +122,7 @@ class SyncDocumentsFromFirestoreService : Service() {
         // monthly payment category
         getDataFromFireStore(
             FirestoreCollectionsConstants.MONTHLY_PAYMENT_CATEGORIES,
-            Functions.getUid()!!,
+            uid,
         ) {}?.let { monthlyPaymentCategories ->
 
 
@@ -138,7 +143,7 @@ class SyncDocumentsFromFirestoreService : Service() {
                     // monthly payments
                     getDataFromFireStore(
                         FirestoreCollectionsConstants.MONTHLY_PAYMENTS,
-                        Functions.getUid()!!,
+                        uid,
                     ) {}?.let { monthlyPayments ->
 
                         if (monthlyPayments.size() != 0) {
@@ -165,7 +170,7 @@ class SyncDocumentsFromFirestoreService : Service() {
         // expense categories
         getDataFromFireStore(
             FirestoreCollectionsConstants.EXPENSE_CATEGORIES,
-            Functions.getUid()!!,
+            uid,
         ) {}?.let { expenseCategory ->
 
             if (expenseCategory.size() != 0) {
@@ -181,7 +186,7 @@ class SyncDocumentsFromFirestoreService : Service() {
                 //expenses
                 getDataFromFireStore(
                     FirestoreCollectionsConstants.EXPENSES,
-                    Functions.getUid()!!,
+                    uid,
                 ) {}?.let { expenses ->
 
                     if (expenses.size() != 0) {
@@ -205,7 +210,7 @@ class SyncDocumentsFromFirestoreService : Service() {
         // emis
         getDataFromFireStore(
             FirestoreCollectionsConstants.EMIs,
-            Functions.getUid()!!,
+            uid,
         ) {}?.let { emis ->
 
             if (emis.size() != 0) {
@@ -217,7 +222,7 @@ class SyncDocumentsFromFirestoreService : Service() {
                 //emi payments
                 getDataFromFireStore(
                     FirestoreCollectionsConstants.EMI_PAYMENTS,
-                    Functions.getUid()!!
+                    uid
                 ) {}?.let { emiPayments ->
 
                     if (emiPayments.size() != 0) {
@@ -236,7 +241,7 @@ class SyncDocumentsFromFirestoreService : Service() {
         //borrower
         getDataFromFireStore(
             FirestoreCollectionsConstants.BORROWERS,
-            Functions.getUid()!!,
+            uid,
         ) {}?.let { borrowerSnapshot ->
 
             if (borrowerSnapshot.size() != 0) {
@@ -249,7 +254,7 @@ class SyncDocumentsFromFirestoreService : Service() {
                 //borrower payments
                 getDataFromFireStore(
                     FirestoreCollectionsConstants.BORROWER_PAYMENTS,
-                    Functions.getUid()!!,
+                    uid,
                 ) {}?.let { paymemtsSnapshot ->
 
                     if (paymemtsSnapshot.size() != 0) {
@@ -265,7 +270,7 @@ class SyncDocumentsFromFirestoreService : Service() {
                         // partial payments
                         getDataFromFireStore(
                             FirestoreCollectionsConstants.PARTIAL_PAYMENTS,
-                            Functions.getUid()!!
+                            uid
                         ) {}?.let { partialPaymentSnapshot ->
 
                             if (partialPaymentSnapshot.size() != 0) {
@@ -293,7 +298,7 @@ class SyncDocumentsFromFirestoreService : Service() {
 
             val renters = getDataFromFireStore(
                 collection = FirestoreCollectionsConstants.RENTERS,
-                uid = Functions.getUid()!!
+                uid = uid
             ) {}
 
             // renter
@@ -308,7 +313,7 @@ class SyncDocumentsFromFirestoreService : Service() {
                     //renter payments
                     val renterPayments = getDataFromFireStore(
                         collection = FirestoreCollectionsConstants.RENTER_PAYMENTS,
-                        uid = Functions.getUid()!!
+                        uid = uid
                     ) {}
 
                     renterPayments?.let { paymentSnapshot ->
@@ -317,11 +322,34 @@ class SyncDocumentsFromFirestoreService : Service() {
 
                             renterPaymentRepository.deleteAllPaymentsByIsSynced(true)
                             delay(50)
-                            renterPaymentRepository.insertAllRenterPayment(
-                                paymentSnapshot.toObjects(
-                                    RenterPayment::class.java
-                                )
+
+                            val paymentList = paymentSnapshot.toObjects(
+                                RenterPayment::class.java
                             )
+
+                            paymentList.forEach { payment ->
+
+                                if (payment.billPeriodInfo.billPeriodType == BillPeriodType.BY_MONTH) {
+
+                                    val selectedYear = payment.billPeriodInfo.billYear
+
+                                    if (payment.billPeriodInfo.renterBillMonthType?.forBillYear == null ||
+                                        payment.billPeriodInfo.renterBillMonthType?.forBillYear == 0
+                                    ) {
+                                        payment.billPeriodInfo.renterBillMonthType?.forBillYear =
+                                            selectedYear
+                                    }
+
+                                    if (payment.billPeriodInfo.renterBillMonthType?.toBillYear == null ||
+                                        payment.billPeriodInfo.renterBillMonthType?.toBillYear == 0
+                                    ) {
+                                        payment.billPeriodInfo.renterBillMonthType?.toBillYear =
+                                            selectedYear
+                                    }
+                                }
+
+                                renterPaymentRepository.insertRenterPayment(payment)
+                            }
                         }
                     }
                 }

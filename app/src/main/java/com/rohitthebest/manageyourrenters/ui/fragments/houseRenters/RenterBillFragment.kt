@@ -1,6 +1,5 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -24,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 @AndroidEntryPoint
-@SuppressLint("SetTextI18n")
 class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
     private var _binding: FragmentRenterBillBinding? = null
@@ -64,6 +62,16 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
             requireActivity().onBackPressed()
         }
 
+        includeBinding.showBillRenterMobile.setOnClickListener {
+
+            if (receivedRenter.mobileNumber.isValid()) {
+                showMobileNumberOptionMenu(
+                    requireActivity(),
+                    includeBinding.showBillRenterMobile,
+                    receivedRenter.mobileNumber
+                )
+            }
+        }
 
         binding.toolbar.menu.findItem(R.id.menu_share_bill).setOnMenuItemClickListener {
 
@@ -77,7 +85,6 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
             true
         }
-
         binding.toolbar.menu.findItem(R.id.menu_save_bill).setOnMenuItemClickListener {
 
             val bitmap = includeBinding.root.loadBitmap()
@@ -181,14 +188,6 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
                 binding.toolbar.title = "${renter.name} - payment"
 
-                includeBinding.showBillRenterMobile.setOnClickListener {
-
-                    showMobileNumberOptionMenu(
-                        requireActivity(),
-                        includeBinding.showBillRenterMobile,
-                        receivedRenter.mobileNumber
-                    )
-                }
                 initializeValuesToBill()
             }
     }
@@ -223,9 +222,10 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         //renter info
         includeBinding.showBillRenterName.text = receivedRenter.name
-        includeBinding.showBillRenterMobile.text = receivedRenter.mobileNumber
-        includeBinding.showBillRenterAddress.text = receivedRenter.address
-
+        includeBinding.showBillRenterMobile.text =
+            if (receivedRenter.mobileNumber.isValid()) receivedRenter.mobileNumber else "NA"
+        includeBinding.showBillRenterAddress.text =
+            if (receivedRenter.address.isValid()) receivedRenter.address else "NA"
     }
 
     private fun setBillingParameters() {
@@ -235,18 +235,55 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
             .setDateInTextView(receivedPayment.created)
         includeBinding.showBillBillTime
             .setDateInTextView(receivedPayment.created, "hh:mm a")
+
         includeBinding.showBillBillPeriod.text =
             if (receivedPayment.billPeriodInfo.billPeriodType == BillPeriodType.BY_MONTH) {
 
-                "${monthList[receivedPayment.billPeriodInfo.renterBillMonthType?.forBillMonth!! - 1]}, ${receivedPayment.billPeriodInfo.billYear}"
+                receivedPayment.billPeriodInfo.renterBillMonthType?.let { byMonth ->
+
+                    includeBinding.numberOfMonthsOrDaysTV.text =
+                        getString(R.string.number_of_months)
+                    includeBinding.numberOfMonthOrDaysValueTV.text =
+                        byMonth.numberOfMonths.toString()
+
+                    if ((byMonth.forBillMonth == byMonth.toBillMonth) &&
+                        byMonth.forBillYear == byMonth.toBillYear
+                    ) {
+
+                        getString(
+                            R.string.month_year,
+                            monthList[byMonth.forBillMonth - 1],
+                            byMonth.forBillYear.toString()
+                        )
+                    } else {
+
+                        getString(
+                            R.string.renter_bill_period_field_month,
+                            monthList[receivedPayment.billPeriodInfo.renterBillMonthType?.forBillMonth!! - 1],
+                            receivedPayment.billPeriodInfo.renterBillMonthType?.forBillYear.toString(),
+                            monthList[receivedPayment.billPeriodInfo.renterBillMonthType?.toBillMonth!! - 1],
+                            receivedPayment.billPeriodInfo.renterBillMonthType?.toBillYear.toString(),
+                        )
+                    }
+                }
+
             } else {
 
-                "${WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(receivedPayment.billPeriodInfo.renterBillDateType?.fromBillDate)}" +
-                        " to ${
-                            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                receivedPayment.billPeriodInfo.renterBillDateType?.toBillDate
-                            )
-                        }"
+                receivedPayment.billPeriodInfo.renterBillDateType?.let { byDate ->
+
+                    includeBinding.numberOfMonthsOrDaysTV.text = getString(R.string.number_of_days)
+                    includeBinding.numberOfMonthOrDaysValueTV.text = byDate.numberOfDays.toString()
+
+                    getString(
+                        R.string.renter_bill_period_field_date,
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            byDate.fromBillDate
+                        ),
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            byDate.toBillDate
+                        )
+                    )
+                }
             }
     }
 
@@ -256,30 +293,36 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
             //electricity
             includeBinding.showBillPreviousReading.text =
-                "${
-                    String.format(
-                        "%.2f",
-                        receivedPayment.electricityBillInfo?.previousReading
-                    )
-                } unit(s)"
+                getString(
+                    R.string.renter_bill_electricity_units,
+                    receivedPayment.electricityBillInfo?.previousReading?.format(2)
+                )
+
             includeBinding.showBillCurrentReading.text =
-                "${
-                    String.format(
-                        "%.2f",
-                        receivedPayment.electricityBillInfo?.currentReading
-                    )
-                } unit(s)"
+                getString(
+                    R.string.renter_bill_electricity_units,
+                    receivedPayment.electricityBillInfo?.currentReading?.format(2)
+                )
+
             includeBinding.showBillRate.text =
-                "${String.format("%.2f", receivedPayment.electricityBillInfo?.rate)} per/unit"
+                getString(
+                    R.string.renter_bill_electricity_rate,
+                    receivedPayment.electricityBillInfo?.rate?.format(2)
+                )
+
             includeBinding.showBillDifference.text =
-                "${
-                    String.format(
-                        "%.2f",
-                        receivedPayment.electricityBillInfo?.differenceInReading
-                    )
-                } unit(s)"
+                getString(
+                    R.string.renter_bill_electricity_units,
+                    receivedPayment.electricityBillInfo?.differenceInReading?.format(2)
+                )
+
             includeBinding.showBillElectricityTotal.text =
-                "${receivedPayment.currencySymbol} ${receivedPayment.electricityBillInfo?.totalElectricBill}"
+                getString(
+                    R.string.currency_amount,
+                    receivedPayment.currencySymbol,
+                    receivedPayment.electricityBillInfo?.totalElectricBill?.format(2)
+                )
+
 
         }
     }
@@ -287,23 +330,32 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
     private fun setExtraFields() {
 
         //Extra
-        includeBinding.showBillExtraFieldName.text = "Extra"
+        includeBinding.showBillExtraFieldName.text = getString(R.string.extra)
 
         if (receivedPayment.extras != null) {
 
             includeBinding.showBillExtraFieldName.text =
                 if (!receivedPayment.extras?.fieldName.isValid()) {
-
-                    "Extra"
+                    getString(R.string.extra)
                 } else {
                     receivedPayment.extras?.fieldName
                 }
 
             includeBinding.showBillExtraFieldAmount.text =
-                receivedPayment.currencySymbol + receivedPayment.extras?.fieldAmount?.format(2)
+                getString(
+                    R.string.currency_amount,
+                    receivedPayment.currencySymbol,
+                    receivedPayment.extras?.fieldAmount?.format(2)
+                )
+
         } else {
 
-            includeBinding.showBillExtraFieldAmount.text = receivedPayment.currencySymbol + " 0.0"
+            includeBinding.showBillExtraFieldAmount.text =
+                getString(
+                    R.string.currency_amount,
+                    receivedPayment.currencySymbol,
+                    "0.0"
+                )
         }
     }
 
@@ -317,29 +369,55 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
                 //due
                 includeBinding.showBillDueOfLastPayAmount.text =
-                    "${receivedPayment.currencySymbol} ${abs(dueOfLastPayment).format(2)}"
+                    getString(
+                        R.string.sign_currency_amount,
+                        "+",
+                        receivedPayment.currencySymbol,
+                        abs(dueOfLastPayment).format(2)
+                    )
 
                 includeBinding.showBillPaidInAdvanceInlastPayAmount.text =
-                    "${receivedPayment.currencySymbol} 0.00"
-
+                    getString(
+                        R.string.currency_amount,
+                        receivedPayment.currencySymbol,
+                        "0.0"
+                    )
             }
 
             dueOfLastPayment < 0.0 -> {
 
                 //advance
                 includeBinding.showBillDueOfLastPayAmount.text =
-                    "${receivedPayment.currencySymbol} 0.00"
+                    getString(
+                        R.string.currency_amount,
+                        receivedPayment.currencySymbol,
+                        "0.0"
+                    )
 
                 includeBinding.showBillPaidInAdvanceInlastPayAmount.text =
-                    "${receivedPayment.currencySymbol} ${abs(dueOfLastPayment).format(2)}"
+                    getString(
+                        R.string.sign_currency_amount,
+                        "-",
+                        receivedPayment.currencySymbol,
+                        abs(dueOfLastPayment).format(2)
+                    )
+
             }
 
             else -> {
                 includeBinding.showBillDueOfLastPayAmount.text =
-                    "${receivedPayment.currencySymbol} 0.00"
+                    getString(
+                        R.string.currency_amount,
+                        receivedPayment.currencySymbol,
+                        "0.0"
+                    )
 
                 includeBinding.showBillPaidInAdvanceInlastPayAmount.text =
-                    "${receivedPayment.currencySymbol} 0.00"
+                    getString(
+                        R.string.currency_amount,
+                        receivedPayment.currencySymbol,
+                        "0.0"
+                    )
             }
         }
     }
@@ -362,18 +440,30 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
                         R.color.color_orange
                     )
                     //due
-                    "${receivedPayment.currencySymbol} ${abs(dueOrAdvance).format(2)}"
+                    getString(
+                        R.string.currency_amount,
+                        receivedPayment.currencySymbol,
+                        abs(dueOrAdvance).format(2)
+                    )
                 }
 
                 dueOrAdvance > 0.0 -> {
 
                     includeBinding.showBillDueOrArrearTV.text =
-                        "Paid in advance"
-                    "${receivedPayment.currencySymbol} ${dueOrAdvance.format(2)}"
+                        getString(R.string.paid_in_advance).trim()
+
+                    getString(
+                        R.string.currency_amount,
+                        receivedPayment.currencySymbol,
+                        dueOrAdvance.format(2)
+                    )
                 }
                 else -> {
-
-                    "${receivedPayment.currencySymbol} 0.00"
+                    getString(
+                        R.string.currency_amount,
+                        receivedPayment.currencySymbol,
+                        "0.0"
+                    )
                 }
             }
 
@@ -383,33 +473,44 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         //total rent
         includeBinding.showBillHouseRent.text =
-            "${receivedPayment.currencySymbol} ${
+            getString(
+                R.string.currency_amount,
+                receivedPayment.currencySymbol,
                 receivedPayment.houseRent.format(2)
-            }"
+            )
 
         includeBinding.showBillParking.text =
-            "${receivedPayment.currencySymbol} ${
+            getString(
+                R.string.currency_amount,
+                receivedPayment.currencySymbol,
                 receivedPayment.parkingRent.format(2)
-            }"
+            )
 
         includeBinding.showBillElectricity.text =
-            "${receivedPayment.currencySymbol} ${
+            getString(
+                R.string.currency_amount,
+                receivedPayment.currencySymbol,
                 if (receivedPayment.isElectricityBillIncluded) {
                     receivedPayment.electricityBillInfo?.totalElectricBill?.format(2)
                 } else {
                     0.0
                 }
-            }"
+            )
 
         includeBinding.showBillAmountPaid.text =
-            "${receivedPayment.currencySymbol} ${
+            getString(
+                R.string.currency_amount,
+                receivedPayment.currencySymbol,
                 receivedPayment.amountPaid.format(2)
-            }"
+            )
 
         includeBinding.showBillNetDemand.text =
-            "${receivedPayment.currencySymbol} ${
+            getString(
+                R.string.currency_amount,
+                receivedPayment.currencySymbol,
                 receivedPayment.netDemand.format(2)
-            }"
+            )
+
     }
 
     //[END of setting fields in bills textViews]
@@ -433,7 +534,6 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         return receivedPayment.netDemand - (houseRent + parking + electricBill + extra)
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

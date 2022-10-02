@@ -4,7 +4,7 @@ import java.io.Serializable
 
 data class RenterPaymentExtras(
     var fieldName: String,
-    var fieldAmount: Double
+    var fieldAmount: Double = 0.0
 ) : Serializable {
     constructor() : this(
         "",

@@ -140,7 +140,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider4"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -211,31 +211,218 @@
                     android:text="@string/by_date" />
             </RadioGroup>
 
-            <Spinner
-                android:id="@+id/monthSelectSpinner"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/byMonthCL"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:alpha="1"
-                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/selectYearSpinner"
-                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/periodTypeRG"
-                tools:visibility="gone" />
+                app:layout_constraintVertical_bias="0.0"
+                tools:visibility="visible">
 
-            <Spinner
-                android:id="@+id/selectYearSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/monthSelectSpinner"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/monthSelectSpinner"
-                app:layout_constraintTop_toTopOf="@+id/monthSelectSpinner"
-                tools:visibility="gone" />
+                <Spinner
+                    android:id="@+id/fromMonthSelectSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:alpha="1"
+                    android:contentDescription="@string/select_from_month"
+                    android:minHeight="48dp"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toStartOf="@+id/fromYearSpinner"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider76"
+                    tools:visibility="visible" />
+
+                <Spinner
+                    android:id="@+id/toMonthSelectSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:alpha="1"
+                    android:contentDescription="@string/select_to_month"
+                    android:minHeight="48dp"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toStartOf="@+id/toYearSpinner"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider78"
+                    tools:visibility="visible" />
+
+                <Spinner
+                    android:id="@+id/fromYearSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/select_from_year"
+                    android:minHeight="48dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/fromMonthSelectSpinner"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/fromMonthSelectSpinner"
+                    app:layout_constraintTop_toTopOf="@+id/fromMonthSelectSpinner"
+                    tools:visibility="visible" />
+
+                <Spinner
+                    android:id="@+id/toYearSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/select_to_year"
+                    android:minHeight="48dp"
+                    app:layout_constraintBottom_toBottomOf="@id/toMonthSelectSpinner"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/toMonthSelectSpinner"
+                    app:layout_constraintTop_toTopOf="@+id/toMonthSelectSpinner"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/textView74"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/from_month"
+                    android:textColor="@color/primaryTextColor"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="@+id/divider75"
+                    app:layout_constraintTop_toBottomOf="@+id/divider75" />
+
+                <TextView
+                    android:id="@+id/textView82"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/to_month"
+                    android:textColor="@color/primaryTextColor"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="@+id/textView74"
+                    app:layout_constraintTop_toBottomOf="@+id/divider77" />
+
+                <View
+                    android:id="@+id/divider75"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:id="@+id/divider76"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="@+id/divider75"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@+id/divider75"
+                    app:layout_constraintTop_toBottomOf="@+id/textView74" />
+
+                <View
+                    android:id="@+id/divider77"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="@+id/divider75"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@+id/divider75"
+                    app:layout_constraintTop_toBottomOf="@+id/fromMonthSelectSpinner" />
+
+                <View
+                    android:id="@+id/divider78"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="@+id/divider75"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@+id/divider75"
+                    app:layout_constraintTop_toBottomOf="@+id/textView82" />
+
+                <View
+                    android:id="@+id/divider79"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="@+id/divider75"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@+id/divider75"
+                    app:layout_constraintTop_toBottomOf="@+id/toMonthSelectSpinner" />
+
+                <View
+                    android:id="@+id/divider82"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toTopOf="@+id/divider79"
+                    app:layout_constraintEnd_toStartOf="@+id/textView82"
+                    app:layout_constraintTop_toBottomOf="@+id/divider75" />
+
+                <View
+                    android:id="@+id/divider84"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toTopOf="@+id/divider79"
+                    app:layout_constraintStart_toEndOf="@id/divider77"
+                    app:layout_constraintTop_toBottomOf="@+id/divider75" />
+
+                <TextView
+                    android:id="@+id/byMonthErrorTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="5dp"
+                    android:maxLines="1"
+                    android:padding="2dp"
+                    android:textColor="@color/color_green"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider79"
+                    tools:text="Number of months : 1" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!--            <Spinner-->
+            <!--                android:id="@+id/monthSelectSpinner"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginTop="8dp"-->
+            <!--                android:layout_marginBottom="8dp"-->
+            <!--                android:alpha="1"-->
+            <!--                android:visibility="visible"-->
+            <!--                app:layout_constraintBottom_toBottomOf="parent"-->
+            <!--                app:layout_constraintEnd_toStartOf="@+id/selectYearSpinner"-->
+            <!--                app:layout_constraintHorizontal_bias="0.5"-->
+            <!--                app:layout_constraintStart_toStartOf="parent"-->
+            <!--                app:layout_constraintTop_toBottomOf="@+id/periodTypeRG"-->
+            <!--                tools:visibility="visible" />-->
+
+            <!--            <Spinner-->
+            <!--                android:id="@+id/selectYearSpinner"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                app:layout_constraintBottom_toBottomOf="@+id/monthSelectSpinner"-->
+            <!--                app:layout_constraintEnd_toEndOf="parent"-->
+            <!--                app:layout_constraintHorizontal_bias="0.5"-->
+            <!--                app:layout_constraintStart_toEndOf="@+id/monthSelectSpinner"-->
+            <!--                app:layout_constraintTop_toTopOf="@+id/monthSelectSpinner"-->
+            <!--                tools:visibility="visible" />-->
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/byDateCL"
@@ -252,7 +439,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/periodTypeRG"
                 app:layout_constraintVertical_bias="0.0"
                 tools:alpha="1"
-                tools:visibility="visible">
+                tools:visibility="gone">
 
                 <View
                     android:id="@+id/divider17"

@@ -1,6 +1,5 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.addContentFragments
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +9,7 @@ import android.widget.CompoundButton
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -46,32 +46,50 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
     private val binding get() = _binding!!
 
     private lateinit var includeBinding: AddPaymentLayoutBinding
-
     private var receivedRenter: Renter? = null
     private var currentTimestamp = 0L
-
-    private lateinit var monthList: List<String>
+    private lateinit var supportingDocmtHelperModel: SupportingDocumentHelperModel
+    private lateinit var payment: RenterPayment
     private lateinit var currencyList: List<String>
-    private lateinit var yearList: ArrayList<Int>
-
-    private var periodType: BillPeriodType = BillPeriodType.BY_MONTH
-    private var billMonth: String = ""
-    private var billMonthNumber = 1
+    private lateinit var yearListFrom: ArrayList<Int>
+    private lateinit var yearListTo: ArrayList<Int>
     private var currencySymbol: String = ""
-    private var selectedYear: Int = 0
-
-    //if selected by_date method
-    private var fromDateTimestamp: Long = 0L
-    private var tillDateTimeStamp: Long = 0L
-    private var numberOfDays: Int = 0
-
+    private var periodType: BillPeriodType = BillPeriodType.BY_MONTH
+    private var delayCalculateBillJob: Job? = null
     private var lastPaymentInfo: RenterPayment? = null
     private var duesOrAdvanceAmount: Double = 0.0
     private var isPaymentAdded = false
 
-    private lateinit var supportingDocmtHelperModel: SupportingDocumentHelperModel
+    private var previousNumberOfMonths = 1
+    private var baseHouseRent = 0.0
+    private var baseParkingRent = 0.0
 
-    private lateinit var payment: RenterPayment
+
+    //if selected by_month period type
+    private var selectedFromMonthNumber: Int = 1
+    private var selectedToMonthNumber: Int = 1
+    private var selectedFromYear: Int = 0
+    private var selectedToYear: Int = 0
+    private var numberOfMonths: Int = 1
+
+    //if selected by_date period type
+    private var fromDateTimestamp: Long = 0L
+    private var tillDateTimeStamp: Long = 0L
+    private var numberOfDays: Int = 0
+
+    //electricity vars
+    private var previousReading: Double = 0.0
+    private var currentReading: Double = 0.0
+    private var rate: Double = 0.0
+    private var difference: Double = 0.0
+    private var totalElectricBill: Double = 0.0
+
+    //total rent vars
+    private var parkingBill: Double = 0.0
+    private var houseRent: Double = 0.0
+    private var extraBillAmount: Double = 0.0
+    private var amountPaid: Double = 0.0
+    private var netDemand: Double = 0.0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -92,27 +110,130 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         includeBinding = binding.include
 
-        monthList = ArrayList()          //List of months
-        currencyList = ArrayList()       //List of currency Symbols
-
-        //List of months
-        monthList = resources.getStringArray(R.array.months).toList()
-
         //List of currency symbols of different places
         currencyList = resources.getStringArray(R.array.currency_symbol).toList()
+        setUpCurrencySymbolSpinner()
+        currencySymbol = currencyList[0]
 
-        setUpSpinnerMonth() //Setting the from(month) and till(month) spinners
-        setUpCurrencySymbolList()
+        currentTimestamp = System.currentTimeMillis()
+        setDateAndTimeInTextViews()
 
-        selectedYear = WorkingWithDateAndTime.getCurrentYear()
+        // for period type by_month
+        populateYearListFrom(WorkingWithDateAndTime.getCurrentYear())
+        populateYearListTo(WorkingWithDateAndTime.getCurrentYear())
+        setUpMonthSpinners()
+        setUpYearSpinners()
 
-        yearList = populateYearList(selectedYear)
+        initializeByMonthField()
 
-        setUpSpinnerYear()
+        // for period type by_date
+        fromDateTimestamp = currentTimestamp
+        tillDateTimeStamp = currentTimestamp
+        numberOfDays = 0
+        setNumberOfDays()
+        includeBinding.fromDateTV.setDateInTextView(fromDateTimestamp)
+        includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
+
+
+        includeBinding.duesOfLastPaymentTV.text =
+            getString(R.string.duesOfLastPayment_message)
 
         getMessage()
         initListeners()
         textWatcher()
+    }
+
+    private fun setUpYearSpinners() {
+
+        includeBinding.fromYearSpinner.setListToSpinner(
+            requireContext(), yearListFrom, { position ->
+                selectedFromYear = yearListFrom[position]
+                setNumberOfMonthsInTextView()
+            }, {}
+        )
+        includeBinding.toYearSpinner.setListToSpinner(
+            requireContext(), yearListTo, { position ->
+                selectedToYear = yearListTo[position]
+                setNumberOfMonthsInTextView()
+            }, {}
+        )
+    }
+
+    private fun setNumberOfMonthsInTextView() {
+
+        numberOfMonths = WorkingWithDateAndTime.calculateNumberOfMonthsInBetween(
+            Pair(selectedFromMonthNumber, selectedFromYear),
+            Pair(selectedToMonthNumber, selectedToYear)
+        )
+
+        includeBinding.byMonthErrorTV.text = if (numberOfMonths <= 0) {
+
+            includeBinding.byMonthErrorTV.changeTextColor(requireContext(), R.color.color_orange)
+            "Please enter a valid month range"
+        } else {
+            includeBinding.byMonthErrorTV.changeTextColor(requireContext(), R.color.color_green)
+            modifyRent(numberOfMonths)
+            "Number of months : $numberOfMonths"
+        }
+    }
+
+    private fun modifyRent(numberOfMonths: Int) {
+
+        if (periodType == BillPeriodType.BY_MONTH) {
+            var houseRent = if (includeBinding.houseRentET.editText.isTextValid())
+                includeBinding.houseRentET.editText?.text.toString().toDouble()
+            else
+                0.0
+
+            var parkingRent = if (includeBinding.parkingET.editText.isTextValid())
+                includeBinding.parkingET.editText?.text.toString().toDouble()
+            else
+                0.0
+
+            if (houseRent > 0.0 && parkingRent > 0.0) {
+
+                val diff: Int
+
+                if (previousNumberOfMonths < numberOfMonths) {
+                    diff = numberOfMonths - previousNumberOfMonths
+                    houseRent += (baseHouseRent * diff)
+                    parkingRent += (baseParkingRent * diff)
+
+                } else if (previousNumberOfMonths > numberOfMonths) {
+                    diff = previousNumberOfMonths - numberOfMonths
+                    houseRent -= (baseHouseRent * diff)
+                    parkingRent -= (baseParkingRent * diff)
+                }
+
+                if (previousNumberOfMonths != numberOfMonths) {
+                    previousNumberOfMonths = numberOfMonths
+                    includeBinding.houseRentET.editText?.setText((houseRent).toString())
+                    includeBinding.parkingET.editText?.setText((parkingRent).toString())
+                }
+            }
+        }
+    }
+
+    private fun setUpMonthSpinners() {
+
+        val monthList = resources.getStringArray(R.array.months).toList()
+
+        includeBinding.fromMonthSelectSpinner.setListToSpinner(
+            requireContext(), monthList,
+            { position ->
+                selectedFromMonthNumber = position + 1
+                setNumberOfMonthsInTextView()
+            }, {}
+        )
+
+        includeBinding.toMonthSelectSpinner.setListToSpinner(
+            requireContext(), monthList,
+            { position ->
+                selectedToMonthNumber = position + 1
+                setNumberOfMonthsInTextView()
+            },
+            {}
+        )
     }
 
     private fun getMessage() {
@@ -162,7 +283,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             }
     }
 
-
     private fun initialChanges() {
 
         Log.i(TAG, "initialChanges: ")
@@ -171,72 +291,47 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             includeBinding.renterNameTV.text = it.name
 
-            currentTimestamp = System.currentTimeMillis()
+            lastPaymentInfo?.let { lastPayment ->
 
-            setDateAndTimeInTextViews()
-
-            periodType = BillPeriodType.BY_MONTH
-
-            val currentMonthIndex = WorkingWithDateAndTime.getCurrentMonth()
-            billMonth = monthList[currentMonthIndex]
-            billMonthNumber = currentMonthIndex + 1
-            includeBinding.monthSelectSpinner.setSelection(currentMonthIndex)
-
-            fromDateTimestamp = currentTimestamp
-            tillDateTimeStamp = currentTimestamp
-            numberOfDays = 0
-            setNumberOfDays()
-
-            includeBinding.fromDateTV.setDateInTextView(fromDateTimestamp)
-
-            includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
-
-            if (lastPaymentInfo != null) {
-
-                currencySymbol = lastPaymentInfo!!.currencySymbol
-
+                // currency symbol
+                currencySymbol = lastPayment.currencySymbol
                 includeBinding.moneySymbolSpinner.setSelection(currencyList.indexOf(currencySymbol))
 
-                if (lastPaymentInfo!!.billPeriodInfo.billPeriodType == BillPeriodType.BY_MONTH) {
+                if (lastPayment.billPeriodInfo.billPeriodType == BillPeriodType.BY_MONTH) {
 
+                    baseHouseRent = getBaseHouseRentBasedOnLastPayment()
+                    baseParkingRent = getBaseParkingRentBasedOnLastPayment()
+
+                    includeBinding.houseRentET.editText?.setText(baseHouseRent.toString())
+                    includeBinding.parkingET.editText?.setText(baseParkingRent.toString())
+                    includeBinding.periodTypeRG.check(includeBinding.byMonthRB.id)
                     showByMonthAndHideByDateView()
                     initializeByMonthField()
 
-                } else if (lastPaymentInfo!!.billPeriodInfo.billPeriodType == BillPeriodType.BY_DATE) {
+                } else if (lastPayment.billPeriodInfo.billPeriodType == BillPeriodType.BY_DATE) {
 
+                    includeBinding.houseRentET.editText?.setText(lastPayment.houseRent.toString())
+                    includeBinding.parkingET.editText?.setText(lastPayment.parkingRent.toString())
                     includeBinding.periodTypeRG.check(includeBinding.byDateRB.id)
                     hideByMonthAndShowByDateView()
                     initialiseByDateField()
                 }
 
-                includeBinding.houseRentET.editText?.setText(lastPaymentInfo?.houseRent.toString())
 
-                if (lastPaymentInfo?.isElectricityBillIncluded != false) {
+                if (lastPayment.isElectricityBillIncluded) {
 
-                    includeBinding.previousReadingET.setText(lastPaymentInfo?.electricityBillInfo?.currentReading.toString())
-
-                    includeBinding.currentReadingET.setText((lastPaymentInfo?.electricityBillInfo?.currentReading.toString()))
-
-                    includeBinding.rateET.setText(lastPaymentInfo?.electricityBillInfo?.rate.toString())
-
+                    includeBinding.previousReadingET.setText(lastPayment.electricityBillInfo?.currentReading.toString())
+                    includeBinding.currentReadingET.setText((lastPayment.electricityBillInfo?.currentReading.toString()))
+                    includeBinding.rateET.setText(lastPayment.electricityBillInfo?.rate.toString())
                 }
 
-                includeBinding.parkingET.editText?.setText(lastPaymentInfo?.parkingRent.toString())
+                if (lastPayment.extras?.fieldName.isValid()) {
 
-                if (lastPaymentInfo!!.extras?.fieldName.isValid()) {
-
-                    includeBinding.extraFieldNameET.setText(lastPaymentInfo!!.extras?.fieldName)
-                    includeBinding.extraAmountET.setText(lastPaymentInfo!!.extras?.fieldAmount.toString())
+                    includeBinding.extraFieldNameET.setText(lastPayment.extras?.fieldName)
+                    includeBinding.extraAmountET.setText(lastPayment.extras?.fieldAmount.toString())
                 }
 
                 initializeLastPaymentsDuesAndAdvance()
-
-            } else {
-
-                currencySymbol = currencyList[0]
-
-                includeBinding.duesOfLastPaymentTV.text =
-                    getString(R.string.duesOfLastPayment_message)
             }
 
             amountPaid = calculateTotalBill().toDouble()
@@ -246,27 +341,43 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         binding.progressBar.hide()
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun setDateAndTimeInTextViews() {
+    private fun getBaseParkingRentBasedOnLastPayment(): Double {
 
-        includeBinding.dateTV.text = "Payment Date : ${
-            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                currentTimestamp
-            )
-        }"
+        lastPaymentInfo?.let {
 
-        includeBinding.timeTV.text = "Time : ${
-            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                currentTimestamp,
-                "hh:mm a"
-            )
-        }"
+            return (it.parkingRent) / (it.billPeriodInfo.renterBillMonthType?.numberOfMonths!!)
+        }
+        return 0.0
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun initializeLastPaymentsDuesAndAdvance() {
+    private fun getBaseHouseRentBasedOnLastPayment(): Double {
+        lastPaymentInfo?.let {
 
-        Log.d(TAG, "initializeLastPaymentsDuesAndAdvance: ")
+            return (it.houseRent) / (it.billPeriodInfo.renterBillMonthType?.numberOfMonths!!)
+        }
+        return 0.0
+    }
+
+    private fun setDateAndTimeInTextViews() {
+
+        includeBinding.dateTV.text =
+            getString(
+                R.string.payment_date,
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    currentTimestamp
+                )
+            )
+
+        includeBinding.timeTV.text =
+            getString(
+                R.string.time_,
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    currentTimestamp, "hh:mm a"
+                )
+            )
+    }
+
+    private fun initializeLastPaymentsDuesAndAdvance() {
 
         when {
             receivedRenter?.dueOrAdvanceAmount!! < 0.0 -> {
@@ -276,9 +387,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     R.color.color_orange
                 )
                 includeBinding.duesOfLastPaymentTV.text =
-                    "Dues from last payments : + ${lastPaymentInfo?.currencySymbol} ${
-                        abs(receivedRenter?.dueOrAdvanceAmount!!)
-                    }"
+                    getString(
+                        R.string.dues_from_last_payment,
+                        "${lastPaymentInfo?.currencySymbol} ${
+                            abs(receivedRenter?.dueOrAdvanceAmount!!)
+                        }"
+                    )
 
                 duesOrAdvanceAmount = receivedRenter?.dueOrAdvanceAmount!!
             }
@@ -289,14 +403,17 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     R.color.color_green
                 )
                 includeBinding.duesOfLastPaymentTV.text =
-                    "Paid in advance in last payments : - ${lastPaymentInfo?.currencySymbol}${receivedRenter?.dueOrAdvanceAmount}"
+                    getString(
+                        R.string.paid_in_advance_in_last_payment,
+                        "${lastPaymentInfo?.currencySymbol}${receivedRenter?.dueOrAdvanceAmount}"
+                    )
 
                 duesOrAdvanceAmount = receivedRenter?.dueOrAdvanceAmount!!
             }
             else -> {
 
                 includeBinding.duesOfLastPaymentTV.text =
-                    "There are no dues and no money given in advance."
+                    getString(R.string.duesOfLastPayment_message)
             }
         }
     }
@@ -307,7 +424,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         tillDateTimeStamp = currentTimestamp
 
         includeBinding.fromDateTV.setDateInTextView(fromDateTimestamp)
-
         includeBinding.tillDateTV.setDateInTextView(tillDateTimeStamp)
 
         numberOfDays =
@@ -318,61 +434,70 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     private fun initializeByMonthField() {
 
-        billMonthNumber =
-            if (lastPaymentInfo?.billPeriodInfo?.renterBillMonthType?.forBillMonth!! + 1 > 12) {
-                1
-            } else {
+        lastPaymentInfo?.let { lastPayment ->
 
-                lastPaymentInfo?.billPeriodInfo?.renterBillMonthType!!.forBillMonth + 1
+            lastPayment.billPeriodInfo.renterBillMonthType?.let { renterBillMonthType ->
+
+                // from
+                selectedFromMonthNumber =
+                    if (renterBillMonthType.toBillMonth == 12) {
+
+                        if (renterBillMonthType.toBillYear + 1 != WorkingWithDateAndTime.getCurrentYear()
+                        ) {
+                            // setting fromYear to the next year
+                            selectedFromYear = renterBillMonthType.toBillYear + 1
+                        }
+                        1
+                    } else {
+
+                        selectedFromYear = renterBillMonthType.toBillYear
+                        renterBillMonthType.toBillMonth + 1
+                    }
+
+                if (selectedFromMonthNumber == 12 &&
+                    renterBillMonthType.toBillYear != WorkingWithDateAndTime.getCurrentYear()
+                ) {
+                    selectedFromYear = yearListFrom[1] // previous year
+                }
+
+                // to
+                selectedToMonthNumber = selectedFromMonthNumber
+                selectedToYear = selectedFromYear
+
             }
-
-        includeBinding.monthSelectSpinner.setSelection(billMonthNumber - 1)
-
-        // setting the selected year to be the year of november if this
-        // payment is for month of december, because if the payment of
-        // december is paid in the month of january of the next year
-        // then the selected year will be increased by 1
-
-        if (billMonthNumber == 12) {
-
-            selectedYear = lastPaymentInfo?.billPeriodInfo?.billYear!!
-            includeBinding.selectYearSpinner.setSelection(1)
         }
+
+        populateYearListFrom(selectedFromYear)
+        populateYearListTo(selectedToYear)
+        setUpYearSpinners()
+        includeBinding.fromMonthSelectSpinner.setSelection(selectedFromMonthNumber - 1)
+        includeBinding.toMonthSelectSpinner.setSelection(selectedToMonthNumber - 1)
+        includeBinding.fromYearSpinner.setSelection(yearListFrom.indexOf(selectedFromYear))
+        includeBinding.toYearSpinner.setSelection(yearListFrom.indexOf(selectedToYear))
+        setNumberOfMonthsInTextView()
     }
 
-    private fun setUpSpinnerMonth() {
+    private fun populateYearListFrom(selectedYear: Int) {
 
-        includeBinding.monthSelectSpinner.setListToSpinner(
-            requireContext(),
-            monthList,
-            { position ->
-                billMonth = monthList[position]
-                billMonthNumber = position + 1
-            }, {}
-        )
-    }
-
-    private fun setUpSpinnerYear() {
-
-        includeBinding.selectYearSpinner.setListToSpinner(
-            requireContext(), yearList,
-            { position -> selectedYear = yearList[position] }, {}
-        )
-    }
-
-    private fun populateYearList(selectedYear: Int): ArrayList<Int> {
-
-        val yearList = ArrayList<Int>()
+        yearListFrom = java.util.ArrayList()
 
         for (year in selectedYear downTo selectedYear - 5) {
 
-            yearList.add(year)
+            yearListFrom.add(year)
         }
-
-        return yearList
     }
 
-    private fun setUpCurrencySymbolList() {
+    private fun populateYearListTo(selectedYear: Int) {
+
+        yearListTo = java.util.ArrayList()
+
+        for (year in selectedYear until (selectedYear + 5)) {
+
+            yearListTo.add(year)
+        }
+    }
+
+    private fun setUpCurrencySymbolSpinner() {
 
         includeBinding.moneySymbolSpinner.setListToSpinner(
             requireContext(),
@@ -406,13 +531,71 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         binding.toolbar.menu.findItem(R.id.menuSaveRenterPayment).setOnMenuItemClickListener {
 
-            if (validateForm()) {
-
-                calculateTotalBill()
-                showBillInBottomSheet()
-            }
+            validateFormAndShowBillPreviewInBottomSheet()
 
             true
+        }
+    }
+
+    private fun validateFormAndShowBillPreviewInBottomSheet() {
+
+        if (validateForm()) {
+
+            if (periodType == BillPeriodType.BY_DATE) {
+
+                lifecycleScope.launch {
+
+                    val isValid = paymentViewModel.validateByDateField(
+                        receivedRenter?.key!!,
+                        RenterBillDateType(fromDateTimestamp, tillDateTimeStamp, numberOfDays)
+                    )
+
+                    if (!isValid) {
+
+                        includeBinding.byDateErrorMessageTV.changeTextColor(
+                            requireContext(),
+                            R.color.color_orange
+                        )
+                        includeBinding.byDateErrorMessageTV.text =
+                            getString(R.string.renter_payment_date_range_error_message)
+                    } else {
+
+                        calculateTotalBill()
+                        showBillInBottomSheet()
+                    }
+                }
+
+            } else {
+
+                lifecycleScope.launch {
+
+                    val isValid = paymentViewModel.validateByMonthField(
+                        receivedRenter?.key!!,
+                        RenterBillMonthType(
+                            selectedFromMonthNumber,
+                            selectedFromYear,
+                            selectedToMonthNumber,
+                            selectedToYear,
+                            numberOfMonths
+                        )
+                    )
+
+                    if (!isValid) {
+
+                        includeBinding.byMonthErrorTV.changeTextColor(
+                            requireContext(),
+                            R.color.color_orange
+                        )
+                        includeBinding.byMonthErrorTV.text =
+                            getString(R.string.renter_payment_month_range_error_message)
+                    } else {
+
+                        calculateTotalBill()
+                        showBillInBottomSheet()
+                    }
+                }
+
+            }
         }
     }
 
@@ -438,8 +621,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
-
-    @SuppressLint("SetTextI18n")
     override fun onClick(v: View?) {
 
         when (v?.id) {
@@ -485,6 +666,47 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             return false
         }
 
+        if (includeBinding.extraFieldNameET.isTextValid()
+            && !includeBinding.extraAmountET.isTextValid()
+        ) {
+
+            includeBinding.extraAmountET.requestFocus()
+            includeBinding.extraAmountET.error = "Required"
+            return false
+        }
+
+        if (includeBinding.extraAmountET.isTextValid() &&
+            !includeBinding.extraFieldNameET.isTextValid()
+        ) {
+
+            includeBinding.extraFieldNameET.requestFocus()
+            includeBinding.extraFieldNameET.error = "Required"
+            return false
+        }
+
+        if (periodType == BillPeriodType.BY_DATE) {
+
+            if (includeBinding.byDateErrorMessageTV.isVisible
+                && includeBinding.byDateErrorMessageTV.currentTextColor == ContextCompat.getColor(
+                    requireContext(),
+                    R.color.color_orange
+                )
+            ) {
+                return false
+            }
+
+        } else {
+
+            if (includeBinding.byMonthErrorTV.isVisible
+                && includeBinding.byMonthErrorTV.currentTextColor == ContextCompat.getColor(
+                    requireContext(),
+                    R.color.color_orange
+                )
+            ) {
+                return false
+            }
+        }
+
         return includeBinding.houseRentET.error == null
     }
 
@@ -517,7 +739,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             supportingDocmtHelperModel = supportingDocumentHelperModel
         }
     }
-
 
     private fun showDateRangePickerDialog() {
 
@@ -586,13 +807,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     }
 
-    //electricity vars
-    private var previousReading: Double = 0.0
-    private var currentReading: Double = 0.0
-    private var rate: Double = 0.0
-    private var difference: Double = 0.0
-    private var totalElectricBill: Double = 0.0
-
     private fun calculateElectricBill(): Double {
 
         previousReading = if (includeBinding.previousReadingET.text.toString().trim() == "") {
@@ -640,14 +854,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         return totalElectricBill
     }
 
-    //total rent vars
-    private var parkingBill: Double = 0.0
-    private var houseRent: Double = 0.0
-    private var extraBillAmount: Double = 0.0
-    private var amountPaid: Double = 0.0
-    private var netDemand: Double = 0.0
-
-    @SuppressLint("SetTextI18n")
     private fun calculateTotalBill(shouldUpdateAmountPaidTV: Boolean = false): String {
 
         calculateElectricBill()
@@ -668,7 +874,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
             0.0
         }
 
-        extraBillAmount = if (includeBinding.extraAmountET.text.toString().trim() != "") {
+        extraBillAmount = if (includeBinding.extraAmountET.isTextValid()) {
 
             includeBinding.extraAmountET.text.toString().trim().toDouble()
         } else {
@@ -678,7 +884,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         netDemand =
             ((totalElectricBill + parkingBill + houseRent + extraBillAmount) - duesOrAdvanceAmount)
 
-        includeBinding.totalTV.text = "$currencySymbol ${String.format("%.2f", netDemand)}"
+        includeBinding.totalTV.text =
+            getString(R.string.currency_amount, currencySymbol, String.format("%.2f", netDemand))
 
         amountPaid = if (!includeBinding.amountPaidET.editText?.isTextValid()!!
         ) {
@@ -725,9 +932,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 periodType,
                 if (periodType == BillPeriodType.BY_MONTH) {
                     RenterBillMonthType(
-                        billMonthNumber,
-                        billMonthNumber,
-                        1
+                        selectedFromMonthNumber,
+                        selectedFromYear,
+                        selectedToMonthNumber,
+                        selectedToYear,
+                        numberOfMonths
                     )
                 } else {
                     null
@@ -742,7 +951,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                 } else {
                     null
                 },
-                selectedYear
+                selectedFromYear
             )
 
             val isElectricBillIncluded = (includeBinding.previousReadingET.isTextValid()
@@ -842,7 +1051,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
             hideByMonthAndShowByDateView()
         }
-
     }
 
     private fun textWatcher() {
@@ -852,18 +1060,36 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
                 includeBinding.houseRentET.error = EDIT_TEXT_EMPTY_MESSAGE
             } else {
-
+                if (periodType == BillPeriodType.BY_MONTH) {
+                    baseHouseRent = (includeBinding.houseRentET.editText?.text.toString()
+                        .toDouble()) / numberOfMonths
+                }
                 includeBinding.houseRentET.error = null
             }
             calculateTotalBillJob()
         }
 
-        includeBinding.parkingET.editText?.onTextChangedListener {
+        includeBinding.parkingET.editText?.onTextChangedListener { s ->
+            if (!s?.isEmpty()!!) {
+                if (periodType == BillPeriodType.BY_MONTH) {
+                    baseParkingRent = (includeBinding.parkingET.editText?.text.toString()
+                        .toDouble()) / numberOfMonths
+                }
+            }
             calculateTotalBillJob()
         }
 
         includeBinding.extraAmountET.onTextChangedListener {
             calculateTotalBillJob()
+            if (it?.isNotEmpty()!!) {
+                includeBinding.extraAmountET.error = null
+            }
+        }
+
+        includeBinding.extraFieldNameET.onTextChangedListener {
+            if (it?.isNotEmpty()!!) {
+                includeBinding.extraFieldNameET.error = null
+            }
         }
 
         includeBinding.previousReadingET.onTextChangedListener {
@@ -908,8 +1134,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
     }
 
-    private var delayCalculateBillJob: Job? = null
-
     private fun calculateTotalBillJob() {
 
         try {
@@ -934,8 +1158,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         try {
             periodType = BillPeriodType.BY_MONTH
             includeBinding.byDateCL.hide()
-            includeBinding.monthSelectSpinner.show()
-            includeBinding.selectYearSpinner.show()
+            includeBinding.byMonthCL.show()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -946,8 +1169,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         try {
             periodType = BillPeriodType.BY_DATE
             includeBinding.byDateCL.show()
-            includeBinding.monthSelectSpinner.hide()
-            includeBinding.selectYearSpinner.hide()
+            includeBinding.byMonthCL.hide()
         } catch (e: Exception) {
             e.printStackTrace()
         }

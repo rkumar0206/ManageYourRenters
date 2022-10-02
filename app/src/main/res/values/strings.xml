@@ -273,6 +273,14 @@
     <string name="due_currency_symbol_amount_interest">Due : %1$s %2$s\n( +%3$s int added )</string>
     <string name="borrowed_on">Borrowed on : %1$s</string>
     <string name="month_year">%1$s, %2$s</string>
+    <string name="for_month_year_to_month_year">From\u0020:\u0020%1$s, %2$s\nTo\u0020\u0020\u0020\u0020\u0020\u0020:\u0020%3$s, %4$s</string>
+    <string name="from_date_to_date">From\u0020:\u0020%1$s\nTo\u0020\u0020\u0020\u0020\u0020\u0020:\u0020%2$s</string>
+    <string name="renter_payment_date_time">Payment date\u0020:\u0020%1$s\nPayment time\u0020:\u0020%2$s</string>
+    <string name="renter_payment_extras">%1$s\u0020:\u0020%2$s\u0020%3$s</string>
+    <string name="renter_payment_net_demand">Net demand\u0020:\u0020%1$s\u0020%2$s</string>
+    <string name="renter_payment_amount_paid">Amount paid\u0020:\u0020%1$s\u0020%2$s</string>
+    <string name="renter_bill_period_field_month">%1$s,\u0020%2$s\u0020to\u0020%3$s,\u0020%4$s</string>
+    <string name="renter_bill_period_field_date">%1$s\u0020to\u0020%2$s</string>
     <string name="already_synced">Already Synced</string>
     <string name="payment_info">Payment info</string>
     <string name="move_to_category">Move to other category</string>
@@ -318,7 +326,19 @@
     <string name="number_of_family_members_optional">Number of family members (Optional)</string>
     <string name="occupation">Occupation</string>
     <string name="number_of_family_members">Number of family members</string>
-
+    <string name="number_of_months">Number of months : </string>
+    <string name="number_of_days">Number of days : </string>
+    <string name="renter_bill_electricity_units">%1$s\u0020unit(s)</string>
+    <string name="renter_bill_electricity_rate">%1$s\u0020per/unit</string>
+    <string name="currency_amount">%1$s\u0020%2$s</string>
+    <string name="sign_currency_amount">%1$s\u0020%2$s\u0020%3$s</string>
+    <string name="extra">Extra</string>
+    <string name="renter_payment_date_range_error_message">A payment with selected date range is already present!!</string>
+    <string name="renter_payment_month_range_error_message">A payment with selected month range is already present!!</string>
+    <string name="payment_date">Payment Date\u0020:\u0020%1$s</string>
+    <string name="time_">Time\u0020:\u0020%1$s</string>
+    <string name="dues_from_last_payment">Dues from last payments\u0020:\u0020+\u0020%1$s</string>
+    <string name="paid_in_advance_in_last_payment">Paid in advance in last payments\u0020:\u0020-\u0020%1$s</string>
 
     <string-array name="interest_time_schedule">
 

@@ -335,7 +335,10 @@
     <string name="extra">Extra</string>
     <string name="renter_payment_date_range_error_message">A payment with selected date range is already present!!</string>
     <string name="renter_payment_month_range_error_message">A payment with selected month range is already present!!</string>
-
+    <string name="payment_date">Payment Date\u0020:\u0020%1$s</string>
+    <string name="time_">Time\u0020:\u0020%1$s</string>
+    <string name="dues_from_last_payment">Dues from last payments\u0020:\u0020+\u0020%1$s</string>
+    <string name="paid_in_advance_in_last_payment">Paid in advance in last payments\u0020:\u0020-\u0020%1$s</string>
 
     <string-array name="interest_time_schedule">
 

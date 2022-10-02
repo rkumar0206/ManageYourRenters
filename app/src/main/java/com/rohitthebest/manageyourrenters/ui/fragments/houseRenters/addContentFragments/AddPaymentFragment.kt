@@ -1,6 +1,5 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters.addContentFragments
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -359,27 +358,26 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         return 0.0
     }
 
-    @SuppressLint("SetTextI18n")
     private fun setDateAndTimeInTextViews() {
 
-        includeBinding.dateTV.text = "Payment Date : ${
-            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                currentTimestamp
+        includeBinding.dateTV.text =
+            getString(
+                R.string.payment_date,
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    currentTimestamp
+                )
             )
-        }"
 
-        includeBinding.timeTV.text = "Time : ${
-            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                currentTimestamp,
-                "hh:mm a"
+        includeBinding.timeTV.text =
+            getString(
+                R.string.time_,
+                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                    currentTimestamp, "hh:mm a"
+                )
             )
-        }"
     }
 
-    @SuppressLint("SetTextI18n")
     private fun initializeLastPaymentsDuesAndAdvance() {
-
-        Log.d(TAG, "initializeLastPaymentsDuesAndAdvance: ")
 
         when {
             receivedRenter?.dueOrAdvanceAmount!! < 0.0 -> {
@@ -389,9 +387,12 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     R.color.color_orange
                 )
                 includeBinding.duesOfLastPaymentTV.text =
-                    "Dues from last payments : + ${lastPaymentInfo?.currencySymbol} ${
-                        abs(receivedRenter?.dueOrAdvanceAmount!!)
-                    }"
+                    getString(
+                        R.string.dues_from_last_payment,
+                        "${lastPaymentInfo?.currencySymbol} ${
+                            abs(receivedRenter?.dueOrAdvanceAmount!!)
+                        }"
+                    )
 
                 duesOrAdvanceAmount = receivedRenter?.dueOrAdvanceAmount!!
             }
@@ -402,7 +403,10 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
                     R.color.color_green
                 )
                 includeBinding.duesOfLastPaymentTV.text =
-                    "Paid in advance in last payments : - ${lastPaymentInfo?.currencySymbol}${receivedRenter?.dueOrAdvanceAmount}"
+                    getString(
+                        R.string.paid_in_advance_in_last_payment,
+                        "${lastPaymentInfo?.currencySymbol}${receivedRenter?.dueOrAdvanceAmount}"
+                    )
 
                 duesOrAdvanceAmount = receivedRenter?.dueOrAdvanceAmount!!
             }
@@ -617,7 +621,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onClick(v: View?) {
 
         when (v?.id) {
@@ -851,7 +854,6 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         return totalElectricBill
     }
 
-    @SuppressLint("SetTextI18n")
     private fun calculateTotalBill(shouldUpdateAmountPaidTV: Boolean = false): String {
 
         calculateElectricBill()
@@ -882,7 +884,8 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         netDemand =
             ((totalElectricBill + parkingBill + houseRent + extraBillAmount) - duesOrAdvanceAmount)
 
-        includeBinding.totalTV.text = "$currencySymbol ${String.format("%.2f", netDemand)}"
+        includeBinding.totalTV.text =
+            getString(R.string.currency_amount, currencySymbol, String.format("%.2f", netDemand))
 
         amountPaid = if (!includeBinding.amountPaidET.editText?.isTextValid()!!
         ) {

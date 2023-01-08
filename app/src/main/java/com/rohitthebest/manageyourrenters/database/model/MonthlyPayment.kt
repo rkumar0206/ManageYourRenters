@@ -10,6 +10,7 @@ data class MonthlyPayment(
     @PrimaryKey(autoGenerate = false) var key: String,
     var amount: Double,
     var categoryKey: String,
+    var expenseCategoryKey: String = "", // Optional, and will be used to link the expense, issue #12
     var created: Long,
     var id: Int,
     var message: String = "",
@@ -22,6 +23,7 @@ data class MonthlyPayment(
     constructor() : this(
         "",
         0.0,
+        "",
         "",
         0L,
         0,

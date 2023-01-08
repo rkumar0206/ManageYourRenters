@@ -415,6 +415,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                     if (isInternetAvailable(requireContext())) {
 
                         expenseViewModel.deleteExpense(expenseForMenuItems)
+                        //todo: unlink and monthly payment associated with this expense
                     } else {
 
                         showNoInternetMessage(requireContext())

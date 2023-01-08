@@ -3,24 +3,28 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.monthlyPaymen
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.RadioGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
-import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
-import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
-import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentDateTimeInfo
+import com.rohitthebest.manageyourrenters.database.model.*
 import com.rohitthebest.manageyourrenters.databinding.AddEditMonthlyPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddEditMonthlyPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.ChooseExpenseCategoryBottomSheetFragment
+import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.MonthlyPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -30,13 +34,16 @@ private const val TAG = "AddEditMonthlyPaymentFragment"
 
 @AndroidEntryPoint
 class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthly_payment),
-    View.OnClickListener, RadioGroup.OnCheckedChangeListener {
+    View.OnClickListener, RadioGroup.OnCheckedChangeListener,
+    ChooseExpenseCategoryBottomSheetFragment.OnItemClicked {
 
     private var _binding: FragmentAddEditMonthlyPaymentBinding? = null
     private val binding get() = _binding!!
 
     private val monthlyPaymentViewModel by viewModels<MonthlyPaymentViewModel>()
     private val monthlyPaymentCategoryViewModel by viewModels<MonthlyPaymentCategoryViewModel>()
+    private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
+    private val expenseViewModel by viewModels<ExpenseViewModel>()
 
     private lateinit var includeBinding: AddEditMonthlyPaymentLayoutBinding
 
@@ -64,6 +71,9 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
     private var lastPaymentInfo: MonthlyPayment? = null
 
+    private lateinit var expenseCategoryList: List<ExpenseCategory>
+    private var existingExpenseCategoryName = ""
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAddEditMonthlyPaymentBinding.bind(view)
@@ -81,11 +91,37 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         populateByDateLayoutFields()
         populateByMonthLayoutFields()
 
-        getMessage()
-
         initListeners()
 
         textWatchers()
+        includeBinding.linkExpenseCategoryCB.isChecked = false
+        includeBinding.cardView9.hide()
+
+        lifecycleScope.launch {
+
+            delay(300)
+            getAllExpenseCategories()
+        }
+    }
+
+    private fun getAllExpenseCategories() {
+
+        expenseCategoryViewModel.getAllExpenseCategories()
+            .observe(viewLifecycleOwner) { expenseCategories ->
+
+                //todo : ui is not working properly to show the expense category name suggestions
+
+                expenseCategoryList = expenseCategories
+
+                val adapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_list_item_1,
+                    expenseCategoryList.map { e -> e.categoryName }
+                )
+
+                includeBinding.expenseCategoryNameET.setAdapter(adapter)
+                getMessage()
+            }
     }
 
     private fun populateYearList(selectedYear: Int) {
@@ -159,6 +195,69 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         includeBinding.tillDateTV.setOnClickListener(this)
 
         includeBinding.periodTypeRG.setOnCheckedChangeListener(this)
+
+        includeBinding.linkExpenseCategoryCB.setOnCheckedChangeListener { _, isChecked ->
+
+            includeBinding.cardView9.isVisible = isChecked
+
+            if (isChecked && !includeBinding.expenseCategoryNameET.text.toString().trim()
+                    .isValid() && this::receivedMonthlyPaymentCategory.isInitialized
+            ) {
+                includeBinding.expenseCategoryNameET.setText(receivedMonthlyPaymentCategory.categoryName)
+            }
+
+            if (!isChecked) {
+
+                hideKeyBoard(requireActivity())
+            }
+        }
+
+        includeBinding.chooseExpenseCategoryBtn.setOnClickListener(this)
+
+    }
+
+    override fun onClick(v: View?) {
+
+        if (includeBinding.monthlyPaymentDateTV.id == v?.id || includeBinding.monthlyPaymentDateIB.id == v?.id) {
+
+            Functions.showDateAndTimePickerDialog(
+                requireContext(),
+                paymentDate,
+                false
+            ) { paymentDate ->
+
+                this.paymentDate = paymentDate
+                updateSelectedPaymentDateTextView()
+            }
+        }
+
+        if (v?.id == includeBinding.dateRangePickerBtn.id || v?.id == includeBinding.fromDateTV.id
+            || v?.id == includeBinding.tillDateTV.id
+        ) {
+
+            showDateRangePickerDialog()
+        }
+
+        when (v?.id) {
+
+            includeBinding.chooseExpenseCategoryBtn.id -> {
+
+                if (expenseCategoryList.isNotEmpty()) {
+
+                    requireActivity().supportFragmentManager.let {
+
+                        ChooseExpenseCategoryBottomSheetFragment.newInstance(Bundle())
+                            .apply {
+
+                                show(it, TAG)
+                            }.setOnItemClickedListener(this)
+                    }
+                } else {
+                    showToast(requireContext(), "No expense category added yet!!")
+                }
+            }
+        }
+
     }
 
     private fun initMonthlyPayment() {
@@ -210,7 +309,57 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         monthlyPayment.monthlyPaymentDateTimeInfo = monthlyPaymentDateTimeInfo
 
         monthlyPayment.isSynced = isInternetAvailable(requireContext())
+
+        linkExpenseCategory(monthlyPayment)
+
         saveMonthlyPaymentToDatabase(monthlyPayment)
+    }
+
+    private fun linkExpenseCategory(monthlyPayment: MonthlyPayment) {
+
+        if (includeBinding.linkExpenseCategoryCB.isChecked) {
+
+            val currentExpenseCategoryName =
+                includeBinding.expenseCategoryNameET.text.toString().trim()
+
+            val expenseCategory = expenseCategoryList.stream().filter {
+                it.categoryName.lowercase() == currentExpenseCategoryName.lowercase()
+            }.findAny()
+
+            if (isMessageReceivedForEditing && existingExpenseCategoryName.isValid() &&
+                (existingExpenseCategoryName.lowercase() == currentExpenseCategoryName.lowercase()) &&
+                expenseCategory.isPresent
+            ) {
+                monthlyPayment.expenseCategoryKey = expenseCategory.get().key
+                return
+            }
+
+            if (expenseCategory.isPresent) {
+                Log.d(TAG, "linkExpenseCategory: expense category already present")
+                monthlyPayment.expenseCategoryKey = expenseCategory.get().key
+            } else {
+
+                Log.d(TAG, "linkExpenseCategory: creating new expense category")
+
+                val newExpenseCategory = ExpenseCategory()
+                    .apply {
+                        categoryDescription = receivedMonthlyPaymentCategory.categoryDescription
+                        imageUrl = receivedMonthlyPaymentCategory.imageUrl
+                        this.categoryName = currentExpenseCategoryName
+                        created = System.currentTimeMillis()
+                        modified = System.currentTimeMillis()
+                        uid = receivedMonthlyPaymentCategory.uid
+                        key = Functions.generateKey("_${getUid()}", 50)
+                    }
+
+                expenseCategoryViewModel.insertExpenseCategory(newExpenseCategory)
+                monthlyPayment.expenseCategoryKey = newExpenseCategory.key
+            }
+        } else if (isMessageReceivedForEditing) {
+
+            monthlyPayment.expenseCategoryKey = ""
+            //todo: delete the expense from expense database
+        }
     }
 
     private fun saveMonthlyPaymentToDatabase(monthlyPayment: MonthlyPayment) {
@@ -231,9 +380,29 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
             monthlyPaymentViewModel.updateMonthlyPayment(receivedMonthlyPayment, monthlyPayment)
         }
 
+        if (includeBinding.linkExpenseCategoryCB.isChecked) {
+
+            addPaymentToExpense(monthlyPayment)
+        }
+
         Log.d(TAG, "saveMonthlyPaymentToDatabase: $monthlyPayment")
 
         requireActivity().onBackPressed()
+    }
+
+    private fun addPaymentToExpense(monthlyPayment: MonthlyPayment) {
+
+        val expense = Expense(
+            amount = monthlyPayment.amount,
+            created = monthlyPayment.created,
+            modified = monthlyPayment.modified,
+            spentOn = receivedMonthlyPaymentCategory.categoryName, // todo : add date or month in brackets
+            uid = monthlyPayment.uid,
+            key = monthlyPayment.key,  // this key will be same as monthly payment key as it will be used to delete the expense when this monthly payment is deleted
+            categoryKey = monthlyPayment.expenseCategoryKey
+        )
+
+        expenseViewModel.insertExpense(expense)
     }
 
     private fun validateForm(): Boolean {
@@ -259,30 +428,22 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                 return false
             }
         }
+
+        if (includeBinding.linkExpenseCategoryCB.isChecked && !includeBinding.expenseCategoryNameET.isTextValid()) {
+
+            includeBinding.expenseCategoryNameET.requestFocus()
+            includeBinding.expenseCategoryNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
         return true
     }
 
-    override fun onClick(v: View?) {
 
-        if (includeBinding.monthlyPaymentDateTV.id == v?.id || includeBinding.monthlyPaymentDateIB.id == v?.id) {
+    // on expense category clicked
+    override fun onCategoryClicked(expenseCategory: ExpenseCategory) {
 
-            Functions.showDateAndTimePickerDialog(
-                requireContext(),
-                paymentDate,
-                false
-            ) { paymentDate ->
-
-                this.paymentDate = paymentDate
-                updateSelectedPaymentDateTextView()
-            }
-        }
-
-        if (v?.id == includeBinding.dateRangePickerBtn.id || v?.id == includeBinding.fromDateTV.id
-            || v?.id == includeBinding.tillDateTV.id
-        ) {
-
-            showDateRangePickerDialog()
-        }
+        includeBinding.expenseCategoryNameET.setText(expenseCategory.categoryName)
     }
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
@@ -335,7 +496,6 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         )
     }
 
-
     private fun showByMonthLayout() {
         includeBinding.byMonthCL.show()
         includeBinding.byDateCL.hide()
@@ -373,14 +533,10 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                 getMonthlyPayment()
             }
 
-            lifecycleScope.launch {
+            getMonthlyPaymentCategory()
+            if (!isMessageReceivedForEditing) {
 
-                delay(300)
-                getMonthlyPaymentCategory()
-                if (!isMessageReceivedForEditing) {
-
-                    initialUIChangesBasedOnLastPayment()
-                }
+                initialUIChangesBasedOnLastPayment()
             }
         }
     }
@@ -415,6 +571,17 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                         }
                     }
                     includeBinding.monthlyPaymentAmountET.editText?.setText(amount.toString())
+
+                    if (lastPaymentInfo?.expenseCategoryKey.isValid()) {
+
+                        includeBinding.linkExpenseCategoryCB.isChecked = true
+                        includeBinding.cardView9.show()
+                        includeBinding.expenseCategoryNameET.setText(
+                            expenseCategoryList.stream()
+                                .filter { it.key == lastPaymentInfo?.expenseCategoryKey }
+                                .findFirst().get().categoryName
+                        )
+                    }
                 }
             }
     }
@@ -557,6 +724,21 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                     populateByDateLayoutFields()
                 }
 
+                if (receivedMonthlyPayment.expenseCategoryKey.isValid()) {
+
+                    linkExpenseCategoryCB.isChecked = true
+                    cardView9.show()
+
+                    existingExpenseCategoryName = expenseCategoryList.stream()
+                        .filter { it.key == receivedMonthlyPayment.expenseCategoryKey }
+                        .findFirst().get().categoryName
+
+                    expenseCategoryNameET.setText(existingExpenseCategoryName)
+                } else {
+
+                    linkExpenseCategoryCB.isChecked = false
+                    cardView9.hide()
+                }
             }
         }
     }
@@ -640,8 +822,19 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
                 includeBinding.monthlyPaymentAmountET.error = null
             }
         }
-    }
 
+        includeBinding.expenseCategoryNameET.onTextChangedListener { s ->
+
+            if (includeBinding.linkExpenseCategoryCB.isChecked) {
+
+                if (!s?.toString().isValid()) {
+                    includeBinding.expenseCategoryNameET.error = EDIT_TEXT_EMPTY_MESSAGE
+                } else {
+                    includeBinding.expenseCategoryNameET.error = null
+                }
+            }
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -650,4 +843,5 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
         _binding = null
     }
+
 }

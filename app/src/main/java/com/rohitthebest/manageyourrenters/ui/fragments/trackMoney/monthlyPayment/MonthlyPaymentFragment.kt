@@ -182,6 +182,7 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
                         monthlyPaymentViewModel.deleteMonthlyPayment(
                             monthlyPaymentForMenus
                         )
+                        // todo : delete the expense related to this category
                     } else {
 
                         showNoInternetMessage(requireContext())

@@ -79,6 +79,27 @@ class ExpenseViewModel @Inject constructor(
             Functions.showToast(context, "Expense updated")
         }
 
+    // issue #12
+    fun updateAmountUsingExpenseKey(expenseKey: String, amount: Double) = viewModelScope.launch {
+
+        try {
+
+            val oldValue = expenseRepository.getExpenseByKey(expenseKey).first()
+
+            if (oldValue != null) {
+
+                val newValue = oldValue.copy()
+                newValue.amount = amount
+                updateExpense(oldValue, newValue)
+            }
+
+        } catch (e: Exception) {
+
+            e.printStackTrace()
+        }
+
+    }
+
     fun deleteExpense(expense: Expense) = viewModelScope.launch {
 
         val context = getApplication<Application>().applicationContext

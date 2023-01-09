@@ -390,18 +390,22 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
         if (includeBinding.linkExpenseCategoryCB.isChecked && monthlyPayment.expenseCategoryKey.isValid()) {
 
-            // todo : solve the error, when update scenario, expense is added once again
             isRefreshEnabled = true
 
-            if (isMessageReceivedForEditing && existingExpenseCategoryName.isValid()) {
+            // update scenario and amount changed = update the expense amount also
+            if (isMessageReceivedForEditing && existingExpenseCategoryName.isValid() &&
+                includeBinding.monthlyPaymentAmountET.editText?.text.toString()
+                    .toDouble() != receivedMonthlyPayment.amount
+            ) {
 
-                //todo : update when amount is changed
-            } else {
+                updatePaymentAmountInExpense(
+                    monthlyPayment, includeBinding.monthlyPaymentAmountET.editText?.text.toString()
+                        .toDouble()
+                )
+            } else if (!existingExpenseCategoryName.isValid()) {
 
-                //todo:  add to expense
+                addPaymentToExpense(monthlyPayment)
             }
-
-            addPaymentToExpense(monthlyPayment)
         }
 
         Log.d(TAG, "saveMonthlyPaymentToDatabase: $monthlyPayment")
@@ -409,6 +413,17 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         requireActivity().onBackPressed()
     }
 
+    // issue #12
+    private fun updatePaymentAmountInExpense(monthlyPayment: MonthlyPayment, amount: Double) {
+
+        expenseViewModel.updateAmountUsingExpenseKey(
+            monthlyPayment.key,
+            amount
+        )
+        isRefreshEnabled = false
+    }
+
+    // issue #12
     private fun addPaymentToExpense(monthlyPayment: MonthlyPayment) {
 
         val dateInfo =

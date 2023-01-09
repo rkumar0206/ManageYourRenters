@@ -62,7 +62,7 @@ interface ExpenseDAO {
 
 
     @Query("SELECT * FROM expense_table WHERE `key` = :expenseKey")
-    fun getExpenseByKey(expenseKey: String): Flow<Expense>
+    fun getExpenseByKey(expenseKey: String): Flow<Expense?>
 
     @Query("SELECT * FROM expense_table ORDER BY created DESC")
     fun getAllExpenses(): Flow<List<Expense>>

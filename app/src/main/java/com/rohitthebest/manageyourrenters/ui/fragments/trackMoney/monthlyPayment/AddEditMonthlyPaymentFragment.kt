@@ -56,6 +56,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
     private lateinit var receivedMonthlyPayment: MonthlyPayment
     private var isMessageReceivedForEditing = false
 
+    private lateinit var monthList: List<String>
     private lateinit var yearList: ArrayList<Int>
 
     private var selectedFromMonthNumber: Int = 1
@@ -104,6 +105,8 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         }
     }
 
+    private var isRefreshEnabled = true
+
     private fun getAllExpenseCategories() {
 
         expenseCategoryViewModel.getAllExpenseCategories()
@@ -111,16 +114,21 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
                 //todo : ui is not working properly to show the expense category name suggestions
 
-                expenseCategoryList = expenseCategories
+                if (isRefreshEnabled) {
 
-                val adapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_list_item_1,
-                    expenseCategoryList.map { e -> e.categoryName }
-                )
+                    expenseCategoryList = expenseCategories
 
-                includeBinding.expenseCategoryNameET.setAdapter(adapter)
-                getMessage()
+                    val adapter = ArrayAdapter(
+                        requireContext(),
+                        android.R.layout.simple_list_item_1,
+                        expenseCategoryList.map { e -> e.categoryName }
+                    )
+
+                    includeBinding.expenseCategoryNameET.setAdapter(adapter)
+                    getMessage()
+
+                    isRefreshEnabled = false
+                }
             }
     }
 
@@ -152,7 +160,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
     private fun setUpMonthSpinners() {
 
-        val monthList = resources.getStringArray(R.array.months).toList()
+        monthList = resources.getStringArray(R.array.months).toList()
 
         includeBinding.fromMonthSelectSpinner.setListToSpinner(
             requireContext(), monthList,
@@ -358,7 +366,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         } else if (isMessageReceivedForEditing) {
 
             monthlyPayment.expenseCategoryKey = ""
-            //todo: delete the expense from expense database
+            expenseViewModel.deleteExpenseByKey(monthlyPayment.key)
         }
     }
 
@@ -380,7 +388,18 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
             monthlyPaymentViewModel.updateMonthlyPayment(receivedMonthlyPayment, monthlyPayment)
         }
 
-        if (includeBinding.linkExpenseCategoryCB.isChecked) {
+        if (includeBinding.linkExpenseCategoryCB.isChecked && monthlyPayment.expenseCategoryKey.isValid()) {
+
+            // todo : solve the error, when update scenario, expense is added once again
+            isRefreshEnabled = true
+
+            if (isMessageReceivedForEditing && existingExpenseCategoryName.isValid()) {
+
+                //todo : update when amount is changed
+            } else {
+
+                //todo:  add to expense
+            }
 
             addPaymentToExpense(monthlyPayment)
         }
@@ -392,17 +411,50 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
     private fun addPaymentToExpense(monthlyPayment: MonthlyPayment) {
 
-        val expense = Expense(
-            amount = monthlyPayment.amount,
-            created = monthlyPayment.created,
-            modified = monthlyPayment.modified,
-            spentOn = receivedMonthlyPaymentCategory.categoryName, // todo : add date or month in brackets
-            uid = monthlyPayment.uid,
-            key = monthlyPayment.key,  // this key will be same as monthly payment key as it will be used to delete the expense when this monthly payment is deleted
-            categoryKey = monthlyPayment.expenseCategoryKey
-        )
+        val dateInfo =
+            if (monthlyPayment.monthlyPaymentDateTimeInfo?.paymentPeriodType == BillPeriodType.BY_MONTH) {
 
-        expenseViewModel.insertExpense(expense)
+                val fromMonthYear =
+                    "${monthList[monthlyPayment.monthlyPaymentDateTimeInfo?.forBillMonth!! - 1]}, " +
+                            "${monthlyPayment.monthlyPaymentDateTimeInfo?.forBillYear}"
+
+                val toMonthYear =
+                    "${monthList[monthlyPayment.monthlyPaymentDateTimeInfo?.toBillMonth!! - 1]}, " +
+                            "${monthlyPayment.monthlyPaymentDateTimeInfo?.toBillYear}"
+
+                if (fromMonthYear == toMonthYear) {
+
+                    fromMonthYear
+                } else {
+                    "$fromMonthYear to $toMonthYear"
+                }
+
+            } else {
+
+                "${WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(monthlyPayment.monthlyPaymentDateTimeInfo?.fromBillDate)} to " +
+                        "${
+                            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                                monthlyPayment.monthlyPaymentDateTimeInfo?.toBillDate
+                            )
+                        }"
+            }
+
+        val spentOn = receivedMonthlyPaymentCategory.categoryName + " | $dateInfo"
+
+        if (isRefreshEnabled) {
+            val expense = Expense(
+                amount = monthlyPayment.amount,
+                created = monthlyPayment.created,
+                modified = monthlyPayment.modified,
+                spentOn = spentOn,
+                uid = monthlyPayment.uid,
+                key = monthlyPayment.key,  // this key will be same as monthly payment key as it will be used to delete the expense when this monthly payment is deleted
+                categoryKey = monthlyPayment.expenseCategoryKey
+            )
+
+            expenseViewModel.insertExpense(expense)
+            isRefreshEnabled = false
+        }
     }
 
     private fun validateForm(): Boolean {

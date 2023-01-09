@@ -1,24 +1,32 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.app.Application
+import android.content.Context
 import android.os.Parcelable
+import android.util.Log
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE_CATEGORIES
 import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
+import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+private const val TAG = "ExpenseCategoryViewMode"
 
 @HiltViewModel
 class ExpenseCategoryViewModel @Inject constructor(
     app: Application,
     private val expenseCategoryRepository: ExpenseCategoryRepository,
     private val expenseRepository: ExpenseRepository,
+    private val monthlyPaymentRepository: MonthlyPaymentRepository,
     private val state: SavedStateHandle
 ) : AndroidViewModel(app) {
 
@@ -125,6 +133,8 @@ class ExpenseCategoryViewModel @Inject constructor(
 
                 val expenseKeys = expenseRepository.getKeysByExpenseCategoryKey(expenseCategory.key)
 
+                unlinkMonthlyPaymentsIfAny(context, expenseKeys)
+
                 if (expenseKeys.isNotEmpty()) {
 
                     deleteAllDocumentsUsingKeyFromFirestore(
@@ -139,6 +149,46 @@ class ExpenseCategoryViewModel @Inject constructor(
             expenseRepository.deleteExpenseByExpenseCategoryKey(expenseCategory.key)
             expenseCategoryRepository.deleteExpenseCategory(expenseCategory)
         }
+
+    // issue #12
+    private suspend fun unlinkMonthlyPaymentsIfAny(context: Context, expenseKeys: List<String>) {
+
+        expenseKeys.forEach { key ->
+
+            try {
+
+                val monthlyPayment =
+                    monthlyPaymentRepository.getMonthlyPaymentByKey(key).first()
+
+                monthlyPayment.expenseCategoryKey = ""
+
+                if (isInternetAvailable(context)) {
+
+                    val map = HashMap<String, Any?>()
+                    map["expenseCategoryKey"] = ""
+
+                    updateDocumentOnFireStore(
+                        context,
+                        map,
+                        FirestoreCollectionsConstants.MONTHLY_PAYMENTS,
+                        monthlyPayment.key
+                    )
+
+                }
+
+                monthlyPaymentRepository.updateMonthlyPayment(monthlyPayment)
+            } catch (e: Exception) {
+
+                Log.d(
+                    TAG,
+                    "unlinkMonthlyPaymentIfAny: No monthly payment found with expense key : $key"
+                )
+                e.printStackTrace()
+            }
+
+        }
+
+    }
 
     fun deleteAllExpenseCategories() = viewModelScope.launch {
 

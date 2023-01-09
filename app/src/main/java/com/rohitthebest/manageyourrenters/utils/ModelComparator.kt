@@ -191,6 +191,8 @@ fun compareMonthlyPaymentModel(
     if (oldData.monthlyPaymentDateTimeInfo != newData.monthlyPaymentDateTimeInfo) map["monthlyPaymentDateTimeInfo"] =
         newData.monthlyPaymentDateTimeInfo
     if (oldData.categoryKey != newData.categoryKey) map["categoryKey"] = newData.categoryKey
+    if (oldData.expenseCategoryKey != newData.expenseCategoryKey) map["expenseCategoryKey"] =
+        newData.expenseCategoryKey
     if (oldData.message != newData.message) map["message"] = newData.message
 
     return map

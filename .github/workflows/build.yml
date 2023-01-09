@@ -35,4 +35,4 @@ jobs:
         with:
           name: apk-debug
           path: build/outputs/apk/debug
-          branch: ${{ master }}
+          branch: master

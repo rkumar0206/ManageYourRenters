@@ -112,8 +112,6 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         expenseCategoryViewModel.getAllExpenseCategories()
             .observe(viewLifecycleOwner) { expenseCategories ->
 
-                //todo : ui is not working properly to show the expense category name suggestions
-
                 if (isRefreshEnabled) {
 
                     expenseCategoryList = expenseCategories

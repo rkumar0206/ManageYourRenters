@@ -4,13 +4,16 @@ import android.app.Application
 import android.os.Parcelable
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENT_CATEGORIES
+import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,6 +24,7 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
     app: Application,
     private val repository: MonthlyPaymentCategoryRepository,
     private val monthlyPaymentRepository: MonthlyPaymentRepository,
+    private val expenseRepository: ExpenseRepository,
     private val state: SavedStateHandle
 ) : AndroidViewModel(app) {
 
@@ -108,6 +112,11 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
 
             val context = getApplication<Application>().applicationContext
 
+            val monthlyPaymentKeys =
+                monthlyPaymentRepository.getKeysByMonthlyPaymentCategoryKey(
+                    monthlyPaymentCategory.key
+                )
+
             if (isInternetAvailable(context)) {
 
                 deleteDocumentFromFireStore(
@@ -128,19 +137,29 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
                     }
                 }
 
-                val monthlyPaymentKeys =
-                    monthlyPaymentRepository.getKeysByMonthlyPaymentCategoryKey(
-                        monthlyPaymentCategory.key
+
+                if (monthlyPaymentKeys.isNotEmpty()) {
+
+                    deleteAllDocumentsUsingKeyFromFirestore(
+                        context,
+                        MONTHLY_PAYMENTS,
+                        convertStringListToJSON(monthlyPaymentKeys)
                     )
 
-                deleteAllDocumentsUsingKeyFromFirestore(
-                    context,
-                    MONTHLY_PAYMENTS,
-                    convertStringListToJSON(monthlyPaymentKeys)
-                )
-
+                    // issue #12
+                    delay(50)
+                    deleteAllDocumentsUsingKeyFromFirestore(
+                        context,
+                        EXPENSES,
+                        convertStringListToJSON(monthlyPaymentKeys)
+                    )
+                }
             }
 
+            if (monthlyPaymentKeys.isNotEmpty()) {
+                // issue #12
+                expenseRepository.deleteExpenseByListOfKeys(monthlyPaymentKeys)
+            }
             monthlyPaymentRepository.deleteAllMonthlyPaymentsByCategoryKey(monthlyPaymentCategory.key)
             repository.deleteMonthlyPaymentCategory(monthlyPaymentCategory)
         }

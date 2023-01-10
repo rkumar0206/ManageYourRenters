@@ -339,6 +339,8 @@
     <string name="time_">Time\u0020:\u0020%1$s</string>
     <string name="dues_from_last_payment">Dues from last payments\u0020:\u0020+\u0020%1$s</string>
     <string name="paid_in_advance_in_last_payment">Paid in advance in last payments\u0020:\u0020-\u0020%1$s</string>
+    <string name="choose_existing_category">Choose existing category</string>
+    <string name="link_to_expense_category">Link to expense category</string>
 
     <string-array name="interest_time_schedule">
 

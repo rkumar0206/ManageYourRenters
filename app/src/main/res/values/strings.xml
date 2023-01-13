@@ -52,7 +52,7 @@
     <string name="delete_warning_message">[Warning] : After deletion it CANNOT BE RETRIEVED AGAIN.</string>
     <string name="same_day">Same day</string>
     <string name="electricity_error_message">Previous reading must be less than current reading</string>
-    <string name="total">Total : %1$s</string>
+    <string name="total">Diff: %1$s |  Total: %2$s</string>
     <string name="bill">BILL</string>
     <string name="renter_information">Renter Information</string>
     <string name="name_">Name : </string>

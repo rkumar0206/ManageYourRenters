@@ -119,11 +119,9 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         setDateAndTimeInTextViews()
 
         // for period type by_month
-        populateYearListFrom(WorkingWithDateAndTime.getCurrentYear())
-        populateYearListTo(WorkingWithDateAndTime.getCurrentYear())
+        selectedFromYear = WorkingWithDateAndTime.getCurrentYear()
+        selectedToYear = WorkingWithDateAndTime.getCurrentYear()
         setUpMonthSpinners()
-        setUpYearSpinners()
-
         initializeByMonthField()
 
         // for period type by_date
@@ -849,7 +847,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
 
         includeBinding.electricityErrorTextTV.changeTextColor(requireContext(), R.color.color_green)
         includeBinding.electricityErrorTextTV.text =
-            getString(R.string.total, String.format("%.2f", totalElectricBill))
+            getString(R.string.total, difference.format(2), totalElectricBill.format(2))
 
         return totalElectricBill
     }

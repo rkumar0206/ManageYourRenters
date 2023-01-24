@@ -25,6 +25,14 @@ interface ExpenseDAO {
     @Query("DELETE FROM expense_table WHERE categoryKey = :expenseCategoryKey")
     suspend fun deleteExpenseByExpenseCategoryKey(expenseCategoryKey: String)
 
+    // issue #12
+    @Query("DELETE FROM expense_table WHERE `key` = :expenseKey")
+    suspend fun deleteExpenseByKey(expenseKey: String)
+
+    // issue #12
+    @Query("DELETE FROM expense_table WHERE `key` IN (:expenseKeys)")
+    suspend fun deleteExpenseByListOfKeys(expenseKeys: List<String>)
+
     @Query("DELETE FROM expense_table WHERE isSynced = :isSynced")
     suspend fun deleteExpenseByIsSynced(isSynced: Boolean)
 
@@ -54,7 +62,7 @@ interface ExpenseDAO {
 
 
     @Query("SELECT * FROM expense_table WHERE `key` = :expenseKey")
-    fun getExpenseByKey(expenseKey: String): Flow<Expense>
+    fun getExpenseByKey(expenseKey: String): Flow<Expense?>
 
     @Query("SELECT * FROM expense_table ORDER BY created DESC")
     fun getAllExpenses(): Flow<List<Expense>>

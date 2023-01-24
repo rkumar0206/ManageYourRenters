@@ -7,17 +7,21 @@ import com.rohitthebest.manageyourrenters.data.BillPeriodType
 import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
 import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
 import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentDateTimeInfo
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
+import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MonthlyPaymentViewModel @Inject constructor(
-    app: Application,
     private val repository: MonthlyPaymentRepository,
+    private val expenseRepository: ExpenseRepository,
+    app: Application,
     private val state: SavedStateHandle
 ) : AndroidViewModel(app) {
 
@@ -30,7 +34,7 @@ class MonthlyPaymentViewModel @Inject constructor(
 
     fun saveMonthlyPaymentRvState(rvState: Parcelable?) {
 
-        state.set(MONTHLY_PAYMENT_RV_KEY, rvState)
+        state[MONTHLY_PAYMENT_RV_KEY] = rvState
     }
 
     private val _monthlyPaymentRvState: MutableLiveData<Parcelable> = state.getLiveData(
@@ -66,9 +70,6 @@ class MonthlyPaymentViewModel @Inject constructor(
             repository.insertMonthlyPayment(monthlyPayment)
         }
 
-    fun insertAllMonthlyPayment(monthlyPayments: List<MonthlyPayment>) = viewModelScope.launch {
-        repository.insertAllMonthlyPayment(monthlyPayments)
-    }
 
     fun updateMonthlyPayment(oldValue: MonthlyPayment, newValue: MonthlyPayment) =
         viewModelScope.launch {
@@ -106,16 +107,22 @@ class MonthlyPaymentViewModel @Inject constructor(
                     MONTHLY_PAYMENTS,
                     monthlyPayment.key
                 )
+
+                // issue #12
+                delay(50)
+                deleteDocumentFromFireStore(
+                    context,
+                    EXPENSES,
+                    monthlyPayment.key
+                )
             }
+
+            // issue #12
+            expenseRepository.deleteExpenseByKey(monthlyPayment.key)
 
             repository.deleteMonthlyPayment(monthlyPayment)
             Functions.showToast(context, "Payment deleted")
         }
-
-    fun deleteAllMonthlyPaymentByIsSynced(isSynced: Boolean) = viewModelScope.launch {
-
-        repository.deleteAllMonthlyPaymentByIsSynced(isSynced)
-    }
 
     fun getAllMonthlyPaymentsByCategoryKey(categoryKey: String) =
         repository.getAllMonthlyPaymentsByCategoryKey(categoryKey).asLiveData()

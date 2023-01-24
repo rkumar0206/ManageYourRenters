@@ -25,10 +25,14 @@ enum class BillPeriodType {
 
 data class RenterBillMonthType(
     var forBillMonth: Int,
+    var forBillYear: Int,
     var toBillMonth: Int,
+    var toBillYear: Int,
     var numberOfMonths: Int
 ) : Serializable {
     constructor() : this(
+        0,
+        0,
         0,
         0,
         0
@@ -39,7 +43,7 @@ data class RenterBillDateType(
     var fromBillDate: Long,
     var toBillDate: Long,
     var numberOfDays: Int
-) {
+) : Serializable {
     constructor() : this(
         0L,
         0L,

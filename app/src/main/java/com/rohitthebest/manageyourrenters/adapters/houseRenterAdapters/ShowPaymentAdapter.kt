@@ -15,7 +15,6 @@ import com.rohitthebest.manageyourrenters.databinding.AdapterShowPaymentBinding
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.format
-import com.rohitthebest.manageyourrenters.utils.isValid
 
 private const val TAG = "ShowPaymentAdapter"
 
@@ -43,81 +42,50 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
 
                 Log.d(TAG, "setData: absoluteAdapterPosition : $absoluteAdapterPosition")
 
-                //Period
+                //Bill-Period
                 if (payment.billPeriodInfo.billPeriodType == BillPeriodType.BY_MONTH) {
 
-                    paymentAdapterBillPeriodTV.text = context.getString(
-                        R.string.month_year,
-                        monthList[payment.billPeriodInfo.renterBillMonthType?.forBillMonth!! - 1],
-                        payment.billPeriodInfo.billYear.toString()
-                    )
+                    handleByMonthLayout(payment)
 
                 } else {
 
-                    if (payment.billPeriodInfo.renterBillDateType?.fromBillDate
-                        == payment.billPeriodInfo.renterBillDateType?.toBillDate
-                    ) {
-
-                        paymentAdapterBillPeriodTV.text =
-                            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                payment.billPeriodInfo.renterBillDateType?.toBillDate
-                            )
-                    } else {
-
-                        paymentAdapterBillPeriodTV.textSize = 18.0f
-                        paymentAdapterBillPeriodTV.text =
-                            "From : ${
-                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    payment.billPeriodInfo.renterBillDateType?.fromBillDate
-                                )
-                            }\nTo      : ${
-                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    payment.billPeriodInfo.renterBillDateType?.toBillDate
-                                )
-                            }"
-                    }
+                    handleByDateLayout(payment)
                 }
 
                 //issue date
                 paymentAdapterIssueDateTV.text =
-                    "Payment date : ${
+                    context.getString(
+                        R.string.renter_payment_date_time,
                         WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
                             payment.created
+                        ).toString(),
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            payment.created, "hh:mm a"
                         )
-                    }\n" +
-                            "Payment time : ${
-                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    payment.created, "hh:mm a"
-                                )
-                            }"
+                    )
 
                 //house rent and extra
-                if (payment.houseRent == 0.0 && (payment.extras?.fieldAmount != null && payment.extras?.fieldAmount != 0.0)) {
+                if (payment.houseRent == 0.0 &&
+                    (payment.extras?.fieldAmount != null && payment.extras?.fieldAmount != 0.0)
+                ) {
 
-                    if (!payment.extras?.fieldName?.trim().isValid()) {
-
-                        paymentAdapterNetDemandTV.text =
-                            "Net demand : ${payment.currencySymbol} ${
-                                payment.extras?.fieldAmount?.format(
-                                    2
-                                )
-                            }"
-                    } else {
-
-                        paymentAdapterNetDemandTV.text =
-                            "${payment.extras?.fieldName} : ${payment.currencySymbol} ${
-                                payment.extras?.fieldAmount?.format(
-                                    2
-                                )
-                            }"
-                    }
-
+                    paymentAdapterNetDemandTV.text =
+                        context.getString(
+                            R.string.renter_payment_extras,
+                            payment.extras?.fieldName,
+                            payment.currencySymbol,
+                            payment.extras?.fieldAmount?.format(
+                                2
+                            )
+                        )
                 } else {
 
                     paymentAdapterNetDemandTV.text =
-                        "Net demand : ${payment.currencySymbol} ${
+                        context.getString(
+                            R.string.renter_payment_net_demand,
+                            payment.currencySymbol,
                             payment.netDemand.format(2)
-                        }"
+                        )
                 }
 
                 //total rent
@@ -136,9 +104,11 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
                 }
 
                 paymentAdapterAmountPaidTV.text =
-                    "Amount paid : ${payment.currencySymbol} ${
+                    context.getString(
+                        R.string.renter_payment_amount_paid,
+                        payment.currencySymbol,
                         payment.amountPaid.format(2)
-                    }"
+                    )
 
                 if (payment.isSynced) {
 
@@ -157,6 +127,64 @@ class ShowPaymentAdapter(private val monthList: List<String>) :
                         )
                     )
                 }
+            }
+        }
+
+        private fun handleByMonthLayout(payment: RenterPayment) {
+
+            val context = binding.root.context
+
+            payment.billPeriodInfo.renterBillMonthType?.let { byMonth ->
+
+                if ((byMonth.forBillMonth == byMonth.toBillMonth) &&
+                    byMonth.forBillYear == byMonth.toBillYear
+                ) {
+
+                    binding.paymentAdapterBillPeriodTV.text = context.getString(
+                        R.string.month_year,
+                        monthList[byMonth.forBillMonth - 1],
+                        byMonth.forBillYear.toString()
+                    )
+                } else {
+
+                    binding.paymentAdapterBillPeriodTV.textSize = 18.0f
+
+                    binding.paymentAdapterBillPeriodTV.text = context.getString(
+                        R.string.for_month_year_to_month_year,
+                        monthList[byMonth.forBillMonth - 1],
+                        byMonth.forBillYear.toString(),
+                        monthList[byMonth.toBillMonth - 1],
+                        byMonth.toBillYear.toString()
+                    )
+                }
+            }
+        }
+
+        private fun handleByDateLayout(payment: RenterPayment) {
+
+            val context = binding.root.context
+
+            if (payment.billPeriodInfo.renterBillDateType?.fromBillDate
+                == payment.billPeriodInfo.renterBillDateType?.toBillDate
+            ) {
+
+                binding.paymentAdapterBillPeriodTV.text =
+                    WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                        payment.billPeriodInfo.renterBillDateType?.toBillDate
+                    )
+            } else {
+
+                binding.paymentAdapterBillPeriodTV.textSize = 18.0f
+                binding.paymentAdapterBillPeriodTV.text =
+                    context.getString(
+                        R.string.from_date_to_date,
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            payment.billPeriodInfo.renterBillDateType?.fromBillDate
+                        ).toString(),
+                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                            payment.billPeriodInfo.renterBillDateType?.toBillDate
+                        )
+                    )
             }
         }
 

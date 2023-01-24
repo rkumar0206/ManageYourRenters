@@ -124,7 +124,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
         expenseViewModel.getExpenseByKey(receivedExpenseKey)
             .observe(viewLifecycleOwner) { expense ->
 
-                receivedExpense = expense
+                receivedExpense = expense!!
 
                 updateUI()
             }

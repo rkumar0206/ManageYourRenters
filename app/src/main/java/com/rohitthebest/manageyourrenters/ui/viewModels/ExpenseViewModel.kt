@@ -1,12 +1,15 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
+import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +23,8 @@ private const val TAG = "ExpenseViewModel"
 @HiltViewModel
 class ExpenseViewModel @Inject constructor(
     app: Application,
-    private val expenseRepository: ExpenseRepository
+    private val expenseRepository: ExpenseRepository,
+    private val monthlyPaymentRepository: MonthlyPaymentRepository
 ) : AndroidViewModel(app) {
 
     fun insertExpense(expense: Expense) =
@@ -75,6 +79,27 @@ class ExpenseViewModel @Inject constructor(
             Functions.showToast(context, "Expense updated")
         }
 
+    // issue #12
+    fun updateAmountUsingExpenseKey(expenseKey: String, amount: Double) = viewModelScope.launch {
+
+        try {
+
+            val oldValue = expenseRepository.getExpenseByKey(expenseKey).first()
+
+            if (oldValue != null) {
+
+                val newValue = oldValue.copy()
+                newValue.amount = amount
+                updateExpense(oldValue, newValue)
+            }
+
+        } catch (e: Exception) {
+
+            e.printStackTrace()
+        }
+
+    }
+
     fun deleteExpense(expense: Expense) = viewModelScope.launch {
 
         val context = getApplication<Application>().applicationContext
@@ -88,7 +113,64 @@ class ExpenseViewModel @Inject constructor(
             )
         }
 
+        unlinkMonthlyPaymentIfAny(expense, context)
+
         expenseRepository.deleteExpense(expense)
+        Functions.showToast(context, "Expense deleted")
+    }
+
+    // issue #12
+    private suspend fun unlinkMonthlyPaymentIfAny(expense: Expense, context: Context) {
+
+        try {
+
+            val monthlyPayment =
+                monthlyPaymentRepository.getMonthlyPaymentByKey(expense.key).first()
+
+            monthlyPayment.expenseCategoryKey = ""
+
+            if (isInternetAvailable(context)) {
+
+                val map = HashMap<String, Any?>()
+                map["expenseCategoryKey"] = ""
+
+                updateDocumentOnFireStore(
+                    context,
+                    map,
+                    MONTHLY_PAYMENTS,
+                    monthlyPayment.key
+                )
+
+            }
+
+            monthlyPaymentRepository.updateMonthlyPayment(monthlyPayment)
+        } catch (e: java.lang.NullPointerException) {
+
+            Log.d(
+                TAG,
+                "unlinkMonthlyPaymentIfAny: No monthly payment found with expense key : ${expense.key}"
+            )
+            e.printStackTrace()
+        }
+
+    }
+
+
+    // issue #12
+    fun deleteExpenseByKey(expenseKey: String) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
+
+        if (isInternetAvailable(context)) {
+
+            deleteDocumentFromFireStore(
+                context,
+                EXPENSES,
+                expenseKey
+            )
+        }
+
+        expenseRepository.deleteExpenseByKey(expenseKey)
         Functions.showToast(context, "Expense deleted")
     }
 

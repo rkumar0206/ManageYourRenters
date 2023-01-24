@@ -206,7 +206,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView12"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -376,7 +376,6 @@
                 android:id="@+id/showBill_electricity_total"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:ellipsize="end"
                 android:gravity="center|center_vertical"
@@ -387,7 +386,7 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/textView52"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/textView52"
+                app:layout_constraintStart_toStartOf="@+id/showBill_rate"
                 app:layout_constraintTop_toTopOf="@+id/textView52" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -803,28 +802,58 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
                 android:padding="2dp"
                 android:text="@string/period_"
                 android:textSize="17sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/textView40"
                 app:layout_constraintTop_toBottomOf="@+id/textView40" />
 
             <TextView
-                android:id="@+id/showBill_billPeriod"
+                android:id="@+id/numberOfMonthsOrDaysTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:padding="2dp"
+                android:text="Number of months : "
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/textView40"
+                app:layout_constraintTop_toBottomOf="@+id/textView63" />
+
+            <TextView
+                android:id="@+id/showBill_billPeriod"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginEnd="2dp"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:padding="2dp"
                 android:text="@string/Null"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/textView63"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/textView63"
                 app:layout_constraintTop_toTopOf="@+id/textView63" />
+
+            <TextView
+                android:id="@+id/numberOfMonthOrDaysValueTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:padding="2dp"
+                android:text="@string/Null"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/numberOfMonthsOrDaysTV"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/numberOfMonthsOrDaysTV"
+                app:layout_constraintTop_toTopOf="@+id/numberOfMonthsOrDaysTV" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

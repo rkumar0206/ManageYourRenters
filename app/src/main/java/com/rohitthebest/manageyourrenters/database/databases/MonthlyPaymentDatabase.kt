@@ -11,7 +11,7 @@ import com.rohitthebest.manageyourrenters.database.typeConverters.TypeConverters
 
 @Database(
     entities = [MonthlyPaymentCategory::class, MonthlyPayment::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(TypeConvertersForDatabase::class)

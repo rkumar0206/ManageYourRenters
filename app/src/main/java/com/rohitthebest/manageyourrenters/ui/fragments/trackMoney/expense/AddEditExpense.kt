@@ -214,6 +214,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
                 getUid()!!,
                 generateKey("_${getUid()}", 60),
                 receivedExpenseCategoryKey,
+                null,
                 true
             )
 

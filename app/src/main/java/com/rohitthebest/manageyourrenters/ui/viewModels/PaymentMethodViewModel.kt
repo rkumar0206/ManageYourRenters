@@ -36,4 +36,6 @@ class PaymentMethodViewModel @Inject constructor(
 
     fun getAllPaymentMethods() = repository.getAllPaymentMethods().asLiveData()
 
+    fun getPaymentMethodByKey(paymentMethodKey: String) =
+        repository.getPaymentMethodByKey(paymentMethodKey).asLiveData()
 }

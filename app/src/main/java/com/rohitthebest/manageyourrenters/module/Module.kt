@@ -184,6 +184,14 @@ object Module {
         }
     }
 
+    private val expense_database_migration_2_3 = object : Migration(2, 3) {
+
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+            database.execSQL("ALTER TABLE 'expense_table' ADD COLUMN 'paymentMethods' VARCHAR2 DEFAULT NULL")
+        }
+    }
+
     @Provides
     @Singleton
     fun provideExpenseDatabase(
@@ -194,6 +202,7 @@ object Module {
         EXPENSE_DATABASE_NAME
     )
         .addMigrations(expense_database_migration_1_2)
+        .addMigrations(expense_database_migration_2_3)
         .build()
 
     @Provides

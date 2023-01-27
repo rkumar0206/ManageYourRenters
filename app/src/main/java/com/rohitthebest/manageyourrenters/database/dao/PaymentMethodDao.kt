@@ -25,4 +25,6 @@ interface PaymentMethodDao {
     @Query("SELECT * FROM payment_method_table")
     fun getAllPaymentMethods(): Flow<List<PaymentMethod>>
 
+    @Query("SELECT * FROM payment_method_table WHERE `key` = :paymentMethodKey")
+    fun getPaymentMethodByKey(paymentMethodKey: String): Flow<PaymentMethod>
 }

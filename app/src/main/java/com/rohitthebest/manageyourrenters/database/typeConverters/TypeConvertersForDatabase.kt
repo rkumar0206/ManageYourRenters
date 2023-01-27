@@ -135,4 +135,19 @@ class TypeConvertersForDatabase {
 
         return str?.convertJsonToObject(MonthlyPaymentDateTimeInfo::class.java)
     }
+
+    @TypeConverter
+    fun fromSetToString(paymentMethodKeySet: Set<String>?): String {
+
+        return Gson().toJson(paymentMethodKeySet)
+    }
+
+    @TypeConverter
+    fun fromStringToSet(str: String?): Set<String>? {
+
+        return if (str == null) null else Gson().fromJson(
+            str,
+            object : TypeToken<Set<String>?>() {}.type
+        )
+    }
 }

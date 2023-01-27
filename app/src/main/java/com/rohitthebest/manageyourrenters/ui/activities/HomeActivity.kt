@@ -20,6 +20,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
 import com.rohitthebest.manageyourrenters.data.AppUpdate
 import com.rohitthebest.manageyourrenters.data.RenterTypes
+import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
 import com.rohitthebest.manageyourrenters.databinding.ActivityHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.APP_UPDATE_FIRESTORE_DOCUMENT_KEY
@@ -33,6 +34,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_MONTHLY_PAYM
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.APP_UPDATES
 import com.rohitthebest.manageyourrenters.ui.ProfileBottomSheet
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBooleanToSharedPreference
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
@@ -41,6 +43,7 @@ import com.rohitthebest.manageyourrenters.utils.convertToJsonString
 import com.rohitthebest.manageyourrenters.utils.getDocumentFromFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import java.util.*
 
 private const val TAG = "HomeActivity"
 
@@ -56,6 +59,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
     private val emiViewModel: EMIViewModel by viewModels()
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
     private val monthlyPaymentCategoryViewModel by viewModels<MonthlyPaymentCategoryViewModel>()
+    private val paymentMethodViewModel by viewModels<PaymentMethodViewModel>()
 
     private lateinit var renterTypeList: ArrayList<RenterTypes>
     private lateinit var renterTypeAdapter: RenterTypeAdapter
@@ -89,6 +93,45 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         handleShortcuts()
 
         checkForUpdates()
+
+        //Issue #78
+        checkIfDefaultPaymentMethodIsInserted()
+    }
+
+    private fun checkIfDefaultPaymentMethodIsInserted() {
+
+        paymentMethodViewModel.getPaymentMethodByKey(Constants.PAYMENT_METHOD_CASH_KEY)
+            .observe(this) { paymentMethod ->
+
+                Log.d(TAG, "checkIfDefaultPaymentMethodIsInserted: $paymentMethod")
+
+                if (paymentMethod == null) {
+
+                    val paymentMethodCash = PaymentMethod(
+                        key = Constants.PAYMENT_METHOD_CASH_KEY,
+                        paymentMethod = "CASH",
+                        uid = getUid()!!,
+                        isSynced = true
+                    )
+
+                    val paymentMethodCashLess = PaymentMethod(
+                        key = Constants.PAYMENT_METHOD_CASHLESS_KEY,
+                        paymentMethod = "CASHLESS",
+                        uid = getUid()!!,
+                        isSynced = true
+                    )
+                    val paymentMethodOthers = PaymentMethod(
+                        key = Constants.PAYMENT_METHOD_OTHER_KEY,
+                        paymentMethod = "OTHER",
+                        uid = getUid()!!,
+                        isSynced = true
+                    )
+
+                    paymentMethodViewModel.insertAllPaymentMethod(
+                        listOf(paymentMethodCash, paymentMethodCashLess, paymentMethodOthers)
+                    )
+                }
+            }
     }
 
     private fun checkForUpdates(shouldOpenWhatsNewActivity: Boolean = false) {

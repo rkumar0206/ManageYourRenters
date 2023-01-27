@@ -24,4 +24,6 @@ class PaymentMethodRepository @Inject constructor(
 
     fun getAllPaymentMethods() = dao.getAllPaymentMethods()
 
+    fun getPaymentMethodByKey(paymentMethodKey: String) =
+        dao.getPaymentMethodByKey(paymentMethodKey)
 }

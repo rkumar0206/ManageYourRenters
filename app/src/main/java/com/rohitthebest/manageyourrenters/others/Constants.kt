@@ -65,5 +65,6 @@ object Constants {
 
     // Default payment method keys
     const val PAYMENT_METHOD_CASH_KEY = "payment_method_cash_1316797_rrrrr"
-    const val PAYMENT_METHOD_UPI_KEY = "payment_method_upi_5765763_rrrrr"
+    const val PAYMENT_METHOD_CASHLESS_KEY = "payment_method_cash_less_5765763_rrrrr"
+    const val PAYMENT_METHOD_OTHER_KEY = "payment_method_other_6546332_rrrrr"
 }

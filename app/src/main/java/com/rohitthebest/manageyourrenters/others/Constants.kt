@@ -17,6 +17,7 @@ object Constants {
     const val EMI_DATABASE_NAME = "emi_database.db"
     const val EXPENSE_DATABASE_NAME = "expense_database.db"
     const val MONTHLY_PAYMENT_DATABASE_NAME = "monthly_payment_db"
+    const val PAYMENT_METHOD_DATABASE_NAME = "payment_method_db"
     //----------------------------
 
     const val NOTIFICATION_CHANNEL_ID = "NotificationChannelID"
@@ -61,4 +62,8 @@ object Constants {
     // app update related
     const val APP_VERSION = BuildConfig.VERSION_NAME
     const val APP_UPDATE_FIRESTORE_DOCUMENT_KEY = "latest_app_version"
+
+    // Default payment method keys
+    const val PAYMENT_METHOD_CASH_KEY = "payment_method_cash_1316797_rrrrr"
+    const val PAYMENT_METHOD_UPI_KEY = "payment_method_upi_5765763_rrrrr"
 }

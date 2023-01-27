@@ -12,6 +12,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.EMI_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.MONTHLY_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.PARTIAL_PAYMENT_DATABASE_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.PAYMENT_METHOD_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.RENTER_AND_PAYMENT_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.UNSPLASH_BASE_URL
 import dagger.Module
@@ -254,6 +255,25 @@ object Module {
     // =========================================================================================
 
 
+    // ----------------------------- Payment method ----------------------------------------
+
+    @Singleton
+    @Provides
+    fun getPaymentMethodDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(
+        context,
+        PaymentMethodDatabase::class.java,
+        PAYMENT_METHOD_DATABASE_NAME
+    ).build()
+
+    @Provides
+    @Singleton
+    fun getPaymentMethodDao(db: PaymentMethodDatabase) = db.getPaymentMethodDao()
+
+    // ==================================================================================
+
+
     // ------------------------------ Expense Category API -----------------------------------
 
     @Provides
@@ -268,6 +288,8 @@ object Module {
             .readTimeout(60, TimeUnit.SECONDS)
             .build()
     }
+    // ==================================================================================
+
 
     // ----------------------------- Unsplash API ----------------------------------------
 
@@ -290,5 +312,4 @@ object Module {
 
 
     // ==================================================================================
-
 }

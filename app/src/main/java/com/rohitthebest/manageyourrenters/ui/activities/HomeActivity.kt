@@ -98,6 +98,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         checkIfDefaultPaymentMethodIsInserted()
     }
 
+    //Issue #78
     private fun checkIfDefaultPaymentMethodIsInserted() {
 
         paymentMethodViewModel.getPaymentMethodByKey(Constants.PAYMENT_METHOD_DEBIT_CARD_KEY)

@@ -395,7 +395,7 @@ class ShowBillForConfirmationBottomSheetFragment : BottomSheetDialogFragment() {
                 if (receivedPayment.isElectricityBillIncluded) {
                     receivedPayment.electricityBillInfo?.totalElectricBill?.format(2)
                 } else {
-                    0.0
+                    "0.0"
                 }
             )
 

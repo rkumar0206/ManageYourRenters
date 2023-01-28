@@ -100,7 +100,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
     private fun checkIfDefaultPaymentMethodIsInserted() {
 
-        paymentMethodViewModel.getPaymentMethodByKey(Constants.PAYMENT_METHOD_CASH_KEY)
+        paymentMethodViewModel.getPaymentMethodByKey(Constants.PAYMENT_METHOD_DEBIT_CARD_KEY)
             .observe(this) { paymentMethod ->
 
                 Log.d(TAG, "checkIfDefaultPaymentMethodIsInserted: $paymentMethod")
@@ -114,12 +114,20 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
                         isSynced = true
                     )
 
-                    val paymentMethodCashLess = PaymentMethod(
-                        key = Constants.PAYMENT_METHOD_CASHLESS_KEY,
-                        paymentMethod = "CASHLESS",
+                    val paymentMethodDebitCard = PaymentMethod(
+                        key = Constants.PAYMENT_METHOD_DEBIT_CARD_KEY,
+                        paymentMethod = "DEBIT CARD",
                         uid = getUid()!!,
                         isSynced = true
                     )
+
+                    val paymentMethodCreditCard = PaymentMethod(
+                        key = Constants.PAYMENT_METHOD_CREDIT_CARD_KEY,
+                        paymentMethod = "CREDIT CARD",
+                        uid = getUid()!!,
+                        isSynced = true
+                    )
+
                     val paymentMethodOthers = PaymentMethod(
                         key = Constants.PAYMENT_METHOD_OTHER_KEY,
                         paymentMethod = "OTHER",
@@ -128,7 +136,12 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
                     )
 
                     paymentMethodViewModel.insertAllPaymentMethod(
-                        listOf(paymentMethodCash, paymentMethodCashLess, paymentMethodOthers)
+                        listOf(
+                            paymentMethodCash,
+                            paymentMethodDebitCard,
+                            paymentMethodCreditCard,
+                            paymentMethodOthers
+                        )
                     )
                 }
             }
@@ -457,6 +470,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
             emiViewModel.deleteAllEMIs()
             expenseCategoryViewModel.deleteAllExpenseCategories()
             monthlyPaymentCategoryViewModel.deleteAllMonthlyPaymentCategories()
+            paymentMethodViewModel.deleteAllPaymentMethods()
             changeIsSyncedValue()
 
         } catch (e: Exception) {

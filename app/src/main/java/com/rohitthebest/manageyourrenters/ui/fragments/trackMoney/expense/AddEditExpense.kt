@@ -9,14 +9,20 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.PaymentMethodAdapter
 import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
 import com.rohitthebest.manageyourrenters.databinding.AddExpenseLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseBinding
+import com.rohitthebest.manageyourrenters.others.Constants.ADD_PAYMENT_METHOD_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
@@ -31,7 +37,8 @@ import java.util.*
 private const val TAG = "AddEditExpense"
 
 @AndroidEntryPoint
-class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickListener {
+class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickListener,
+    PaymentMethodAdapter.OnClickListener {
 
     private var _binding: FragmentAddExpenseBinding? = null
     private val binding get() = _binding!!
@@ -40,6 +47,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
     private val expenseViewModel by viewModels<ExpenseViewModel>()
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
+    private val paymentMethodViewModel by viewModels<PaymentMethodViewModel>()
 
     private lateinit var receivedExpenseCategoryKey: String
     private lateinit var receivedExpenseCategory: ExpenseCategory
@@ -49,6 +57,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
     private var receivedExpenseKey = ""
     private lateinit var receivedExpense: Expense
     private var isMessageReceivedForEditing = false
+    private lateinit var paymentMethodAdapter: PaymentMethodAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,16 +66,40 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
         includeBinding = binding.includeLayout
 
         selectedDate = Calendar.getInstance()
+        paymentMethodAdapter = PaymentMethodAdapter()
 
         updateSelectedDateTextView()
-
         getMessage()
-
         initListeners()
-
         textWatchers()
-
         setUpSpentOnAutoCompleteTextView()
+        setUpPaymentMethodRecyclerView()
+    }
+
+    private fun setUpPaymentMethodRecyclerView() {
+
+        includeBinding.paymentMethodRV.apply {
+
+            adapter = paymentMethodAdapter
+            layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
+            setHasFixedSize(true)
+        }
+
+        paymentMethodAdapter.setOnClickListener(this)
+    }
+
+    override fun onItemClick(paymentMethod: PaymentMethod, position: Int) {
+
+        if (paymentMethod.key != ADD_PAYMENT_METHOD_KEY) {
+
+            paymentMethod.isSelected = !paymentMethod.isSelected
+            paymentMethodAdapter.notifyItemChanged(position)
+        } else {
+
+            // todo: show the EditTextBottomSheetFragment
+            showToast(requireContext(), "Add button clicked")
+        }
+
     }
 
     private fun setUpSpentOnAutoCompleteTextView() {
@@ -115,8 +148,33 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
                 delay(300)
                 getExpenseCategory()
+                getAllPaymentMethods()
             }
         }
+    }
+
+    private fun getAllPaymentMethods() {
+
+        paymentMethodViewModel.getAllPaymentMethods()
+            .observe(viewLifecycleOwner) { paymentMethods ->
+
+                if (isMessageReceivedForEditing) {
+
+                    // todo: change the isSelected method as per what is selected for this expense
+                } else {
+
+                    val addPaymentMethod = PaymentMethod(
+                        key = ADD_PAYMENT_METHOD_KEY,
+                        paymentMethod = getString(R.string.add),
+                        uid = "",
+                        isSynced = false,
+                        isSelected = false
+                    )
+
+                    paymentMethodAdapter.submitList(paymentMethods + listOf(addPaymentMethod))
+                }
+
+            }
     }
 
     private fun getExpense() {
@@ -320,4 +378,5 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
         super.onDestroyView()
         _binding = null
     }
+
 }

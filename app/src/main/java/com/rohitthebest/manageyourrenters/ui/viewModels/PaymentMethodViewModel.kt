@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
@@ -11,10 +12,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PaymentMethodViewModel @Inject constructor(
+    app: Application,
     private val repository: PaymentMethodRepository
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     fun insertPaymentMethod(paymentMethod: PaymentMethod) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
+
+        // todo : upload the payment method to firestore
         repository.insertPaymentMethod(paymentMethod)
     }
 

@@ -20,6 +20,7 @@ import com.rohitthebest.manageyourrenters.databinding.AddExpenseLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseBinding
 import com.rohitthebest.manageyourrenters.others.Constants.ADD_PAYMENT_METHOD_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.ui.fragments.EditTextBottomSheetFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
@@ -74,32 +75,6 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
         textWatchers()
         setUpSpentOnAutoCompleteTextView()
         setUpPaymentMethodRecyclerView()
-    }
-
-    private fun setUpPaymentMethodRecyclerView() {
-
-        includeBinding.paymentMethodRV.apply {
-
-            adapter = paymentMethodAdapter
-            layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
-            setHasFixedSize(true)
-        }
-
-        paymentMethodAdapter.setOnClickListener(this)
-    }
-
-    override fun onItemClick(paymentMethod: PaymentMethod, position: Int) {
-
-        if (paymentMethod.key != ADD_PAYMENT_METHOD_KEY) {
-
-            paymentMethod.isSelected = !paymentMethod.isSelected
-            paymentMethodAdapter.notifyItemChanged(position)
-        } else {
-
-            // todo: show the EditTextBottomSheetFragment
-            showToast(requireContext(), "Add button clicked")
-        }
-
     }
 
     private fun setUpSpentOnAutoCompleteTextView() {
@@ -176,6 +151,37 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
             }
     }
+
+    private fun setUpPaymentMethodRecyclerView() {
+
+        includeBinding.paymentMethodRV.apply {
+
+            adapter = paymentMethodAdapter
+            layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
+            setHasFixedSize(true)
+        }
+
+        paymentMethodAdapter.setOnClickListener(this)
+    }
+
+    override fun onItemClick(paymentMethod: PaymentMethod, position: Int) {
+
+        if (paymentMethod.key != ADD_PAYMENT_METHOD_KEY) {
+
+            paymentMethod.isSelected = !paymentMethod.isSelected
+            paymentMethodAdapter.notifyItemChanged(position)
+        } else {
+
+            requireActivity().supportFragmentManager.let {
+
+                EditTextBottomSheetFragment.newInstance(Bundle())
+                    .apply {
+                        show(it, TAG)
+                    }
+            }
+        }
+    }
+
 
     private fun getExpense() {
 

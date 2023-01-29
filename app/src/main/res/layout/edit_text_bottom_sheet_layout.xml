@@ -12,7 +12,7 @@
         android:background="@color/color_white">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/addSupportingDocToolbar"
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:menu="@menu/save_menu"
@@ -29,6 +29,7 @@
         android:layout_marginEnd="20dp">
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -43,11 +44,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/white"
+                android:inputType="textCapCharacters|textAutoComplete"
+                android:maxLength="15"
                 android:hint="@string/add_payment_method" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <View
+        android:id="@+id/divider107"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="24dp"
+        android:background="?android:attr/listDivider"
+        android:visibility="invisible" />
 
 
 </LinearLayout>

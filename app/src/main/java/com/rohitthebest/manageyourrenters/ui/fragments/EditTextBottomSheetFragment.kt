@@ -14,8 +14,10 @@ import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.isTextValid
 import com.rohitthebest.manageyourrenters.utils.isValid
 import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,6 +47,9 @@ class EditTextBottomSheetFragment : BottomSheetDialogFragment() {
 
         _binding = EditTextBottomSheetLayoutBinding.bind(view)
 
+        binding.editText.editText?.requestFocus()
+        Functions.showKeyboard(requireActivity(), binding.editText.editText!!)
+
         lifecycleScope.launch {
             delay(100)
             getAllPaymentMethods()
@@ -65,23 +70,31 @@ class EditTextBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun initListeners() {
 
-        binding.editText.editText?.requestFocus()
-        Functions.showKeyboard(requireActivity(), binding.editText)
-
         binding.toolbar.setNavigationOnClickListener {
             showToast(requireContext(), getString(R.string.cancelled))
+            hideKeyBoard(requireActivity())
             dismiss()
         }
 
         binding.toolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
 
-            if (binding.editText.editText?.error == null) {
+            if (isFormValid()) {
 
                 savePaymentMethod()
             }
 
             true
         }
+    }
+
+    private fun isFormValid(): Boolean {
+
+        if (!binding.editText.editText?.isTextValid()!!) {
+            binding.editText.error = Constants.EDIT_TEXT_EMPTY_MESSAGE
+            return false
+        }
+
+        return binding.editText.editText?.error == null
     }
 
     private fun savePaymentMethod() {

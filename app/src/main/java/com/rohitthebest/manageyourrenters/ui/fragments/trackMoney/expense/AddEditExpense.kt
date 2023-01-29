@@ -18,6 +18,7 @@ import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
 import com.rohitthebest.manageyourrenters.databinding.AddExpenseLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseBinding
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.ADD_PAYMENT_METHOD_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.ui.fragments.EditTextBottomSheetFragment
@@ -135,20 +136,29 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
                 if (isMessageReceivedForEditing) {
 
-                    // todo: change the isSelected method as per what is selected for this expense
-                } else {
+                    val selectedPaymentMethods = receivedExpense.paymentMethods
 
-                    val addPaymentMethod = PaymentMethod(
-                        key = ADD_PAYMENT_METHOD_KEY,
-                        paymentMethod = getString(R.string.add),
-                        uid = "",
-                        isSynced = false,
-                        isSelected = false
-                    )
+                    selectedPaymentMethods?.let {
 
-                    paymentMethodAdapter.submitList(paymentMethods + listOf(addPaymentMethod))
+                        paymentMethods.forEach { pm ->
+
+                            if (it.contains(pm.key)) {
+
+                                pm.isSelected = true
+                            }
+                        }
+                    }
                 }
 
+                val addPaymentMethod = PaymentMethod(
+                    key = ADD_PAYMENT_METHOD_KEY,
+                    paymentMethod = getString(R.string.add),
+                    uid = "",
+                    isSynced = false,
+                    isSelected = false
+                )
+
+                paymentMethodAdapter.submitList(paymentMethods + listOf(addPaymentMethod))
             }
     }
 
@@ -267,8 +277,13 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
         val expense: Expense
 
+        val selectedPaymentMethods =
+            paymentMethodAdapter.currentList.filter { pm -> pm.isSelected }
+                .map { pm -> pm.key }
+
         if (!isMessageReceivedForEditing) {
 
+            // insert
             expense = Expense(
                 null,
                 includeBinding.expenseAmountET.editText?.text.toString().trim().toDouble(),
@@ -278,7 +293,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
                 getUid()!!,
                 generateKey("_${getUid()}", 60),
                 receivedExpenseCategoryKey,
-                null,
+                selectedPaymentMethods.ifEmpty { listOf(Constants.PAYMENT_METHOD_OTHER_KEY) },
                 true
             )
 
@@ -286,11 +301,14 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
         } else {
 
+            // update
+
             expense = receivedExpense.copy()
 
             val oldDate = receivedExpense.created
             val oldAmount = receivedExpense.amount
             val oldSpentOn = receivedExpense.spentOn
+            val oldPaymentMethods = receivedExpense.paymentMethods
 
             Log.d(TAG, "initExpense: oldDate = $oldDate -> newDate = $selectedDate")
             Log.d(
@@ -311,15 +329,18 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
                 || oldAmount != includeBinding.expenseAmountET.editText?.text.toString().trim()
                     .toDouble()
                 || oldSpentOn != includeBinding.expenseSpentOnET.text.toString().trim()
+                || oldPaymentMethods != selectedPaymentMethods
             ) {
 
                 expense.created = selectedDate.timeInMillis
                 expense.amount =
                     includeBinding.expenseAmountET.editText?.text.toString().trim().toDouble()
                 expense.spentOn = includeBinding.expenseSpentOnET.text.toString().trim()
-
+                expense.paymentMethods =
+                    selectedPaymentMethods.ifEmpty { listOf(Constants.PAYMENT_METHOD_OTHER_KEY) }
                 expense.modified = System.currentTimeMillis()
                 expense.isSynced = true
+
                 saveExpenseInDatabase(expense)
 
             } else {

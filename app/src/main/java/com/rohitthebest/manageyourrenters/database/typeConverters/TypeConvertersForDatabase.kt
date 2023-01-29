@@ -137,17 +137,17 @@ class TypeConvertersForDatabase {
     }
 
     @TypeConverter
-    fun fromSetToString(paymentMethodKeySet: Set<String>?): String {
+    fun fromListToString(paymentMethodKeyList: List<String>?): String {
 
-        return Gson().toJson(paymentMethodKeySet)
+        return Gson().toJson(paymentMethodKeyList)
     }
 
     @TypeConverter
-    fun fromStringToSet(str: String?): Set<String>? {
+    fun fromStringToList(str: String?): List<String>? {
 
         return if (str == null) null else Gson().fromJson(
             str,
-            object : TypeToken<Set<String>?>() {}.type
+            object : TypeToken<List<String>?>() {}.type
         )
     }
 }

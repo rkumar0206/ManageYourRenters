@@ -60,6 +60,8 @@ fun View.invisible() {
     }
 }
 
+fun Context.isInternetAvailable() = Functions.isInternetAvailable(this)
+
 fun <T> Context.saveAnyObjectToSharedPreference(
     sharedPrefName: String,
     key: String,

@@ -16,7 +16,7 @@ data class Expense(
     var uid: String,
     var key: String,
     var categoryKey: String = "",
-    var paymentMethods: Set<String>? = null,
+    var paymentMethods: List<String>? = null,
     var isSynced: Boolean = true
 ) {
 

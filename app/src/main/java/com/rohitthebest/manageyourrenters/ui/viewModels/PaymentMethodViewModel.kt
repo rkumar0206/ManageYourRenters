@@ -5,7 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
 import com.rohitthebest.manageyourrenters.repositories.PaymentMethodRepository
+import com.rohitthebest.manageyourrenters.utils.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +23,18 @@ class PaymentMethodViewModel @Inject constructor(
 
         val context = getApplication<Application>().applicationContext
 
-        // todo : upload the payment method to firestore
+        if (context.isInternetAvailable()) {
+
+            paymentMethod.isSynced = true
+            uploadDocumentToFireStore(
+                context,
+                FirestoreCollectionsConstants.PAYMENT_METHODS,
+                paymentMethod.key
+            )
+        } else {
+            paymentMethod.isSynced = false
+        }
+
         repository.insertPaymentMethod(paymentMethod)
     }
 

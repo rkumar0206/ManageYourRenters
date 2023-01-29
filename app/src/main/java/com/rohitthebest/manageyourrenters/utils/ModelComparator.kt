@@ -174,6 +174,8 @@ fun compareExpenseModel(
     if (oldData.amount != newData.amount) map["amount"] = newData.amount
     if (oldData.spentOn != newData.spentOn) map["spentOn"] = newData.spentOn
     if (oldData.categoryKey != newData.categoryKey) map["categoryKey"] = newData.categoryKey
+    if (oldData.paymentMethods != newData.paymentMethods) map["paymentMethods"] =
+        newData.paymentMethods
 
     return map
 }

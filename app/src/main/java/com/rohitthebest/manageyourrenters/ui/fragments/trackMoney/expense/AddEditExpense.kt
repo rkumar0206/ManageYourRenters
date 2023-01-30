@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.adapters.PaymentMethodAdapter
+import com.rohitthebest.manageyourrenters.adapters.SelectPaymentMethodAdapter
 import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
@@ -40,7 +40,7 @@ private const val TAG = "AddEditExpense"
 
 @AndroidEntryPoint
 class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickListener,
-    PaymentMethodAdapter.OnClickListener {
+    SelectPaymentMethodAdapter.OnClickListener {
 
     private var _binding: FragmentAddExpenseBinding? = null
     private val binding get() = _binding!!
@@ -59,7 +59,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
     private var receivedExpenseKey = ""
     private lateinit var receivedExpense: Expense
     private var isMessageReceivedForEditing = false
-    private lateinit var paymentMethodAdapter: PaymentMethodAdapter
+    private lateinit var selectPaymentMethodAdapter: SelectPaymentMethodAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,7 +68,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
         includeBinding = binding.includeLayout
 
         selectedDate = Calendar.getInstance()
-        paymentMethodAdapter = PaymentMethodAdapter()
+        selectPaymentMethodAdapter = SelectPaymentMethodAdapter()
 
         updateSelectedDateTextView()
         getMessage()
@@ -134,16 +134,11 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
         paymentMethodViewModel.getAllPaymentMethods()
             .observe(viewLifecycleOwner) { paymentMethods ->
 
-                if (isMessageReceivedForEditing) {
+                if (isMessageReceivedForEditing && selectPaymentMethodAdapter.currentList.isEmpty()) {
 
-                    val selectedPaymentMethods = receivedExpense.paymentMethods
-
-                    selectedPaymentMethods?.let {
-
+                    receivedExpense.paymentMethods?.let { alreadySelectedPM ->
                         paymentMethods.forEach { pm ->
-
-                            if (it.contains(pm.key)) {
-
+                            if (alreadySelectedPM.contains(pm.key)) {
                                 pm.isSelected = true
                             }
                         }
@@ -158,7 +153,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
                     isSelected = false
                 )
 
-                paymentMethodAdapter.submitList(paymentMethods + listOf(addPaymentMethod))
+                selectPaymentMethodAdapter.submitList(paymentMethods + listOf(addPaymentMethod))
             }
     }
 
@@ -166,12 +161,12 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
         includeBinding.paymentMethodRV.apply {
 
-            adapter = paymentMethodAdapter
+            adapter = selectPaymentMethodAdapter
             layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
             setHasFixedSize(true)
         }
 
-        paymentMethodAdapter.setOnClickListener(this)
+        selectPaymentMethodAdapter.setOnClickListener(this)
     }
 
     override fun onItemClick(paymentMethod: PaymentMethod, position: Int) {
@@ -179,7 +174,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
         if (paymentMethod.key != ADD_PAYMENT_METHOD_KEY) {
 
             paymentMethod.isSelected = !paymentMethod.isSelected
-            paymentMethodAdapter.notifyItemChanged(position)
+            selectPaymentMethodAdapter.notifyItemChanged(position)
         } else {
 
             requireActivity().supportFragmentManager.let {
@@ -278,7 +273,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
         val expense: Expense
 
         val selectedPaymentMethods =
-            paymentMethodAdapter.currentList.filter { pm -> pm.isSelected }
+            selectPaymentMethodAdapter.currentList.filter { pm -> pm.isSelected }
                 .map { pm -> pm.key }
 
         if (!isMessageReceivedForEditing) {

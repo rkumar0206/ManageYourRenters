@@ -9,17 +9,17 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
-import com.rohitthebest.manageyourrenters.databinding.ItemPaymentMethodBinding
+import com.rohitthebest.manageyourrenters.databinding.ItemSelectPaymentMethodBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.hide
 
-class PaymentMethodAdapter :
-    ListAdapter<PaymentMethod, PaymentMethodAdapter.PaymentMethodViewHolder>(DiffUtilCallback()) {
+class SelectPaymentMethodAdapter :
+    ListAdapter<PaymentMethod, SelectPaymentMethodAdapter.PaymentMethodViewHolder>(DiffUtilCallback()) {
 
     private var mListener: OnClickListener? = null
 
-    inner class PaymentMethodViewHolder(val binding: ItemPaymentMethodBinding) :
+    inner class PaymentMethodViewHolder(val binding: ItemSelectPaymentMethodBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
@@ -70,11 +70,14 @@ class PaymentMethodAdapter :
                                 R.color.colorGrey
                             )
                         )
+
                         paymentMethodName.setBackgroundColor(
                             Functions.getBackgroundColor(
                                 ContextCompat.getColor(root.context, R.color.colorGrey)
                             )
                         )
+
+                        root.elevation = 15.0f
                     }
 
                 }
@@ -100,7 +103,11 @@ class PaymentMethodAdapter :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PaymentMethodViewHolder {
 
         val binding =
-            ItemPaymentMethodBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemSelectPaymentMethodBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
 
         return PaymentMethodViewHolder(binding)
     }

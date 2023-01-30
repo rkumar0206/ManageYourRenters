@@ -37,6 +37,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_trackMoneyHomeFragment_to_paymentMethodsFragment"
+            app:destination="@id/paymentMethodsFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/emiFragment"
@@ -142,6 +149,13 @@
         <deepLink
             android:id="@+id/deepLink"
             app:uri="http://www.rtb/expense/" />
+        <action
+            android:id="@+id/action_expenseCategoryFragment_to_paymentMethodsFragment"
+            app:destination="@id/paymentMethodsFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/addEditExpenseCategoryFragment"
@@ -231,6 +245,14 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_monthlyPaymentCategoryFragment_to_paymentMethodsFragment"
+            app:destination="@id/paymentMethodsFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/addEditMonthlyPaymentCategory"
@@ -297,4 +319,9 @@
             android:defaultValue="0L"
             app:argType="long" />
     </dialog>
+    <fragment
+        android:id="@+id/paymentMethodsFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.PaymentMethodsFragment"
+        android:label="PaymentMethodsFragment"
+        tools:layout="@layout/fragment_payment_methods" />
 </navigation>

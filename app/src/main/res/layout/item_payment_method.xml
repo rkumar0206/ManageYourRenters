@@ -6,51 +6,51 @@
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:elevation="10dp"
-    app:cardCornerRadius="20dp"
+    app:cardCornerRadius="5dp"
+    app:strokeColor="@color/secondaryTextColor"
     app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
         android:layout_gravity="center"
         android:gravity="center">
 
         <TextView
-            android:id="@+id/paymentMethodName"
+            android:id="@+id/paymentMethodNameTV"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/add_remove_payment_method_selection"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="4dp"
+            android:layout_height="0dp"
             android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="1"
-            android:padding="8dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
+            android:gravity="center_vertical"
+            android:padding="5dp"
             android:textColor="@color/primaryTextColor"
-            android:textSize="18sp"
+            android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/add_remove_payment_method_selection"
+            app:layout_constraintEnd_toStartOf="@+id/syncBtn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Payment method" />
+            tools:text="CASH" />
 
-        <ImageView
-            android:id="@+id/add_remove_payment_method_selection"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="4dp"
-            android:backgroundTint="@android:color/transparent"
-            android:contentDescription="@string/add_remove_payment_method_selection"
+        <ImageButton
+            android:id="@+id/syncBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:contentDescription="@string/sync_with_cloud"
+            app:layout_constraintBottom_toBottomOf="@+id/editBtn"
+            app:layout_constraintEnd_toStartOf="@+id/editBtn"
+            app:layout_constraintTop_toTopOf="@+id/editBtn"
+            app:srcCompat="@drawable/ic_baseline_sync_24" />
+
+        <ImageButton
+            android:id="@+id/editBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:contentDescription="@string/edit"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_add_24" />
-
+            app:layout_constraintVertical_bias="0.5"
+            app:srcCompat="@drawable/ic_baseline_edit_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

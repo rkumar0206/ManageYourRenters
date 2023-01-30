@@ -347,6 +347,8 @@
     <string name="add_payment_method">Add payment method</string>
     <string name="this_payment_method_already_exists">This payment method already exists</string>
     <string name="payment_method_saved">Payment method saved</string>
+    <string name="payment_methods">Payment methods</string>
+    <string name="shortcuts">Shortcuts</string>
 
     <string-array name="interest_time_schedule">
 

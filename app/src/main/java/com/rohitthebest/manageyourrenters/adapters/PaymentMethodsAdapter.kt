@@ -3,12 +3,15 @@ package com.rohitthebest.manageyourrenters.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
 import com.rohitthebest.manageyourrenters.databinding.ItemPaymentMethodBinding
+import com.rohitthebest.manageyourrenters.others.Constants
 
 class PaymentMethodsAdapter :
     ListAdapter<PaymentMethod, PaymentMethodsAdapter.PaymentMethodsViewHolder>(DiffUtilCallback()) {
@@ -20,19 +23,31 @@ class PaymentMethodsAdapter :
 
         init {
 
-            binding.root.setOnClickListener(this)
-            binding.editBtn.setOnClickListener(this)
-            binding.syncBtn.setOnClickListener(this)
+            binding.rootL.setOnClickListener(this)
+            binding.menuBtn.setOnClickListener(this)
         }
 
         fun setData(paymentMethod: PaymentMethod?) {
 
             paymentMethod?.let {
-
                 binding.apply {
-
                     paymentMethodNameTV.text = it.paymentMethod
-                    syncBtn.isVisible = !it.isSynced
+
+                    binding.root.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            binding.root.context,
+                            if (it.isSynced) R.color.color_green else R.color.color_orange
+                        )
+                    )
+
+                    val defaultPaymentMethods = listOf(
+                        Constants.PAYMENT_METHOD_OTHER_KEY,
+                        Constants.PAYMENT_METHOD_CASH_KEY,
+                        Constants.PAYMENT_METHOD_DEBIT_CARD_KEY,
+                        Constants.PAYMENT_METHOD_CREDIT_CARD_KEY
+                    )
+
+                    binding.menuBtn.isVisible = !defaultPaymentMethods.contains(paymentMethod.key)
                 }
             }
         }
@@ -40,17 +55,17 @@ class PaymentMethodsAdapter :
         override fun onClick(v: View?) {
             when (v?.id) {
 
-                binding.editBtn.id -> {
+                binding.menuBtn.id -> {
 
                     if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
-                        mListener!!.onEditBtnClicked(
+                        mListener!!.onMenuBtnClicked(
                             getItem(absoluteAdapterPosition),
                             absoluteAdapterPosition
                         )
                     }
                 }
 
-                binding.root.id -> {
+                binding.rootL.id -> {
 
                     if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
                         mListener!!.onItemClick(
@@ -58,16 +73,6 @@ class PaymentMethodsAdapter :
                             absoluteAdapterPosition
                         )
                     }
-                }
-
-                binding.syncBtn.id -> {
-                    if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
-                        mListener!!.onSyncBtnClicked(
-                            getItem(absoluteAdapterPosition),
-                            absoluteAdapterPosition
-                        )
-                    }
-
                 }
             }
         }
@@ -104,8 +109,7 @@ class PaymentMethodsAdapter :
     interface OnClickListener {
 
         fun onItemClick(paymentMethod: PaymentMethod, position: Int)
-        fun onEditBtnClicked(paymentMethod: PaymentMethod, position: Int)
-        fun onSyncBtnClicked(paymentMethod: PaymentMethod, position: Int)
+        fun onMenuBtnClicked(paymentMethod: PaymentMethod, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

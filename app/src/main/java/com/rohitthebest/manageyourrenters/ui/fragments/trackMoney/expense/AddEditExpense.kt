@@ -21,7 +21,7 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddExpenseBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.ADD_PAYMENT_METHOD_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
-import com.rohitthebest.manageyourrenters.ui.fragments.EditTextBottomSheetFragment
+import com.rohitthebest.manageyourrenters.ui.fragments.AddEditPaymentMethodBottomSheetFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
@@ -179,7 +179,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
             requireActivity().supportFragmentManager.let {
 
-                EditTextBottomSheetFragment.newInstance(Bundle())
+                AddEditPaymentMethodBottomSheetFragment.newInstance(Bundle())
                     .apply {
                         show(it, TAG)
                     }

@@ -38,6 +38,7 @@ object Constants {
     const val SUPPORTING_DOCUMENT_HELPER_MODEL_KEY = "dsbjsbjhbuyavvu"
     const val RENTER_PAYMENT_CONFIRMATION_BILL_KEY = "BNZBNJBHVDLK&hjbxjhbskxknxB"
 
+    // Menu BottomSheet related
     const val SHOW_EDIT_MENU = "SHOW_EDIT_MENU_sjcjwncjkn"
     const val SHOW_DOCUMENTS_MENU = "SHOW_DOCUMENTS_MENU_sjcjwncacacn"
     const val SHOW_DELETE_MENU = "DELETE_MENUbkjbskjc"
@@ -71,4 +72,9 @@ object Constants {
 
     const val ADD_PAYMENT_METHOD_KEY =
         "add_payment_method_key" // will be used only for recycler view
+
+    // PaymentMethod BottomSheet menu
+    const val IS_FOR_EDIT = "is_for_edit_key"
+    const val PAYMENT_METHOD_KEY_FOR_EDIT = "PAYMENT_METHOD_KEY_FOR_EDIT_KEY"
+
 }

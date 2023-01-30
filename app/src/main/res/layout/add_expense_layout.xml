@@ -85,7 +85,7 @@
 
             <View
                 android:id="@+id/divider61"
-                android:layout_width="377dp"
+                android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_marginTop="2dp"
                 android:background="?android:attr/listDivider"

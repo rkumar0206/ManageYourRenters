@@ -216,3 +216,13 @@ fun compareMonthlyPaymentCategoryModel(
 
     return map
 }
+
+fun comparePaymentMethod(oldData: PaymentMethod, newData: PaymentMethod): HashMap<String, Any?> {
+
+    val map: HashMap<String, Any?> = HashMap()
+
+    if (oldData.isSynced != newData.isSynced) map["synced"] = newData.isSynced
+    if (oldData.paymentMethod != newData.paymentMethod) map["paymentMethod"] = newData.paymentMethod
+
+    return map
+}

@@ -110,28 +110,28 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
                     val paymentMethodCash = PaymentMethod(
                         key = Constants.PAYMENT_METHOD_CASH_KEY,
-                        paymentMethod = "💵 CASH",
+                        paymentMethod = Constants.CASH_PAYMENT_METHOD,
                         uid = getUid()!!,
                         isSynced = true
                     )
 
                     val paymentMethodDebitCard = PaymentMethod(
                         key = Constants.PAYMENT_METHOD_DEBIT_CARD_KEY,
-                        paymentMethod = "💳 DEBIT CARD",
+                        paymentMethod = Constants.DEBIT_CARD_PAYMENT_METHOD,
                         uid = getUid()!!,
                         isSynced = true
                     )
 
                     val paymentMethodCreditCard = PaymentMethod(
                         key = Constants.PAYMENT_METHOD_CREDIT_CARD_KEY,
-                        paymentMethod = "💳 CREDIT CARD",
+                        paymentMethod = Constants.CREDIT_CARD_PAYMENT_METHOD,
                         uid = getUid()!!,
                         isSynced = true
                     )
 
                     val paymentMethodOthers = PaymentMethod(
                         key = Constants.PAYMENT_METHOD_OTHER_KEY,
-                        paymentMethod = "💰 OTHER",
+                        paymentMethod = Constants.OTHER_PAYMENT_METHOD,
                         uid = getUid()!!,
                         isSynced = true
                     )

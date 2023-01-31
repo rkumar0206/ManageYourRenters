@@ -74,6 +74,10 @@ class ExpenseRepository @Inject constructor(
 
     fun getExpensesByDateRange(date1: Long, date2: Long) = dao.getExpensesByDateRange(date1, date2)
 
+    fun getExpensesByPaymentMethodKey(paymentMethodKey: String) = dao.getExpensesByPaymentMethodKey(
+        paymentMethodKey
+    )
+
     suspend fun getKeysByExpenseCategoryKey(expenseCategoryKey: String) =
         dao.getKeysByExpenseCategoryKey(expenseCategoryKey)
 }

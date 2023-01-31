@@ -5,9 +5,12 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.PaymentMethodsAdapter
+import com.rohitthebest.manageyourrenters.data.CustomDateRange
+import com.rohitthebest.manageyourrenters.data.ShowExpenseBottomSheetTagsEnum
 import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
 import com.rohitthebest.manageyourrenters.databinding.FragmentPaymentMethodsBinding
 import com.rohitthebest.manageyourrenters.others.Constants
@@ -73,8 +76,17 @@ class PaymentMethodsFragment : Fragment(R.layout.fragment_payment_methods),
     }
 
     override fun onItemClick(paymentMethod: PaymentMethod, position: Int) {
-        //todo: show all the expenses where cash is selected as payment method
-        requireContext().showToast("item : ${paymentMethod.paymentMethod}")
+
+        val action =
+            PaymentMethodsFragmentDirections.actionPaymentMethodsFragmentToShowExpenseBottomSheetFragment(
+                paymentMethodKey = paymentMethod.key,
+                callingFragementTag = ShowExpenseBottomSheetTagsEnum.PAYMENT_METHOD_FRAGMENT,
+                dateRangeMessage = CustomDateRange.ALL_TIME,
+                date1 = 0L,
+                date2 = 0L
+            )
+
+        findNavController().navigate(action)
     }
 
     override fun onMenuBtnClicked(paymentMethod: PaymentMethod, position: Int) {

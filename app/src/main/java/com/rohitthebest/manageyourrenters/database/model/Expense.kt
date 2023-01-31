@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.isValid
 
 @Entity(tableName = "expense_table")
 data class Expense(
@@ -33,7 +35,27 @@ data class Expense(
         true
     )
 
-    fun showDetailedInfoInAlertDialog(context: Context, categoryName: String) {
+    fun showDetailedInfoInAlertDialog(
+        context: Context,
+        categoryName: String,
+        paymentMethodsMap: Map<String, String>
+    ) {
+
+        val spentOn = if (this.spentOn.isValid()) this.spentOn else categoryName
+        var paymentMethods = ""
+
+        if (this.paymentMethods == null) {
+            paymentMethods = Constants.OTHER_PAYMENT_METHOD
+        } else {
+
+            this.paymentMethods!!.forEachIndexed { index, pm ->
+                paymentMethods += paymentMethodsMap[pm]
+
+                if (index != this.paymentMethods!!.size - 1) {
+                    paymentMethods += " | "
+                }
+            }
+        }
 
         val msg =
             "\nDate : ${
@@ -41,9 +63,11 @@ data class Expense(
                     this.created, "dd-MM-yyyy hh:mm a"
                 )
             }\n\n" +
-                    "Amount : ${this.amount}\n\n" +
-                    "Spent On : ${this.spentOn}\n\n" +
-                    "Category : $categoryName"
+                    "Amount: ${this.amount}\n\n" +
+                    "Spent On: ${spentOn}\n\n" +
+                    "Category: $categoryName" +
+                    "\n\n" +
+                    "PaymentMethods: $paymentMethods"
 
         MaterialAlertDialogBuilder(context)
             .setTitle("Expense info")

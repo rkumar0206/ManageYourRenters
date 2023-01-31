@@ -20,6 +20,7 @@ import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
@@ -50,6 +51,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     private val expenseViewModel by viewModels<ExpenseViewModel>()
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
+    private val paymentMethodViewModel by viewModels<PaymentMethodViewModel>()
 
     private lateinit var receivedExpenseCategoryKey: String
 
@@ -106,9 +108,9 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
             binding.addExpensesFAB.hide()
 
-            binding.toolbar.title = "All Expenses"
+            binding.toolbar.title = getString(R.string.all_expenses)
 
-            expenseAdapter = ExpenseAdapter("Not specified")
+            expenseAdapter = ExpenseAdapter(getString(R.string.not_specified))
 
             setUpRecyclerView()
 
@@ -299,10 +301,14 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         expenseCategoryViewModel.getExpenseCategoryByKey(expense.categoryKey)
             .observe(viewLifecycleOwner) { expenseCategory ->
 
-                expense.showDetailedInfoInAlertDialog(
-                    requireContext(),
-                    expenseCategory.categoryName
-                )
+                paymentMethodViewModel.getAllPaymentMethods()
+                    .observe(viewLifecycleOwner) { paymentMethods ->
+                        expense.showDetailedInfoInAlertDialog(
+                            requireContext(),
+                            expenseCategory.categoryName,
+                            paymentMethods.associate { it.key to it.paymentMethod }
+                        )
+                    }
             }
     }
 

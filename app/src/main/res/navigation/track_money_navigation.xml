@@ -318,10 +318,22 @@
             android:name="date2"
             android:defaultValue="0L"
             app:argType="long" />
+        <argument
+            android:name="callingFragementTag"
+            android:defaultValue="GRAPH_FRAGMENT"
+            app:argType="com.rohitthebest.manageyourrenters.data.ShowExpenseBottomSheetTagsEnum" />
+        <argument
+            android:name="paymentMethodKey"
+            app:argType="string"
+            app:nullable="true" />
     </dialog>
     <fragment
         android:id="@+id/paymentMethodsFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.PaymentMethodsFragment"
         android:label="PaymentMethodsFragment"
-        tools:layout="@layout/fragment_payment_methods" />
+        tools:layout="@layout/fragment_payment_methods">
+        <action
+            android:id="@+id/action_paymentMethodsFragment_to_showExpenseBottomSheetFragment"
+            app:destination="@id/showExpenseBottomSheetFragment" />
+    </fragment>
 </navigation>

@@ -70,6 +70,11 @@ object Constants {
     const val PAYMENT_METHOD_CREDIT_CARD_KEY = "payment_method_credit_card_974673_rrrrr"
     const val PAYMENT_METHOD_OTHER_KEY = "payment_method_other_6546332_rrrrr"
 
+    const val CASH_PAYMENT_METHOD = "💵 CASH"
+    const val OTHER_PAYMENT_METHOD = "💰 OTHER"
+    const val DEBIT_CARD_PAYMENT_METHOD = "💳 DEBIT CARD"
+    const val CREDIT_CARD_PAYMENT_METHOD = "💳 CREDIT CARD"
+
     const val ADD_PAYMENT_METHOD_KEY =
         "add_payment_method_key" // will be used only for recycler view
 

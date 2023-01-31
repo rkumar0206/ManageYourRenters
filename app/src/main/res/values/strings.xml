@@ -350,6 +350,8 @@
     <string name="payment_methods">Payment methods</string>
     <string name="shortcuts">Shortcuts</string>
     <string name="are_you_sure">Are You Sure?</string>
+    <string name="not_specified">Not specified</string>
+    <string name="all_expenses">All Expenses</string>
 
     <string-array name="interest_time_schedule">
 

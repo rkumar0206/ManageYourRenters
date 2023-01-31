@@ -20,6 +20,8 @@ class PaymentMethodRepository @Inject constructor(
     suspend fun deletePaymentMethod(paymentMethod: PaymentMethod) =
         dao.deletePaymentMethod(paymentMethod)
 
+    suspend fun deleteByIsSyncedValue(isSynced: Boolean) = dao.deleteByIsSyncedValue(isSynced)
+
     suspend fun deleteAllPaymentMethods() = dao.deleteAllPaymentMethods()
 
     fun getAllPaymentMethods() = dao.getAllPaymentMethods()

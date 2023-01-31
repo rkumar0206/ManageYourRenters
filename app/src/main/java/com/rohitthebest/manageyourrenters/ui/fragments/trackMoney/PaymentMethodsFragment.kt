@@ -73,6 +73,7 @@ class PaymentMethodsFragment : Fragment(R.layout.fragment_payment_methods),
     }
 
     override fun onItemClick(paymentMethod: PaymentMethod, position: Int) {
+        //todo: show all the expenses where cash is selected as payment method
         requireContext().showToast("item : ${paymentMethod.paymentMethod}")
     }
 

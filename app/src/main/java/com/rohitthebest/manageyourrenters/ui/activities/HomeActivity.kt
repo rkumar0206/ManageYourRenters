@@ -425,7 +425,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
         try {
             MaterialAlertDialogBuilder(this)
-                .setTitle("Are You Sure?")
+                .setTitle(getString(R.string.are_you_sure))
                 .setMessage("You will be signed out from this app.")
                 .setPositiveButton("Yes") { _, _ ->
 

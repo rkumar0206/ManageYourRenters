@@ -19,6 +19,9 @@ interface PaymentMethodDao {
     @Delete
     suspend fun deletePaymentMethod(paymentMethod: PaymentMethod)
 
+    @Query("DELETE FROM payment_method_table WHERE isSynced = :isSynced")
+    suspend fun deleteByIsSyncedValue(isSynced: Boolean)
+
     @Query("DELETE FROM payment_method_table")
     suspend fun deleteAllPaymentMethods()
 

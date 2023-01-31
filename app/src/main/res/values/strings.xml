@@ -349,6 +349,7 @@
     <string name="payment_method_saved">Payment method saved</string>
     <string name="payment_methods">Payment methods</string>
     <string name="shortcuts">Shortcuts</string>
+    <string name="are_you_sure">Are You Sure?</string>
 
     <string-array name="interest_time_schedule">
 

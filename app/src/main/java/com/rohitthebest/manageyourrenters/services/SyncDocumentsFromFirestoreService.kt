@@ -55,6 +55,9 @@ class SyncDocumentsFromFirestoreService : Service() {
     @Inject
     lateinit var monthlyPaymentRepository: MonthlyPaymentRepository
 
+    @Inject
+    lateinit var paymentMethodRepository: PaymentMethodRepository
+
     private var uid = ""
 
 
@@ -82,11 +85,15 @@ class SyncDocumentsFromFirestoreService : Service() {
             syncMonthlyPayments()
         }
 
+        val job6 = CoroutineScope(Dispatchers.IO).launch {
+            syncPaymentMethods()
+        }
+
         CoroutineScope(Dispatchers.IO).launch {
 
             delay(50)
 
-            while (!job1.isCompleted || !job2.isCompleted || !job3.isCompleted || !job4.isCompleted || !job5.isCompleted) {
+            while (!job1.isCompleted || !job2.isCompleted || !job3.isCompleted || !job4.isCompleted || !job5.isCompleted || !job6.isCompleted) {
 
                 delay(100)
                 Log.d(TAG, "onStartCommand: sync time extended")
@@ -285,11 +292,8 @@ class SyncDocumentsFromFirestoreService : Service() {
                         }
                     }
                 }
-
-
             }
         }
-
     }
 
     private suspend fun syncRenterAndRenterPayment() {
@@ -356,6 +360,27 @@ class SyncDocumentsFromFirestoreService : Service() {
             }
         }
     }
+
+    private suspend fun syncPaymentMethods() {
+
+        getDataFromFireStore(
+            FirestoreCollectionsConstants.PAYMENT_METHODS,
+            uid
+        ) {}?.let { paymentMethodSnapshot ->
+
+            if (paymentMethodSnapshot.size() != 0) {
+
+                paymentMethodRepository.deleteByIsSyncedValue(true)
+                delay(50)
+                paymentMethodRepository.insertAllPaymentMethod(
+                    paymentMethodSnapshot.toObjects(
+                        PaymentMethod::class.java
+                    )
+                )
+            }
+        }
+    }
+
 
     override fun onBind(intent: Intent?): IBinder? {
         return null

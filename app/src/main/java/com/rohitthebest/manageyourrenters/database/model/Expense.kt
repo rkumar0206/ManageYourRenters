@@ -42,21 +42,6 @@ data class Expense(
     ) {
 
         val spentOn = if (this.spentOn.isValid()) this.spentOn else categoryName
-        var paymentMethods = ""
-
-        if (this.paymentMethods == null) {
-            paymentMethods = Constants.OTHER_PAYMENT_METHOD
-        } else {
-
-            this.paymentMethods!!.forEachIndexed { index, pm ->
-                paymentMethods += paymentMethodsMap[pm]
-
-                if (index != this.paymentMethods!!.size - 1) {
-                    paymentMethods += " | "
-                }
-            }
-        }
-
         val msg =
             "\nDate : ${
                 WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
@@ -67,7 +52,7 @@ data class Expense(
                     "Spent On: ${spentOn}\n\n" +
                     "Category: $categoryName" +
                     "\n\n" +
-                    "PaymentMethods: $paymentMethods"
+                    "PaymentMethods: ${getPaymentMethodString(paymentMethodsMap)}"
 
         MaterialAlertDialogBuilder(context)
             .setTitle("Expense info")
@@ -78,6 +63,27 @@ data class Expense(
             }
             .create()
             .show()
+    }
+
+    /**
+     * @param paymentMethodsMap : map of paymentMethodKey as key and paymentMethod as value
+     * @return all the payment methods used in this expense
+     */
+    fun getPaymentMethodString(paymentMethodsMap: Map<String, String>): String {
+
+        return if (this.paymentMethods == null) {
+            Constants.OTHER_PAYMENT_METHOD
+        } else {
+            var paymentMethods = ""
+            this.paymentMethods!!.forEachIndexed { index, pm ->
+                paymentMethods += paymentMethodsMap[pm]
+
+                if (index != this.paymentMethods!!.size - 1) {
+                    paymentMethods += " | "
+                }
+            }
+            paymentMethods
+        }
     }
 
 }

@@ -62,7 +62,10 @@ class ShowExpenseBottomSheetFragment : BottomSheetDialogFragment(), ExpenseAdapt
             this.dismiss()
         }
 
-        expenseAdapter = ExpenseAdapter(getString(R.string.not_specified), true)
+        expenseAdapter = ExpenseAdapter(
+            categoryName = getString(R.string.not_specified),
+            isCalledFromExpenseBottomSheetFragment = true
+        )
         setUpRecyclerView()
         getMessage()
     }

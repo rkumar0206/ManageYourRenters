@@ -20,6 +20,7 @@ import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
@@ -50,6 +51,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     private val expenseViewModel by viewModels<ExpenseViewModel>()
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
+    private val paymentMethodViewModel by viewModels<PaymentMethodViewModel>()
 
     private lateinit var receivedExpenseCategoryKey: String
 
@@ -102,20 +104,23 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         } else {
 
             // show all the expenses
-            isArgumentEmpty = true
-
-            binding.addExpensesFAB.hide()
-
-            binding.toolbar.title = "All Expenses"
-
-            expenseAdapter = ExpenseAdapter("Not specified")
-
-            setUpRecyclerView()
-
             lifecycleScope.launch {
-
                 delay(300)
-                observeExpenses()
+
+                paymentMethodViewModel.getAllPaymentMethods()
+                    .observe(viewLifecycleOwner) { paymentMethods ->
+
+                        isArgumentEmpty = true
+                        binding.addExpensesFAB.hide()
+                        binding.toolbar.title = getString(R.string.all_expenses)
+
+                        expenseAdapter =
+                            ExpenseAdapter(categoryName = getString(R.string.not_specified),
+                                paymentMethodsMap = paymentMethods.associate { it.key to it.paymentMethod })
+
+                        setUpRecyclerView()
+                        observeExpenses()
+                    }
             }
         }
     }
@@ -127,15 +132,20 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             expenseCategoryViewModel.getExpenseCategoryByKey(receivedExpenseCategoryKey)
                 .observe(viewLifecycleOwner) { expenseCategory ->
 
-                    receivedExpenseCategory = expenseCategory
+                    paymentMethodViewModel.getAllPaymentMethods()
+                        .observe(viewLifecycleOwner) { paymentMethods ->
 
-                    binding.toolbar.title = "${expenseCategory.categoryName} Expenses"
+                            receivedExpenseCategory = expenseCategory
+                            binding.toolbar.title =
+                                "${expenseCategory.categoryName} ${getString(R.string.expenses)}"
 
-                    expenseAdapter = ExpenseAdapter(receivedExpenseCategory.categoryName)
+                            expenseAdapter = ExpenseAdapter(
+                                categoryName = receivedExpenseCategory.categoryName,
+                                paymentMethodsMap = paymentMethods.associate { it.key to it.paymentMethod })
 
-                    setUpRecyclerView()
-
-                    observeExpenses()
+                            setUpRecyclerView()
+                            observeExpenses()
+                        }
                 }
         }
     }
@@ -151,16 +161,12 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 if (sortBy == SortExpense.BY_CREATED) {
 
                     expenseViewModel.getExpensesByExpenseCategoryKey(receivedExpenseCategoryKey)
-                        .observe(
-                            viewLifecycleOwner
-                        ) { expenses ->
-
+                        .observe(viewLifecycleOwner) { expenses ->
                             handleExpenseList(expenses)
                         }
                 } else if (sortBy == SortExpense.BY_DATE_RANGE) {
 
                     // adding number of milliseconds in one day to the endDate for accurate result
-
                     expenseViewModel.getExpenseByDateRangeAndExpenseCategoryKey(
                         receivedExpenseCategoryKey,
                         startDate,
@@ -170,7 +176,6 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                         handleExpenseList(expenses)
                     }
                 }
-
             }
         } else {
 
@@ -185,7 +190,6 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 expenseViewModel.getExpensesByDateRange(
                     startDate, (endDate + Constants.ONE_DAY_MILLISECONDS)
                 ).observe(viewLifecycleOwner) { expenses ->
-
                     handleExpenseList(expenses)
                 }
             }
@@ -299,10 +303,14 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
         expenseCategoryViewModel.getExpenseCategoryByKey(expense.categoryKey)
             .observe(viewLifecycleOwner) { expenseCategory ->
 
-                expense.showDetailedInfoInAlertDialog(
-                    requireContext(),
-                    expenseCategory.categoryName
-                )
+                paymentMethodViewModel.getAllPaymentMethods()
+                    .observe(viewLifecycleOwner) { paymentMethods ->
+                        expense.showDetailedInfoInAlertDialog(
+                            requireContext(),
+                            expenseCategory.categoryName,
+                            paymentMethods.associate { it.key to it.paymentMethod }
+                        )
+                    }
             }
     }
 
@@ -468,7 +476,7 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
         binding.toolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.addExpensesFAB.setOnClickListener {

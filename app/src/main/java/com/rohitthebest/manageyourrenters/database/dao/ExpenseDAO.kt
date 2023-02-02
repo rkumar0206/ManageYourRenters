@@ -83,4 +83,7 @@ interface ExpenseDAO {
 
     @Query("SELECT `key` FROM expense_table WHERE categoryKey = :expenseCategoryKey")
     suspend fun getKeysByExpenseCategoryKey(expenseCategoryKey: String): List<String>
+
+    @Query("SELECT * FROM expense_table WHERE paymentMethods LIKE '%' || :paymentMethodKey || '%' ORDER BY created DESC")
+    fun getExpensesByPaymentMethodKey(paymentMethodKey: String): Flow<List<Expense>>
 }

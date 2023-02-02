@@ -22,6 +22,7 @@ import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.E
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE_CATEGORIES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENT_CATEGORIES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.PAYMENT_METHODS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTERS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.RENTER_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.*
@@ -68,6 +69,9 @@ class UploadService : Service() {
 
     @Inject
     lateinit var monthlyPaymentRepository: MonthlyPaymentRepository
+
+    @Inject
+    lateinit var paymentMethodRepository: PaymentMethodRepository
 
 
     @SuppressLint("UnspecifiedImmutableFlag")
@@ -146,6 +150,11 @@ class UploadService : Service() {
                     model = monthlyPaymentRepository.getMonthlyPaymentByKey(key).first()
                 }
 
+                PAYMENT_METHODS -> {
+
+                    model = paymentMethodRepository.getPaymentMethodByKey(key).first()
+                }
+
                 else -> {
                     stopSelf()
                 }
@@ -188,59 +197,65 @@ class UploadService : Service() {
                 getString(R.string.renter_payments) -> {
 
                     val payment = document as RenterPayment
-                    payment.isSynced = isSyncedValue
+                    payment.isSynced = false
                     renterPaymentRepository.updateRenterPayment(payment)
                 }
 
                 getString(R.string.borrowers) -> {
 
                     val borrower = document as Borrower
-                    borrower.isSynced = isSyncedValue
+                    borrower.isSynced = false
                     borrowerRepository.update(borrower)
                 }
 
                 getString(R.string.borrowerPayments) -> {
                     val borrowerPayment = document as BorrowerPayment
-                    borrowerPayment.isSynced = isSyncedValue
+                    borrowerPayment.isSynced = false
                     borrowerPaymentRepository.updateBorrowerPayment(borrowerPayment)
                 }
 
                 getString(R.string.emis) -> {
                     val emi = document as EMI
-                    emi.isSynced = isSyncedValue
+                    emi.isSynced = false
                     emiRepository.updateEMI(emi)
                 }
 
                 getString(R.string.emiPayments) -> {
                     val emiPayment = document as EMIPayment
-                    emiPayment.isSynced = isSyncedValue
+                    emiPayment.isSynced = false
                     emiPaymentRepository.updateEMIPayment(emiPayment)
                 }
 
                 EXPENSE_CATEGORIES -> {
                     val expenseCategory = document as ExpenseCategory
-                    expenseCategory.isSynced = isSyncedValue
+                    expenseCategory.isSynced = false
                     expenseCategoryRepository.updateExpenseCategory(expenseCategory)
                 }
 
                 EXPENSES -> {
 
                     val expense = document as Expense
-                    expense.isSynced = isSyncedValue
+                    expense.isSynced = false
                     expenseRepository.updateExpense(expense)
                 }
 
                 MONTHLY_PAYMENT_CATEGORIES -> {
 
                     val category = document as MonthlyPaymentCategory
-                    category.isSynced = isSyncedValue
+                    category.isSynced = false
                     monthlyPaymentCategoryRepository.updateMonthlyPaymentCategory(category)
                 }
                 MONTHLY_PAYMENTS -> {
 
                     val monthlyPayment = document as MonthlyPayment
-                    monthlyPayment.isSynced = isSyncedValue
+                    monthlyPayment.isSynced = false
                     monthlyPaymentRepository.updateMonthlyPayment(monthlyPayment)
+                }
+
+                PAYMENT_METHODS -> {
+                    val paymentMethod = document as PaymentMethod
+                    paymentMethod.isSynced = false
+                    paymentMethodRepository.updatePaymentMethod(paymentMethod)
                 }
 
                 else -> stopSelf()

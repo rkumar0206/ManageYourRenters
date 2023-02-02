@@ -174,6 +174,8 @@ fun compareExpenseModel(
     if (oldData.amount != newData.amount) map["amount"] = newData.amount
     if (oldData.spentOn != newData.spentOn) map["spentOn"] = newData.spentOn
     if (oldData.categoryKey != newData.categoryKey) map["categoryKey"] = newData.categoryKey
+    if (oldData.paymentMethods != newData.paymentMethods) map["paymentMethods"] =
+        newData.paymentMethods
 
     return map
 }
@@ -211,6 +213,16 @@ fun compareMonthlyPaymentCategoryModel(
         newData.categoryDescription
     if (oldData.categoryName != newData.categoryName) map["categoryName"] = newData.categoryName
     if (oldData.imageUrl != newData.imageUrl) map["imageUrl"] = newData.imageUrl
+
+    return map
+}
+
+fun comparePaymentMethod(oldData: PaymentMethod, newData: PaymentMethod): HashMap<String, Any?> {
+
+    val map: HashMap<String, Any?> = HashMap()
+
+    if (oldData.isSynced != newData.isSynced) map["synced"] = newData.isSynced
+    if (oldData.paymentMethod != newData.paymentMethod) map["paymentMethod"] = newData.paymentMethod
 
     return map
 }

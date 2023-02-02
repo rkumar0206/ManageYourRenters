@@ -493,7 +493,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
                 if (receivedPayment.isElectricityBillIncluded) {
                     receivedPayment.electricityBillInfo?.totalElectricBill?.format(2)
                 } else {
-                    0.0
+                    "0.0"
                 }
             )
 

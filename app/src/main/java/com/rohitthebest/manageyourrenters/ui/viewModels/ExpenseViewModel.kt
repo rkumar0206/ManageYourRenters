@@ -10,6 +10,7 @@ import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.E
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
+import com.rohitthebest.manageyourrenters.repositories.PaymentMethodRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +25,8 @@ private const val TAG = "ExpenseViewModel"
 class ExpenseViewModel @Inject constructor(
     app: Application,
     private val expenseRepository: ExpenseRepository,
-    private val monthlyPaymentRepository: MonthlyPaymentRepository
+    private val monthlyPaymentRepository: MonthlyPaymentRepository,
+    private val paymentMethodRepository: PaymentMethodRepository
 ) : AndroidViewModel(app) {
 
     fun insertExpense(expense: Expense) =
@@ -277,5 +279,36 @@ class ExpenseViewModel @Inject constructor(
         }
 
     }
+
+    // issue #78
+    private val _expensesByPaymentMethods = MutableLiveData<List<Expense>>(emptyList())
+    val expensesByPaymentMethods: LiveData<List<Expense>> get() = _expensesByPaymentMethods
+
+    fun getExpenseByPaymentMethodsKey(paymentMethodKeys: List<String>) {
+
+        viewModelScope.launch {
+
+            val expenses = expenseRepository.getAllExpenses().first()
+
+            val isOtherPaymentMethodKeyPresent =
+                paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
+
+            val resultExpenses = expenses.filter { expense ->
+
+                if (isOtherPaymentMethodKeyPresent) {
+                    // for other payment method, get all the expenses where payment methods is null as well as payment method is other
+                    expense.paymentMethods == null || expense.paymentMethods!!.any { it in paymentMethodKeys }
+                } else {
+                    expense.paymentMethods != null && expense.paymentMethods!!.any { it in paymentMethodKeys }
+                }
+            }
+            _expensesByPaymentMethods.value = resultExpenses
+        }
+    }
+
+    fun getExpenseByPaymentMethodsKey(paymentMethodKey: String) =
+        expenseRepository.getExpensesByPaymentMethodKey(
+            paymentMethodKey
+        ).asLiveData()
 
 }

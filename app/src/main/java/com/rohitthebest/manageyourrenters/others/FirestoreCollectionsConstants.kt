@@ -14,4 +14,5 @@ object FirestoreCollectionsConstants {
     const val EMI_PAYMENTS = "EMI_Payments"
     const val PARTIAL_PAYMENTS = "Partial_Payments"
     const val APP_UPDATES = "AppUpdates"
+    const val PAYMENT_METHODS = "PaymentMethods"
 }

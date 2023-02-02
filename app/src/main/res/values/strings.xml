@@ -208,6 +208,7 @@
     <string name="house_renters_disabled_message">house renters shortcut is disabled</string>
     <string name="deep_analyze_mode">Deep analyze mode</string>
     <string name="add_remove_expense_category_selection">Add Remove Expense category selection</string>
+    <string name="add_remove_payment_method_selection">Add Remove payment method selection</string>
     <string name="clear_selection_fab">clear selection fab</string>
     <string name="clear_date_range">Clear date range</string>
     <string name="last_30_days">Last 30 days</string>
@@ -341,6 +342,16 @@
     <string name="paid_in_advance_in_last_payment">Paid in advance in last payments\u0020:\u0020-\u0020%1$s</string>
     <string name="choose_existing_category">Choose existing category</string>
     <string name="link_to_expense_category">Link to expense category</string>
+    <string name="payment_methods_default_other">Payment methods (Default: Other)</string>
+    <string name="add">Add</string>
+    <string name="add_payment_method">Add payment method</string>
+    <string name="this_payment_method_already_exists">This payment method already exists</string>
+    <string name="payment_method_saved">Payment method saved</string>
+    <string name="payment_methods">Payment methods</string>
+    <string name="shortcuts">Shortcuts</string>
+    <string name="are_you_sure">Are You Sure?</string>
+    <string name="not_specified">Not specified</string>
+    <string name="all_expenses">All Expenses</string>
 
     <string-array name="interest_time_schedule">
 

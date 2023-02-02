@@ -18,6 +18,7 @@ import com.anychart.enums.Align
 import com.anychart.enums.LegendLayout
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
+import com.rohitthebest.manageyourrenters.data.ShowExpenseBottomSheetTagsEnum
 import com.rohitthebest.manageyourrenters.databinding.FragmentGraphBinding
 import com.rohitthebest.manageyourrenters.others.Constants.CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_NAME
@@ -191,9 +192,11 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
             val action =
                 GraphFragmentDirections.actionGraphFragmentToShowExpenseBottomSheetFragment(
-                    if (selectedCustomDateRangeMenu == CustomDateRange.ALL_TIME) CustomDateRange.ALL_TIME else CustomDateRange.CUSTOM_DATE_RANGE,
-                    d1,
-                    d2
+                    dateRangeMessage = if (selectedCustomDateRangeMenu == CustomDateRange.ALL_TIME) CustomDateRange.ALL_TIME else CustomDateRange.CUSTOM_DATE_RANGE,
+                    date1 = d1,
+                    date2 = d2,
+                    callingFragementTag = ShowExpenseBottomSheetTagsEnum.GRAPH_FRAGMENT,
+                    paymentMethodKey = null
                 )
             findNavController().navigate(action)
         }

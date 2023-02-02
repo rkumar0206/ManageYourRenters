@@ -1,6 +1,5 @@
 package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -18,7 +17,8 @@ import java.util.*
 
 class ExpenseAdapter(
     val categoryName: String = "",
-    val isCalledFromGraphFragment: Boolean = false
+    val paymentMethodsMap: Map<String, String> = emptyMap(),
+    val isCalledFromExpenseBottomSheetFragment: Boolean = false
 ) :
     ListAdapter<Expense, ExpenseAdapter.ExpenseViewHolder>(DiffUtilCallback()) {
 
@@ -50,15 +50,14 @@ class ExpenseAdapter(
 
         }
 
-        @SuppressLint("SetTextI18n")
         fun setData(expense: Expense?) {
 
             expense?.let { exp ->
 
                 binding.apply {
 
-                    val p = PrettyTime()
-                    expenseDateTV.text = p.format(Date(exp.created))
+                    val prettyTime = PrettyTime()
+                    expenseDateTV.text = prettyTime.format(Date(exp.created))
 
                     expenseAmountTV.text = exp.amount.toString()
 
@@ -98,11 +97,16 @@ class ExpenseAdapter(
                         }
                     }
 
-                    if (isCalledFromGraphFragment) {
+                    if (isCalledFromExpenseBottomSheetFragment) {
                         // hide menu button
                         expenseMenuBtn.hide()
                     }
 
+                    if (paymentMethodsMap.isNotEmpty())
+                        expensePaymentMethodsTV.text = exp.getPaymentMethodString(paymentMethodsMap)
+                    else {
+                        expensePaymentMethodsTV.hide()
+                    }
                 }
             }
         }

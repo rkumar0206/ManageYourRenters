@@ -352,6 +352,24 @@
     <string name="are_you_sure">Are You Sure?</string>
     <string name="not_specified">Not specified</string>
     <string name="all_expenses">All Expenses</string>
+    <string name="add_filter">Filter</string>
+    <string name="apply">Apply</string>
+    <string name="_spent_on">Spent On</string>
+    <string name="sort_by">Sort By</string>
+    <string name="islessthan">isLessThan</string>
+    <string name="isgreaterthan">isGreaterThan</string>
+    <string name="isequalto">isEqualTo</string>
+    <string name="startswith">startsWith</string>
+    <string name="endswith">endsWith</string>
+    <string name="contains">contains</string>
+    <string name="regex">regex</string>
+    <string name="date_created">date created</string>
+    <string name="date_modified">date modified</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="enter_your_text">Enter your text</string>
+    <string name="clear_filter">Clear</string>
+    <string name="isbetween">isBetween</string>
 
     <string-array name="interest_time_schedule">
 

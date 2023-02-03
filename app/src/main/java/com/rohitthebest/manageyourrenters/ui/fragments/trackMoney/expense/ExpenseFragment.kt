@@ -13,10 +13,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.ExpenseAdapter
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
+import com.rohitthebest.manageyourrenters.data.filter.ExpenseFilterDto
 import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_FILTER_KEY
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
@@ -44,7 +46,8 @@ enum class SortExpense {
 
 @AndroidEntryPoint
 class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnClickListener,
-    CustomMenuItems.OnItemClickListener, ChooseExpenseCategoryBottomSheetFragment.OnItemClicked {
+    CustomMenuItems.OnItemClickListener, ChooseExpenseCategoryBottomSheetFragment.OnItemClicked,
+    ExpenseFilterBottomSheetFragment.OnClickListener {
 
     private var _binding: FragmentExpenseBinding? = null
     private val binding get() = _binding!!
@@ -65,6 +68,8 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
     private var sortBy: SortExpense = SortExpense.BY_CREATED
     private var isArgumentEmpty = false
     private var searchView: SearchView? = null
+
+    private var expenseFilterDto: ExpenseFilterDto? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -199,21 +204,36 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     private fun handleExpenseList(expenses: List<Expense>) {
 
+        var modifiedExpenseList = expenses
+
+        if (expenseFilterDto != null) {
+
+            modifiedExpenseList = expenseViewModel.applyFilter(expenses, expenseFilterDto!!)
+        }
+
         if (searchView != null && searchView!!.query.toString().isValid()) {
 
-            setUpSearchMenuButton(expenses)
+            setUpSearchMenuButton(modifiedExpenseList)
         } else {
 
-            if (expenses.isNotEmpty()) {
+            if (modifiedExpenseList.isNotEmpty()) {
 
                 setNoExpenseAddedVisibility(false)
-                setUpSearchMenuButton(expenses)
+                setUpSearchMenuButton(modifiedExpenseList)
             } else {
 
                 binding.noExpenseCategoryTV.text = getString(R.string.no_expense_added_message)
                 setNoExpenseAddedVisibility(true)
             }
-            expenseAdapter.submitList(expenses)
+            expenseAdapter.submitList(modifiedExpenseList)
+
+            lifecycleScope.launch {
+                delay(100)
+
+                if (expenseFilterDto != null) {
+                    binding.expenseRV.scrollToPosition(0)
+                }
+            }
         }
 
         binding.progressbar.hide()
@@ -507,6 +527,43 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             true
         }
 
+        binding.toolbar.menu.findItem(R.id.menu_expense_filters).setOnMenuItemClickListener {
+            handleFilterMenu()
+            true
+        }
+    }
+
+    private fun handleFilterMenu() {
+
+        requireActivity().supportFragmentManager.let {
+
+            val bundle = Bundle()
+            bundle.putString(
+                EXPENSE_FILTER_KEY,
+                if (expenseFilterDto == null) "" else expenseFilterDto.convertToJsonString()
+            )
+
+            ExpenseFilterBottomSheetFragment.newInstance(
+                bundle
+            ).apply {
+                show(it, TAG)
+            }.setOnClickListener(this)
+        }
+    }
+
+    override fun onFilterApply(expenseFilterDto: ExpenseFilterDto?) {
+
+        this.expenseFilterDto = expenseFilterDto
+
+        if (this.expenseFilterDto != null) {
+            binding.toolbar.menu.findItem(R.id.menu_expense_filters)
+                .setIcon(R.drawable.baseline_filter_list_colored_24)
+        } else {
+            binding.toolbar.menu.findItem(R.id.menu_expense_filters)
+                .setIcon(R.drawable.baseline_filter_list_24)
+        }
+
+        observeExpenses()
     }
 
     private fun handleTotalExpenseMenu() {

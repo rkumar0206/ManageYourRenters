@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
+import com.rohitthebest.manageyourrenters.data.filter.*
 import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
@@ -17,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 private const val TAG = "ExpenseViewModel"
@@ -310,5 +312,105 @@ class ExpenseViewModel @Inject constructor(
         expenseRepository.getExpensesByPaymentMethodKey(
             paymentMethodKey
         ).asLiveData()
+
+    fun applyFilter(expenses: List<Expense>, expenseFilterDto: ExpenseFilterDto): List<Expense> {
+
+        var mExpenses = expenses
+
+        if (expenseFilterDto.isPaymentMethodEnabled) {
+
+            mExpenses = applyFilterByPaymentMethods(expenseFilterDto.paymentMethods, mExpenses)
+        }
+
+        if (expenseFilterDto.isAmountEnabled) {
+
+            mExpenses = mExpenses.filter { expense: Expense ->
+
+                when (expenseFilterDto.selectedAmountFilter) {
+
+                    IntFilterOptions.isLessThan -> expense.amount < expenseFilterDto.amount
+                    IntFilterOptions.isGreaterThan -> expense.amount > expenseFilterDto.amount
+                    IntFilterOptions.isEqualsTo -> expense.amount == expenseFilterDto.amount
+                    IntFilterOptions.isBetween -> expense.amount == expenseFilterDto.amount  // todo: need to change the logic
+                }
+            }
+        }
+
+        if (expenseFilterDto.isSpentOnEnabled) {
+
+            mExpenses = mExpenses.filter { expense: Expense ->
+
+                when (expenseFilterDto.selectedSpentOnFilter) {
+
+                    StringFilterOptions.startsWith -> expense.spentOn.startsWith(expenseFilterDto.spentOnText)
+                    StringFilterOptions.endsWith -> expense.spentOn.endsWith(expenseFilterDto.spentOnText)
+                    StringFilterOptions.containsWith -> expense.spentOn.startsWith(expenseFilterDto.spentOnText)
+
+                    StringFilterOptions.regex -> {
+                        val pattern: Pattern = Pattern.compile(expenseFilterDto.spentOnText)
+                        val matcher = pattern.matcher(expense.spentOn)
+                        matcher.find()
+                    }
+                }
+            }
+        }
+
+        if (expenseFilterDto.isSortByEnabled) {
+
+            val isDescending = expenseFilterDto.sortOrder == SortOrder.descending
+
+            mExpenses = when (expenseFilterDto.sortByFilter) {
+
+                SortFilter.amount -> {
+                    if (isDescending) {
+                        mExpenses.sortedByDescending { it.amount }
+                    } else {
+                        mExpenses.sortedBy { it.amount }
+                    }
+                }
+
+                SortFilter.dateCreated -> {
+
+                    if (isDescending) {
+                        mExpenses.sortedByDescending { it.created }
+                    } else {
+                        mExpenses.sortedBy { it.created }
+                    }
+                }
+
+                SortFilter.dateModified -> {
+
+                    if (isDescending) {
+                        mExpenses.sortedByDescending { it.modified }
+                    } else {
+                        mExpenses.sortedBy { it.modified }
+                    }
+                }
+            }
+        }
+
+        return mExpenses
+    }
+
+    private fun applyFilterByPaymentMethods(
+        paymentMethodKeys: List<String>,
+        expenses: List<Expense>
+    ): List<Expense> {
+
+        val isOtherPaymentMethodKeyPresent =
+            paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
+
+        val resultExpenses = expenses.filter { expense ->
+
+            if (isOtherPaymentMethodKeyPresent) {
+                // for other payment method, get all the expenses where payment methods is null as well as payment method is other
+                expense.paymentMethods == null || expense.paymentMethods!!.any { it in paymentMethodKeys }
+            } else {
+                expense.paymentMethods != null && expense.paymentMethods!!.any { it in paymentMethodKeys }
+            }
+        }
+
+        return resultExpenses
+    }
 
 }

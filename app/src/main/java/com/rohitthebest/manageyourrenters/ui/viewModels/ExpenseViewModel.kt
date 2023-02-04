@@ -11,7 +11,6 @@ import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.E
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
-import com.rohitthebest.manageyourrenters.repositories.PaymentMethodRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,8 +26,7 @@ private const val TAG = "ExpenseViewModel"
 class ExpenseViewModel @Inject constructor(
     app: Application,
     private val expenseRepository: ExpenseRepository,
-    private val monthlyPaymentRepository: MonthlyPaymentRepository,
-    private val paymentMethodRepository: PaymentMethodRepository
+    private val monthlyPaymentRepository: MonthlyPaymentRepository
 ) : AndroidViewModel(app) {
 
     fun insertExpense(expense: Expense) =
@@ -54,10 +52,6 @@ class ExpenseViewModel @Inject constructor(
             Functions.showToast(context, "Expense saved")
 
         }
-
-    fun insertAllExpense(expenses: List<Expense>) = viewModelScope.launch {
-        expenseRepository.insertAllExpense(expenses)
-    }
 
     fun updateExpense(oldValue: Expense, newValue: Expense) =
         viewModelScope.launch {
@@ -176,14 +170,6 @@ class ExpenseViewModel @Inject constructor(
 
         expenseRepository.deleteExpenseByKey(expenseKey)
         Functions.showToast(context, "Expense deleted")
-    }
-
-    fun deleteAllExpenses() = viewModelScope.launch {
-        expenseRepository.deleteAllExpenses()
-    }
-
-    fun deleteAllExpensesByIsSynced(isSynced: Boolean) = viewModelScope.launch {
-        expenseRepository.deleteExpenseByIsSynced(isSynced)
     }
 
     fun getAllExpenses() = expenseRepository.getAllExpenses().asLiveData()
@@ -331,7 +317,7 @@ class ExpenseViewModel @Inject constructor(
                     IntFilterOptions.isLessThan -> expense.amount < expenseFilterDto.amount
                     IntFilterOptions.isGreaterThan -> expense.amount > expenseFilterDto.amount
                     IntFilterOptions.isEqualsTo -> expense.amount == expenseFilterDto.amount
-                    IntFilterOptions.isBetween -> expense.amount == expenseFilterDto.amount  // todo: need to change the logic
+                    IntFilterOptions.isBetween -> (expense.amount >= expenseFilterDto.amount) && (expense.amount <= expenseFilterDto.amount2)
                 }
             }
         }
@@ -344,7 +330,7 @@ class ExpenseViewModel @Inject constructor(
 
                     StringFilterOptions.startsWith -> expense.spentOn.startsWith(expenseFilterDto.spentOnText)
                     StringFilterOptions.endsWith -> expense.spentOn.endsWith(expenseFilterDto.spentOnText)
-                    StringFilterOptions.containsWith -> expense.spentOn.startsWith(expenseFilterDto.spentOnText)
+                    StringFilterOptions.containsWith -> expense.spentOn.contains(expenseFilterDto.spentOnText)
 
                     StringFilterOptions.regex -> {
                         val pattern: Pattern = Pattern.compile(expenseFilterDto.spentOnText)

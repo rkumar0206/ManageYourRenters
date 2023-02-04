@@ -10,6 +10,7 @@ data class ExpenseFilterDto(
     var paymentMethods: List<String>,
     var selectedAmountFilter: IntFilterOptions,
     var amount: Double,
+    var amount2: Double,        // only used when selected INtFilterOption is isBetween
     var selectedSpentOnFilter: StringFilterOptions,
     var spentOnText: String,
     var sortByFilter: SortFilter,
@@ -23,6 +24,7 @@ data class ExpenseFilterDto(
         true,
         emptyList(),
         IntFilterOptions.isEqualsTo,
+        0.0,
         0.0,
         StringFilterOptions.containsWith,
         "",

@@ -370,6 +370,7 @@
     <string name="enter_your_text">Enter your text</string>
     <string name="clear_filter">Clear</string>
     <string name="isbetween">isBetween</string>
+    <string name="and">and</string>
 
     <string-array name="interest_time_schedule">
 

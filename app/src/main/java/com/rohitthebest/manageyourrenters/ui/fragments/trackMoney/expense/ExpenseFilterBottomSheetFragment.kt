@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.RadioGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -93,6 +94,12 @@ class ExpenseFilterBottomSheetFragment :
                         IntFilterOptions.isBetween -> isBetweenRB.id
                     }
                 )
+
+                if (expenseFilterDto.selectedAmountFilter == IntFilterOptions.isBetween) {
+
+                    includeBinding.amountET2.setText(expenseFilterDto.amount.toString())
+                    includeBinding.amountET3.setText(expenseFilterDto.amount2.toString())
+                }
 
                 amountET.setText(expenseFilterDto.amount.toString())
             }
@@ -198,23 +205,99 @@ class ExpenseFilterBottomSheetFragment :
         }
     }
 
+    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+
+        when (buttonView?.id) {
+
+            includeBinding.expenseFilterAmountCB.id -> {
+
+                expenseFilterDto.isAmountEnabled = isChecked
+
+                if (isChecked) {
+                    includeBinding.amountRG.check(includeBinding.isEqualToRB.id)
+                    handleAmountETVisibility(false)
+                } else {
+                    includeBinding.amountRG.check(RadioGroup.NO_ID)
+                    includeBinding.amountET.setText("")
+                }
+            }
+
+            includeBinding.expenseFilterSortByCB.id -> {
+
+                expenseFilterDto.isSortByEnabled = isChecked
+
+                if (isChecked) {
+                    includeBinding.sortByRG.check(includeBinding.dateCreatedRB.id)
+                    includeBinding.sortOrderRG.check(includeBinding.descendingRB.id)
+                } else {
+                    includeBinding.sortByRG.check(RadioGroup.NO_ID)
+                    includeBinding.sortOrderRG.check(RadioGroup.NO_ID)
+                }
+            }
+
+            includeBinding.expenseFilterSpentOnCB.id -> {
+
+                expenseFilterDto.isSpentOnEnabled = isChecked
+
+                if (isChecked) {
+
+                    includeBinding.spentOnRG.check(includeBinding.containsRB.id)
+                } else {
+                    includeBinding.spentOnRG.check(RadioGroup.NO_ID)
+                    includeBinding.spentOnET.setText("")
+                }
+            }
+
+            includeBinding.expenseFilterPaymentMethodCB.id -> {
+
+                expenseFilterDto.isPaymentMethodEnabled = isChecked
+            }
+
+            includeBinding.isBetweenRB.id -> {
+
+                handleAmountETVisibility(isChecked)
+            }
+        }
+    }
+
+    private fun handleAmountETVisibility(isBetweenChecked: Boolean) {
+
+        includeBinding.amountET2.isVisible = isBetweenChecked
+        includeBinding.amountET3.isVisible = isBetweenChecked
+        includeBinding.andTV.isVisible = isBetweenChecked
+        includeBinding.amountET.isVisible = !isBetweenChecked
+    }
+
     private fun handleApplyMenuClicked() {
 
         expenseFilterDto.apply {
 
             if (isAmountEnabled) {
 
-                amount =
-                    if (includeBinding.amountET.isTextValid()) includeBinding.amountET.text.toString()
-                        .trim().toDouble()
-                    else
-                        0.0
+                if (includeBinding.amountRG.checkedRadioButtonId == includeBinding.isBetweenRB.id) {
+
+                    amount =
+                        if (includeBinding.amountET2.isTextValid()) includeBinding.amountET2.text.toString()
+                            .trim().toDouble() else 0.0
+
+                    amount2 =
+                        if (includeBinding.amountET3.isTextValid()) includeBinding.amountET3.text.toString()
+                            .trim().toDouble() else 0.0
+                } else {
+
+                    amount =
+                        if (includeBinding.amountET.isTextValid()) includeBinding.amountET.text.toString()
+                            .trim().toDouble()
+                        else
+                            0.0
+                }
 
                 selectedAmountFilter = when (includeBinding.amountRG.checkedRadioButtonId) {
 
                     includeBinding.isLessThanRB.id -> IntFilterOptions.isLessThan
                     includeBinding.isGreaterThanRB.id -> IntFilterOptions.isGreaterThan
                     includeBinding.isEqualToRB.id -> IntFilterOptions.isEqualsTo
+                    includeBinding.isBetweenRB.id -> IntFilterOptions.isBetween
                     else -> IntFilterOptions.isEqualsTo
                 }
             }
@@ -269,61 +352,6 @@ class ExpenseFilterBottomSheetFragment :
             dismiss()
         }
     }
-
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-
-        when (buttonView?.id) {
-
-            includeBinding.expenseFilterAmountCB.id -> {
-
-                expenseFilterDto.isAmountEnabled = isChecked
-
-                if (isChecked) {
-                    includeBinding.amountRG.check(includeBinding.isEqualToRB.id)
-                } else {
-                    includeBinding.amountRG.check(RadioGroup.NO_ID)
-                    includeBinding.amountET.setText("")
-                }
-            }
-
-            includeBinding.expenseFilterSortByCB.id -> {
-
-                expenseFilterDto.isSortByEnabled = isChecked
-
-                if (isChecked) {
-                    includeBinding.sortByRG.check(includeBinding.dateCreatedRB.id)
-                    includeBinding.sortOrderRG.check(includeBinding.descendingRB.id)
-                } else {
-                    includeBinding.sortByRG.check(RadioGroup.NO_ID)
-                    includeBinding.sortOrderRG.check(RadioGroup.NO_ID)
-                }
-            }
-
-            includeBinding.expenseFilterSpentOnCB.id -> {
-
-                expenseFilterDto.isSpentOnEnabled = isChecked
-
-                if (isChecked) {
-
-                    includeBinding.spentOnRG.check(includeBinding.containsRB.id)
-                } else {
-                    includeBinding.spentOnRG.check(RadioGroup.NO_ID)
-                    includeBinding.spentOnET.setText("")
-                }
-            }
-
-            includeBinding.expenseFilterPaymentMethodCB.id -> {
-
-                expenseFilterDto.isPaymentMethodEnabled = isChecked
-            }
-
-            includeBinding.isBetweenRB.id -> {
-
-                // todo : handle this option, in both in UI and expense viewModel
-            }
-        }
-    }
-
 
     fun setOnClickListener(listener: OnClickListener) {
         mListener = listener

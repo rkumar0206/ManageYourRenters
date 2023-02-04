@@ -7,6 +7,7 @@ import android.widget.CompoundButton
 import android.widget.RadioGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -22,13 +23,16 @@ import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
 import com.rohitthebest.manageyourrenters.utils.isTextValid
 import com.rohitthebest.manageyourrenters.utils.isValid
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val TAG = "ExpenseFilterBottomShee"
 
 @AndroidEntryPoint
 class ExpenseFilterBottomSheetFragment :
     BottomSheetDialogFragment(R.layout.fragment_expense_filter),
-    CompoundButton.OnCheckedChangeListener, SelectPaymentMethodAdapter.OnClickListener {
+    CompoundButton.OnCheckedChangeListener, SelectPaymentMethodAdapter.OnClickListener,
+    RadioGroup.OnCheckedChangeListener {
 
     private var _binding: FragmentExpenseFilterBinding? = null
     private val binding get() = _binding!!
@@ -160,6 +164,7 @@ class ExpenseFilterBottomSheetFragment :
 
         paymentMethod.isSelected = !paymentMethod.isSelected
         selectPaymentMethodAdapter.notifyItemChanged(position)
+        includeBinding.expenseFilterPaymentMethodCB.isChecked = true
     }
 
     private fun getAllPaymentMethods() {
@@ -183,7 +188,12 @@ class ExpenseFilterBottomSheetFragment :
         includeBinding.expenseFilterSortByCB.setOnCheckedChangeListener(this)
         includeBinding.expenseFilterSpentOnCB.setOnCheckedChangeListener(this)
         includeBinding.expenseFilterPaymentMethodCB.setOnCheckedChangeListener(this)
+
         includeBinding.isBetweenRB.setOnCheckedChangeListener(this)
+        includeBinding.amountRG.setOnCheckedChangeListener(this)
+        includeBinding.spentOnRG.setOnCheckedChangeListener(this)
+        includeBinding.sortOrderRG.setOnCheckedChangeListener(this)
+        includeBinding.sortByRG.setOnCheckedChangeListener(this)
 
         binding.toolbar.setNavigationOnClickListener {
             dismiss()
@@ -213,50 +223,137 @@ class ExpenseFilterBottomSheetFragment :
 
                 expenseFilterDto.isAmountEnabled = isChecked
 
-                if (isChecked) {
+                if (isChecked && includeBinding.amountRG.checkedRadioButtonId == RadioGroup.NO_ID) {
                     includeBinding.amountRG.check(includeBinding.isEqualToRB.id)
-                    handleAmountETVisibility(false)
-                } else {
+                    includeBinding.amountET.requestFocus()
+                } else if (!isChecked) {
                     includeBinding.amountRG.check(RadioGroup.NO_ID)
                     includeBinding.amountET.setText("")
+                    includeBinding.amountET.clearFocus()
                 }
+                includeBinding.spentOnET.clearFocus()
             }
 
             includeBinding.expenseFilterSortByCB.id -> {
 
                 expenseFilterDto.isSortByEnabled = isChecked
 
-                if (isChecked) {
+                if (isChecked && includeBinding.sortByRG.checkedRadioButtonId == RadioGroup.NO_ID &&
+                    includeBinding.sortOrderRG.checkedRadioButtonId == RadioGroup.NO_ID
+                ) {
                     includeBinding.sortByRG.check(includeBinding.dateCreatedRB.id)
                     includeBinding.sortOrderRG.check(includeBinding.descendingRB.id)
-                } else {
+                } else if (!isChecked) {
                     includeBinding.sortByRG.check(RadioGroup.NO_ID)
                     includeBinding.sortOrderRG.check(RadioGroup.NO_ID)
                 }
+                includeBinding.amountET.clearFocus()
+                includeBinding.spentOnET.clearFocus()
             }
 
             includeBinding.expenseFilterSpentOnCB.id -> {
 
                 expenseFilterDto.isSpentOnEnabled = isChecked
 
-                if (isChecked) {
+                if (isChecked && includeBinding.spentOnRG.checkedRadioButtonId == RadioGroup.NO_ID) {
 
                     includeBinding.spentOnRG.check(includeBinding.containsRB.id)
-                } else {
+                    includeBinding.spentOnET.requestFocus()
+                } else if (!isChecked) {
                     includeBinding.spentOnRG.check(RadioGroup.NO_ID)
                     includeBinding.spentOnET.setText("")
+                    includeBinding.spentOnET.clearFocus()
                 }
+                includeBinding.amountET.clearFocus()
             }
 
             includeBinding.expenseFilterPaymentMethodCB.id -> {
 
                 expenseFilterDto.isPaymentMethodEnabled = isChecked
+
+                if (!isChecked) {
+                    expenseFilterDto.paymentMethods = emptyList()
+                    getAllPaymentMethods()
+                }
+                includeBinding.amountET.clearFocus()
+                includeBinding.spentOnET.clearFocus()
             }
 
             includeBinding.isBetweenRB.id -> {
 
                 handleAmountETVisibility(isChecked)
             }
+        }
+    }
+
+    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+
+        when (group?.id) {
+            includeBinding.amountRG.id -> {
+
+                executeWithDelay(50) {
+                    if (!includeBinding.expenseFilterAmountCB.isChecked &&
+                        includeBinding.amountRG.checkedRadioButtonId != RadioGroup.NO_ID
+                    ) {
+                        includeBinding.expenseFilterAmountCB.isChecked = true
+                    }
+                }
+            }
+
+            includeBinding.spentOnRG.id -> {
+
+                executeWithDelay {
+                    if (!includeBinding.expenseFilterSpentOnCB.isChecked
+                        && includeBinding.spentOnRG.checkedRadioButtonId != RadioGroup.NO_ID
+                    ) {
+                        includeBinding.expenseFilterSpentOnCB.isChecked = true
+                    }
+                }
+            }
+
+            includeBinding.sortByRG.id -> {
+
+                executeWithDelay {
+                    if (!includeBinding.expenseFilterSortByCB.isChecked
+                        && includeBinding.sortByRG.checkedRadioButtonId != RadioGroup.NO_ID
+                    ) {
+                        includeBinding.expenseFilterSortByCB.isChecked = true
+                    }
+
+                    if (includeBinding.expenseFilterSortByCB.isChecked
+                        && includeBinding.sortOrderRG.checkedRadioButtonId == RadioGroup.NO_ID
+                    ) {
+                        includeBinding.sortOrderRG.check(includeBinding.descendingRB.id)
+                    }
+                }
+            }
+
+            includeBinding.sortOrderRG.id -> {
+
+                executeWithDelay {
+                    if (!includeBinding.expenseFilterSortByCB.isChecked
+                        && includeBinding.sortOrderRG.checkedRadioButtonId != RadioGroup.NO_ID
+                    ) {
+                        includeBinding.expenseFilterSortByCB.isChecked = true
+                    }
+
+                    if (includeBinding.expenseFilterSortByCB.isChecked
+                        && includeBinding.sortByRG.checkedRadioButtonId == RadioGroup.NO_ID
+                    ) {
+                        includeBinding.sortByRG.check(includeBinding.dateCreatedRB.id)
+                    }
+                }
+            }
+        }
+    }
+
+    private inline fun executeWithDelay(
+        timeInMillis: Long = 50,
+        crossinline method: () -> Unit
+    ) {
+        lifecycleScope.launch {
+            delay(timeInMillis)
+            method()
         }
     }
 
@@ -376,5 +473,4 @@ class ExpenseFilterBottomSheetFragment :
         super.onDestroyView()
         _binding = null
     }
-
 }

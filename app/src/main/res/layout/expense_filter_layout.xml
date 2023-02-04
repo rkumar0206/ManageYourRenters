@@ -71,12 +71,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/expenseFilterAmountCB" />
 
-    <View
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/divider110"
         android:layout_width="0dp"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:layout_marginTop="5dp"
-        android:background="?android:attr/listDivider"
+        android:elevation="0dp"
+        app:cardBackgroundColor="#41B9B9B9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/amountCL" />
@@ -91,12 +92,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/expenseFilterSpentOnCB" />
 
-    <View
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/divider112"
         android:layout_width="0dp"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:layout_marginTop="5dp"
-        android:background="?android:attr/listDivider"
+        android:elevation="0dp"
+        app:cardBackgroundColor="#41B9B9B9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spentOnET" />
@@ -132,12 +134,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/expenseFilterPaymentMethodCB" />
 
-    <View
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/divider114"
         android:layout_width="0dp"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:layout_marginTop="5dp"
-        android:background="?android:attr/listDivider"
+        android:elevation="0dp"
+        app:cardBackgroundColor="#41B9B9B9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/paymentMethodFilterRV" />

@@ -199,7 +199,6 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 }
             }
         }
-
     }
 
     private fun handleExpenseList(expenses: List<Expense>) {

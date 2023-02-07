@@ -71,6 +71,8 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     private var expenseFilterDto: ExpenseFilterDto? = null
 
+    private lateinit var expenseList: List<Expense>
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentExpenseBinding.bind(view)
@@ -203,28 +205,28 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     private fun handleExpenseList(expenses: List<Expense>) {
 
-        var modifiedExpenseList = expenses
+        expenseList = expenses
 
         if (expenseFilterDto != null) {
 
-            modifiedExpenseList = expenseViewModel.applyFilter(expenses, expenseFilterDto!!)
+            expenseList = expenseViewModel.applyFilter(expenses, expenseFilterDto!!)
         }
 
         if (searchView != null && searchView!!.query.toString().isValid()) {
 
-            setUpSearchMenuButton(modifiedExpenseList)
+            setUpSearchMenuButton(expenseList)
         } else {
 
-            if (modifiedExpenseList.isNotEmpty()) {
+            if (expenseList.isNotEmpty()) {
 
                 setNoExpenseAddedVisibility(false)
-                setUpSearchMenuButton(modifiedExpenseList)
+                setUpSearchMenuButton(expenseList)
             } else {
 
                 binding.noExpenseCategoryTV.text = getString(R.string.no_expense_added_message)
                 setNoExpenseAddedVisibility(true)
             }
-            expenseAdapter.submitList(modifiedExpenseList)
+            expenseAdapter.submitList(expenseList)
 
             lifecycleScope.launch {
                 delay(100)
@@ -567,90 +569,46 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
 
     private fun handleTotalExpenseMenu() {
 
-        if (!isArgumentEmpty) {
+        val sum = expenseList.sumOf { it.amount }
 
-            // Expenses by category
-
-            if (sortBy == SortExpense.BY_CREATED) {
-
-                expenseViewModel.getTotalExpenseAmountByExpenseCategory(
-                    receivedExpenseCategoryKey
-                ).observe(viewLifecycleOwner) { totalAmount ->
-
-                    showTotalAmountSumInAlertDialog(
-                        receivedExpenseCategory.categoryName,
-                        totalAmount
-                    )
-                }
-
-            } else {
-
-                expenseViewModel.getTotalExpenseAmountByCategoryKeyAndDateRange(
-                    receivedExpenseCategoryKey,
-                    startDate, endDate + Constants.ONE_DAY_MILLISECONDS
-                ).observe(viewLifecycleOwner) { totalAmount ->
-
-                    val title = "${receivedExpenseCategory.categoryName}\nFrom ${
-                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                            startDate
-                        )
-                    } to " +
-                            "${
-                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    endDate
-                                )
-                            }"
-
-                    showTotalAmountSumInAlertDialog(
-                        title,
-                        totalAmount
-                    )
-                }
-            }
+        if (sortBy == SortExpense.BY_CREATED) {
+            showTotalAmountSumInAlertDialog(
+                if (!isArgumentEmpty) receivedExpenseCategory.categoryName else getString(R.string.all_expenses),
+                sum
+            )
         } else {
 
-            // All expenses
-
-            if (sortBy == SortExpense.BY_CREATED) {
-
-                expenseViewModel.getTotalExpenseAmount()
-                    .observe(viewLifecycleOwner) { totalAmount ->
-
-                        showTotalAmountSumInAlertDialog(
-                            "All expenses", totalAmount
-                        )
-
-                    }
-            } else if (sortBy == SortExpense.BY_DATE_RANGE) {
-
-                expenseViewModel.getTotalExpenseAmountByDateRange(
-                    startDate, (endDate + Constants.ONE_DAY_MILLISECONDS)
-                ).observe(viewLifecycleOwner) { totalAmount ->
-
-                    val title = "From ${
-                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                            startDate
-                        )
-                    } to " +
-                            "${
-                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    endDate
-                                )
-                            }"
-                    showTotalAmountSumInAlertDialog(
-                        title, totalAmount
-                    )
-
-                }
-            }
+            showTotalAmountForDateRange(
+                if (!isArgumentEmpty) receivedExpenseCategory.categoryName else getString(R.string.all_expenses),
+                sum
+            )
         }
     }
 
-    private fun showTotalAmountSumInAlertDialog(title: String, totalAmount: Double?) {
+    private fun showTotalAmountForDateRange(categoryName: String = "", totalAmount: Double = 0.0) {
+
+        val title = "${categoryName}\nFrom ${
+            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                startDate
+            )
+        } to " +
+                "${
+                    WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                        endDate
+                    )
+                }"
+
+        showTotalAmountSumInAlertDialog(
+            title,
+            totalAmount
+        )
+    }
+
+    private fun showTotalAmountSumInAlertDialog(title: String, totalAmount: Double = 0.0) {
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
-            .setMessage("Total expense : $totalAmount")
+            .setMessage(getString(R.string.total_expense, totalAmount.format(2)))
             .setPositiveButton("Ok") { dialog, _ -> dialog.dismiss() }
             .create()
             .show()

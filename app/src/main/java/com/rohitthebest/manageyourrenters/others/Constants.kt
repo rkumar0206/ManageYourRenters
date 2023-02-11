@@ -82,4 +82,5 @@ object Constants {
     const val IS_FOR_EDIT = "is_for_edit_key"
     const val PAYMENT_METHOD_KEY_FOR_EDIT = "PAYMENT_METHOD_KEY_FOR_EDIT_KEY"
 
+    const val EXPENSE_FILTER_KEY = "EXPENSE_FILTER_KEY_sdbjhsbjs"
 }

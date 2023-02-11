@@ -300,7 +300,7 @@ class BorrowerViewModel @Inject constructor(
                 }
             }
 
-            _allBorrowersList.value = allBorrowers
+            _allBorrowersList.value = allBorrowers.sortedByDescending { it.totalDueAmount }
         }
     }
 

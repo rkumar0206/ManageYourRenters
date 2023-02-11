@@ -13,10 +13,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.ExpenseAdapter
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
+import com.rohitthebest.manageyourrenters.data.filter.ExpenseFilterDto
 import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_FILTER_KEY
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
@@ -44,7 +46,8 @@ enum class SortExpense {
 
 @AndroidEntryPoint
 class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnClickListener,
-    CustomMenuItems.OnItemClickListener, ChooseExpenseCategoryBottomSheetFragment.OnItemClicked {
+    CustomMenuItems.OnItemClickListener, ChooseExpenseCategoryBottomSheetFragment.OnItemClicked,
+    ExpenseFilterBottomSheetFragment.OnClickListener {
 
     private var _binding: FragmentExpenseBinding? = null
     private val binding get() = _binding!!
@@ -65,6 +68,10 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
     private var sortBy: SortExpense = SortExpense.BY_CREATED
     private var isArgumentEmpty = false
     private var searchView: SearchView? = null
+
+    private var expenseFilterDto: ExpenseFilterDto? = null
+
+    private lateinit var expenseList: List<Expense>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -194,26 +201,40 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                 }
             }
         }
-
     }
 
     private fun handleExpenseList(expenses: List<Expense>) {
 
+        expenseList = expenses
+
+        if (expenseFilterDto != null) {
+
+            expenseList = expenseViewModel.applyFilter(expenses, expenseFilterDto!!)
+        }
+
         if (searchView != null && searchView!!.query.toString().isValid()) {
 
-            setUpSearchMenuButton(expenses)
+            setUpSearchMenuButton(expenseList)
         } else {
 
-            if (expenses.isNotEmpty()) {
+            if (expenseList.isNotEmpty()) {
 
                 setNoExpenseAddedVisibility(false)
-                setUpSearchMenuButton(expenses)
+                setUpSearchMenuButton(expenseList)
             } else {
 
                 binding.noExpenseCategoryTV.text = getString(R.string.no_expense_added_message)
                 setNoExpenseAddedVisibility(true)
             }
-            expenseAdapter.submitList(expenses)
+            expenseAdapter.submitList(expenseList)
+
+            lifecycleScope.launch {
+                delay(100)
+
+                if (expenseFilterDto != null) {
+                    binding.expenseRV.scrollToPosition(0)
+                }
+            }
         }
 
         binding.progressbar.hide()
@@ -507,94 +528,87 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
             true
         }
 
+        binding.toolbar.menu.findItem(R.id.menu_expense_filters).setOnMenuItemClickListener {
+            handleFilterMenu()
+            true
+        }
+    }
+
+    private fun handleFilterMenu() {
+
+        requireActivity().supportFragmentManager.let {
+
+            val bundle = Bundle()
+            bundle.putString(
+                EXPENSE_FILTER_KEY,
+                if (expenseFilterDto == null) "" else expenseFilterDto.convertToJsonString()
+            )
+
+            ExpenseFilterBottomSheetFragment.newInstance(
+                bundle
+            ).apply {
+                show(it, TAG)
+            }.setOnClickListener(this)
+        }
+    }
+
+    override fun onFilterApply(expenseFilterDto: ExpenseFilterDto?) {
+
+        this.expenseFilterDto = expenseFilterDto
+
+        if (this.expenseFilterDto != null) {
+            binding.toolbar.menu.findItem(R.id.menu_expense_filters)
+                .setIcon(R.drawable.baseline_filter_list_colored_24)
+        } else {
+            binding.toolbar.menu.findItem(R.id.menu_expense_filters)
+                .setIcon(R.drawable.baseline_filter_list_24)
+        }
+
+        observeExpenses()
     }
 
     private fun handleTotalExpenseMenu() {
 
-        if (!isArgumentEmpty) {
+        val sum = expenseList.sumOf { it.amount }
 
-            // Expenses by category
-
-            if (sortBy == SortExpense.BY_CREATED) {
-
-                expenseViewModel.getTotalExpenseAmountByExpenseCategory(
-                    receivedExpenseCategoryKey
-                ).observe(viewLifecycleOwner) { totalAmount ->
-
-                    showTotalAmountSumInAlertDialog(
-                        receivedExpenseCategory.categoryName,
-                        totalAmount
-                    )
-                }
-
-            } else {
-
-                expenseViewModel.getTotalExpenseAmountByCategoryKeyAndDateRange(
-                    receivedExpenseCategoryKey,
-                    startDate, endDate + Constants.ONE_DAY_MILLISECONDS
-                ).observe(viewLifecycleOwner) { totalAmount ->
-
-                    val title = "${receivedExpenseCategory.categoryName}\nFrom ${
-                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                            startDate
-                        )
-                    } to " +
-                            "${
-                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    endDate
-                                )
-                            }"
-
-                    showTotalAmountSumInAlertDialog(
-                        title,
-                        totalAmount
-                    )
-                }
-            }
+        if (sortBy == SortExpense.BY_CREATED) {
+            showTotalAmountSumInAlertDialog(
+                if (!isArgumentEmpty) receivedExpenseCategory.categoryName else getString(R.string.all_expenses),
+                sum
+            )
         } else {
 
-            // All expenses
-
-            if (sortBy == SortExpense.BY_CREATED) {
-
-                expenseViewModel.getTotalExpenseAmount()
-                    .observe(viewLifecycleOwner) { totalAmount ->
-
-                        showTotalAmountSumInAlertDialog(
-                            "All expenses", totalAmount
-                        )
-
-                    }
-            } else if (sortBy == SortExpense.BY_DATE_RANGE) {
-
-                expenseViewModel.getTotalExpenseAmountByDateRange(
-                    startDate, (endDate + Constants.ONE_DAY_MILLISECONDS)
-                ).observe(viewLifecycleOwner) { totalAmount ->
-
-                    val title = "From ${
-                        WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                            startDate
-                        )
-                    } to " +
-                            "${
-                                WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-                                    endDate
-                                )
-                            }"
-                    showTotalAmountSumInAlertDialog(
-                        title, totalAmount
-                    )
-
-                }
-            }
+            showTotalAmountForDateRange(
+                if (!isArgumentEmpty) receivedExpenseCategory.categoryName else getString(R.string.all_expenses),
+                sum
+            )
         }
     }
 
-    private fun showTotalAmountSumInAlertDialog(title: String, totalAmount: Double?) {
+    private fun showTotalAmountForDateRange(categoryName: String = "", totalAmount: Double = 0.0) {
+
+        val title = "${categoryName}\nFrom ${
+            WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                startDate
+            )
+        } to " +
+                "${
+                    WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+                        endDate
+                    )
+                }"
+
+        showTotalAmountSumInAlertDialog(
+            title,
+            totalAmount
+        )
+    }
+
+    private fun showTotalAmountSumInAlertDialog(title: String, totalAmount: Double = 0.0) {
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
-            .setMessage("Total expense : $totalAmount")
+            .setMessage(getString(R.string.total_expense, totalAmount.format(2)))
             .setPositiveButton("Ok") { dialog, _ -> dialog.dismiss() }
             .create()
             .show()

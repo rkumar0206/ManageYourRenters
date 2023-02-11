@@ -213,7 +213,7 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
 
         binding.toolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
 
         }
 
@@ -328,7 +328,7 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
             } else {
 
                 showToast(requireContext(), "No change detected...")
-                requireActivity().onBackPressed()
+                requireActivity().onBackPressedDispatcher.onBackPressed()
             }
         }
     }
@@ -345,7 +345,7 @@ class AddEditExpenseCategoryFragment : Fragment(R.layout.fragment_add_expense_ca
             expenseCategoryViewModel.updateExpenseCategory(receivedExpenseCategory, expenseCategory)
         }
 
-        requireActivity().onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     private fun isImageClearBtnVisible(isVisible: Boolean) {

@@ -398,7 +398,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
         binding.emiPaymentToolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.emiPaymentToolbar.menu.findItem(R.id.menu_show_emi_details)

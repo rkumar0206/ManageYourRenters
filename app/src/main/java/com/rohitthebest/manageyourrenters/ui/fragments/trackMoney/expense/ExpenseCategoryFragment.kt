@@ -287,7 +287,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
         binding.toolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.toolbar.menu.findItem(R.id.menu_expense_graph).setOnMenuItemClickListener {

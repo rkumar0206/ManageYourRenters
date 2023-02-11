@@ -36,7 +36,7 @@ class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
             ?.convertJsonToObject(AppUpdate::class.java)
 
         if (appUpdate == null) {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         } else {
 
             if (appUpdate?.version == APP_VERSION) {

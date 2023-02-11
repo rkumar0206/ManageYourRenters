@@ -113,7 +113,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
     private fun initListeners() {
 
         binding.toolbar.setNavigationOnClickListener {
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.toolbar.menu.findItem(R.id.menu_deep_analyze_expense).setOnMenuItemClickListener {

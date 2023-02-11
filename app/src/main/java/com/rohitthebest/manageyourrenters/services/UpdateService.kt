@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.services
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -27,10 +28,15 @@ class UpdateService : Service() {
 
         val collection = intent?.getStringExtra(COLLECTION_KEY)
         val key = intent?.getStringExtra(DOCUMENT_KEY)
-        val map =
-            intent?.getSerializableExtra(UPDATE_DOCUMENT_MAP_KEY) as HashMap<String, Any?>
 
-        val randomId = intent.getIntExtra(RANDOM_ID_KEY, 1000)
+        val map: HashMap<String, Any?> =
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
+                intent?.getSerializableExtra(UPDATE_DOCUMENT_MAP_KEY) as HashMap<String, Any?>
+            } else ({
+                intent?.getSerializableExtra(UPDATE_DOCUMENT_MAP_KEY, HashMap::class.java)
+            }) as HashMap<String, Any?>
+
+        val randomId = intent?.getIntExtra(RANDOM_ID_KEY, 1000)
 
         val pendingIntent: PendingIntent =
             Functions.getPendingIntentForForegroundServiceNotification(
@@ -46,7 +52,7 @@ class UpdateService : Service() {
             .setProgress(100, 0, true)
             .build()
 
-        startForeground(randomId, notification)
+        startForeground(randomId!!, notification)
 
 
         val docRef = FirebaseFirestore.getInstance()

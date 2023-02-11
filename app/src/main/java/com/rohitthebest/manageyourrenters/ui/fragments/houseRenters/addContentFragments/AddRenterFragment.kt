@@ -173,7 +173,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
 
         binding.addRenterToolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.addRenterToolbar.menu.findItem(R.id.menu_add_person).setOnMenuItemClickListener {
@@ -376,7 +376,7 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             showToast(requireContext(), "Renter info updated")
         }
 
-        requireActivity().onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     private fun isValidForm(): Boolean {

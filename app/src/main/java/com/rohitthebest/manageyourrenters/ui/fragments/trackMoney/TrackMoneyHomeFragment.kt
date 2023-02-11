@@ -41,7 +41,7 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
 
         binding.trackMoneyHomeToolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         getMessage()
@@ -83,7 +83,7 @@ class TrackMoneyHomeFragment : Fragment(R.layout.fragment_track_money_home),
                         Log.d(TAG, "getMessage: Not mapped")
 
                         showToast(requireContext(), "Not available")
-                        requireActivity().onBackPressed()
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
                     }
                 }
             }

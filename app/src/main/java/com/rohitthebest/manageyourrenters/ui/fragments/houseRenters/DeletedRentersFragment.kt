@@ -55,7 +55,7 @@ class DeletedRentersFragment : Fragment(R.layout.fragment_deleted_renters),
     private fun initListeners() {
 
         binding.toolbar.setNavigationOnClickListener {
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.toolbar.menu.findItem(R.id.menu_info_deleted_renter_fragment)

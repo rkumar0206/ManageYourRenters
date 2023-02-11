@@ -133,7 +133,7 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
         binding.addEmiPaymentToolbar.setNavigationOnClickListener {
 
             hideKeyBoard(requireActivity())
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.addEmiPaymentToolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
@@ -290,7 +290,7 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
 
             emiPaymentViewModel.insertEMIPayment(emiPayment, null)
         }
-        requireActivity().onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     private fun isFormValid(): Boolean {

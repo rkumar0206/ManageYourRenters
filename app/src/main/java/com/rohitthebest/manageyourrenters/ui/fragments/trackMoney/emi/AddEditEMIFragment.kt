@@ -139,7 +139,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
 
         binding.addEmiToolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.addEmiToolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
@@ -315,7 +315,7 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
             emiViewModel.updateEMI(receivedEmi, emi)
         }
 
-        requireActivity().onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     private fun isFormValid(): Boolean {

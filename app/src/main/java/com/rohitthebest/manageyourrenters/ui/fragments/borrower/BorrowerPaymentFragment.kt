@@ -73,7 +73,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
         binding.borrowerPaymentToolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.addPaymentFAB.setOnClickListener {

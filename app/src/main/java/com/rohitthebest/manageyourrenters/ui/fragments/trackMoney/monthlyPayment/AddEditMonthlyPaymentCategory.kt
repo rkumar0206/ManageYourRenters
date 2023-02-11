@@ -186,7 +186,7 @@ class AddEditMonthlyPaymentCategory :
 
         binding.toolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
 
         }
 
@@ -269,7 +269,7 @@ class AddEditMonthlyPaymentCategory :
             } else {
 
                 Functions.showToast(requireContext(), "No change detected...")
-                requireActivity().onBackPressed()
+                requireActivity().onBackPressedDispatcher.onBackPressed()
             }
         }
     }
@@ -288,7 +288,7 @@ class AddEditMonthlyPaymentCategory :
                 monthlyPaymentCategory
             )
         }
-        requireActivity().onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     private fun initImageSearchEditText() {

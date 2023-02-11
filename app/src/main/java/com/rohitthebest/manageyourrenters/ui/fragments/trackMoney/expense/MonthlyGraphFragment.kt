@@ -51,7 +51,7 @@ class MonthlyGraphFragment : Fragment(R.layout.fragment_monthly_graph) {
 
         binding.toolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 

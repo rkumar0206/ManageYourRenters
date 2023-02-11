@@ -229,7 +229,7 @@ class MonthlyPaymentFragment : Fragment(R.layout.fragment_monthly_payment),
     private fun initListeners() {
 
         binding.toolbar.setNavigationOnClickListener {
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.addMonthlyPaymentsFAB.setOnClickListener {

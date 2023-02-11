@@ -232,7 +232,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
         binding.toolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.toolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
@@ -341,7 +341,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
             } else {
 
                 showToast(requireContext(), "No change detected...")
-                requireActivity().onBackPressed()
+                requireActivity().onBackPressedDispatcher.onBackPressed()
             }
         }
 
@@ -367,7 +367,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
         Log.d(TAG, "saveExpenseInDatabase: expense saved -> $expense")
 
-        requireActivity().onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     private fun isFormValid(): Boolean {

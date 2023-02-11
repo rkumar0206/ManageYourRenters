@@ -89,7 +89,8 @@ class BorrowerDetailBottomSheetDialog : BottomSheetDialogFragment() {
             borrowerAddedOnTV.text =
                 WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(receivedBorrower.created)
 
-            borrowerDueAmountTV.text = "Total Due : ${receivedBorrower.totalDueAmount.format(2)}"
+            borrowerDueAmountTV.text =
+                getString(R.string.total_dues, receivedBorrower.totalDueAmount.format(2))
 
             //email
             if (receivedBorrower.emailId.isValid()) borrowerEmailTV.text = receivedBorrower.emailId

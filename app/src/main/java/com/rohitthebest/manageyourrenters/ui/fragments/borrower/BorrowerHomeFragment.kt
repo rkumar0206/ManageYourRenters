@@ -81,7 +81,7 @@ class BorrowerHomeFragment : Fragment(R.layout.fragment_borrower_home),
         }
         binding.individualRenterToolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
         binding.refreshLayout.setOnRefreshListener {
 

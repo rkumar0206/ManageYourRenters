@@ -30,4 +30,7 @@ interface EMIDao {
 
     @Query("SELECT * FROM emi_table WHERE `key` = :emiKey")
     fun getEMIByKey(emiKey: String): Flow<EMI>
+
+    @Query("UPDATE emi_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }

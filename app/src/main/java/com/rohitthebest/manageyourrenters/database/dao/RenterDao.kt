@@ -58,4 +58,6 @@ interface RenterDao {
     @Query("SELECT DISTINCT address FROM renter_table")
     fun getAllDistinctAddress(): Flow<List<String>>
 
+    @Query("UPDATE renter_table SET isSynced = 'false' WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }

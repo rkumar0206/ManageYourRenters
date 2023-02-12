@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.NOTIFICATION_CHANNEL_ID
@@ -16,7 +17,9 @@ import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.deleteFromFireStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class DeleteService : Service() {
 
@@ -55,6 +58,17 @@ class DeleteService : Service() {
                 stopSelf()
                 Log.d(TAG, "onStartCommand: document deleted from collection $collection")
             }
+        }
+
+        // starting stop timer
+        CoroutineScope(Dispatchers.IO).launch {
+
+            Log.d(
+                TAG,
+                "onStartCommand: timer started for ${Constants.SERVICE_STOP_TIME_IN_SECONDS} seconds"
+            )
+            delay(TimeUnit.SECONDS.toMillis(Constants.SERVICE_STOP_TIME_IN_SECONDS))
+            stopSelf()
         }
 
         return START_NOT_STICKY

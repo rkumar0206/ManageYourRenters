@@ -14,6 +14,7 @@ import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.SERVICE_STOP_TIME_IN_SECONDS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWERS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BORROWER_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMI_PAYMENTS
@@ -31,8 +32,10 @@ import com.rohitthebest.manageyourrenters.utils.insertToFireStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val TAG = "UploadService"
@@ -73,6 +76,8 @@ class UploadService : Service() {
     @Inject
     lateinit var paymentMethodRepository: PaymentMethodRepository
 
+    @Inject
+    lateinit var updateIsSyncedValueForAnyTableRepository: UpdateIsSyncedValueForAnyTableRepository
 
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -103,9 +108,29 @@ class UploadService : Service() {
             .collection(collection!!)
             .document(key!!)
 
-        CoroutineScope(Dispatchers.IO).launch {
+        var model: Any? = null
 
-            var model: Any? = null
+        // starting stop timer
+        val stopTimerJob = CoroutineScope(Dispatchers.IO).launch {
+
+            Log.d(TAG, "onStartCommand: timer started for $SERVICE_STOP_TIME_IN_SECONDS seconds")
+
+            delay(TimeUnit.SECONDS.toMillis(SERVICE_STOP_TIME_IN_SECONDS))
+
+            if (model != null) {
+
+                updateIsSyncedValueForAnyTableRepository.updateIsSyncValueToFalse(collection, key)
+                Log.d(
+                    TAG,
+                    "updateIsSyncedValueOfDocument: upload in collection $collection, was UNSUCCESSFUL"
+                )
+                stopSelf()
+            } else {
+                stopSelf()
+            }
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
 
             when (collection) {
 
@@ -156,128 +181,38 @@ class UploadService : Service() {
                 }
 
                 else -> {
+                    stopTimerJob.cancel()
                     stopSelf()
                 }
             }
 
             if (model != null) {
 
-                updateIsSyncedValueOfDocument(
-                    collection,
-                    model,
-                    insertToFireStore(docRef, model)
-                )
+                if (!insertToFireStore(docRef, model!!)) {
+
+                    // upload was unsuccessful therefore updating the isSynced value to false
+                    updateIsSyncedValueForAnyTableRepository.updateIsSyncValueToFalse(
+                        collection,
+                        key
+                    )
+                    Log.d(
+                        TAG,
+                        "updateIsSyncedValueOfDocument: upload in collection $collection, was UNSUCCESSFUL"
+                    )
+                } else {
+                    Log.d(
+                        TAG,
+                        "updateIsSyncedValueOfDocument: upload in collection $collection, was successful"
+                    )
+                }
+                stopTimerJob.cancel()
                 stopSelf()
             } else {
-
+                stopTimerJob.cancel()
                 stopSelf()
             }
         }
-
         return START_NOT_STICKY
-    }
-
-
-    private suspend fun updateIsSyncedValueOfDocument(
-        collection: String,
-        document: Any,
-        isSyncedValue: Boolean
-    ) {
-
-        if (!isSyncedValue) {
-            when (collection) {
-
-                getString(R.string.renters) -> {
-
-                    val renter = document as Renter
-                    renter.isSynced = getString(R.string.f)
-                    renterRepository.updateRenter(renter)
-                }
-
-                getString(R.string.renter_payments) -> {
-
-                    val payment = document as RenterPayment
-                    payment.isSynced = false
-                    renterPaymentRepository.updateRenterPayment(payment)
-                }
-
-                getString(R.string.borrowers) -> {
-
-                    val borrower = document as Borrower
-                    borrower.isSynced = false
-                    borrowerRepository.update(borrower)
-                }
-
-                getString(R.string.borrowerPayments) -> {
-                    val borrowerPayment = document as BorrowerPayment
-                    borrowerPayment.isSynced = false
-                    borrowerPaymentRepository.updateBorrowerPayment(borrowerPayment)
-                }
-
-                getString(R.string.emis) -> {
-                    val emi = document as EMI
-                    emi.isSynced = false
-                    emiRepository.updateEMI(emi)
-                }
-
-                getString(R.string.emiPayments) -> {
-                    val emiPayment = document as EMIPayment
-                    emiPayment.isSynced = false
-                    emiPaymentRepository.updateEMIPayment(emiPayment)
-                }
-
-                EXPENSE_CATEGORIES -> {
-                    val expenseCategory = document as ExpenseCategory
-                    expenseCategory.isSynced = false
-                    expenseCategoryRepository.updateExpenseCategory(expenseCategory)
-                }
-
-                EXPENSES -> {
-
-                    val expense = document as Expense
-                    expense.isSynced = false
-                    expenseRepository.updateExpense(expense)
-                }
-
-                MONTHLY_PAYMENT_CATEGORIES -> {
-
-                    val category = document as MonthlyPaymentCategory
-                    category.isSynced = false
-                    monthlyPaymentCategoryRepository.updateMonthlyPaymentCategory(category)
-                }
-                MONTHLY_PAYMENTS -> {
-
-                    val monthlyPayment = document as MonthlyPayment
-                    monthlyPayment.isSynced = false
-                    monthlyPaymentRepository.updateMonthlyPayment(monthlyPayment)
-                }
-
-                PAYMENT_METHODS -> {
-                    val paymentMethod = document as PaymentMethod
-                    paymentMethod.isSynced = false
-                    paymentMethodRepository.updatePaymentMethod(paymentMethod)
-                }
-
-                else -> stopSelf()
-            }
-
-        }
-
-        if (isSyncedValue) {
-
-            Log.d(
-                TAG,
-                "updateIsSyncedValueOfDocument: upload in collection $collection, was successful"
-            )
-        } else {
-
-            Log.d(
-                TAG,
-                "updateIsSyncedValueOfDocument: upload in collection $collection, was UNSUCCESSFUL"
-            )
-        }
-
-
     }
 
     override fun onBind(p0: Intent?): IBinder? {

@@ -22,8 +22,8 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddSupportingDocum
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
 import com.rohitthebest.manageyourrenters.others.Constants.SUPPORTING_DOCUMENT_HELPER_MODEL_KEY
 import com.rohitthebest.manageyourrenters.utils.*
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.checkIfPermissionsGranted
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isPermissionGranted
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -168,7 +168,9 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
 
         includeBinding.addFileMCV.setOnClickListener {
 
-            if (requireContext().checkIfPermissionsGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            if (requireContext().isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)
+                || requireContext().isPermissionGranted(Manifest.permission.POST_NOTIFICATIONS)
+            ) {
 
                 if (docType == DocumentType.PDF) {
 
@@ -280,9 +282,9 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
         when {
 
             //check if permission already granted
-            requireContext().checkIfPermissionsGranted(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
-
+            requireContext().isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
                 //permission is granted
+                return
             }
 
             // if the app deems that they should show the request permission rationale

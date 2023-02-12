@@ -14,15 +14,24 @@ import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPDATE_DOCUMENT_MAP_KEY
+import com.rohitthebest.manageyourrenters.repositories.UpdateIsSyncedValueForAnyTableRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class UpdateService : Service() {
 
     private val TAG = "UpdateService"
+
+    @Inject
+    lateinit var updateIsSyncedValueForAnyTableRepository: UpdateIsSyncedValueForAnyTableRepository
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
@@ -46,7 +55,7 @@ class UpdateService : Service() {
         val notification = NotificationCompat.Builder(
             this,
             Constants.NOTIFICATION_CHANNEL_ID
-        ).setSmallIcon(R.drawable.ic_baseline_payment_24)
+        ).setSmallIcon(R.drawable.expense_shortcut_icon)
             .setContentIntent(pendingIntent)
             .setContentTitle("Updating on $collection.")
             .setProgress(100, 0, true)
@@ -54,10 +63,24 @@ class UpdateService : Service() {
 
         startForeground(randomId!!, notification)
 
-
         val docRef = FirebaseFirestore.getInstance()
             .collection(collection!!)
             .document(key!!)
+
+        // starting stop timer
+        val stopTimerJob = CoroutineScope(Dispatchers.IO).launch {
+
+            Log.d(
+                TAG,
+                "onStartCommand: timer started for ${Constants.SERVICE_STOP_TIME_IN_SECONDS} seconds"
+            )
+            delay(TimeUnit.SECONDS.toMillis(Constants.SERVICE_STOP_TIME_IN_SECONDS))
+
+            updateIsSyncedValueForAnyTableRepository.updateIsSyncValueToFalse(
+                collection, key
+            )
+            stopSelf()
+        }
 
         CoroutineScope(Dispatchers.IO).launch {
 
@@ -67,10 +90,17 @@ class UpdateService : Service() {
                     TAG,
                     "onStartCommand: Updated document in collection $collection with key $key"
                 )
+                stopTimerJob.cancel()
+                stopSelf()
+            } else {
+                Log.d(
+                    TAG,
+                    "onStartCommand: Updated document in collection $collection with key $key was UNSUCCESSFUL"
+                )
+                stopTimerJob.cancel()
                 stopSelf()
             }
         }
-
         return START_NOT_STICKY
     }
 

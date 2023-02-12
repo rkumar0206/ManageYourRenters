@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 private const val TAG = "UploadDocumentListToFir"
 
@@ -50,43 +51,52 @@ class UploadDocumentListToFireStoreService : Service() {
         val db = FirebaseFirestore.getInstance()
         val batch = db.batch()
 
-        when (collection) {
+        CoroutineScope(Dispatchers.IO).launch {
 
-            PARTIAL_PAYMENTS -> {
+            when (collection) {
 
-                Log.d(TAG, "onStartCommand: $uploadData")
+                PARTIAL_PAYMENTS -> {
 
-                val partialPaymentList = fromStringToPartialPaymentList(uploadData!!)
+                    Log.d(TAG, "onStartCommand: $uploadData")
 
-                if (partialPaymentList.isNotEmpty()) {
+                    val partialPaymentList = fromStringToPartialPaymentList(uploadData!!)
 
-                    partialPaymentList.forEach { partialPayment ->
+                    if (partialPaymentList.isNotEmpty()) {
 
-                        batch.set(
-                            db.collection(collection)
-                                .document(partialPayment.key),
-                            partialPayment
-                        )
-                    }
+                        partialPaymentList.forEach { partialPayment ->
 
-                    CoroutineScope(Dispatchers.IO).launch {
-
-                        delay(150)
+                            batch.set(
+                                db.collection(collection)
+                                    .document(partialPayment.key),
+                                partialPayment
+                            )
+                        }
 
                         if (uploadFilesOnFirestore(batch)) {
 
-                            Log.d(TAG, "onStartCommand: Upload successfull")
+                            Log.d(TAG, "onStartCommand: List Upload SUCCESSFUL")
+                            stopSelf()
+                        } else {
+                            Log.d(TAG, "onStartCommand: List Upload UNSUCCESSFUL")
                             stopSelf()
                         }
+                    } else {
+                        stopSelf()
                     }
-
-
-                } else {
-
-                    stopSelf()
                 }
-
             }
+        }
+
+
+        // starting stop timer
+        CoroutineScope(Dispatchers.IO).launch {
+
+            Log.d(
+                TAG,
+                "onStartCommand: timer started for ${Constants.SERVICE_STOP_TIME_IN_SECONDS} seconds"
+            )
+            delay(TimeUnit.SECONDS.toMillis(Constants.SERVICE_STOP_TIME_IN_SECONDS))
+            stopSelf()
         }
 
         return START_NOT_STICKY

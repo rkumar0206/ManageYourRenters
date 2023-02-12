@@ -15,6 +15,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.getDataFromFireStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val TAG = "SyncDocumentsFromFirestore"
@@ -120,6 +121,14 @@ class SyncDocumentsFromFirestoreService : Service() {
             .build()
 
         startForeground(6826, notification)
+
+        // staring stop timer
+        CoroutineScope(Dispatchers.IO).launch {
+
+            Log.d(TAG, "onStartCommand: timer started for 140 seconds")
+            delay(TimeUnit.SECONDS.toMillis(140))
+            stopSelf()
+        }
 
         return START_NOT_STICKY
     }

@@ -43,6 +43,8 @@ interface BorrowerPaymentDao {
     @Query("SELECT `key`, supportingDocument FROM borrower_payment_table WHERE borrowerKey = :borrowerKey AND isSynced = 1")
     suspend fun getPaymentKeysAndSupportingDocumentByBorrowerKey(borrowerKey: String): List<KeyAndSupportingDoc>
 
+    @Query("UPDATE borrower_payment_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }
 
 

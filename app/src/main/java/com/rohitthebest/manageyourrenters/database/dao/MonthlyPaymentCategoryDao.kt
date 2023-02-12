@@ -30,4 +30,7 @@ interface MonthlyPaymentCategoryDao {
 
     @Query("SELECT * FROM monthly_payment_category_table WHERE `key`= :key")
     fun getMonthlyPaymentCategoryUsingKey(key: String): Flow<MonthlyPaymentCategory>
+
+    @Query("UPDATE monthly_payment_category_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }

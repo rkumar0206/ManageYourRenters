@@ -60,20 +60,30 @@ class ExpenseViewModel @Inject constructor(
 
             if (isInternetAvailable(context)) {
 
-                updateDocumentOnFireStore(
-                    context,
-                    compareExpenseModel(oldValue, newValue),
-                    EXPENSES,
-                    oldValue.key
-                )
+                newValue.isSynced = true
 
+                if (!oldValue.isSynced) {
+                    uploadDocumentToFireStore(
+                        context,
+                        EXPENSES,
+                        newValue.key
+                    )
+                } else {
+                    val map = compareExpenseModel(oldValue, newValue)
+                    if (map.isNotEmpty()) {
+                        updateDocumentOnFireStore(
+                            context,
+                            map,
+                            EXPENSES,
+                            oldValue.key
+                        )
+                    }
+                }
             } else {
-
                 newValue.isSynced = false
             }
 
             expenseRepository.updateExpense(newValue)
-
             Functions.showToast(context, "Expense updated")
         }
 

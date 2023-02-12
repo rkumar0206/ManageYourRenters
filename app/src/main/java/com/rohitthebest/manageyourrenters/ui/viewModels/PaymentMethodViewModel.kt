@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
-import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.PAYMENT_METHODS
 import com.rohitthebest.manageyourrenters.repositories.PaymentMethodRepository
 import com.rohitthebest.manageyourrenters.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +40,7 @@ class PaymentMethodViewModel @Inject constructor(
             paymentMethod.isSynced = true
             uploadDocumentToFireStore(
                 context,
-                FirestoreCollectionsConstants.PAYMENT_METHODS,
+                PAYMENT_METHODS,
                 paymentMethod.key
             )
         } else {
@@ -59,14 +59,21 @@ class PaymentMethodViewModel @Inject constructor(
 
             if (Functions.isInternetAvailable(context)) {
 
-                val map = comparePaymentMethod(oldValue, newValue)
-                if (map.isNotEmpty()) {
-                    updateDocumentOnFireStore(
-                        context,
-                        map,
-                        FirestoreCollectionsConstants.PAYMENT_METHODS,
-                        oldValue.key
-                    )
+                newValue.isSynced = true
+
+                if (!oldValue.isSynced) {
+
+                    uploadDocumentToFireStore(context, PAYMENT_METHODS, newValue.key)
+                } else {
+                    val map = comparePaymentMethod(oldValue, newValue)
+                    if (map.isNotEmpty()) {
+                        updateDocumentOnFireStore(
+                            context,
+                            map,
+                            PAYMENT_METHODS,
+                            oldValue.key
+                        )
+                    }
                 }
             } else {
                 newValue.isSynced = false
@@ -80,7 +87,7 @@ class PaymentMethodViewModel @Inject constructor(
         val context = getApplication<Application>().applicationContext
         deleteDocumentFromFireStore(
             context,
-            FirestoreCollectionsConstants.PAYMENT_METHODS,
+            PAYMENT_METHODS,
             paymentMethod.key
         )
         repository.deletePaymentMethod(paymentMethod)

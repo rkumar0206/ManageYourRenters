@@ -76,10 +76,6 @@ class ExpenseCategoryViewModel @Inject constructor(
             Functions.showToast(context, "Expense Category saved")
         }
 
-    fun insertAllExpenseCategory(expenseCategories: List<ExpenseCategory>) = viewModelScope.launch {
-        expenseCategoryRepository.insertAllExpenseCategory(expenseCategories)
-    }
-
     fun updateExpenseCategory(
         oldValue: ExpenseCategory,
         newValue: ExpenseCategory
@@ -92,14 +88,26 @@ class ExpenseCategoryViewModel @Inject constructor(
 
                 newValue.isSynced = true
 
-                updateDocumentOnFireStore(
-                    context,
-                    compareExpenseCategoryModel(oldValue, newValue),
-                    EXPENSE_CATEGORIES,
-                    newValue.key
-                )
-            } else {
+                if (!oldValue.isSynced) {
 
+                    uploadDocumentToFireStore(
+                        context,
+                        EXPENSE_CATEGORIES,
+                        newValue.key
+                    )
+                } else {
+                    val map = compareExpenseCategoryModel(oldValue, newValue)
+                    if (map.isNotEmpty()) {
+                        updateDocumentOnFireStore(
+                            context,
+                            map,
+                            EXPENSE_CATEGORIES,
+                            newValue.key
+                        )
+                    }
+                }
+
+            } else {
                 newValue.isSynced = false
             }
 
@@ -194,11 +202,6 @@ class ExpenseCategoryViewModel @Inject constructor(
 
         expenseCategoryRepository.deleteAllExpenseCategories()
         expenseRepository.deleteAllExpenses()
-    }
-
-    fun deleteExpenseCategoryByIsSyncedValue(isSynced: Boolean) = viewModelScope.launch {
-
-        expenseCategoryRepository.deleteAllExpenseCategoriesByIsSynced(isSynced)
     }
 
     fun getExpenseCategoryByKey(key: String) =

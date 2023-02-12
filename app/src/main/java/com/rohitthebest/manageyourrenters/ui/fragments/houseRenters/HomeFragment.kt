@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.houseRenters
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
@@ -26,6 +27,8 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.Renter
 import com.rohitthebest.manageyourrenters.databinding.FragmentHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION
+import com.rohitthebest.manageyourrenters.ui.activities.ShowImageActivity
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
@@ -325,10 +328,21 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             renterForMenus.supportingDocument?.let { supportingDoc ->
 
-                Functions.onViewOrDownloadSupportingDocument(
-                    requireActivity(),
-                    supportingDoc
-                )
+                if (supportingDoc.documentType == DocumentType.IMAGE) {
+
+                    // open image activity
+                    val intent = Intent(requireContext(), ShowImageActivity::class.java)
+                    intent.putExtra(
+                        GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION,
+                        supportingDoc.convertToJsonString()
+                    )
+                    requireActivity().startActivity(intent)
+                } else {
+                    Functions.onViewOrDownloadSupportingDocument(
+                        requireActivity(),
+                        supportingDoc
+                    )
+                }
             }
         }
     }

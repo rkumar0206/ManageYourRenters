@@ -84,5 +84,6 @@ object Constants {
 
     const val EXPENSE_FILTER_KEY = "EXPENSE_FILTER_KEY_sdbjhsbjs"
 
-    var SERVICE_STOP_TIME_IN_SECONDS: Long = 45
+    const val SERVICE_STOP_TIME_IN_SECONDS: Long = 45
+    const val GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION = "GENERIC_KEY_skdjhshjsvhjs"
 }

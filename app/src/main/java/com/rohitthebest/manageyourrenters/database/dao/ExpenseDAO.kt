@@ -86,4 +86,7 @@ interface ExpenseDAO {
 
     @Query("SELECT * FROM expense_table WHERE paymentMethods LIKE '%' || :paymentMethodKey || '%' ORDER BY created DESC")
     fun getExpensesByPaymentMethodKey(paymentMethodKey: String): Flow<List<Expense>>
+
+    @Query("UPDATE expense_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }

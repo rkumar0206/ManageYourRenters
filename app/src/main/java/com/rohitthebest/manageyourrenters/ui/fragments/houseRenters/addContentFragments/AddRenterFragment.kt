@@ -293,8 +293,8 @@ class AddRenterFragment : Fragment(), View.OnClickListener, CompoundButton.OnChe
             address = includeBinding.renterAddressET.text.toString().trim()
             imageUrl = ""
             occupation = includeBinding.renterOccupation.editText?.text.toString().trim()
-            noOfFamilyMembers =
-                includeBinding.renterNoOfMembers.editText?.text.toString().trim().toInt()
+            noOfFamilyMembers = if (includeBinding.renterNoOfMembers.editText.isTextValid())
+                includeBinding.renterNoOfMembers.editText?.text.toString().trim().toInt() else 0
             uid = getUid()!!
 
             renterId = if (!isMessageReceivesForEditing) {

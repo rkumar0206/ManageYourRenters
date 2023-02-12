@@ -30,4 +30,7 @@ interface PaymentMethodDao {
 
     @Query("SELECT * FROM payment_method_table WHERE `key` = :paymentMethodKey")
     fun getPaymentMethodByKey(paymentMethodKey: String): Flow<PaymentMethod>
+
+    @Query("UPDATE payment_method_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }

@@ -31,4 +31,6 @@ interface ExpenseCategoryDAO {
     @Query("SELECT * FROM expense_category_table WHERE `key` = :key")
     fun getExpenseCategoryByKey(key: String): Flow<ExpenseCategory>
 
+    @Query("UPDATE expense_category_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }

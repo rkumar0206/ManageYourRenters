@@ -47,4 +47,7 @@ interface RenterPaymentDao {
 
     @Query("SELECT SUM(amountPaid) FROM renter_payment_table")
     fun getTotalRevenueOfAllTime(): Flow<Double>
+
+    @Query("UPDATE renter_payment_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }

@@ -468,7 +468,7 @@ class Functions {
 
         }
 
-        fun Context.checkIfPermissionsGranted(permission: String): Boolean {
+        fun Context.isPermissionGranted(permission: String): Boolean {
 
             return ContextCompat.checkSelfPermission(
                 this, permission

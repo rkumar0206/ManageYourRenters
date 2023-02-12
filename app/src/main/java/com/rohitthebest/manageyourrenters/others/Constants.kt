@@ -83,4 +83,6 @@ object Constants {
     const val PAYMENT_METHOD_KEY_FOR_EDIT = "PAYMENT_METHOD_KEY_FOR_EDIT_KEY"
 
     const val EXPENSE_FILTER_KEY = "EXPENSE_FILTER_KEY_sdbjhsbjs"
+
+    var SERVICE_STOP_TIME_IN_SECONDS: Long = 45
 }

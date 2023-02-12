@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class DeleteAllDocumentsService : Service() {
 
@@ -71,6 +72,17 @@ class DeleteAllDocumentsService : Service() {
                     stopSelf()
                 }
             }
+        }
+
+        // starting stop timer
+        CoroutineScope(Dispatchers.IO).launch {
+
+            Log.d(
+                TAG,
+                "onStartCommand: timer started for ${Constants.SERVICE_STOP_TIME_IN_SECONDS} seconds"
+            )
+            delay(TimeUnit.SECONDS.toMillis(Constants.SERVICE_STOP_TIME_IN_SECONDS))
+            stopSelf()
         }
 
         return START_REDELIVER_INTENT

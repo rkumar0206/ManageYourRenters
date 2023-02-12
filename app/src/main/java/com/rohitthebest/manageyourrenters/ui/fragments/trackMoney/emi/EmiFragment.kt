@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
@@ -17,6 +18,7 @@ import com.rohitthebest.manageyourrenters.data.SupportingDocumentHelperModel
 import com.rohitthebest.manageyourrenters.database.model.EMI
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.activities.ShowImageActivity
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIViewModel
@@ -182,10 +184,21 @@ class EmiFragment : Fragment(R.layout.fragment_emi), EMIAdapter.OnClickListener,
 
             emiForMenuItems.supportingDocument?.let { supportingDoc ->
 
-                onViewOrDownloadSupportingDocument(
-                    requireActivity(),
-                    supportingDoc
-                )
+                if (supportingDoc.documentType == DocumentType.IMAGE) {
+
+                    // open image activity
+                    val intent = Intent(requireContext(), ShowImageActivity::class.java)
+                    intent.putExtra(
+                        Constants.GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION,
+                        supportingDoc.convertToJsonString()
+                    )
+                    requireActivity().startActivity(intent)
+                } else {
+                    onViewOrDownloadSupportingDocument(
+                        requireActivity(),
+                        supportingDoc
+                    )
+                }
             }
 
         }

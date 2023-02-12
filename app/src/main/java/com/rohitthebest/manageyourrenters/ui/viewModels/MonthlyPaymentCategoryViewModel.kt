@@ -66,13 +66,13 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
 
             } else {
 
-            monthlyPaymentCategory.isSynced = false
+                monthlyPaymentCategory.isSynced = false
+            }
+
+            repository.insertMonthlyPaymentCategory(monthlyPaymentCategory)
+
+            Functions.showToast(context, "Monthly Payment Category saved")
         }
-
-        repository.insertMonthlyPaymentCategory(monthlyPaymentCategory)
-
-        Functions.showToast(context, "Monthly Payment Category saved")
-    }
 
     fun insertAllMonthlyPaymentCategory(monthlyPaymentCategories: List<MonthlyPaymentCategory>) =
         viewModelScope.launch {
@@ -91,12 +91,25 @@ class MonthlyPaymentCategoryViewModel @Inject constructor(
 
                 newValue.isSynced = true
 
-                updateDocumentOnFireStore(
-                    context,
-                    compareMonthlyPaymentCategoryModel(oldValue, newValue),
-                    MONTHLY_PAYMENT_CATEGORIES,
-                    oldValue.key
-                )
+                if (!oldValue.isSynced) {
+
+                    uploadDocumentToFireStore(
+                        context,
+                        MONTHLY_PAYMENT_CATEGORIES,
+                        newValue.key
+                    )
+                } else {
+                    val map = compareMonthlyPaymentCategoryModel(oldValue, newValue)
+                    if (map.isNotEmpty()) {
+                        updateDocumentOnFireStore(
+                            context,
+                            map,
+                            MONTHLY_PAYMENT_CATEGORIES,
+                            oldValue.key
+                        )
+                    }
+                }
+
             } else {
 
                 newValue.isSynced = false

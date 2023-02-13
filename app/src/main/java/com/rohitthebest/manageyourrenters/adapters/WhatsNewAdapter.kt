@@ -1,6 +1,5 @@
 package com.rohitthebest.manageyourrenters.adapters
 
-import android.graphics.Typeface
 import android.os.Build
 import android.text.Html
 import android.view.LayoutInflater
@@ -9,11 +8,13 @@ import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.StyleType
 import com.rohitthebest.manageyourrenters.data.WhatsNew
 import com.rohitthebest.manageyourrenters.databinding.AdapterWhatsNewBinding
-import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.applyStyles
+import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.isValid
+import com.rohitthebest.manageyourrenters.utils.show
 
 class WhatsNewAdapter :
     ListAdapter<WhatsNew, WhatsNewAdapter.WhatsNewViewHolder>(DiffUtilCallback()) {
@@ -60,85 +61,9 @@ class WhatsNewAdapter :
                         }
 
                     } else {
-
-                        when {
-
-                            new.feature.endsWith("-heading") || (new.textStyle.isValid() && new.textStyle.equals(
-                                "heading"
-                            )) -> {
-
-                                changeTextStyle(
-                                    color = R.color.primaryTextColor,
-                                    typeface = Typeface.BOLD,
-                                    textSize = 20f,
-                                    text = new.feature.replace("-heading", "")
-                                )
-
-                            }
-
-                            new.feature.endsWith("-critical") || (new.textStyle.isValid() && new.textStyle.equals(
-                                "critical"
-                            )) -> {
-
-                                changeTextStyle(
-                                    R.color.color_orange,
-                                    Typeface.BOLD,
-                                    20f,
-                                    new.feature.replace("-critical", "")
-                                )
-                            }
-                            new.feature.startsWith("https") || new.feature.startsWith("http") -> {
-
-                                changeTextStyle(
-                                    R.color.blue_text_color,
-                                    Typeface.NORMAL,
-                                    16f,
-                                    new.feature
-                                )
-                                whatsNewTV.underline()
-                            }
-
-                            else -> {
-
-                                if (new.textStyle.isValid()) {
-
-                                    val typeface = when {
-
-                                        new.textStyle!!.contains("B") && new.textStyle!!.contains("I") -> {
-                                            Typeface.BOLD_ITALIC
-                                        }
-
-                                        new.textStyle!!.contains("B") -> {
-                                            Typeface.BOLD
-                                        }
-
-                                        new.textStyle!!.contains("I") -> {
-                                            Typeface.ITALIC
-                                        }
-
-                                        else -> Typeface.NORMAL
-                                    }
-                                    changeTextStyle(
-                                        if (new.textStyle!!.contains("B")) R.color.primaryTextColor else R.color.secondaryTextColor,
-                                        typeface,
-                                        16f,
-                                        new.feature
-                                    )
-
-                                    if (new.textStyle!!.contains("U")) {
-                                        whatsNewTV.underline()
-                                    }
-
-                                } else {
-                                    changeTextStyle(
-                                        R.color.secondaryTextColor,
-                                        Typeface.NORMAL,
-                                        16f,
-                                        new.feature
-                                    )
-                                }
-                            }
-                        }
+                        whatsNewTV.applyStyles(
+                            new.feature, new.textStyle ?: ""
+                        )
                     }
 
                     if (new.image.isValid()) {
@@ -148,20 +73,6 @@ class WhatsNewAdapter :
                         whatsNewExpandBtn.hide()
                     }
                 }
-            }
-        }
-
-        private fun changeTextStyle(color: Int, typeface: Int, textSize: Float, text: String) {
-
-            binding.apply {
-
-                whatsNewTV.changeTextColor(
-                    binding.root.context,
-                    color
-                )
-                whatsNewTV.setTypeface(null, typeface)
-                whatsNewTV.textSize = textSize
-                whatsNewTV.text = text
             }
         }
     }

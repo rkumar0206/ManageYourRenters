@@ -16,6 +16,7 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.TextWatcher
 import android.text.style.StrikethroughSpan
+import android.text.style.UnderlineSpan
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SearchView
@@ -329,6 +330,21 @@ fun TextView.strikeThrough() {
 
     spannableStringBuilder.setSpan(
         strikeThroughSpan,
+        0,
+        this.text.toString().length,
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+    )
+
+    this.text = spannableStringBuilder
+}
+
+fun TextView.underline() {
+
+    val spannableStringBuilder = SpannableStringBuilder(this.text.toString())
+    val span = UnderlineSpan()
+
+    spannableStringBuilder.setSpan(
+        span,
         0,
         this.text.toString().length,
         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

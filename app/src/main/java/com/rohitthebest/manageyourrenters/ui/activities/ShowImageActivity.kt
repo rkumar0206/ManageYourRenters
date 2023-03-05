@@ -4,16 +4,20 @@ import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.ImageHeaderParser
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
 import com.rohitthebest.manageyourrenters.data.WhatsNew
 import com.rohitthebest.manageyourrenters.databinding.ActivityShowImageBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.setImageToImageViewUsingGlide
-import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
-import com.rohitthebest.manageyourrenters.utils.downloadFileFromUrl
-import com.rohitthebest.manageyourrenters.utils.isValid
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -59,11 +63,23 @@ class ShowImageActivity : AppCompatActivity() {
 
 
         binding.downloadImageFAB.setOnClickListener {
-            downloadFileFromUrl(
-                this,
-                imageUrl,
-                imageName
-            )
+
+            MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.download))
+                .setMessage(getString(R.string.download_message))
+                .setPositiveButton(getString(R.string.download)) { dialog, _ ->
+
+                    downloadFileFromUrl(
+                        this,
+                        imageUrl,
+                        imageName
+                    )
+                    dialog.dismiss()
+                }
+                .setNegativeButton(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+                .create()
+                .show()
+
         }
 
     }
@@ -82,7 +98,7 @@ class ShowImageActivity : AppCompatActivity() {
 
     private fun handleImageReceivedFromWhatsNew() {
 
-        // todo
+        binding.progressBar.show()
 
         val whatsNew =
             intent.getStringExtra(Constants.GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION)
@@ -97,8 +113,32 @@ class ShowImageActivity : AppCompatActivity() {
             Glide.with(this)
                 .asGif()
                 .load(imageUrl)
-                .placeholder(R.drawable.baseline_loading_24)
                 .error(R.drawable.ic_outline_error_outline_24)
+                .listener(object : RequestListener<GifDrawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<GifDrawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        binding.progressBar.hide()
+                        binding.imageIV.setImageResource(R.drawable.ic_outline_error_outline_24)
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: GifDrawable?,
+                        model: Any?,
+                        target: Target<GifDrawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+
+                        binding.progressBar.hide()
+                        return false
+                    }
+                })
+                .fitCenter()
                 .into(binding.imageIV)
         }
 
@@ -108,6 +148,8 @@ class ShowImageActivity : AppCompatActivity() {
 
         if (!imageUrl.isValid()) onBackPressedDispatcher.onBackPressed()
 
+        binding.progressBar.show()
+
         setImageToImageViewUsingGlide(
             applicationContext,
             this,
@@ -115,7 +157,9 @@ class ShowImageActivity : AppCompatActivity() {
             {
                 binding.imageIV.setImageResource(R.drawable.ic_outline_error_outline_24)
             },
-            {}
+            {
+                binding.progressBar.hide()
+            }
         )
     }
 }

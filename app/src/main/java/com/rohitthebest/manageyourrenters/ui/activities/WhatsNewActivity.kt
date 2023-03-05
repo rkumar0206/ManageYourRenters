@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.activities
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,6 +12,7 @@ import com.rohitthebest.manageyourrenters.data.WhatsNew
 import com.rohitthebest.manageyourrenters.databinding.ActivityWhatsNewBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.APP_VERSION
+import com.rohitthebest.manageyourrenters.others.Constants.GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION2
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.openLinkInBrowser
@@ -106,7 +108,19 @@ class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
 
         if (whatsNew.image.isValid()) {
 
-            // todo:
+            val intent = Intent(this, ShowImageActivity::class.java)
+            intent.putExtra(
+                Constants.GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION,
+                whatsNew.convertToJsonString()
+            )
+
+            // sending the tag to ShowImageActivity to handle the image send by WhatsNewActivity
+            intent.putExtra(
+                GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION2,
+                getString(R.string.whats_new)
+            )
+
+            startActivity(intent)
         }
 
     }

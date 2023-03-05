@@ -36,7 +36,10 @@ data class WhatsNew(
 
     constructor() : this(
         "",
-        ""
+        "",
+        ImageType.JPEG,
+        "",
+        StyleType.NORMAL
     )
 }
 

@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.data
 
+import com.bumptech.glide.load.ImageHeaderParser.ImageType
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 
@@ -27,11 +28,22 @@ data class AppUpdate(
 
 data class WhatsNew(
     var feature: String,
-    var image: String?
+    var image: String? = "",
+    var imageType: ImageType? = ImageType.JPEG,
+    var textStyle: String? = "",    // example: "B" or "I" or "heading" or "critical"
+    var styleType: StyleType? = StyleType.NORMAL
 ) {
 
     constructor() : this(
         "",
-        ""
+        "",
+        ImageType.JPEG,
+        "",
+        StyleType.NORMAL
     )
+}
+
+enum class StyleType {
+    NORMAL,
+    HTML
 }

@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
+import com.rohitthebest.manageyourrenters.data.filter.*
 import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
@@ -16,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 private const val TAG = "ExpenseViewModel"
@@ -51,10 +53,6 @@ class ExpenseViewModel @Inject constructor(
 
         }
 
-    fun insertAllExpense(expenses: List<Expense>) = viewModelScope.launch {
-        expenseRepository.insertAllExpense(expenses)
-    }
-
     fun updateExpense(oldValue: Expense, newValue: Expense) =
         viewModelScope.launch {
 
@@ -62,20 +60,30 @@ class ExpenseViewModel @Inject constructor(
 
             if (isInternetAvailable(context)) {
 
-                updateDocumentOnFireStore(
-                    context,
-                    compareExpenseModel(oldValue, newValue),
-                    EXPENSES,
-                    oldValue.key
-                )
+                newValue.isSynced = true
 
+                if (!oldValue.isSynced) {
+                    uploadDocumentToFireStore(
+                        context,
+                        EXPENSES,
+                        newValue.key
+                    )
+                } else {
+                    val map = compareExpenseModel(oldValue, newValue)
+                    if (map.isNotEmpty()) {
+                        updateDocumentOnFireStore(
+                            context,
+                            map,
+                            EXPENSES,
+                            oldValue.key
+                        )
+                    }
+                }
             } else {
-
                 newValue.isSynced = false
             }
 
             expenseRepository.updateExpense(newValue)
-
             Functions.showToast(context, "Expense updated")
         }
 
@@ -174,14 +182,6 @@ class ExpenseViewModel @Inject constructor(
         Functions.showToast(context, "Expense deleted")
     }
 
-    fun deleteAllExpenses() = viewModelScope.launch {
-        expenseRepository.deleteAllExpenses()
-    }
-
-    fun deleteAllExpensesByIsSynced(isSynced: Boolean) = viewModelScope.launch {
-        expenseRepository.deleteExpenseByIsSynced(isSynced)
-    }
-
     fun getAllExpenses() = expenseRepository.getAllExpenses().asLiveData()
 
     fun getAllSpentOn() = expenseRepository.getAllSpentOn().asLiveData()
@@ -276,6 +276,137 @@ class ExpenseViewModel @Inject constructor(
             _expenseOfEachMonth.value = listOfExpensesInEachMonth
         }
 
+    }
+
+    // issue #78
+    private val _expensesByPaymentMethods = MutableLiveData<List<Expense>>(emptyList())
+    val expensesByPaymentMethods: LiveData<List<Expense>> get() = _expensesByPaymentMethods
+
+    fun getExpenseByPaymentMethodsKey(paymentMethodKeys: List<String>) {
+
+        viewModelScope.launch {
+
+            val expenses = expenseRepository.getAllExpenses().first()
+
+            val isOtherPaymentMethodKeyPresent =
+                paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
+
+            val resultExpenses = expenses.filter { expense ->
+
+                if (isOtherPaymentMethodKeyPresent) {
+                    // for other payment method, get all the expenses where payment methods is null as well as payment method is other
+                    expense.paymentMethods == null || expense.paymentMethods!!.any { it in paymentMethodKeys }
+                } else {
+                    expense.paymentMethods != null && expense.paymentMethods!!.any { it in paymentMethodKeys }
+                }
+            }
+            _expensesByPaymentMethods.value = resultExpenses
+        }
+    }
+
+    fun getExpenseByPaymentMethodsKey(paymentMethodKey: String) =
+        expenseRepository.getExpensesByPaymentMethodKey(
+            paymentMethodKey
+        ).asLiveData()
+
+    fun applyFilter(expenses: List<Expense>, expenseFilterDto: ExpenseFilterDto): List<Expense> {
+
+        var mExpenses = expenses
+
+        if (expenseFilterDto.isPaymentMethodEnabled) {
+
+            mExpenses = applyFilterByPaymentMethods(expenseFilterDto.paymentMethods, mExpenses)
+        }
+
+        if (expenseFilterDto.isAmountEnabled) {
+
+            mExpenses = mExpenses.filter { expense: Expense ->
+
+                when (expenseFilterDto.selectedAmountFilter) {
+
+                    IntFilterOptions.isLessThan -> expense.amount < expenseFilterDto.amount
+                    IntFilterOptions.isGreaterThan -> expense.amount > expenseFilterDto.amount
+                    IntFilterOptions.isEqualsTo -> expense.amount == expenseFilterDto.amount
+                    IntFilterOptions.isBetween -> (expense.amount >= expenseFilterDto.amount) && (expense.amount <= expenseFilterDto.amount2)
+                }
+            }
+        }
+
+        if (expenseFilterDto.isSpentOnEnabled) {
+
+            mExpenses = mExpenses.filter { expense: Expense ->
+
+                when (expenseFilterDto.selectedSpentOnFilter) {
+
+                    StringFilterOptions.startsWith -> expense.spentOn.startsWith(expenseFilterDto.spentOnText)
+                    StringFilterOptions.endsWith -> expense.spentOn.endsWith(expenseFilterDto.spentOnText)
+                    StringFilterOptions.containsWith -> expense.spentOn.contains(expenseFilterDto.spentOnText)
+
+                    StringFilterOptions.regex -> {
+                        val pattern: Pattern = Pattern.compile(expenseFilterDto.spentOnText)
+                        val matcher = pattern.matcher(expense.spentOn)
+                        matcher.find()
+                    }
+                }
+            }
+        }
+
+        if (expenseFilterDto.isSortByEnabled) {
+
+            val isDescending = expenseFilterDto.sortOrder == SortOrder.descending
+
+            mExpenses = when (expenseFilterDto.sortByFilter) {
+
+                SortFilter.amount -> {
+                    if (isDescending) {
+                        mExpenses.sortedByDescending { it.amount }
+                    } else {
+                        mExpenses.sortedBy { it.amount }
+                    }
+                }
+
+                SortFilter.dateCreated -> {
+
+                    if (isDescending) {
+                        mExpenses.sortedByDescending { it.created }
+                    } else {
+                        mExpenses.sortedBy { it.created }
+                    }
+                }
+
+                SortFilter.dateModified -> {
+
+                    if (isDescending) {
+                        mExpenses.sortedByDescending { it.modified }
+                    } else {
+                        mExpenses.sortedBy { it.modified }
+                    }
+                }
+            }
+        }
+
+        return mExpenses
+    }
+
+    private fun applyFilterByPaymentMethods(
+        paymentMethodKeys: List<String>,
+        expenses: List<Expense>
+    ): List<Expense> {
+
+        val isOtherPaymentMethodKeyPresent =
+            paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
+
+        val resultExpenses = expenses.filter { expense ->
+
+            if (isOtherPaymentMethodKeyPresent) {
+                // for other payment method, get all the expenses where payment methods is null as well as payment method is other
+                expense.paymentMethods == null || expense.paymentMethods!!.any { it in paymentMethodKeys }
+            } else {
+                expense.paymentMethods != null && expense.paymentMethods!!.any { it in paymentMethodKeys }
+            }
+        }
+
+        return resultExpenses
     }
 
 }

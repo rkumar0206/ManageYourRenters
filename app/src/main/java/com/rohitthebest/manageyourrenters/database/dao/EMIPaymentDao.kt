@@ -52,4 +52,7 @@ interface EMIPaymentDao {
 
     @Query("SELECT COUNT(id) FROM emi_payment_table WHERE emiKey = :emiKey")
     fun getTotalCountByKey(emiKey: String): Flow<Int>
+
+    @Query("UPDATE emi_payment_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }

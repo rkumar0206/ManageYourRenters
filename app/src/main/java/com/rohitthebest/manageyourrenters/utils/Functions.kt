@@ -468,7 +468,7 @@ class Functions {
 
         }
 
-        fun Context.checkIfPermissionsGranted(permission: String): Boolean {
+        fun Context.isPermissionGranted(permission: String): Boolean {
 
             return ContextCompat.checkSelfPermission(
                 this, permission
@@ -574,15 +574,14 @@ class Functions {
             imageView: ImageView,
             imageUrl: String?,
             crossinline onLoadFailed: () -> Unit,
-            crossinline onResourceReady: () -> Unit
+            crossinline onResourceReady: () -> Unit,
+            placeholder: Int = R.drawable.gradient_blue
         ) {
 
             Glide.with(context)
                 .load(imageUrl)
-                .apply {
-                    this.error(R.drawable.ic_outline_error_outline_24)
-                    this.placeholder(R.drawable.gradient_blue)
-                }
+                .error(R.drawable.ic_outline_error_outline_24)
+                .placeholder(placeholder)
                 .listener(object : RequestListener<Drawable> {
 
                     override fun onLoadFailed(

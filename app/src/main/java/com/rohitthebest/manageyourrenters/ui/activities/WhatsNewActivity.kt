@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.activities
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,13 +12,11 @@ import com.rohitthebest.manageyourrenters.data.WhatsNew
 import com.rohitthebest.manageyourrenters.databinding.ActivityWhatsNewBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.APP_VERSION
+import com.rohitthebest.manageyourrenters.others.Constants.GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION2
+import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.openLinkInBrowser
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
-import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
-import com.rohitthebest.manageyourrenters.utils.downloadFileFromUrl
-import com.rohitthebest.manageyourrenters.utils.hide
-import com.rohitthebest.manageyourrenters.utils.show
 
 class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
 
@@ -28,7 +27,7 @@ class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        setTheme(R.style.Theme_ManageYourRenters)
         binding = ActivityWhatsNewBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -36,13 +35,13 @@ class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
             ?.convertJsonToObject(AppUpdate::class.java)
 
         if (appUpdate == null) {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         } else {
 
             if (appUpdate?.version == APP_VERSION) {
 
                 binding.appUpdateBtn.hide()
-                binding.textView86.text = "Using latest version ($APP_VERSION)"
+                binding.textView86.text = getString(R.string.using_latest_version, APP_VERSION)
             } else {
                 binding.appUpdateBtn.show()
                 binding.appUpdateBtn.text =
@@ -58,6 +57,10 @@ class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
             setUpRecyclerView()
 
             whatsNewAdapter.submitList(appUpdate!!.whatsNew)
+        }
+
+        binding.toolbar.setNavigationOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
     }
 
@@ -107,6 +110,22 @@ class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
             openLinkInBrowser(this, whatsNew.feature)
         }
 
-        // todo : show image in image activity or fragment
+        if (whatsNew.image.isValid()) {
+
+            val intent = Intent(this, ShowImageActivity::class.java)
+            intent.putExtra(
+                Constants.GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION,
+                whatsNew.convertToJsonString()
+            )
+
+            // sending the tag to ShowImageActivity to handle the image send by WhatsNewActivity
+            intent.putExtra(
+                GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION2,
+                getString(R.string.whats_new)
+            )
+
+            startActivity(intent)
+        }
+
     }
 }

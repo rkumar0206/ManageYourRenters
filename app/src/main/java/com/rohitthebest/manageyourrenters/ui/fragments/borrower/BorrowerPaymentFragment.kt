@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.borrower
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
@@ -20,6 +21,7 @@ import com.rohitthebest.manageyourrenters.database.model.Borrower
 import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentBorrowerPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.activities.ShowImageActivity
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
@@ -73,7 +75,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
         binding.borrowerPaymentToolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.addPaymentFAB.setOnClickListener {
@@ -268,6 +270,7 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
             val bundle = Bundle()
             bundle.putBoolean(Constants.SHOW_SYNC_MENU, !borrowerPayment.isSynced)
+            bundle.putBoolean(Constants.SHOW_DOCUMENTS_MENU, true)
 
             CustomMenuItems.newInstance(
                 bundle
@@ -354,10 +357,21 @@ class BorrowerPaymentFragment : Fragment(R.layout.fragment_borrower_payment),
 
             borrowerPaymentForMenus!!.supportingDocument?.let { supportingDoc ->
 
-                onViewOrDownloadSupportingDocument(
-                    requireActivity(),
-                    supportingDoc
-                )
+                if (supportingDoc.documentType == DocumentType.IMAGE) {
+
+                    // open image activity
+                    val intent = Intent(requireContext(), ShowImageActivity::class.java)
+                    intent.putExtra(
+                        Constants.GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION,
+                        supportingDoc.convertToJsonString()
+                    )
+                    requireActivity().startActivity(intent)
+                } else {
+                    onViewOrDownloadSupportingDocument(
+                        requireActivity(),
+                        supportingDoc
+                    )
+                }
             }
         }
     }

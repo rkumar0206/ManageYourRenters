@@ -1,5 +1,6 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.emi
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
@@ -19,6 +20,7 @@ import com.rohitthebest.manageyourrenters.database.model.EMIPayment
 import com.rohitthebest.manageyourrenters.databinding.FragmentEmiPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.SHOW_DOCUMENTS_MENU
+import com.rohitthebest.manageyourrenters.ui.activities.ShowImageActivity
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.EMIPaymentViewModel
@@ -242,10 +244,21 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
             emiPaymentForMenus.supportingDocument?.let { supportingDoc ->
 
-                Functions.onViewOrDownloadSupportingDocument(
-                    requireActivity(),
-                    supportingDoc
-                )
+                if (supportingDoc.documentType == DocumentType.IMAGE) {
+
+                    // open image activity
+                    val intent = Intent(requireContext(), ShowImageActivity::class.java)
+                    intent.putExtra(
+                        Constants.GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION,
+                        supportingDoc.convertToJsonString()
+                    )
+                    requireActivity().startActivity(intent)
+                } else {
+                    Functions.onViewOrDownloadSupportingDocument(
+                        requireActivity(),
+                        supportingDoc
+                    )
+                }
             }
 
         }
@@ -398,7 +411,7 @@ class EMIPaymentFragment : Fragment(R.layout.fragment_emi_payment),
 
         binding.emiPaymentToolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.emiPaymentToolbar.menu.findItem(R.id.menu_show_emi_details)

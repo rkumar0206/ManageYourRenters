@@ -15,6 +15,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.getDataFromFireStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val TAG = "SyncDocumentsFromFirestore"
@@ -55,6 +56,9 @@ class SyncDocumentsFromFirestoreService : Service() {
     @Inject
     lateinit var monthlyPaymentRepository: MonthlyPaymentRepository
 
+    @Inject
+    lateinit var paymentMethodRepository: PaymentMethodRepository
+
     private var uid = ""
 
 
@@ -82,11 +86,15 @@ class SyncDocumentsFromFirestoreService : Service() {
             syncMonthlyPayments()
         }
 
+        val job6 = CoroutineScope(Dispatchers.IO).launch {
+            syncPaymentMethods()
+        }
+
         CoroutineScope(Dispatchers.IO).launch {
 
             delay(50)
 
-            while (!job1.isCompleted || !job2.isCompleted || !job3.isCompleted || !job4.isCompleted || !job5.isCompleted) {
+            while (!job1.isCompleted || !job2.isCompleted || !job3.isCompleted || !job4.isCompleted || !job5.isCompleted || !job6.isCompleted) {
 
                 delay(100)
                 Log.d(TAG, "onStartCommand: sync time extended")
@@ -113,6 +121,14 @@ class SyncDocumentsFromFirestoreService : Service() {
             .build()
 
         startForeground(6826, notification)
+
+        // staring stop timer
+        CoroutineScope(Dispatchers.IO).launch {
+
+            Log.d(TAG, "onStartCommand: timer started for 140 seconds")
+            delay(TimeUnit.SECONDS.toMillis(140))
+            stopSelf()
+        }
 
         return START_NOT_STICKY
     }
@@ -285,11 +301,8 @@ class SyncDocumentsFromFirestoreService : Service() {
                         }
                     }
                 }
-
-
             }
         }
-
     }
 
     private suspend fun syncRenterAndRenterPayment() {
@@ -356,6 +369,27 @@ class SyncDocumentsFromFirestoreService : Service() {
             }
         }
     }
+
+    private suspend fun syncPaymentMethods() {
+
+        getDataFromFireStore(
+            FirestoreCollectionsConstants.PAYMENT_METHODS,
+            uid
+        ) {}?.let { paymentMethodSnapshot ->
+
+            if (paymentMethodSnapshot.size() != 0) {
+
+                paymentMethodRepository.deleteByIsSyncedValue(true)
+                delay(50)
+                paymentMethodRepository.insertAllPaymentMethod(
+                    paymentMethodSnapshot.toObjects(
+                        PaymentMethod::class.java
+                    )
+                )
+            }
+        }
+    }
+
 
     override fun onBind(intent: Intent?): IBinder? {
         return null

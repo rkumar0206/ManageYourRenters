@@ -287,7 +287,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
 
         binding.toolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.toolbar.menu.findItem(R.id.menu_expense_graph).setOnMenuItemClickListener {
@@ -302,9 +302,15 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
         binding.toolbar.menu.findItem(R.id.menu_show_all_expenses).setOnMenuItemClickListener {
 
             findNavController().navigate(R.id.action_expenseCategoryFragment_to_expenseFragment)
-
             true
         }
+
+        binding.toolbar.menu.findItem(R.id.menu_item_payment_methods_expense)
+            .setOnMenuItemClickListener {
+
+                findNavController().navigate(R.id.action_expenseCategoryFragment_to_paymentMethodsFragment)
+                true
+            }
     }
 
     private fun setNoExpenseCategoryMessageTvVisibility(isVisible: Boolean) {

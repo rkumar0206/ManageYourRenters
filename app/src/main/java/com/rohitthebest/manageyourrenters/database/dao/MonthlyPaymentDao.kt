@@ -42,4 +42,7 @@ interface MonthlyPaymentDao {
 
     @Query("SELECT `key` FROM monthly_payment_table WHERE categoryKey= :categoryKey")
     suspend fun getKeysByMonthlyPaymentCategoryKey(categoryKey: String): List<String>
+
+    @Query("UPDATE monthly_payment_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }

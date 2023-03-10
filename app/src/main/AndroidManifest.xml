@@ -25,6 +25,7 @@
         <activity android:name=".ui.activities.BorrowerActivity" />
         <activity android:name=".ui.activities.LoginActivity" />
         <activity android:name=".ui.activities.WhatsNewActivity" />
+        <activity android:name=".ui.activities.ShowImageActivity" />
         <activity
             android:name=".ui.activities.HouseRentersActivity"
             android:exported="true">

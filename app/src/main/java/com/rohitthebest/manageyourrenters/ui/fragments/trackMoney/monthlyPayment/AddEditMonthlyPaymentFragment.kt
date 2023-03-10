@@ -181,7 +181,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
     private fun initListeners() {
 
         binding.toolbar.setNavigationOnClickListener {
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.toolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
@@ -408,7 +408,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
 
         Log.d(TAG, "saveMonthlyPaymentToDatabase: $monthlyPayment")
 
-        requireActivity().onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     // issue #12

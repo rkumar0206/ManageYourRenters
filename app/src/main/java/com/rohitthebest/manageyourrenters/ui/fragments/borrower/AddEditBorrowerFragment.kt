@@ -124,7 +124,8 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_borrower), V
 
         binding.addRenterToolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+
         }
 
         binding.addRenterToolbar.menu.findItem(R.id.menu_add_person).setOnMenuItemClickListener {
@@ -294,7 +295,7 @@ class AddEditBorrowerFragment : Fragment(R.layout.fragment_add_edit_borrower), V
             showToast(requireContext(), "Borrower info updated")
         }
 
-        requireActivity().onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     private fun isValidForm(): Boolean {

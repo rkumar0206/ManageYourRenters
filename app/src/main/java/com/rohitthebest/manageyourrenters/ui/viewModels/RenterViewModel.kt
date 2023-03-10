@@ -96,28 +96,29 @@ class RenterViewModel @Inject constructor(
 
         val context = getApplication<Application>().applicationContext
 
-        if (isInternetAvailable(context) && compareRenterModel(oldValue, newValue).isNotEmpty()) {
+        if (isInternetAvailable(context)) {
 
             newValue.isSynced = context.getString(R.string.t)
 
-            updateDocumentOnFireStore(
-                context,
-                compareRenterModel(oldValue, newValue),
-                RENTERS,
-                oldValue.key!!
-            )
-
+            if (oldValue.isSynced != context.getString(R.string.t)) {
+                uploadDocumentToFireStore(context, RENTERS, newValue.key!!)
+            } else {
+                val map = compareRenterModel(oldValue, newValue)
+                if (map.isNotEmpty()) {
+                    updateDocumentOnFireStore(
+                        context,
+                        map,
+                        RENTERS,
+                        oldValue.key!!
+                    )
+                }
+            }
         } else {
 
             newValue.isSynced = context.getString(R.string.f)
         }
 
         repo.updateRenter(newValue)
-    }
-
-    fun insertRenters(renters: List<Renter>) = viewModelScope.launch {
-
-        repo.insertRenters(renters)
     }
 
     fun addOrReplaceBorrowerSupportingDocument(
@@ -263,16 +264,9 @@ class RenterViewModel @Inject constructor(
         deletedRenterRepository.deleteAllDeletedRenters()
     }
 
-    fun deleteRenterByIsSynced(isSynced: String) = viewModelScope.launch {
-
-        repo.deleteRenterByIsSynced(isSynced)
-    }
-
     fun getAllRentersList() = repo.getAllRentersList().asLiveData()
 
     fun getRenterCount() = repo.getRenterCount().asLiveData()
-
-    fun getRenterByIsSynced(isSynced: String) = repo.getRenterByIsSynced(isSynced).asLiveData()
 
     fun getRenterByKey(renterKey: String) = repo.getRenterByKey(renterKey).asLiveData()
 

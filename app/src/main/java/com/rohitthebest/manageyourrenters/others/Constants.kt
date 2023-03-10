@@ -17,6 +17,7 @@ object Constants {
     const val EMI_DATABASE_NAME = "emi_database.db"
     const val EXPENSE_DATABASE_NAME = "expense_database.db"
     const val MONTHLY_PAYMENT_DATABASE_NAME = "monthly_payment_db"
+    const val PAYMENT_METHOD_DATABASE_NAME = "payment_method_db"
     //----------------------------
 
     const val NOTIFICATION_CHANNEL_ID = "NotificationChannelID"
@@ -37,6 +38,7 @@ object Constants {
     const val SUPPORTING_DOCUMENT_HELPER_MODEL_KEY = "dsbjsbjhbuyavvu"
     const val RENTER_PAYMENT_CONFIRMATION_BILL_KEY = "BNZBNJBHVDLK&hjbxjhbskxknxB"
 
+    // Menu BottomSheet related
     const val SHOW_EDIT_MENU = "SHOW_EDIT_MENU_sjcjwncjkn"
     const val SHOW_DOCUMENTS_MENU = "SHOW_DOCUMENTS_MENU_sjcjwncacacn"
     const val SHOW_DELETE_MENU = "DELETE_MENUbkjbskjc"
@@ -61,4 +63,29 @@ object Constants {
     // app update related
     const val APP_VERSION = BuildConfig.VERSION_NAME
     const val APP_UPDATE_FIRESTORE_DOCUMENT_KEY = "latest_app_version"
+
+    // Default payment method keys
+    const val PAYMENT_METHOD_CASH_KEY = "payment_method_cash_1316797_rrrrr"
+    const val PAYMENT_METHOD_DEBIT_CARD_KEY = "payment_method_debit_card_5765763_rrrrr"
+    const val PAYMENT_METHOD_CREDIT_CARD_KEY = "payment_method_credit_card_974673_rrrrr"
+    const val PAYMENT_METHOD_OTHER_KEY = "payment_method_other_6546332_rrrrr"
+
+    const val CASH_PAYMENT_METHOD = "💵 CASH"
+    const val OTHER_PAYMENT_METHOD = "💰 OTHER"
+    const val DEBIT_CARD_PAYMENT_METHOD = "💳 DEBIT CARD"
+    const val CREDIT_CARD_PAYMENT_METHOD = "💳 CREDIT CARD"
+
+    const val ADD_PAYMENT_METHOD_KEY =
+        "add_payment_method_key" // will be used only for recycler view
+
+    // PaymentMethod BottomSheet menu
+    const val IS_FOR_EDIT = "is_for_edit_key"
+    const val PAYMENT_METHOD_KEY_FOR_EDIT = "PAYMENT_METHOD_KEY_FOR_EDIT_KEY"
+
+    const val EXPENSE_FILTER_KEY = "EXPENSE_FILTER_KEY_sdbjhsbjs"
+
+    const val SERVICE_STOP_TIME_IN_SECONDS: Long = 45
+    const val GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION = "GENERIC_KEY_skdjhshjsvhjs"
+    const val GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION2 =
+        "GENERIC_KEY_2**cnxjhshjxfnvkjss"
 }

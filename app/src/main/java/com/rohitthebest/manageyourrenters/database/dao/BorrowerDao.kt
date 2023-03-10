@@ -30,4 +30,7 @@ interface BorrowerDao {
 
     @Query("SELECT * FROM borrower_table WHERE `key` = :borrowerKey")
     fun getBorrowerByKey(borrowerKey: String): Flow<Borrower>
+
+    @Query("UPDATE borrower_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }

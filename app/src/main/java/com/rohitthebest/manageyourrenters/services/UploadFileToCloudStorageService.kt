@@ -1,11 +1,14 @@
 package com.rohitthebest.manageyourrenters.services
 
+import android.Manifest
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.IBinder
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.firestore.FirebaseFirestore
@@ -31,8 +34,10 @@ import com.rohitthebest.manageyourrenters.utils.uploadFileUriOnFirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -94,7 +99,7 @@ class UploadFileToCloudStorageService : Service() {
         NotificationManagerCompat.from(this).apply {
 
             notificationBuilder.setProgress(100, 0, false)
-            notify(notificationId, notificationBuilder.build())
+            updateNotification(this, notificationId, notificationBuilder)
         }
 
         startForeground(notificationId, notificationBuilder.build())
@@ -113,6 +118,14 @@ class UploadFileToCloudStorageService : Service() {
             uploadFileToFirebaseStorage(fileRef)
         }
 
+        // starting stop timer for 3 minutes
+        CoroutineScope(Dispatchers.IO).launch {
+
+            Log.d(TAG, "onStartCommand: timer started for 3 minutes")
+            delay(TimeUnit.MINUTES.toMillis(3))
+            stopSelf()
+        }
+
         return START_NOT_STICKY
     }
 
@@ -125,7 +138,6 @@ class UploadFileToCloudStorageService : Service() {
             { task ->
 
                 // updating progress here
-
                 try {
 
                     NotificationManagerCompat.from(applicationContext).apply {
@@ -139,7 +151,7 @@ class UploadFileToCloudStorageService : Service() {
                             currentProgress,
                             false
                         )
-                        notify(notificationId, notificationBuilder.build())
+                        updateNotification(this, notificationId, notificationBuilder)
                     }
                 } catch (e: NullPointerException) {
                     e.printStackTrace()
@@ -148,21 +160,21 @@ class UploadFileToCloudStorageService : Service() {
             },
             { downloadUrl ->
 
-                val supportingDocument = SupportingDocument(
-                    supportingDocumentHelperModel.documentName,
-                    downloadUrl,
-                    supportingDocumentHelperModel.documentType
-                )
-
-                val map = HashMap<String, Any?>()
-                map["supportingDocAdded"] = true
-                map["supportingDocument"] = supportingDocument
-
-                val docRef = FirebaseFirestore.getInstance()
-                    .collection(supportingDocumentHelperModel.modelName)
-                    .document(documentKey)
-
                 CoroutineScope(Dispatchers.IO).launch {
+
+                    val supportingDocument = SupportingDocument(
+                        supportingDocumentHelperModel.documentName,
+                        downloadUrl,
+                        supportingDocumentHelperModel.documentType
+                    )
+
+                    val map = HashMap<String, Any?>()
+                    map["supportingDocAdded"] = true
+                    map["supportingDocument"] = supportingDocument
+
+                    val docRef = FirebaseFirestore.getInstance()
+                        .collection(supportingDocumentHelperModel.modelName)
+                        .document(documentKey)
 
                     if (updateDocumentOnFireStore(docRef, map)) {
 
@@ -274,10 +286,24 @@ class UploadFileToCloudStorageService : Service() {
                 .setContentText("Upload complete")
                 .setProgress(0, 0, false)
 
-            notify(notificationId, notificationBuilder.build())
+            updateNotification(this, notificationId, notificationBuilder)
         }
 
         stopSelf()
+    }
+
+    private fun updateNotification(
+        notificationManagerCompat: NotificationManagerCompat,
+        notificationId: Int,
+        notificationBuilder: NotificationCompat.Builder
+    ) {
+        if (ActivityCompat.checkSelfPermission(
+                this@UploadFileToCloudStorageService,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationManagerCompat.notify(notificationId, notificationBuilder.build())
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {

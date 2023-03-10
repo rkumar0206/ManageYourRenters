@@ -187,11 +187,6 @@ class RenterPaymentViewModel @Inject constructor(
         paymentRepository.updateRenterPayment(renterPayment)
     }
 
-    fun insertPayments(renterPayments: List<RenterPayment>) = viewModelScope.launch {
-
-        paymentRepository.insertAllRenterPayment(renterPayments)
-    }
-
     fun deletePayment(renterPayment: RenterPayment) = viewModelScope.launch {
 
         val context = getApplication<Application>().applicationContext
@@ -272,16 +267,6 @@ class RenterPaymentViewModel @Inject constructor(
         }
     }
 
-    fun deleteAllRenterPayments() = viewModelScope.launch {
-
-        paymentRepository.deleteAllRenterPayments()
-    }
-
-    fun deleteAllPaymentsByIsSynced(isSynced: Boolean) = viewModelScope.launch {
-
-        paymentRepository.deleteAllPaymentsByIsSynced(isSynced)
-    }
-
     fun getAllPaymentsListOfRenter(renterKey: String) =
         paymentRepository.getAllPaymentsListOfRenter(renterKey).asLiveData()
 
@@ -290,8 +275,6 @@ class RenterPaymentViewModel @Inject constructor(
 
     fun getLastRenterPayment(renterKey: String) =
         paymentRepository.getLastRenterPayment(renterKey).asLiveData()
-
-    fun getAllRenterPayments() = paymentRepository.getAllRenterPayments().asLiveData()
 
     fun getTotalRevenueOfAllTime() = paymentRepository.getTotalRevenueOfAllTime().asLiveData()
 

@@ -72,7 +72,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:padding="3dp"
-                    android:text="Shortcuts"
+                    android:text="@string/shortcuts"
                     android:textColor="@color/primaryTextColor"
                     android:textSize="18sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -96,6 +96,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
+                        android:contentDescription="@string/expenses"
                         app:srcCompat="@drawable/ic_expense" />
 
                 </com.google.android.material.card.MaterialCardView>
@@ -153,6 +154,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
+                        android:contentDescription="@string/monthly_payments"
                         app:srcCompat="@drawable/ic_monthly_payments" />
 
                 </com.google.android.material.card.MaterialCardView>
@@ -173,6 +175,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:scaleType="centerCrop"
+                        android:contentDescription="@string/emi"
                         app:srcCompat="@drawable/ic_emi" />
 
                 </com.google.android.material.card.MaterialCardView>

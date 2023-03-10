@@ -20,6 +20,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
 import com.rohitthebest.manageyourrenters.data.AppUpdate
 import com.rohitthebest.manageyourrenters.data.RenterTypes
+import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
 import com.rohitthebest.manageyourrenters.databinding.ActivityHomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.APP_UPDATE_FIRESTORE_DOCUMENT_KEY
@@ -33,6 +34,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_MONTHLY_PAYM
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.APP_UPDATES
 import com.rohitthebest.manageyourrenters.ui.ProfileBottomSheet
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBooleanToSharedPreference
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
@@ -41,6 +43,7 @@ import com.rohitthebest.manageyourrenters.utils.convertToJsonString
 import com.rohitthebest.manageyourrenters.utils.getDocumentFromFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import java.util.*
 
 private const val TAG = "HomeActivity"
 
@@ -56,6 +59,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
     private val emiViewModel: EMIViewModel by viewModels()
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
     private val monthlyPaymentCategoryViewModel by viewModels<MonthlyPaymentCategoryViewModel>()
+    private val paymentMethodViewModel by viewModels<PaymentMethodViewModel>()
 
     private lateinit var renterTypeList: ArrayList<RenterTypes>
     private lateinit var renterTypeAdapter: RenterTypeAdapter
@@ -89,6 +93,59 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         handleShortcuts()
 
         checkForUpdates()
+
+        //Issue #78
+        checkIfDefaultPaymentMethodIsInserted()
+    }
+
+    //Issue #78
+    private fun checkIfDefaultPaymentMethodIsInserted() {
+
+        paymentMethodViewModel.getPaymentMethodByKey(Constants.PAYMENT_METHOD_DEBIT_CARD_KEY)
+            .observe(this) { paymentMethod ->
+
+                Log.d(TAG, "checkIfDefaultPaymentMethodIsInserted: $paymentMethod")
+
+                if (paymentMethod == null) {
+
+                    val paymentMethodCash = PaymentMethod(
+                        key = Constants.PAYMENT_METHOD_CASH_KEY,
+                        paymentMethod = Constants.CASH_PAYMENT_METHOD,
+                        uid = getUid()!!,
+                        isSynced = true
+                    )
+
+                    val paymentMethodDebitCard = PaymentMethod(
+                        key = Constants.PAYMENT_METHOD_DEBIT_CARD_KEY,
+                        paymentMethod = Constants.DEBIT_CARD_PAYMENT_METHOD,
+                        uid = getUid()!!,
+                        isSynced = true
+                    )
+
+                    val paymentMethodCreditCard = PaymentMethod(
+                        key = Constants.PAYMENT_METHOD_CREDIT_CARD_KEY,
+                        paymentMethod = Constants.CREDIT_CARD_PAYMENT_METHOD,
+                        uid = getUid()!!,
+                        isSynced = true
+                    )
+
+                    val paymentMethodOthers = PaymentMethod(
+                        key = Constants.PAYMENT_METHOD_OTHER_KEY,
+                        paymentMethod = Constants.OTHER_PAYMENT_METHOD,
+                        uid = getUid()!!,
+                        isSynced = true
+                    )
+
+                    paymentMethodViewModel.insertAllPaymentMethod(
+                        listOf(
+                            paymentMethodCash,
+                            paymentMethodDebitCard,
+                            paymentMethodCreditCard,
+                            paymentMethodOthers
+                        )
+                    )
+                }
+            }
     }
 
     private fun checkForUpdates(shouldOpenWhatsNewActivity: Boolean = false) {
@@ -368,7 +425,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
         try {
             MaterialAlertDialogBuilder(this)
-                .setTitle("Are You Sure?")
+                .setTitle(getString(R.string.are_you_sure))
                 .setMessage("You will be signed out from this app.")
                 .setPositiveButton("Yes") { _, _ ->
 
@@ -414,6 +471,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
             emiViewModel.deleteAllEMIs()
             expenseCategoryViewModel.deleteAllExpenseCategories()
             monthlyPaymentCategoryViewModel.deleteAllMonthlyPaymentCategories()
+            paymentMethodViewModel.deleteAllPaymentMethods()
             changeIsSyncedValue()
 
         } catch (e: Exception) {

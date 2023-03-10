@@ -208,6 +208,7 @@
     <string name="house_renters_disabled_message">house renters shortcut is disabled</string>
     <string name="deep_analyze_mode">Deep analyze mode</string>
     <string name="add_remove_expense_category_selection">Add Remove Expense category selection</string>
+    <string name="add_remove_payment_method_selection">Add Remove payment method selection</string>
     <string name="clear_selection_fab">clear selection fab</string>
     <string name="clear_date_range">Clear date range</string>
     <string name="last_30_days">Last 30 days</string>
@@ -258,6 +259,7 @@
     <string name="show_calendar_button">show calendar button</string>
     <string name="view_edit">View / Edit</string>
     <string name="cancelled">Cancelled</string>
+    <string name="cancel">Cancel</string>
     <string name="uploading_doc_progress_message">Uploading document to cloud is in progress…</string>
     <string name="edit_payment">Edit payment</string>
     <string name="this_payment_already_has_some_partial_payments">This payment already has some partial payments.</string>
@@ -307,6 +309,7 @@
     <string name="no_dues_or_advance">No Dues/Advance</string>
     <string name="total_advance">Total Advance : %1$s</string>
     <string name="total_dues">Total Dues : %1$s</string>
+    <string name="total_expense">Total Expense : %1$s</string>
     <string name="enter_file_name">Enter file name</string>
     <string name="renter_status_message">Status is %1$s.\nWhen changed to %2$s you %3$s add payments for this renter.</string>
     <string name="renter_is_marked_as_inactive">This renter is INACTIVE.</string>
@@ -341,6 +344,38 @@
     <string name="paid_in_advance_in_last_payment">Paid in advance in last payments\u0020:\u0020-\u0020%1$s</string>
     <string name="choose_existing_category">Choose existing category</string>
     <string name="link_to_expense_category">Link to expense category</string>
+    <string name="payment_methods_default_other">Payment methods (Default: Other)</string>
+    <string name="add">Add</string>
+    <string name="add_payment_method">Add payment method</string>
+    <string name="this_payment_method_already_exists">This payment method already exists</string>
+    <string name="payment_method_saved">Payment method saved</string>
+    <string name="payment_methods">Payment methods</string>
+    <string name="shortcuts">Shortcuts</string>
+    <string name="are_you_sure">Are You Sure?</string>
+    <string name="not_specified">Not specified</string>
+    <string name="all_expenses">All Expenses</string>
+    <string name="add_filter">Filter</string>
+    <string name="apply">Apply</string>
+    <string name="_spent_on">Spent On</string>
+    <string name="sort_by">Sort By</string>
+    <string name="islessthan">isLessThan</string>
+    <string name="isgreaterthan">isGreaterThan</string>
+    <string name="isequalto">isEqualTo</string>
+    <string name="startswith">startsWith</string>
+    <string name="endswith">endsWith</string>
+    <string name="contains">contains</string>
+    <string name="regex">regex</string>
+    <string name="date_created">date created</string>
+    <string name="date_modified">date modified</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="enter_your_text">Enter your text</string>
+    <string name="clear_filter">Clear</string>
+    <string name="isbetween">isBetween</string>
+    <string name="and">and</string>
+    <string name="download_message">Click on download for downloading the image/GIF.</string>
+    <string name="update_and_feature"><![CDATA[Update & Feature]]></string>
+    <string name="using_latest_version">Using latest version %1$s</string>
 
     <string-array name="interest_time_schedule">
 

@@ -59,7 +59,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
 
         binding.toolbar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         includeBinding.showBillRenterMobile.setOnClickListener {
@@ -146,7 +146,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
                     } else {
 
                         showToast(requireContext(), "Something went wrong...")
-                        requireActivity().onBackPressed()
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
                     }
 
                 }
@@ -493,7 +493,7 @@ class RenterBillFragment : Fragment(R.layout.fragment_renter_bill) {
                 if (receivedPayment.isElectricityBillIncluded) {
                     receivedPayment.electricityBillInfo?.totalElectricBill?.format(2)
                 } else {
-                    0.0
+                    "0.0"
                 }
             )
 

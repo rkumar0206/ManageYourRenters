@@ -78,14 +78,23 @@ class MonthlyPaymentViewModel @Inject constructor(
 
             if (Functions.isInternetAvailable(context)) {
 
-                updateDocumentOnFireStore(
-                    context,
-                    compareMonthlyPaymentModel(oldValue, newValue),
-                    MONTHLY_PAYMENTS,
-                    oldValue.key
-                )
-
                 newValue.isSynced = true
+
+                if (!oldValue.isSynced) {
+
+                    uploadDocumentToFireStore(context, MONTHLY_PAYMENTS, newValue.key)
+                } else {
+
+                    val map = compareMonthlyPaymentModel(oldValue, newValue)
+                    if (map.isNotEmpty()) {
+                        updateDocumentOnFireStore(
+                            context,
+                            map,
+                            MONTHLY_PAYMENTS,
+                            oldValue.key
+                        )
+                    }
+                }
             } else {
 
                 newValue.isSynced = false

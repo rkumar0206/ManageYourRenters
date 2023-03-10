@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+
+    <CheckBox
+        android:id="@+id/expenseFilterAmountCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:checked="false"
+        android:padding="3dp"
+        android:text="@string/amount"
+        android:textColor="@color/blue_text_color"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <CheckBox
+        android:id="@+id/expenseFilterSpentOnCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:padding="3dp"
+        android:text="@string/_spent_on"
+        android:textColor="@color/blue_text_color"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider110" />
+
+    <CheckBox
+        android:id="@+id/expenseFilterPaymentMethodCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="8dp"
+        android:padding="3dp"
+        android:text="@string/payment_methods"
+        android:textColor="@color/blue_text_color"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider112" />
+
+    <CheckBox
+        android:id="@+id/expenseFilterSortByCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:checked="true"
+        android:padding="3dp"
+        android:text="@string/sort_by"
+        android:textColor="@color/blue_text_color"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider114" />
+
+    <View
+        android:id="@+id/divider109"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/expenseFilterAmountCB" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/divider110"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="5dp"
+        android:elevation="0dp"
+        app:cardBackgroundColor="#41B9B9B9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/amountCL" />
+
+    <View
+        android:id="@+id/divider111"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/expenseFilterSpentOnCB" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/divider112"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="5dp"
+        android:elevation="0dp"
+        app:cardBackgroundColor="#41B9B9B9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spentOnET" />
+
+    <View
+        android:id="@+id/divider115"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/expenseFilterSortByCB" />
+
+    <View
+        android:id="@+id/divider116"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="65dp"
+        android:background="?android:attr/listDivider"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sortOrderRG" />
+
+    <View
+        android:id="@+id/divider113"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/expenseFilterPaymentMethodCB" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/divider114"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="5dp"
+        android:elevation="0dp"
+        app:cardBackgroundColor="#41B9B9B9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/paymentMethodFilterRV" />
+
+    <RadioGroup
+        android:id="@+id/amountRG"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider109">
+
+        <RadioButton
+            android:id="@+id/isLessThanRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/islessthan"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/isGreaterThanRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/isgreaterthan"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/isBetweenRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/isbetween"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/isEqualToRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/isequalto"
+            android:textSize="12sp" />
+    </RadioGroup>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/amountCL"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/amountRG"
+        app:layout_constraintStart_toStartOf="@+id/amountRG"
+        app:layout_constraintTop_toBottomOf="@+id/amountRG">
+
+        <EditText
+            android:id="@+id/amountET"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autofillHints="0.0"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="@string/_0_0"
+            android:inputType="numberDecimal"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/andTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/and"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            tools:visibility="gone" />
+
+        <EditText
+            android:id="@+id/amountET2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autofillHints="0.0"
+            android:ems="5"
+            android:gravity="center"
+            android:hint="@string/_0_0"
+            android:inputType="numberDecimal"
+            android:minHeight="48dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/andTV"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            tools:visibility="gone" />
+
+        <EditText
+            android:id="@+id/amountET3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autofillHints="0.0"
+            android:ems="5"
+            android:gravity="center"
+            android:hint="@string/_0_0"
+            android:inputType="numberDecimal"
+            android:minHeight="48dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/andTV"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            tools:visibility="gone" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <RadioGroup
+        android:id="@+id/spentOnRG"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider111">
+
+        <RadioButton
+            android:id="@+id/startsWithRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/startswith"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/endsWithRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/endswith"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/containsRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/contains"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/regexRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/regex"
+            android:textSize="12sp" />
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/spentOnET"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="16dp"
+        android:autofillHints="enter your text"
+        android:hint="@string/enter_your_text"
+        android:inputType="textFilter"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spentOnRG" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/paymentMethodFilterRV"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider113"
+        tools:visibility="gone" />
+
+    <RadioGroup
+        android:id="@+id/sortByRG"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider115">
+
+        <RadioButton
+            android:id="@+id/amountRB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/amount"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/dateCreatedRB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="@string/date_created"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/dateModifiedRB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/date_modified"
+            android:textSize="12sp" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/sortOrderRG"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="@+id/sortByRG"
+        app:layout_constraintStart_toStartOf="@+id/sortByRG"
+        app:layout_constraintTop_toBottomOf="@+id/sortByRG">
+
+        <RadioButton
+            android:id="@+id/ascendingRB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="2"
+            android:text="@string/ascending"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/descendingRB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="@string/descending"
+            android:textSize="12sp" />
+    </RadioGroup>
+</androidx.constraintlayout.widget.ConstraintLayout>

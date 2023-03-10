@@ -225,7 +225,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
 
         binding.addBorrowerPaymentToolBar.setNavigationOnClickListener {
 
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         includeBinding.addInterestCB.setOnCheckedChangeListener(this)
@@ -512,7 +512,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
             showToast(requireContext(), getString(R.string.payment_updated))
         }
 
-        requireActivity().onBackPressed()
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     private fun textWatchers() {

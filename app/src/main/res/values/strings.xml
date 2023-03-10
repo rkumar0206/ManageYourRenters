@@ -259,6 +259,7 @@
     <string name="show_calendar_button">show calendar button</string>
     <string name="view_edit">View / Edit</string>
     <string name="cancelled">Cancelled</string>
+    <string name="cancel">Cancel</string>
     <string name="uploading_doc_progress_message">Uploading document to cloud is in progress…</string>
     <string name="edit_payment">Edit payment</string>
     <string name="this_payment_already_has_some_partial_payments">This payment already has some partial payments.</string>
@@ -372,6 +373,9 @@
     <string name="clear_filter">Clear</string>
     <string name="isbetween">isBetween</string>
     <string name="and">and</string>
+    <string name="download_message">Click on download for downloading the image/GIF.</string>
+    <string name="update_and_feature"><![CDATA[Update & Feature]]></string>
+    <string name="using_latest_version">Using latest version %1$s</string>
 
     <string-array name="interest_time_schedule">
 

@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -16,6 +17,7 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.TextWatcher
 import android.text.style.StrikethroughSpan
+import android.text.style.UnderlineSpan
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SearchView
@@ -337,6 +339,21 @@ fun TextView.strikeThrough() {
     this.text = spannableStringBuilder
 }
 
+fun TextView.underline() {
+
+    val spannableStringBuilder = SpannableStringBuilder(this.text.toString())
+    val span = UnderlineSpan()
+
+    spannableStringBuilder.setSpan(
+        span,
+        0,
+        this.text.toString().length,
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+    )
+
+    this.text = spannableStringBuilder
+}
+
 inline fun Spinner.setListToSpinner(
     context: Context,
     list: List<Any>,
@@ -440,5 +457,95 @@ fun Bitmap.saveToStorage(context: Context, fileName: String): Uri? {
 
         return Uri.parse(path)
     }
+}
 
+fun TextView.applyStyles(text: String, textStyle: String) {
+
+    when {
+
+        text.endsWith("-heading") || (textStyle.isValid() && textStyle == "heading") -> {
+
+            this.changeTextStyle(
+                color = R.color.primaryTextColor,
+                typeface = Typeface.BOLD,
+                textSize = 20f,
+                text = text.replace("-heading", "")
+            )
+        }
+
+        text.endsWith("-critical") || (textStyle.isValid() && textStyle == "critical") -> {
+
+            this.changeTextStyle(
+                R.color.color_orange,
+                Typeface.BOLD,
+                20f,
+                text.replace("-critical", "")
+            )
+        }
+        text.startsWith("https") || text.startsWith("http") -> {
+
+            this.changeTextStyle(
+                R.color.blue_text_color,
+                Typeface.NORMAL,
+                16f,
+                text
+            )
+            this.underline()
+        }
+
+        else -> {
+
+            if (textStyle.isValid()) {
+
+                val typeface = when {
+
+                    textStyle.contains("B") && textStyle.contains("I") -> {
+                        Typeface.BOLD_ITALIC
+                    }
+
+                    textStyle.contains("B") -> {
+                        Typeface.BOLD
+                    }
+
+                    textStyle.contains("I") -> {
+                        Typeface.ITALIC
+                    }
+
+                    else -> Typeface.NORMAL
+                }
+                this.changeTextStyle(
+                    if (textStyle.contains("B")) R.color.primaryTextColor else R.color.secondaryTextColor,
+                    typeface,
+                    16f,
+                    text
+                )
+
+                if (textStyle.contains("U")) {
+                    this.underline()
+                }
+
+            } else {
+                this.changeTextStyle(
+                    R.color.secondaryTextColor,
+                    Typeface.NORMAL,
+                    16f,
+                    text
+                )
+            }
+        }
+    }
+}
+
+fun TextView.changeTextStyle(color: Int, typeface: Int, textSize: Float, text: String) {
+
+    this.apply {
+
+        changeTextColor(
+            this.context,
+            color
+        )
+        setTypeface(null, typeface)
+        this.textSize = textSize
+        this.text = text
+    }
 }

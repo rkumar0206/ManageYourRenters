@@ -30,10 +30,10 @@
         android:backgroundTint="@color/color_white"
         android:contentDescription="@string/imagebutton"
         android:minWidth="48dp"
-        android:rotation="-90"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/whatsNewTV"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/whatsNewTV"
-        app:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24" />
+        app:srcCompat="@drawable/baseline_keyboard_arrow_right_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

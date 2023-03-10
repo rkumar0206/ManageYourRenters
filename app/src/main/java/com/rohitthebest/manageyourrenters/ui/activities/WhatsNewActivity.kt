@@ -27,7 +27,7 @@ class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        setTheme(R.style.Theme_ManageYourRenters)
         binding = ActivityWhatsNewBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -41,7 +41,7 @@ class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
             if (appUpdate?.version == APP_VERSION) {
 
                 binding.appUpdateBtn.hide()
-                binding.textView86.text = "Using latest version ($APP_VERSION)"
+                binding.textView86.text = getString(R.string.using_latest_version, APP_VERSION)
             } else {
                 binding.appUpdateBtn.show()
                 binding.appUpdateBtn.text =
@@ -57,6 +57,10 @@ class WhatsNewActivity : AppCompatActivity(), WhatsNewAdapter.OnClickListener {
             setUpRecyclerView()
 
             whatsNewAdapter.submitList(appUpdate!!.whatsNew)
+        }
+
+        binding.toolbar.setNavigationOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
     }
 

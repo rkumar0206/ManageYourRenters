@@ -374,6 +374,8 @@
     <string name="isbetween">isBetween</string>
     <string name="and">and</string>
     <string name="download_message">Click on download for downloading the image/GIF.</string>
+    <string name="update_and_feature"><![CDATA[Update & Feature]]></string>
+    <string name="using_latest_version">Using latest version %1$s</string>
 
     <string-array name="interest_time_schedule">
 

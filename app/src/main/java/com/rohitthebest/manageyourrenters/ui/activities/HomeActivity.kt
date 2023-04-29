@@ -97,6 +97,16 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         checkIfDefaultPaymentMethodIsInserted()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        // checking if the user is logged in
+        if (mAuth.currentUser == null) {
+            navigateToLoginActivity()
+        }
+    }
+
+
     //Issue #78
     private fun checkIfDefaultPaymentMethodIsInserted() {
 

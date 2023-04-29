@@ -76,12 +76,20 @@ data class Expense(
         } else {
             var paymentMethods = ""
             this.paymentMethods!!.forEachIndexed { index, pm ->
-                paymentMethods += paymentMethodsMap[pm]
+
+                if (paymentMethodsMap[pm] != null) {
+                    paymentMethods += paymentMethodsMap[pm]
+                }
 
                 if (index != this.paymentMethods!!.size - 1) {
                     paymentMethods += " | "
                 }
             }
+
+            if (!paymentMethods.isValid()) {
+                paymentMethods = Constants.OTHER_PAYMENT_METHOD
+            }
+
             paymentMethods
         }
     }

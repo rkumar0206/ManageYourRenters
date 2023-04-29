@@ -36,6 +36,8 @@ class ExpenseViewModel @Inject constructor(
 
             if (isInternetAvailable(context)) {
 
+                expense.isSynced = true
+
                 uploadDocumentToFireStore(
                     context,
                     EXPENSES,

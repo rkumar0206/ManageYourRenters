@@ -477,13 +477,14 @@ class ExpenseFragment : Fragment(R.layout.fragment_expense), ExpenseAdapter.OnCl
                     expenseAdapter.notifyItemChanged(expenseForMenuPosition)
 
                     // update expense category modified value
-                    val oldValue = receivedExpenseCategory.copy()
-                    receivedExpenseCategory.modified = System.currentTimeMillis()
-                    expenseCategoryViewModel.updateExpenseCategory(
-                        oldValue,
-                        receivedExpenseCategory
-                    )
-
+                    if (this::receivedExpenseCategory.isInitialized) {
+                        val oldValue = receivedExpenseCategory.copy()
+                        receivedExpenseCategory.modified = System.currentTimeMillis()
+                        expenseCategoryViewModel.updateExpenseCategory(
+                            oldValue,
+                            receivedExpenseCategory
+                        )
+                    }
                 } else {
 
                     showNoInternetMessage(requireContext())

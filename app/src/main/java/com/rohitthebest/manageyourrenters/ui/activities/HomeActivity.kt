@@ -34,7 +34,6 @@ import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_MONTHLY_PAYM
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.APP_UPDATES
 import com.rohitthebest.manageyourrenters.ui.ProfileBottomSheet
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.saveBooleanToSharedPreference
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
@@ -98,6 +97,16 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         checkIfDefaultPaymentMethodIsInserted()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        // checking if the user is logged in
+        if (mAuth.currentUser == null) {
+            navigateToLoginActivity()
+        }
+    }
+
+
     //Issue #78
     private fun checkIfDefaultPaymentMethodIsInserted() {
 
@@ -111,28 +120,28 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
                     val paymentMethodCash = PaymentMethod(
                         key = Constants.PAYMENT_METHOD_CASH_KEY,
                         paymentMethod = Constants.CASH_PAYMENT_METHOD,
-                        uid = getUid()!!,
+                        uid = "",
                         isSynced = true
                     )
 
                     val paymentMethodDebitCard = PaymentMethod(
                         key = Constants.PAYMENT_METHOD_DEBIT_CARD_KEY,
                         paymentMethod = Constants.DEBIT_CARD_PAYMENT_METHOD,
-                        uid = getUid()!!,
+                        uid = "",
                         isSynced = true
                     )
 
                     val paymentMethodCreditCard = PaymentMethod(
                         key = Constants.PAYMENT_METHOD_CREDIT_CARD_KEY,
                         paymentMethod = Constants.CREDIT_CARD_PAYMENT_METHOD,
-                        uid = getUid()!!,
+                        uid = "",
                         isSynced = true
                     )
 
                     val paymentMethodOthers = PaymentMethod(
                         key = Constants.PAYMENT_METHOD_OTHER_KEY,
                         paymentMethod = Constants.OTHER_PAYMENT_METHOD,
-                        uid = getUid()!!,
+                        uid = "",
                         isSynced = true
                     )
 

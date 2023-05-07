@@ -70,5 +70,7 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
+    fun getTheOldestSavedBudgetYear() = budgetRepository.getTheOldestSavedBudgetYear().asLiveData()
+
     fun getBudgetByKey(budgetKey: String) = budgetRepository.getBudgetByKey(budgetKey).asLiveData()
 }

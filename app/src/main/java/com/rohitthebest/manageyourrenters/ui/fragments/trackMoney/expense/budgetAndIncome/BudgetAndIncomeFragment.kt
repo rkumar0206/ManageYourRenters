@@ -6,50 +6,160 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.FragmentBudgetBinding
+import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.format
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Calendar
 
 @AndroidEntryPoint
-class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget) {
+class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClickListener {
 
     private var _binding: FragmentBudgetBinding? = null
     private val binding get() = _binding!!
 
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
+    private val budgetViewModel by viewModels<BudgetViewModel>()
+    private val expenseViewModel by viewModels<ExpenseViewModel>()
+
+    private var selectedMonth: Int = 0
+    private var selectedYear: Int = 0
+
+    private var monthList: List<String> = emptyList()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentBudgetBinding.bind(view)
 
+
+        monthList = resources.getStringArray(R.array.months).toList()
+
         initUI()
         initListeners()
-        //todo: get all expense categories
-        // todo: create a budget recyclerview adapter
-        // todo: pass all the expense categories
-        // todo: in the layout add the button for adding budget to each category
-        // todo: modify the expense category table and add a budget field
-    }
-
-    private fun initListeners() {
-        // todo: date textview should be clickable
-        // todo: and when clicked it should show the option like monthly, weekly, and daily
-        // todo: the previous and next button should show the next date and previous date
-        // todo:
-
-        binding.toolbar.setNavigationOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
-        }
     }
 
     private fun initUI() {
 
+        selectedMonth = WorkingWithDateAndTime.getCurrentMonth()
+        selectedYear = WorkingWithDateAndTime.getCurrentYear()
+
+        binding.iabDateTV.text =
+            getString(R.string.month_and_year, monthList[selectedMonth], selectedYear.toString())
+
+        handleUiAfterDateChange()
+
+
+        budgetViewModel.getTheOldestSavedBudgetYear().observe(viewLifecycleOwner) { year ->
+            try {
+                if (year != null) {
+                    //todo: initialize year spinner from this year
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
+
+    private fun initListeners() {
+
+        binding.toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+
+        binding.iabDateNextBtn.setOnClickListener(this)
+        binding.iabDateTV.setOnClickListener(this)
+        binding.iabDatePreviousBtn.setOnClickListener(this)
+        binding.iabIncomeAddBtn.setOnClickListener(this)
+        binding.iabBudgetMCV.setOnClickListener(this)
+        binding.iabSavingMCV.setOnClickListener(this)
+        binding.iabExpenseMCV.setOnClickListener(this)
+        binding.iabIncomeMCV.setOnClickListener(this)
+    }
+
+    override fun onClick(v: View?) {
+
+        when (v?.id) {
+
+            binding.iabDateNextBtn.id -> {
+
+                handleNextDateButton()
+            }
+
+            binding.iabDatePreviousBtn.id -> {
+                handlePreviousDateButton()
+            }
+
+            binding.iabIncomeAddBtn.id -> {
+
+                // todo: show bottomsheet for adding income
+            }
+        }
+    }
+
+    private fun handlePreviousDateButton() {
+
+        if (selectedMonth == 0) {
+            selectedYear -= 1
+        }
+
+        selectedMonth = WorkingWithDateAndTime.getPreviousMonth(selectedMonth)
+
+        handleUiAfterDateChange()
+    }
+
+    private fun handleNextDateButton() {
+
+        if (selectedMonth == 11) {
+            selectedYear += 1
+        }
+
+        selectedMonth = WorkingWithDateAndTime.getNextMonth(selectedMonth)
+        handleUiAfterDateChange()
+    }
+
+    private fun handleUiAfterDateChange() {
+
+        setMonthAndYearInTextView()
+
+        val calendar = Calendar.getInstance()
+        calendar.set(selectedYear, selectedMonth, 5)
+        val dateInMillis = calendar.timeInMillis
+        val datePairForExpense =
+            WorkingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonth(dateInMillis)
+
+
+        expenseViewModel.getTotalExpenseAmountByDateRange(
+            datePairForExpense.first, datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
+        ).observe(viewLifecycleOwner) { total ->
+
+            try {
+                binding.iabExpenseValueTV.text = total.format(2)
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
+                binding.iabExpenseValueTV.text = getString(R.string._0_0)
+            }
+        }
+
+        //todo: show if any budget is added for this month, year
+        // todo: show total income added
+        // todo : show total savings done (income - expense)
+    }
+
+
+    private fun setMonthAndYearInTextView() {
+
+        binding.iabDateTV.text =
+            getString(R.string.month_and_year, monthList[selectedMonth], selectedYear.toString())
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
 
     /**
      * Work to be done

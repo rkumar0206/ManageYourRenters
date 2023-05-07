@@ -43,13 +43,13 @@
             android:layout_height="match_parent">
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardV123"
+                android:id="@+id/iabSavingMCV"
                 android:layout_width="wrap_content"
                 android:layout_height="80dp"
-                app:layout_constraintEnd_toStartOf="@+id/cardV"
+                app:layout_constraintEnd_toStartOf="@+id/iabExpenseMCV"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/cardView27"
-                app:layout_constraintTop_toTopOf="@+id/cardView27"
+                app:layout_constraintStart_toEndOf="@+id/iabBudgetMCV"
+                app:layout_constraintTop_toTopOf="@+id/iabBudgetMCV"
                 app:strokeColor="#09AF10"
                 app:strokeWidth="0.8dp">
 
@@ -102,13 +102,13 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardV"
+                android:id="@+id/iabExpenseMCV"
                 android:layout_width="wrap_content"
                 android:layout_height="80dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/cardV123"
-                app:layout_constraintTop_toTopOf="@+id/cardV123"
+                app:layout_constraintStart_toEndOf="@+id/iabSavingMCV"
+                app:layout_constraintTop_toTopOf="@+id/iabSavingMCV"
                 app:strokeColor="@color/color_Red"
                 app:strokeWidth="0.8dp">
 
@@ -161,16 +161,16 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardView27"
+                android:id="@+id/iabBudgetMCV"
                 android:layout_width="wrap_content"
                 android:layout_height="80dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/cardV123"
+                app:layout_constraintEnd_toStartOf="@+id/iabSavingMCV"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardView26"
+                app:layout_constraintTop_toBottomOf="@+id/iabIncomeMCV"
                 app:strokeColor="@color/dark_blue"
                 app:strokeWidth="0.8dp">
 
@@ -275,7 +275,7 @@
                 app:srcCompat="@drawable/ic_baseline_keyboard_arrow_left_24" />
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardView26"
+                android:id="@+id/iabIncomeMCV"
                 android:layout_width="0dp"
                 android:layout_height="80dp"
                 android:layout_marginStart="8dp"
@@ -357,6 +357,7 @@
         app:layout_constraintTop_toBottomOf="@+id/c" />
 
     <TextView
+        android:id="@+id/noBudgetAddedTV"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -373,7 +374,7 @@
         app:layout_constraintTop_toTopOf="@+id/iabBudgetRV" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/iabAddBudgetFAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"

@@ -295,4 +295,20 @@ object WorkingWithDateAndTime {
         return "${getCurrentMonth()}_${getCurrentYear()}"
     }
 
+    fun getNextMonth(selectedMonth: Int): Int {
+
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.MONTH, selectedMonth)
+        cal.add(Calendar.MONTH, 1)
+        return cal.get(Calendar.MONTH)
+    }
+
+    fun getPreviousMonth(selectedMonth: Int): Int {
+
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.MONTH, selectedMonth)
+        cal.add(Calendar.MONTH, -1)
+        return cal.get(Calendar.MONTH)
+    }
+
 }

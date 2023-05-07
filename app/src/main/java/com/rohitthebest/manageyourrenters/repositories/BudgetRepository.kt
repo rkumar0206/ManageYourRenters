@@ -26,5 +26,7 @@ class BudgetRepository @Inject constructor(
     fun getAllBudgetsByMonthAndYear(monthAndYearString: String) =
         dao.getAllBudgetsByMonthAndYear(monthAndYearString)
 
+    fun getTheOldestSavedBudgetYear() = dao.getTheOldestSavedBudgetYear()
+
     fun getBudgetByKey(budgetKey: String) = dao.getBudgetBuyBudgetKey(budgetKey)
 }

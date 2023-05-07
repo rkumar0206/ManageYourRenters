@@ -290,4 +290,9 @@ object WorkingWithDateAndTime {
         return Pair(firstCal.timeInMillis, lastCal.timeInMillis)
     }
 
+    fun getCurrentMonthAndYearString(): String {
+
+        return "${getCurrentMonth()}_${getCurrentYear()}"
+    }
+
 }

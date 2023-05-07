@@ -25,6 +25,9 @@ interface BudgetDao {
     @Query("SELECT * FROM budget_table")
     fun getAllBudgets(): Flow<List<Budget>>
 
+    @Query("SELECT * FROM budget_table where monthYearString = :monthAndYearString order by created DESC")
+    fun getAllBudgetsByMonthAndYear(monthAndYearString: String): Flow<List<Budget>>
+
     @Query("SELECT * FROM budget_table where `key` = :budgetKey")
     fun getBudgetBuyBudgetKey(budgetKey: String): Flow<Budget>
 

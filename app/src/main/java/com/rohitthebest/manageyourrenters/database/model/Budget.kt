@@ -15,7 +15,7 @@ data class Budget(
     var budgetLimit: Double,
     var month: Int,
     var year: Int,
-    var categoryKey: String,
+    var expenseCategoryKey: String,
     var monthYearString: String,
     var isSynced: Boolean,
     var uid: String

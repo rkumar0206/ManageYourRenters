@@ -35,6 +35,10 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget) {
         // todo: and when clicked it should show the option like monthly, weekly, and daily
         // todo: the previous and next button should show the next date and previous date
         // todo:
+
+        binding.toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
     }
 
     private fun initUI() {
@@ -45,4 +49,29 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget) {
         super.onDestroyView()
         _binding = null
     }
+
+
+    /**
+     * Work to be done
+     * budget will be calculated only on monthly basis
+     * once the month changes income, budget and expense should be reset
+     * user can change the budget limit any time they want
+     * saving the total of income and expense
+     * Tables/ Models:
+     * Budget:
+     * categoryKey
+     * budgetAmount
+     * month
+     * year
+     * monthYearString
+     * key
+     *
+     * Income:
+     * source
+     * income
+     * month
+     * year
+     * monthYearString
+     * key
+     */
 }

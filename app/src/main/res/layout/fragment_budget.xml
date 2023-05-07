@@ -20,6 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
+            android:id="@+id/toolbar"
             app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
             app:title="Income and Budget" />
 
@@ -226,14 +227,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="May 1, 2023"
+                android:text="May, 2023"
                 android:textSize="24sp"
                 app:autoSizeTextType="uniform"
                 app:layout_constraintEnd_toStartOf="@+id/iabDateNextBtn"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/iabDatePreviousBtn"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="May 1, 2023" />
+                tools:text="May, 2023" />
 
             <View
                 android:id="@+id/divider117"

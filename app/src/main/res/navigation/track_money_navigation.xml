@@ -156,6 +156,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_expenseCategoryFragment_to_budgetAndIncomeFragment"
+            app:destination="@id/budgetAndIncomeFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/addEditExpenseCategoryFragment"
@@ -336,4 +343,9 @@
             android:id="@+id/action_paymentMethodsFragment_to_showExpenseBottomSheetFragment"
             app:destination="@id/showExpenseBottomSheetFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/budgetAndIncomeFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budgetAndIncome.BudgetAndIncomeFragment"
+        android:label="BudgetAndIncomeFragment"
+        tools:layout="@layout/fragment_budget" />
 </navigation>

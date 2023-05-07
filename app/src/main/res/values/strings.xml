@@ -376,6 +376,14 @@
     <string name="download_message">Click on download for downloading the image/GIF.</string>
     <string name="update_and_feature"><![CDATA[Update & Feature]]></string>
     <string name="using_latest_version">Using latest version %1$s</string>
+    <string name="budget_and_income">Budget and Income</string>
+    <string name="previous_budget_date">previous budget date</string>
+    <string name="next_budget_date">next budget date</string>
+    <string name="savings">Savings</string>
+    <string name="_100000000000">100000000000</string>
+    <string name="expense">Expense</string>
+    <string name="budget">Budget</string>
+    <string name="income">Income</string>
 
     <string-array name="interest_time_schedule">
 

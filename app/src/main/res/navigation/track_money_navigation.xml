@@ -347,5 +347,28 @@
         android:id="@+id/budgetAndIncomeFragment"
         android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budgetAndIncome.BudgetAndIncomeFragment"
         android:label="BudgetAndIncomeFragment"
-        tools:layout="@layout/fragment_budget" />
+        tools:layout="@layout/fragment_budget">
+        <action
+            android:id="@+id/action_budgetAndIncomeFragment_to_addBudgetFragment"
+            app:destination="@id/addBudgetFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/addBudgetFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budgetAndIncome.AddBudgetFragment"
+        android:label="AddBudgetFragment"
+        tools:layout="@layout/fragment_add_budget">
+        <argument
+            android:name="monthMessage"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="yearMessage"
+            android:defaultValue="2023"
+            app:argType="integer" />
+    </fragment>
 </navigation>

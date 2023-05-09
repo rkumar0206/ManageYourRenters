@@ -2,21 +2,32 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budge
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.budgetAndIncome.SetBudgetExpenseCategoryAdapter
+import com.rohitthebest.manageyourrenters.database.model.Budget
 import com.rohitthebest.manageyourrenters.databinding.FragmentBudgetBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfViewOnScrolled
 import com.rohitthebest.manageyourrenters.utils.format
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Calendar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClickListener {
+class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClickListener,
+    SetBudgetExpenseCategoryAdapter.OnClickListener {
 
     private var _binding: FragmentBudgetBinding? = null
     private val binding get() = _binding!!
@@ -27,8 +38,9 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
 
     private var selectedMonth: Int = 0
     private var selectedYear: Int = 0
-
     private var monthList: List<String> = emptyList()
+
+    private lateinit var setBudgetExpenseCategoryAdapter: SetBudgetExpenseCategoryAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -36,10 +48,53 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
 
 
         monthList = resources.getStringArray(R.array.months).toList()
+        setBudgetExpenseCategoryAdapter = SetBudgetExpenseCategoryAdapter()
+
 
         initUI()
         initListeners()
+        setUpRecyclerView()
+
+        lifecycleScope.launch {
+
+            delay(300)
+            initUI()
+        }
+
     }
+
+    private fun getAllBudgets() {
+
+        budgetViewModel.getAllBudgetsByMonthAndYear(
+            selectedMonth, selectedYear
+        )
+
+        budgetViewModel.allBudgetListByMonthAndYear.observe(viewLifecycleOwner) { budgets ->
+
+            binding.noBudgetAddedTV.isVisible = budgets.isEmpty()
+
+            setBudgetExpenseCategoryAdapter.submitList(budgets)
+        }
+    }
+
+    private fun setUpRecyclerView() {
+
+        binding.iabBudgetRV.apply {
+
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = setBudgetExpenseCategoryAdapter
+            changeVisibilityOfViewOnScrolled(binding.iabAddBudgetFAB)
+        }
+
+        setBudgetExpenseCategoryAdapter.setOnClickListener(this)
+    }
+
+    override fun onAddBudgetClicked(budget: Budget) {
+
+        requireContext().showToast("${budget.currentExpenseAmount}", Toast.LENGTH_LONG)
+    }
+
 
     private fun initUI() {
 
@@ -50,7 +105,6 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
             getString(R.string.month_and_year, monthList[selectedMonth], selectedYear.toString())
 
         handleUiAfterDateChange()
-
 
         budgetViewModel.getTheOldestSavedBudgetYear().observe(viewLifecycleOwner) { year ->
             try {
@@ -77,6 +131,7 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
         binding.iabSavingMCV.setOnClickListener(this)
         binding.iabExpenseMCV.setOnClickListener(this)
         binding.iabIncomeMCV.setOnClickListener(this)
+        binding.iabAddBudgetFAB.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
@@ -94,7 +149,17 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
 
             binding.iabIncomeAddBtn.id -> {
 
-                // todo: show bottomsheet for adding income
+                // todo: show bottomSheet for adding income
+            }
+
+            binding.iabAddBudgetFAB.id -> {
+
+                val action =
+                    BudgetAndIncomeFragmentDirections.actionBudgetAndIncomeFragmentToAddBudgetFragment(
+                        selectedMonth, selectedYear
+                    )
+
+                findNavController().navigate(action)
             }
         }
     }
@@ -124,12 +189,20 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
 
         setMonthAndYearInTextView()
 
-        val calendar = Calendar.getInstance()
-        calendar.set(selectedYear, selectedMonth, 5)
-        val dateInMillis = calendar.timeInMillis
-        val datePairForExpense =
-            WorkingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonth(dateInMillis)
+        getAllBudgets()
+        showExpenseTotal()
 
+        // todo: show if any budget is added for this month, year
+        // todo: show total income added
+        // todo : show total savings done (income - expense)
+    }
+
+    private fun showExpenseTotal() {
+
+        val datePairForExpense =
+            WorkingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonthForGivenMonthAndYear(
+                selectedMonth, selectedYear
+            )
 
         expenseViewModel.getTotalExpenseAmountByDateRange(
             datePairForExpense.first, datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
@@ -142,10 +215,6 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
                 binding.iabExpenseValueTV.text = getString(R.string._0_0)
             }
         }
-
-        //todo: show if any budget is added for this month, year
-        // todo: show total income added
-        // todo : show total savings done (income - expense)
     }
 
 

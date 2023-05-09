@@ -311,4 +311,15 @@ object WorkingWithDateAndTime {
         return cal.get(Calendar.MONTH)
     }
 
+    fun getMillisecondsOfStartAndEndDayOfMonthForGivenMonthAndYear(
+        month: Int,
+        year: Int
+    ): Pair<Long, Long> {
+
+        val calendar = Calendar.getInstance()
+        calendar.set(year, month, 5)
+        val dateInMillis = calendar.timeInMillis
+        return getMillisecondsOfStartAndEndDayOfMonth(dateInMillis)
+    }
+
 }

@@ -29,6 +29,10 @@ data class Budget(
     @Ignore
     var categoryImageUrl: String = ""
 
+    @Exclude
+    @Ignore
+    var currentExpenseAmount: Double = 0.0
+
     constructor() : this(
         "",
         System.currentTimeMillis(),

@@ -19,7 +19,11 @@ import android.text.TextWatcher
 import android.text.style.StrikethroughSpan
 import android.text.style.UnderlineSpan
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -147,6 +151,28 @@ fun RecyclerView.changeVisibilityOfFABOnScrolled(fab: FloatingActionButton) {
                 } else if (dy < 0 && fab.visibility != View.VISIBLE) {
 
                     fab.show()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    })
+}
+
+fun RecyclerView.changeVisibilityOfViewOnScrolled(view: View) {
+
+    this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            try {
+                if (dy > 0 && view.visibility == View.VISIBLE) {
+
+                    view.hide()
+                } else if (dy < 0 && view.visibility != View.VISIBLE) {
+
+                    view.show()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

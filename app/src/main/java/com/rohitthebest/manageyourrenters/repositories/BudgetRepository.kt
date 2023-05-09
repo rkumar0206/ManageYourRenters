@@ -23,8 +23,8 @@ class BudgetRepository @Inject constructor(
 
     fun getAllBudgets() = dao.getAllBudgets()
 
-    fun getAllBudgetsByMonthAndYear(monthAndYearString: String) =
-        dao.getAllBudgetsByMonthAndYear(monthAndYearString)
+    fun getAllBudgetsByMonthAndYear(month: Int, year: Int) =
+        dao.getAllBudgetsByMonthAndYear(month, year)
 
     fun getTheOldestSavedBudgetYear() = dao.getTheOldestSavedBudgetYear()
 

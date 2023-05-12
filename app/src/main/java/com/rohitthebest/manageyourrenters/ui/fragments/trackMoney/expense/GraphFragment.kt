@@ -440,7 +440,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
             expenseViewModel.getTotalExpenseAmount().observe(viewLifecycleOwner) { total ->
 
-                pie.legend().title("Total expense : $total")
+                pie.legend().title("Total expense : ${total.format(3)}")
             }
 
             expenseCategoryViewModel.getAllExpenseCategories()

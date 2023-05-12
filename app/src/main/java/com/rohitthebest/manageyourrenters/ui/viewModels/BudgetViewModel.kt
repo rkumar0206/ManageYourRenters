@@ -90,39 +90,40 @@ class BudgetViewModel @Inject constructor(
         viewModelScope.launch {
 
             // get all expense categories
-            var expenseCategories =
+            val allExpenseCategories =
                 ArrayList(expenseCategoryRepository.getAllExpenseCategories().first())
 
             // get all budgets for the selected month and year
-            var allBudgetsByMonthAndYear =
+            val allBudgetsAlreadyAddedByMonthAndYear =
                 budgetRepository.getAllBudgetsByMonthAndYear(month, year).first()
 
-            allBudgetsByMonthAndYear = allBudgetsByMonthAndYear.sortedBy { it.expenseCategoryKey }
+
+            // get all the expense category key for which budget is added
+            val budgetCategoryKeys =
+                allBudgetsAlreadyAddedByMonthAndYear.map { it.expenseCategoryKey }
+
+            val categoriesWithBudgetAlreadyAdded = allExpenseCategories.filter {
+                budgetCategoryKeys.contains(it.key)
+            }
+
+            // remove all the expense categories for which budget is already added
+            allExpenseCategories.removeAll(categoriesWithBudgetAlreadyAdded.toSet())
 
             val datePairForExpense =
                 WorkingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonthForGivenMonthAndYear(
                     month, year
                 )
 
-            // get all the expense category key for which budget is added
-            val budgetCategoryKeys = allBudgetsByMonthAndYear.map { it.expenseCategoryKey }
-
-            // remove all the expense categories for which budget is already added
-            val categoriesToRemove = expenseCategories.filter {
-                budgetCategoryKeys.contains(it.key)
-            }
-
-            expenseCategories.removeAll(categoriesToRemove.toSet())
-
             addOtherDetailsToBudget(
-                allBudgetsByMonthAndYear,
-                categoriesToRemove.sortedBy { it.key },
+                allBudgetsAlreadyAddedByMonthAndYear.sortedBy { it.expenseCategoryKey },
+                categoriesWithBudgetAlreadyAdded.sortedBy { it.key },
                 datePairForExpense
             )
 
-            val expenseCategoryAsBudget: ArrayList<Budget> = ArrayList(allBudgetsByMonthAndYear)
+            val expenseCategoryAsBudget: ArrayList<Budget> =
+                ArrayList(allBudgetsAlreadyAddedByMonthAndYear)
 
-            expenseCategories.forEach { category ->
+            allExpenseCategories.forEach { category ->
 
                 val budget = Budget()
                 budget.apply {
@@ -134,12 +135,13 @@ class BudgetViewModel @Inject constructor(
                     this.monthYearString = this.generateMonthYearString()
                     this.categoryName = category.categoryName
                     this.categoryImageUrl = category.imageUrl ?: ""
+                    this.modified = 0L
                 }
                 expenseCategoryAsBudget.add(budget)
             }
 
             _allExpenseCategoryAsBudgets.value =
-                expenseCategoryAsBudget.sortedByDescending { it.budgetLimit }
+                expenseCategoryAsBudget.sortedByDescending { it.modified }
         }
     }
 

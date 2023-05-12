@@ -2,7 +2,6 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budge
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -10,7 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
-import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.budgetAndIncome.SetBudgetExpenseCategoryAdapter
+import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.budgetAndIncome.BudgetRVAdapter
 import com.rohitthebest.manageyourrenters.database.model.Budget
 import com.rohitthebest.manageyourrenters.databinding.FragmentBudgetBinding
 import com.rohitthebest.manageyourrenters.others.Constants
@@ -27,7 +26,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClickListener,
-    SetBudgetExpenseCategoryAdapter.OnClickListener {
+    BudgetRVAdapter.OnClickListener {
 
     private var _binding: FragmentBudgetBinding? = null
     private val binding get() = _binding!!
@@ -40,7 +39,7 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
     private var selectedYear: Int = 0
     private var monthList: List<String> = emptyList()
 
-    private lateinit var setBudgetExpenseCategoryAdapter: SetBudgetExpenseCategoryAdapter
+    private lateinit var budgetAdapter: BudgetRVAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -48,7 +47,7 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
 
 
         monthList = resources.getStringArray(R.array.months).toList()
-        setBudgetExpenseCategoryAdapter = SetBudgetExpenseCategoryAdapter()
+        budgetAdapter = BudgetRVAdapter()
 
 
         initUI()
@@ -73,7 +72,7 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
 
             binding.noBudgetAddedTV.isVisible = budgets.isEmpty()
 
-            setBudgetExpenseCategoryAdapter.submitList(budgets)
+            budgetAdapter.submitList(budgets)
         }
     }
 
@@ -82,19 +81,24 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
         binding.iabBudgetRV.apply {
 
             setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = setBudgetExpenseCategoryAdapter
+            layoutManager =
+                LinearLayoutManager(requireContext())
+            adapter = budgetAdapter
             changeVisibilityOfViewOnScrolled(binding.iabAddBudgetFAB)
         }
 
-        setBudgetExpenseCategoryAdapter.setOnClickListener(this)
+        budgetAdapter.setOnClickListener(this)
     }
 
-    override fun onAddBudgetClicked(budget: Budget) {
+    override fun onItemClick(budget: Budget) {
 
-        requireContext().showToast("${budget.currentExpenseAmount}", Toast.LENGTH_LONG)
+        requireContext().showToast(budget.toString())
     }
 
+    override fun onMenuBtnClick(budget: Budget) {
+
+        requireContext().showToast(budget.currentExpenseAmount)
+    }
 
     private fun initUI() {
 

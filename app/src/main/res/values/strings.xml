@@ -387,6 +387,8 @@
     <string name="add_budget">Add Budget</string>
     <string name="click_on_add_budget_button_to_add_budgets_for_this_month">Click on ADD BUDGET button to add budgets for this month</string>
     <string name="month_and_year">%1$s\u0020,\u0020%2$s</string>
+    <string name="spentVsLimit">Spent\u0020%1$s\u0020from\u0020%2$s</string>
+    <string name="budgetPerDay">%1$s\u0020per day</string>
 
     <string-array name="interest_time_schedule">
 

@@ -5,6 +5,7 @@ import android.util.Log
 import java.sql.Timestamp
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.YearMonth
 import java.util.*
 
 @SuppressLint("SimpleDateFormat")
@@ -320,6 +321,12 @@ object WorkingWithDateAndTime {
         calendar.set(year, month, 5)
         val dateInMillis = calendar.timeInMillis
         return getMillisecondsOfStartAndEndDayOfMonth(dateInMillis)
+    }
+
+    fun getNumberOfDaysInMonth(month: Int, year: Int): Int {
+
+        val yearMonth = YearMonth.of(year, month + 1)
+        return yearMonth.lengthOfMonth()
     }
 
 }

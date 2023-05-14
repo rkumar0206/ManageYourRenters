@@ -389,6 +389,9 @@
     <string name="month_and_year">%1$s\u0020,\u0020%2$s</string>
     <string name="spentVsLimit">Spent\u0020%1$s\u0020from\u0020%2$s</string>
     <string name="budgetPerDay">%1$s\u0020per day</string>
+    <string name="enter_budget_limit">Enter budget limit</string>
+    <string name="add_budget_limit">Add budget limit</string>
+    <string name="budget_limit_should_be_grater_than_0">Budget limit should be greater than 0</string>
 
     <string-array name="interest_time_schedule">
 

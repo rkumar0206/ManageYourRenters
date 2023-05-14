@@ -4,19 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="3dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="3dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="3dp"
     android:background="@color/white"
-    app:cardCornerRadius="5dp">
+    app:cardCornerRadius="10dp">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageButton
+            android:id="@+id/budget_menuBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="3dp"
+            android:backgroundTint="@android:color/transparent"
+            android:rotation="90"
+            android:src="@drawable/ic_baseline_more_vert_24"
+            app:layout_constraintBottom_toBottomOf="@+id/budgetCategoryNameTV"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/budgetCategoryNameTV" />
+
         <ImageView
             android:id="@+id/categoryImage"
             android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/expense_shortcut_icon" />
@@ -27,15 +45,16 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:ellipsize="end"
+            android:layout_marginEnd="4dp"
+            android:ellipsize="middle"
             android:maxLines="1"
             android:padding="3dp"
-            android:text="Shopping"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/primaryTextColor"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/budget_menuBtn"
             app:layout_constraintStart_toEndOf="@+id/categoryImage"
-            app:layout_constraintTop_toTopOf="@+id/categoryImage" />
+            app:layout_constraintTop_toTopOf="@+id/categoryImage"
+            tools:text="Shopping" />
 
         <ProgressBar
             android:id="@+id/budgetProgressBar"
@@ -58,11 +77,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="5dp"
+            android:layout_marginBottom="8dp"
             android:ellipsize="end"
             android:gravity="start|center_vertical"
             android:maxLines="1"
             android:padding="3dp"
             android:text="1000"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/divider121"
             app:layout_constraintStart_toStartOf="@+id/budgetProgressBar"
             app:layout_constraintTop_toBottomOf="@+id/budgetProgressBar" />
@@ -78,6 +100,7 @@
             android:maxLines="1"
             android:padding="3dp"
             android:text="5000"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="@+id/budgetProgressBar"
             app:layout_constraintStart_toEndOf="@+id/divider121"
             app:layout_constraintTop_toBottomOf="@+id/budgetProgressBar" />

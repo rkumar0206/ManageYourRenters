@@ -96,7 +96,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="8dp"
             android:progress="30"
-            android:progressDrawable="@drawable/custom_progress_bar_1_green"
+            android:progressDrawable="@drawable/custom_progress_bar_1"
             app:layout_constraintEnd_toStartOf="@+id/percentMCV"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -122,6 +122,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:textSize="12sp"
+                android:textColor="@color/primaryTextColor"
                 tools:text="100%" />
 
         </com.google.android.material.card.MaterialCardView>

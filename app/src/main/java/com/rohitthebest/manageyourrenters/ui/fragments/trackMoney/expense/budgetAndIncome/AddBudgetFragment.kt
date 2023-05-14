@@ -11,13 +11,13 @@ import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAda
 import com.rohitthebest.manageyourrenters.database.model.Budget
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddBudgetBinding
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
-import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+private const val TAG = "AddBudgetFragment"
 
 @AndroidEntryPoint
 class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
@@ -62,22 +62,36 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         //todo: show a dialog or something to add a limit to a budget
 
         showToast(requireContext(), "$budget")
-        if (budget.budgetLimit == 0.0) {
-            budget.apply {
-                this.budgetLimit = 500.0
-                this.uid = getUid()!!
-                this.isSynced = false
-                this.month = selectedMonth
-                this.year = selectedYear
-                this.monthYearString = this.generateMonthYearString()
-                this.created = System.currentTimeMillis()
-                this.modified = System.currentTimeMillis()
-                this.key = generateKey(appendString = "_${this.uid}")
-            }
-            budgetViewModel.insertBudget(budget)
-            getAllExpenseCategoriesAsBudget()
-            setBudgetExpenseCategoryAdapter.notifyDataSetChanged()
+
+        requireActivity().supportFragmentManager.let { fm ->
+
+            AddBudgetLimitBottomSheetFragment.newInstance(Bundle())
+                .apply {
+                    show(fm, TAG)
+                }
         }
+
+//        if (budget.budgetLimit == 0.0) {
+//            budget.apply {
+//                this.budgetLimit = 500.0
+//                this.uid = getUid()!!
+//                this.isSynced = false
+//                this.month = selectedMonth
+//                this.year = selectedYear
+//                this.monthYearString = this.generateMonthYearString()
+//                this.created = System.currentTimeMillis()
+//                this.modified = System.currentTimeMillis()
+//                this.key = generateKey(appendString = "_${this.uid}")
+//            }
+//            budgetViewModel.insertBudget(budget)
+//            getAllExpenseCategoriesAsBudget()
+//            setBudgetExpenseCategoryAdapter.notifyDataSetChanged()
+//        }
+    }
+
+    override fun onBudgetMenuBtnClicked(budget: Budget) {
+
+        // todo: show popup menu with options for editing or removing the budget
     }
 
     private fun getMessage() {

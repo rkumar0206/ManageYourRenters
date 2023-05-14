@@ -1,7 +1,9 @@
 package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.budgetAndIncome
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +13,7 @@ import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.database.model.Budget
 import com.rohitthebest.manageyourrenters.databinding.AdapterSetBudgetExpenseCategoryBinding
 import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.changeTextColor
 import com.rohitthebest.manageyourrenters.utils.format
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.isValid
@@ -34,11 +37,11 @@ class SetBudgetExpenseCategoryAdapter :
                 }
             }
 
-            binding.budgetLimitTV.setOnClickListener {
+            binding.budgetMenuBtn.setOnClickListener {
 
                 if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
 
-                    mListener!!.onAddBudgetClicked(getItem(absoluteAdapterPosition))
+                    mListener!!.onBudgetMenuBtnClicked(getItem(absoluteAdapterPosition))
                 }
             }
         }
@@ -84,6 +87,51 @@ class SetBudgetExpenseCategoryAdapter :
 
                     }
 
+                    val progressInPercent =
+                        ((myBudget.currentExpenseAmount / myBudget.budgetLimit) * 100).toInt()
+
+                    when {
+
+                        (progressInPercent in 0..35) -> {
+
+                            budgetCurrent.changeTextColor(binding.root.context, R.color.color_green)
+                            budgetProgressBar.progressTintList = ColorStateList.valueOf(
+                                ContextCompat.getColor(
+                                    binding.root.context,
+                                    R.color.color_green
+                                )
+                            )
+                        }
+
+                        (progressInPercent in 36..68) -> {
+
+                            budgetCurrent.changeTextColor(
+                                binding.root.context,
+                                R.color.color_yellow
+                            )
+                            budgetProgressBar.progressTintList = ColorStateList.valueOf(
+                                ContextCompat.getColor(
+                                    binding.root.context,
+                                    R.color.color_yellow
+                                )
+                            )
+                        }
+
+                        progressInPercent > 68 -> {
+
+                            budgetCurrent.changeTextColor(
+                                binding.root.context,
+                                R.color.color_Red
+                            )
+                            budgetProgressBar.progressTintList = ColorStateList.valueOf(
+                                ContextCompat.getColor(
+                                    binding.root.context,
+                                    R.color.color_Red
+                                )
+                            )
+                        }
+                    }
+
                     if (myBudget.currentExpenseAmount > myBudget.budgetLimit) {
                         budgetProgressBar.progress = myBudget.budgetLimit.toInt()
                     } else {
@@ -126,6 +174,7 @@ class SetBudgetExpenseCategoryAdapter :
     interface OnClickListener {
 
         fun onAddBudgetClicked(budget: Budget)
+        fun onBudgetMenuBtnClicked(budget: Budget)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

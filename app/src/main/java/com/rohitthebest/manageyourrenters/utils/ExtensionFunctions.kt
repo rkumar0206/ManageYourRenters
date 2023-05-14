@@ -208,6 +208,8 @@ fun String?.isValid(): Boolean {
             && this.trim().isNotBlank()
 }
 
+fun String?.isNotValid() = !this.isValid()
+
 inline fun EditText.onTextChangedListener(
     crossinline onTextChanged: (s: CharSequence?) -> Unit
 ) {
@@ -508,6 +510,7 @@ fun TextView.applyStyles(text: String, textStyle: String) {
                 text.replace("-critical", "")
             )
         }
+
         text.startsWith("https") || text.startsWith("http") -> {
 
             this.changeTextStyle(

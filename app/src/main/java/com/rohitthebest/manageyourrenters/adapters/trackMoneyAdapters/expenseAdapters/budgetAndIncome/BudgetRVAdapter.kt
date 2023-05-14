@@ -1,6 +1,6 @@
 package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.budgetAndIncome
 
-import android.graphics.drawable.Drawable
+import android.content.res.ColorStateList
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -17,6 +17,8 @@ import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.format
 import com.rohitthebest.manageyourrenters.utils.isValid
+
+private const val TAG = "BudgetRVAdapter"
 
 class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(DiffUtilCallback()) {
 
@@ -76,13 +78,13 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
                         myBudget.budgetLimit.format(2)
                     )
 
-                    Log.d("BudgetRVAdapter", "setData: budget: $myBudget")
+                    //Log.d(TAG, "setData: budget: $myBudget")
 
                     val numberOfDaysInMonth = WorkingWithDateAndTime.getNumberOfDaysInMonth(
                         myBudget.month, myBudget.year
                     )
 
-                    Log.d("BudgetRVAdapter", "setData: numberOfDaysInMonth: $numberOfDaysInMonth")
+                    //Log.d(TAG, "setData: numberOfDaysInMonth: $numberOfDaysInMonth")
 
                     baPerDayExpenseTV.text = binding.root.context.getString(
                         R.string.budgetPerDay,
@@ -98,8 +100,18 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
                         "$progressInPercent%"
                     }
 
-                    baProgressBar.progressDrawable =
-                        getProgressBarColorBasedOnExpensePercent(progressInPercent)
+                    changeProgressColorsByProgressPercent(progressInPercent)
+
+                    Log.d(
+                        TAG,
+                        "setData: ${myBudget.categoryName} - percent: $progressInPercent"
+                    )
+                    Log.d(
+                        TAG,
+                        "setData: ${myBudget.categoryName} - progressDrawable: ${
+                            changeProgressColorsByProgressPercent(progressInPercent).hashCode()
+                        }"
+                    )
 
                     baProgressBar.max = myBudget.budgetLimit.toInt()
 
@@ -112,26 +124,42 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
             }
         }
 
-        private fun getProgressBarColorBasedOnExpensePercent(progressInPercent: Int): Drawable? {
+        private fun changeProgressColorsByProgressPercent(progressInPercent: Int) {
 
-            return when {
+            when {
 
-                (progressInPercent in 1..33) -> {
-                    ContextCompat.getDrawable(
-                        binding.root.context, R.drawable.custom_progress_bar_1_green
+                (progressInPercent in 0..35) -> {
+                    val colorGreen = ContextCompat.getColor(
+                        binding.root.context,
+                        R.color.color_green
                     )
+                    binding.baProgressBar.progressTintList = ColorStateList.valueOf(
+                        colorGreen
+                    )
+                    binding.percentMCV.strokeColor = colorGreen
                 }
 
-                (progressInPercent in 34..68) -> {
-                    ContextCompat.getDrawable(
-                        binding.root.context, R.drawable.custom_progress_bar_1_yellow
+                (progressInPercent in 36..68) -> {
+                    val colorYellow = ContextCompat.getColor(
+                        binding.root.context,
+                        R.color.color_yellow
                     )
+                    binding.baProgressBar.progressTintList = ColorStateList.valueOf(
+                        colorYellow
+                    )
+                    binding.percentMCV.strokeColor = colorYellow
                 }
 
                 else -> {
-                    ContextCompat.getDrawable(
-                        binding.root.context, R.drawable.custom_progress_bar_1_orange
+                    val colorRed = ContextCompat.getColor(
+                        binding.root.context,
+                        R.color.color_Red
                     )
+                    binding.baProgressBar.progressTintList = ColorStateList.valueOf(
+                        colorRed
+                    )
+
+                    binding.percentMCV.strokeColor = colorRed
                 }
             }
         }

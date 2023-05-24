@@ -7,7 +7,7 @@ object Constants {
     const val UNSPLASH_BASE_URL = "https://api.unsplash.com/"
 
     const val NO_INTERNET_MESSAGE = "Please check your Internet connection!!!"
-    const val EDIT_TEXT_EMPTY_MESSAGE = "*This is a mandatory field...!!"
+    const val EDIT_TEXT_EMPTY_MESSAGE = "*This is a mandatory field..."
 
     // ----- databases name RELATED---------
     const val RENTER_AND_PAYMENT_DATABASE_NAME = "renter_and_payment_database.db"
@@ -84,6 +84,7 @@ object Constants {
     const val PAYMENT_METHOD_KEY_FOR_EDIT = "PAYMENT_METHOD_KEY_FOR_EDIT_KEY"
 
     const val EXPENSE_FILTER_KEY = "EXPENSE_FILTER_KEY_sdbjhsbjs"
+    const val BUDGET = "passing_budget_object_using_bundle_key"
 
     const val SERVICE_STOP_TIME_IN_SECONDS: Long = 45
     const val GENERIC_KEY_FOR_ACTIVITY_OR_FRAGMENT_COMMUNICATION = "GENERIC_KEY_skdjhshjsvhjs"

@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAd
 
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -33,7 +34,10 @@ class SetBudgetExpenseCategoryAdapter :
 
                 if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
 
-                    mListener!!.onAddBudgetClicked(getItem(absoluteAdapterPosition))
+                    mListener!!.onAddBudgetClicked(
+                        getItem(absoluteAdapterPosition),
+                        absoluteAdapterPosition
+                    )
                 }
             }
 
@@ -41,7 +45,11 @@ class SetBudgetExpenseCategoryAdapter :
 
                 if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
 
-                    mListener!!.onBudgetMenuBtnClicked(getItem(absoluteAdapterPosition))
+                    mListener!!.onBudgetMenuBtnClicked(
+                        getItem(absoluteAdapterPosition),
+                        binding.budgetMenuBtn,
+                        absoluteAdapterPosition
+                    )
                 }
             }
         }
@@ -77,9 +85,11 @@ class SetBudgetExpenseCategoryAdapter :
                         // no budget is set
                         budgetAddLimitBtn.show()
                         budgetLimitTV.hide()
+                        budgetMenuBtn.hide()
                     } else {
                         budgetAddLimitBtn.hide()
                         budgetLimitTV.show()
+                        budgetMenuBtn.show()
 
                         budgetLimitTV.text = myBudget.budgetLimit.format(2)
 
@@ -173,8 +183,8 @@ class SetBudgetExpenseCategoryAdapter :
 
     interface OnClickListener {
 
-        fun onAddBudgetClicked(budget: Budget)
-        fun onBudgetMenuBtnClicked(budget: Budget)
+        fun onAddBudgetClicked(budget: Budget, position: Int)
+        fun onBudgetMenuBtnClicked(budget: Budget, view: View, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

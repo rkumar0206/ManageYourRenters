@@ -392,6 +392,9 @@
     <string name="enter_budget_limit">Enter budget limit</string>
     <string name="add_budget_limit">Add budget limit</string>
     <string name="budget_limit_should_be_grater_than_0">Budget limit should be greater than 0</string>
+    <string name="remove_limit">Remove limit</string>
+    <string name="remove_budget_warning">Budget will be removed for this month</string>
+    <string name="ok">Ok</string>
 
     <string-array name="interest_time_schedule">
 

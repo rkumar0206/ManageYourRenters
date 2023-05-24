@@ -37,8 +37,8 @@ class BudgetViewModel @Inject constructor(
         budgetRepository.insertAllBudget(budgets)
     }
 
-    fun updateBudget(budget: Budget) = viewModelScope.launch {
-        budgetRepository.updateBudget(budget)
+    fun updateBudget(oldBudget: Budget, newBudget: Budget) = viewModelScope.launch {
+        budgetRepository.updateBudget(newBudget)
     }
 
     fun deleteBudget(budget: Budget) = viewModelScope.launch {
@@ -135,13 +135,13 @@ class BudgetViewModel @Inject constructor(
                     this.monthYearString = this.generateMonthYearString()
                     this.categoryName = category.categoryName
                     this.categoryImageUrl = category.imageUrl ?: ""
-                    this.modified = 0L
+                    this.modified = System.currentTimeMillis()
                 }
                 expenseCategoryAsBudget.add(budget)
             }
 
             _allExpenseCategoryAsBudgets.value =
-                expenseCategoryAsBudget.sortedByDescending { it.modified }
+                expenseCategoryAsBudget.sortedBy { it.modified }
         }
     }
 

@@ -14,7 +14,10 @@ import com.rohitthebest.manageyourrenters.databinding.EditTextBottomSheetLayoutB
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.generateKey
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
 import com.rohitthebest.manageyourrenters.utils.isNotValid
 import com.rohitthebest.manageyourrenters.utils.isTextValid
 import com.rohitthebest.manageyourrenters.utils.isValid
@@ -32,6 +35,7 @@ class AddBudgetLimitBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var receivedBudget: Budget
 
     private var isForEdit = false
+    private var mListener: OnBottomSheetDismissListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,7 +64,7 @@ class AddBudgetLimitBottomSheetFragment : BottomSheetDialogFragment() {
         binding.editText.counterMaxLength = 12
         binding.editText.hint = getString(R.string.enter_budget_limit)
 
-        binding.editText.editText?.apply {
+        binding.insideEditText.apply {
 
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
 
@@ -70,8 +74,8 @@ class AddBudgetLimitBottomSheetFragment : BottomSheetDialogFragment() {
             hint = getString(R.string.enter_budget_limit)
         }
 
-        binding.editText.editText?.requestFocus()
-        Functions.showKeyboard(requireActivity(), binding.editText.editText!!)
+        binding.insideEditText.requestFocus()
+        Functions.showKeyboard(requireActivity(), binding.insideEditText)
 
     }
 
@@ -95,9 +99,23 @@ class AddBudgetLimitBottomSheetFragment : BottomSheetDialogFragment() {
 
                             getBudgetByKey()
                         }
+                    } else {
+
+                        try {
+                            receivedBudget = bundle.getString(Constants.BUDGET, "")
+                                .convertJsonToObject(Budget::class.java)!!
+                            receivedBudgetKey = receivedBudget.key
+                        } catch (e: NullPointerException) {
+
+                            requireContext().showToast(getString(R.string.something_went_wrong))
+                            dismiss()
+                        }
+
                     }
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
+                    requireContext().showToast(getString(R.string.something_went_wrong))
+                    dismiss()
                 }
             }
         }
@@ -123,25 +141,65 @@ class AddBudgetLimitBottomSheetFragment : BottomSheetDialogFragment() {
     private fun initListeners() {
 
         binding.toolbar.setNavigationOnClickListener {
-            showToast(requireContext(), getString(R.string.cancelled))
             Functions.hideKeyBoard(requireActivity())
             dismiss()
         }
 
         binding.toolbar.menu.findItem(R.id.menu_save_btn).setOnMenuItemClickListener {
 
-
             if (isFormValid()) {
 
                 if (isForEdit) {
 
+                    updateBudgetLimit()
+                } else {
+                    insertBudgetLimit()
                 }
-
-                // todo: save payment method
             }
 
             true
         }
+    }
+
+    private fun updateBudgetLimit() {
+
+        val budgetBefore = receivedBudget.copy()
+
+        receivedBudget.apply {
+
+            this.budgetLimit = binding.insideEditText.text.toString().trim().toDouble()
+            this.modified = System.currentTimeMillis()
+        }
+
+        budgetViewModel.updateBudget(budgetBefore, receivedBudget)
+
+        if (mListener != null) {
+            mListener!!.onBottomSheetDismissed(
+                true
+            )
+        }
+
+        dismiss()
+    }
+
+    private fun insertBudgetLimit() {
+
+        receivedBudget.apply {
+
+            this.uid = getUid()!!
+            this.key = generateKey("_${this.uid}")
+            this.modified = System.currentTimeMillis()
+            this.created = System.currentTimeMillis()
+            this.budgetLimit = binding.insideEditText.text.toString().trim().toDouble()
+        }
+
+        budgetViewModel.insertBudget(receivedBudget)
+
+        if (mListener != null) {
+            mListener!!.onBottomSheetDismissed(true)
+        }
+
+        dismiss()
     }
 
     private fun isFormValid(): Boolean {
@@ -151,21 +209,26 @@ class AddBudgetLimitBottomSheetFragment : BottomSheetDialogFragment() {
             return false
         }
 
+        if (binding.insideEditText.text.toString().toDouble() <= 0.0) {
+
+            binding.editText.error =
+                getString(R.string.budget_limit_should_be_grater_than_0)
+            return false
+        }
+
         return binding.editText.error == null
     }
 
     private fun textWatchers() {
 
-        binding.editText.editText?.onTextChangedListener { s ->
+        binding.insideEditText.onTextChangedListener { s ->
 
             if (!s.toString().isValid()) {
 
                 binding.editText.error = Constants.EDIT_TEXT_EMPTY_MESSAGE
             } else {
 
-                if (this::receivedBudget.isInitialized &&
-                    s?.toString()?.trim()?.toDouble()!! <= 0.0
-                ) {
+                if (s?.toString()?.trim()?.toDouble()!! <= 0.0) {
                     binding.editText.error =
                         getString(R.string.budget_limit_should_be_grater_than_0)
                 } else {
@@ -183,6 +246,19 @@ class AddBudgetLimitBottomSheetFragment : BottomSheetDialogFragment() {
             return fragment
         }
     }
+
+    interface OnBottomSheetDismissListener {
+
+        fun onBottomSheetDismissed(
+            isBudgetLimitAdded: Boolean
+        )
+    }
+
+    fun setOnBottomSheetDismissListener(listener: OnBottomSheetDismissListener) {
+
+        mListener = listener
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

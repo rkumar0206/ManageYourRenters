@@ -20,6 +20,8 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfViewOnScrolled
 import com.rohitthebest.manageyourrenters.utils.format
+import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -50,16 +52,12 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
         budgetAdapter = BudgetRVAdapter()
 
 
-        initUI()
         initListeners()
         setUpRecyclerView()
 
-        lifecycleScope.launch {
+        binding.progressBar.show()
 
-            delay(300)
-            initUI()
-        }
-
+        initUI()
     }
 
     private fun getAllBudgets() {
@@ -73,6 +71,7 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
             binding.noBudgetAddedTV.isVisible = budgets.isEmpty()
 
             budgetAdapter.submitList(budgets)
+            binding.progressBar.hide()
         }
     }
 
@@ -108,7 +107,12 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
         binding.iabDateTV.text =
             getString(R.string.month_and_year, monthList[selectedMonth], selectedYear.toString())
 
-        handleUiAfterDateChange()
+        binding.progressBar.show()
+
+        lifecycleScope.launch {
+            delay(300)
+            handleUiAfterDateChange()
+        }
 
         budgetViewModel.getTheOldestSavedBudgetYear().observe(viewLifecycleOwner) { year ->
             try {
@@ -190,6 +194,8 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
     }
 
     private fun handleUiAfterDateChange() {
+
+        binding.progressBar.show()
 
         setMonthAndYearInTextView()
 

@@ -20,10 +20,12 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoIntern
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.convertToJsonString
 import com.rohitthebest.manageyourrenters.utils.executeAfterDelay
+import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.isValid
 import com.rohitthebest.manageyourrenters.utils.onTextChanged
 import com.rohitthebest.manageyourrenters.utils.onTextSubmit
+import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -55,6 +57,8 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
 
         monthList = resources.getStringArray(R.array.months).toList()
         setBudgetExpenseCategoryAdapter = SetBudgetExpenseCategoryAdapter()
+
+        binding.progressBar.show()
 
         getMessage()
         initListeners()
@@ -204,12 +208,9 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
 
         budgetViewModel.getAllExpenseCategoryAsBudget(selectedMonth, selectedYear)
         budgetViewModel.allExpenseCategoryAsBudgets.observe(viewLifecycleOwner) { budgets ->
-
-            //setBudgetExpenseCategoryAdapter.submitList(budgets)
-
             setUpSearchViewMenu(budgets)
+            binding.progressBar.hide()
         }
-
     }
 
     private var searchTextDelayJob: Job? = null
@@ -237,7 +238,6 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
     private fun searchBudget(query: String, budgets: List<Budget>) {
 
         if (!query.isValid()) {
-            //binding.setBudgetRV.scrollToPosition(0)
             setBudgetExpenseCategoryAdapter.submitList(budgets)
 
             showNoBudgetAddedTV(
@@ -292,7 +292,6 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
             getString(R.string.month_and_year, monthList[selectedMonth], selectedYear.toString())
 
         handleUiAfterDateChange()
-
 
         budgetViewModel.getTheOldestSavedBudgetYear().observe(viewLifecycleOwner) { year ->
             try {

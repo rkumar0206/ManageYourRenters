@@ -3,6 +3,8 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budge
 import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
+import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -17,8 +19,13 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.convertToJsonString
+import com.rohitthebest.manageyourrenters.utils.executeAfterDelay
 import com.rohitthebest.manageyourrenters.utils.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.isValid
+import com.rohitthebest.manageyourrenters.utils.onTextChanged
+import com.rohitthebest.manageyourrenters.utils.onTextSubmit
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -39,8 +46,8 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
     private var monthList: List<String> = emptyList()
 
     private lateinit var setBudgetExpenseCategoryAdapter: SetBudgetExpenseCategoryAdapter
-
     private var adapterPosition = 0
+    private var searchView: SearchView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -198,10 +205,71 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         budgetViewModel.getAllExpenseCategoryAsBudget(selectedMonth, selectedYear)
         budgetViewModel.allExpenseCategoryAsBudgets.observe(viewLifecycleOwner) { budgets ->
 
-            // todo: if no expense category is added yet show a textview for adding an expense category first
-            setBudgetExpenseCategoryAdapter.submitList(budgets)
+            //setBudgetExpenseCategoryAdapter.submitList(budgets)
+
+            setUpSearchViewMenu(budgets)
         }
 
+    }
+
+    private var searchTextDelayJob: Job? = null
+    private fun setUpSearchViewMenu(budgets: List<Budget>) {
+
+        searchView =
+            binding.toolbar.menu.findItem(R.id.menu_search).actionView as SearchView
+
+        searchView?.let { sv ->
+
+            searchBudget(sv.query.toString(), budgets)
+
+            sv.onTextSubmit { query -> searchBudget(query ?: "", budgets) }
+            sv.onTextChanged { query ->
+
+                searchTextDelayJob = lifecycleScope.launch {
+                    searchTextDelayJob.executeAfterDelay {
+                        searchBudget(query ?: "", budgets)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun searchBudget(query: String, budgets: List<Budget>) {
+
+        if (!query.isValid()) {
+            //binding.setBudgetRV.scrollToPosition(0)
+            setBudgetExpenseCategoryAdapter.submitList(budgets)
+
+            showNoBudgetAddedTV(
+                budgets.isEmpty(),
+                getString(R.string.no_expense_category_added_for_budget_message)
+            )
+
+        } else {
+
+            val filteredList = budgets.filter { budget ->
+
+                budget.categoryName.lowercase()
+                    .contains(query.trim().lowercase())
+            }
+
+            showNoBudgetAddedTV(
+                filteredList.isEmpty(),
+                getString(R.string.no_matching_results_found_message)
+            )
+
+            setBudgetExpenseCategoryAdapter.submitList(filteredList)
+        }
+    }
+
+    private fun showNoBudgetAddedTV(
+        isVisible: Boolean,
+        noExpenseCategoryAddedForBudgetMessage: String = ""
+    ) {
+
+        binding.noBudgetLimitAddedTV.text = noExpenseCategoryAddedForBudgetMessage
+        binding.noBudgetLimitAddedTV.isVisible = isVisible
+        binding.setBudgetRV.isVisible = !isVisible
     }
 
     private fun initListeners() {

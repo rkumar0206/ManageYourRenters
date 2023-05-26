@@ -201,11 +201,11 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
 
         getAllBudgets()
         showExpenseTotal()
-
-        // todo: show if any budget is added for this month, year
+        showTotalBudget()
         // todo: show total income added
         // todo : show total savings done (income - expense)
     }
+
 
     private fun showExpenseTotal() {
 
@@ -214,17 +214,41 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
                 selectedMonth, selectedYear
             )
 
-        expenseViewModel.getTotalExpenseAmountByDateRange(
-            datePairForExpense.first, datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
-        ).observe(viewLifecycleOwner) { total ->
+        budgetViewModel.getAllExpenseCategoryOfBudgetsByMonthAndYear(
+            selectedMonth, selectedYear
+        )
+            .observe(viewLifecycleOwner) { categoryKeys ->
 
-            try {
-                binding.iabExpenseValueTV.text = total.format(2)
-            } catch (e: NullPointerException) {
-                e.printStackTrace()
-                binding.iabExpenseValueTV.text = getString(R.string._0_0)
+                if (categoryKeys.isNotEmpty()) {
+                    expenseViewModel.getTotalExpenseByCategoryKeysAndDateRange(
+                        categoryKeys,
+                        datePairForExpense.first,
+                        datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
+                    ).observe(viewLifecycleOwner) { total ->
+                        try {
+                            binding.iabExpenseValueTV.text = total.format(2)
+                        } catch (e: NullPointerException) {
+                            e.printStackTrace()
+                            binding.iabExpenseValueTV.text = getString(R.string._0_0)
+                        }
+                    }
+                } else {
+                    binding.iabExpenseValueTV.text = getString(R.string._0_0)
+                }
             }
-        }
+    }
+
+    private fun showTotalBudget() {
+
+        budgetViewModel.getTotalBudgetByMonthAndYear(selectedMonth, selectedYear)
+            .observe(viewLifecycleOwner) { totalBudget ->
+                try {
+                    binding.iabBudgetValueTV.text = totalBudget.format(2)
+                } catch (e: NullPointerException) {
+                    e.printStackTrace()
+                    binding.iabBudgetValueTV.text = getString(R.string._0_0)
+                }
+            }
     }
 
 

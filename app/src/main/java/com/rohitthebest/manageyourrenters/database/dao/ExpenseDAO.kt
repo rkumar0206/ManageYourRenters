@@ -60,12 +60,12 @@ interface ExpenseDAO {
         date2: Long
     ): Flow<Double>
 
-    @Query("SELECT SUM(amount) FROM expense_table WHERE categoryKey = :expenseCategoryKey AND created BETWEEN :date1 AND :date2")
-    fun getTotalExpenseAmountByCategoryKeyAndDateRange2(
-        expenseCategoryKey: String,
+    @Query("SELECT SUM(amount) FROM expense_table WHERE categoryKey IN (:expenseCategoryKeys) AND created BETWEEN :date1 AND :date2")
+    fun getTotalExpenseByCategoryKeysAndDateRange(
+        expenseCategoryKeys: List<String>,
         date1: Long,
         date2: Long
-    ): Double
+    ): Flow<Double>
 
 
     @Query("SELECT * FROM expense_table WHERE `key` = :expenseKey")

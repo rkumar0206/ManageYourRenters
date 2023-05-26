@@ -34,5 +34,9 @@ interface BudgetDao {
     @Query("SELECT * FROM budget_table where `key` = :budgetKey")
     fun getBudgetBuyBudgetKey(budgetKey: String): Flow<Budget>
 
-    //todo: calculate total budget for specific month and year
+    @Query("SELECT expenseCategoryKey FROM budget_table where month = :month and year = :year")
+    fun getExpenseCategoryKeysOfAllBudgetsByMonthAndYear(month: Int, year: Int): Flow<List<String>>
+
+    @Query("SELECT SUM(budgetLimit) FROM budget_table where month = :month and year = :year")
+    fun getTotalBudgetByMonthAndYear(month: Int, year: Int): Flow<Double>
 }

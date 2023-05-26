@@ -81,6 +81,11 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
+    fun getAllExpenseCategoryOfBudgetsByMonthAndYear(
+        month: Int = WorkingWithDateAndTime.getCurrentMonth(),
+        year: Int = WorkingWithDateAndTime.getCurrentYear()
+    ) = budgetRepository.getExpenseCategoryKeysOfAllBudgetsByMonthAndYear(month, year).asLiveData()
+
 
     private val _allExpenseCategoryAsBudgets = MutableLiveData<List<Budget>>()
     val allExpenseCategoryAsBudgets: LiveData<List<Budget>> get() = _allExpenseCategoryAsBudgets
@@ -180,4 +185,12 @@ class BudgetViewModel @Inject constructor(
     fun getTheOldestSavedBudgetYear() = budgetRepository.getTheOldestSavedBudgetYear().asLiveData()
 
     fun getBudgetByKey(budgetKey: String) = budgetRepository.getBudgetByKey(budgetKey).asLiveData()
+
+    fun getTotalBudgetByMonthAndYear(month: Int, year: Int) =
+        budgetRepository.getTotalBudgetByMonthAndYear(month, year).asLiveData()
+
+    fun getTotalExpenseByMonthAndYear(month: Int, year: Int) {
+
+
+    }
 }

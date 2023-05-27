@@ -22,8 +22,8 @@ class IncomeViewModel @Inject constructor(
         repository.insertAllIncome(incomes)
     }
 
-    fun updateIncome(income: Income) = viewModelScope.launch {
-        repository.updateIncome(income)
+    fun updateIncome(oldIncome: Income, updatedIncome: Income) = viewModelScope.launch {
+        repository.updateIncome(updatedIncome)
     }
 
     fun deleteIncome(income: Income) = viewModelScope.launch {
@@ -38,4 +38,9 @@ class IncomeViewModel @Inject constructor(
 
     fun getIncomeByKey(incomeKey: String) =
         repository.getIncomeByKey(incomeKey = incomeKey).asLiveData()
+
+    fun getTotalIncomeAddedByMonthAndYear(month: Int, year: Int) =
+        repository.getTotalIncomeAddedByMonthAndYear(month, year).asLiveData()
+
+    fun getAllIncomeSources() = repository.getAllIncomeSources().asLiveData()
 }

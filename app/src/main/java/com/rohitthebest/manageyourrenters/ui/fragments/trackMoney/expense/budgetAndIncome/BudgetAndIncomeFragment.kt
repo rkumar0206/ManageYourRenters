@@ -14,8 +14,8 @@ import com.rohitthebest.manageyourrenters.database.model.Budget
 import com.rohitthebest.manageyourrenters.databinding.FragmentBudgetBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
-import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.IncomeViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfViewOnScrolled
@@ -26,6 +26,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private const val TAG = "BudgetAndIncomeFragment"
+
 @AndroidEntryPoint
 class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClickListener,
     BudgetRVAdapter.OnClickListener {
@@ -33,9 +35,9 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
     private var _binding: FragmentBudgetBinding? = null
     private val binding get() = _binding!!
 
-    private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
     private val budgetViewModel by viewModels<BudgetViewModel>()
     private val expenseViewModel by viewModels<ExpenseViewModel>()
+    private val incomeViewModel by viewModels<IncomeViewModel>()
 
     private var selectedMonth: Int = 0
     private var selectedYear: Int = 0
@@ -43,14 +45,14 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
 
     private lateinit var budgetAdapter: BudgetRVAdapter
 
+    private var totalIncome = 0.0
+    private var totalExpense = 0.0
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentBudgetBinding.bind(view)
 
-
         monthList = resources.getStringArray(R.array.months).toList()
         budgetAdapter = BudgetRVAdapter()
-
 
         initListeners()
         setUpRecyclerView()
@@ -157,7 +159,20 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
 
             binding.iabIncomeAddBtn.id -> {
 
-                // todo: show bottomSheet for adding income
+                val bundle = Bundle()
+
+                bundle.putBoolean(Constants.IS_FOR_EDIT, false)
+                bundle.putInt(Constants.INCOME_MONTH_KEY, selectedMonth)
+                bundle.putInt(Constants.INCOME_YEAR_KEY, selectedYear)
+
+                requireActivity().supportFragmentManager.let { fragmentManager ->
+
+                    AddIncomeBottomSheetFragment.newInstance(
+                        bundle
+                    ).apply {
+                        show(fragmentManager, TAG)
+                    }
+                }
             }
 
             binding.iabAddBudgetFAB.id -> {
@@ -171,6 +186,14 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
             }
         }
     }
+
+//    override fun onIncomeBottomSheetDismissed(isIncomeAdded: Boolean) {
+//
+//        if (isIncomeAdded) {
+//            showTotalIncomeAdded()
+//        }
+//    }
+
 
     private fun handlePreviousDateButton() {
 
@@ -202,8 +225,37 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
         getAllBudgets()
         showExpenseTotal()
         showTotalBudget()
-        // todo: show total income added
-        // todo : show total savings done (income - expense)
+        showTotalIncomeAdded()
+        showTotalSavings()
+    }
+
+    private fun showTotalSavings() {
+
+        lifecycleScope.launch {
+            delay(150)
+            binding.iabSavingValueTV.text = (totalIncome - totalExpense).format(2)
+        }
+
+    }
+
+    private fun showTotalIncomeAdded() {
+
+        incomeViewModel.getTotalIncomeAddedByMonthAndYear(
+            selectedMonth, selectedYear
+        ).observe(viewLifecycleOwner) { totalIncomeAdded ->
+
+            try {
+                totalIncome = totalIncomeAdded
+                binding.iabIncomeValueTV.text = totalIncomeAdded.format(2)
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
+                totalIncome = 0.0
+                binding.iabIncomeValueTV.text = getString(R.string._0_0)
+            }
+
+            showTotalSavings()
+        }
+
     }
 
 
@@ -226,11 +278,15 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
                         datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
                     ).observe(viewLifecycleOwner) { total ->
                         try {
+                            totalExpense = total
                             binding.iabExpenseValueTV.text = total.format(2)
                         } catch (e: NullPointerException) {
                             e.printStackTrace()
+                            totalExpense = 0.0
                             binding.iabExpenseValueTV.text = getString(R.string._0_0)
                         }
+
+                        showTotalSavings()
                     }
                 } else {
                     binding.iabExpenseValueTV.text = getString(R.string._0_0)
@@ -264,27 +320,4 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
         _binding = null
     }
 
-    /**
-     * Work to be done
-     * budget will be calculated only on monthly basis
-     * once the month changes income, budget and expense should be reset
-     * user can change the budget limit any time they want
-     * saving the total of income and expense
-     * Tables/ Models:
-     * Budget:
-     * categoryKey
-     * budgetAmount
-     * month
-     * year
-     * monthYearString
-     * key
-     *
-     * Income:
-     * source
-     * income
-     * month
-     * year
-     * monthYearString
-     * key
-     */
 }

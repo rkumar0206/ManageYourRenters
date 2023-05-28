@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 private const val TAG = "BudgetAndIncomeFragment"
 
 @AndroidEntryPoint
-class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClickListener,
+class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View.OnClickListener,
     BudgetRVAdapter.OnClickListener {
 
     private var _binding: FragmentBudgetBinding? = null
@@ -178,10 +178,19 @@ class BudgetAndIncomeFragment : Fragment(R.layout.fragment_budget), View.OnClick
             binding.iabAddBudgetFAB.id -> {
 
                 val action =
-                    BudgetAndIncomeFragmentDirections.actionBudgetAndIncomeFragmentToAddBudgetFragment(
+                    BudgetAndIncomeOverviewFragmentDirections.actionBudgetAndIncomeFragmentToAddBudgetFragment(
                         selectedMonth, selectedYear
                     )
 
+                findNavController().navigate(action)
+            }
+
+            binding.iabIncomeMCV.id -> {
+
+                val action =
+                    BudgetAndIncomeOverviewFragmentDirections.actionBudgetAndIncomeFragmentToIncomeFragment(
+                        selectedMonth, selectedYear
+                    )
                 findNavController().navigate(action)
             }
         }

@@ -23,6 +23,9 @@ class IncomeRepository @Inject constructor(
 
     fun getAllIncomes() = dao.getAllIncomes()
 
+    fun getAllIncomesByMonthAndYear(month: Int, year: Int) =
+        dao.getAllIncomesByMonthAndYear(month, year)
+
     fun getIncomeByKey(incomeKey: String) = dao.getIncomeByKey(incomeKey)
 
     fun getTotalIncomeAddedByMonthAndYear(month: Int, year: Int) =

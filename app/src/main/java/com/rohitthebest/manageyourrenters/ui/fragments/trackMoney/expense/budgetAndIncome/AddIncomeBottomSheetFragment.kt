@@ -4,14 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.adapters.SelectPaymentMethodAdapter
 import com.rohitthebest.manageyourrenters.database.model.Income
+import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddIncomeBootmsheetBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.ui.fragments.AddEditPaymentMethodBottomSheetFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.IncomeViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
@@ -19,14 +27,21 @@ import com.rohitthebest.manageyourrenters.utils.isTextValid
 import com.rohitthebest.manageyourrenters.utils.isValid
 import com.rohitthebest.manageyourrenters.utils.onTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+private const val TAG = "AddIncomeBottomSheetFra"
 
 @AndroidEntryPoint
-class AddIncomeBottomSheetFragment : BottomSheetDialogFragment() {
+class AddIncomeBottomSheetFragment : BottomSheetDialogFragment(),
+    SelectPaymentMethodAdapter.OnClickListener {
 
     private var _binding: FragmentAddIncomeBootmsheetBinding? = null
     private val binding get() = _binding!!
 
     private val incomeViewModel by viewModels<IncomeViewModel>()
+    private val paymentMethodViewModel by viewModels<PaymentMethodViewModel>()
+
     private var isForEdit = false
     private var receivedMonth: Int = 0
     private var receivedYear: Int = 0
@@ -34,6 +49,7 @@ class AddIncomeBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var receivedIncome: Income
 
     private var mListener: OnIncomeBottomSheetDismissListener? = null
+    private lateinit var selectPaymentMethodAdapter: SelectPaymentMethodAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -46,9 +62,57 @@ class AddIncomeBottomSheetFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAddIncomeBootmsheetBinding.bind(view)
 
+        selectPaymentMethodAdapter = SelectPaymentMethodAdapter()
+
         getMessage()
         initListener()
         textWatchers()
+        setUpSourceAutoTextView()
+        setUpPaymentMethodRecyclerView()
+    }
+
+    private fun setUpPaymentMethodRecyclerView() {
+
+        binding.linkPaymentMethodsRV.apply {
+
+            adapter = selectPaymentMethodAdapter
+            layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
+            setHasFixedSize(true)
+        }
+
+        selectPaymentMethodAdapter.setOnClickListener(this)
+    }
+
+    override fun onItemClick(paymentMethod: PaymentMethod, position: Int) {
+
+        if (paymentMethod.key != Constants.ADD_PAYMENT_METHOD_KEY) {
+
+            paymentMethod.isSelected = !paymentMethod.isSelected
+            selectPaymentMethodAdapter.notifyItemChanged(position)
+        } else {
+
+            requireActivity().supportFragmentManager.let {
+
+                AddEditPaymentMethodBottomSheetFragment.newInstance(Bundle())
+                    .apply {
+                        show(it, TAG)
+                    }
+            }
+        }
+    }
+
+    private fun setUpSourceAutoTextView() {
+
+        incomeViewModel.getAllIncomeSources().observe(viewLifecycleOwner) { sources ->
+
+            val adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                sources
+            )
+
+            binding.insideEditTextSource.setAdapter(adapter)
+        }
     }
 
     private fun getMessage() {
@@ -86,6 +150,13 @@ class AddIncomeBottomSheetFragment : BottomSheetDialogFragment() {
                         }
                     }
 
+                    lifecycleScope.launch {
+
+                        delay(300)
+                        getAllPaymentMethods()
+                    }
+
+
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
                     requireContext().showToast(getString(R.string.something_went_wrong))
@@ -93,6 +164,35 @@ class AddIncomeBottomSheetFragment : BottomSheetDialogFragment() {
                 }
             }
         }
+
+    }
+
+    private fun getAllPaymentMethods() {
+
+        paymentMethodViewModel.getAllPaymentMethods()
+            .observe(viewLifecycleOwner) { paymentMethods ->
+
+                if (isForEdit && selectPaymentMethodAdapter.currentList.isEmpty()) {
+
+                    receivedIncome.linkedPaymentMethods?.let { alreadySelectedPM ->
+                        paymentMethods.forEach { pm ->
+                            if (alreadySelectedPM.contains(pm.key)) {
+                                pm.isSelected = true
+                            }
+                        }
+                    }
+                }
+
+                val addPaymentMethod = PaymentMethod(
+                    key = Constants.ADD_PAYMENT_METHOD_KEY,
+                    paymentMethod = getString(R.string.add),
+                    uid = "",
+                    isSynced = false,
+                    isSelected = false
+                )
+
+                selectPaymentMethodAdapter.submitList(paymentMethods + listOf(addPaymentMethod))
+            }
 
     }
 
@@ -161,6 +261,13 @@ class AddIncomeBottomSheetFragment : BottomSheetDialogFragment() {
 
         income.source = binding.insideEditTextSource.text.toString().trim()
         income.income = binding.insideEditTextIncome.text.toString().trim().toDouble()
+
+        val selectedPaymentMethods =
+            selectPaymentMethodAdapter.currentList.filter { pm -> pm.isSelected }
+                .map { pm -> pm.key }
+
+        income.linkedPaymentMethods =
+            selectedPaymentMethods.ifEmpty { listOf(Constants.PAYMENT_METHOD_OTHER_KEY) }
 
         if (!isForEdit) {
             incomeViewModel.insertIncome(income)

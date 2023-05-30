@@ -89,10 +89,10 @@
             app:counterMaxLength="15"
             app:errorEnabled="true">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/insideEditTextSource"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:backgroundTint="@color/white"
                 android:hint="@string/source"
                 android:inputType="textCapCharacters|textPersonName"
@@ -103,17 +103,55 @@
 
     </androidx.cardview.widget.CardView>
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView29"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:cardCornerRadius="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/cardView27"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/cardView27"
+        app:layout_constraintTop_toBottomOf="@+id/cardView27">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView23"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/payment_methods_default_other"
+                android:textColor="@color/blue_text_color" />
+
+            <View
+                android:id="@+id/divider124"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/linkPaymentMethodsRV"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginTop="5dp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+
     <View
         android:id="@+id/divider107"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="30dp"
         android:background="?android:attr/listDivider"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView27" />
+        app:layout_constraintTop_toBottomOf="@+id/cardView29" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

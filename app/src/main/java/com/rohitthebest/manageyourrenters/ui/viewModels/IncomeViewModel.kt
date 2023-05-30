@@ -36,6 +36,10 @@ class IncomeViewModel @Inject constructor(
 
     fun getAllIncomes() = repository.getAllIncomes().asLiveData()
 
+    fun getAllIncomesByMonthAndYear(month: Int, year: Int) = repository.getAllIncomesByMonthAndYear(
+        month, year
+    ).asLiveData()
+
     fun getIncomeByKey(incomeKey: String) =
         repository.getIncomeByKey(incomeKey = incomeKey).asLiveData()
 

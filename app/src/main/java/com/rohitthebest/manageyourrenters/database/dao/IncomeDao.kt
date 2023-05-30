@@ -25,6 +25,9 @@ interface IncomeDao {
     @Query("SELECT * FROM income_table")
     fun getAllIncomes(): Flow<List<Income>>
 
+    @Query("SELECT * FROM income_table where month = :month AND year = :year")
+    fun getAllIncomesByMonthAndYear(month: Int, year: Int): Flow<List<Income>>
+
     @Query("SELECT * FROM income_table where `key` = :incomeKey")
     fun getIncomeByKey(incomeKey: String): Flow<Income>
 

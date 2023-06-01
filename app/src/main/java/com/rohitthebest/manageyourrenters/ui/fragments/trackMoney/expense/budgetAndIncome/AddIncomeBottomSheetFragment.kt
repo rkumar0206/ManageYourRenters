@@ -135,6 +135,9 @@ class AddIncomeBottomSheetFragment : BottomSheetDialogFragment(),
                             requireContext().showToast(getString(R.string.something_went_wrong))
                             dismiss()
                         }
+
+                        binding.toolbar.title = getString(R.string.edit_income)
+
                     } else {
 
                         receivedMonth = bundle.getInt(Constants.INCOME_MONTH_KEY, -1)

@@ -2,25 +2,31 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budge
 
 import android.os.Bundle
 import android.view.View
+import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.budgetAndIncome.IncomeRVAdapter
+import com.rohitthebest.manageyourrenters.database.model.Income
 import com.rohitthebest.manageyourrenters.databinding.FragmentIncomeBinding
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.IncomeViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.show
+import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private const val TAG = "IncomeFragment"
+
 @AndroidEntryPoint
-class IncomeFragment : Fragment(R.layout.fragment_income) {
+class IncomeFragment : Fragment(R.layout.fragment_income), IncomeRVAdapter.OnClickListener {
 
     private var _binding: FragmentIncomeBinding? = null
     private val binding get() = _binding!!
@@ -52,6 +58,61 @@ class IncomeFragment : Fragment(R.layout.fragment_income) {
             adapter = incomeRVAdapter
             changeVisibilityOfFABOnScrolled(binding.addIncomeFAB)
         }
+
+        incomeRVAdapter.setOnClickListener(this)
+    }
+
+
+    override fun onItemClick(income: Income) {
+        // todo
+    }
+
+    override fun onIncomeItemMenuBtnClicked(income: Income, view: View) {
+
+        val popupMenu = PopupMenu(requireContext(), view)
+        popupMenu.menuInflater.inflate(R.menu.income_item_menu, popupMenu.menu)
+
+        popupMenu.show()
+
+        popupMenu.setOnMenuItemClickListener {
+
+            return@setOnMenuItemClickListener when (it.itemId) {
+
+                R.id.menu_income_edit -> {
+
+                    handleEditIncomeMenu(income)
+                    true
+                }
+
+                R.id.menu_delete_income -> {
+
+                    deleteIncome(income)
+                    true
+                }
+
+                else -> false
+            }
+
+        }
+    }
+
+    private fun deleteIncome(income: Income) {
+
+        showAlertDialogForDeletion(
+            requireContext(),
+            {
+                incomeViewModel.deleteIncome(income)
+                it.dismiss()
+            },
+            {
+                it.dismiss()
+            }
+        )
+    }
+
+    private fun handleEditIncomeMenu(income: Income) {
+
+        showAddEditIncomeBottomSheetFragment(true, income.key)
     }
 
     private fun initListener() {
@@ -68,6 +129,34 @@ class IncomeFragment : Fragment(R.layout.fragment_income) {
             handleNextDateButton()
         }
 
+        binding.addIncomeFAB.setOnClickListener {
+
+            showAddEditIncomeBottomSheetFragment(false)
+
+        }
+    }
+
+    private fun showAddEditIncomeBottomSheetFragment(isForEdit: Boolean, incomeKey: String = "") {
+
+        val bundle = Bundle()
+
+        bundle.putBoolean(Constants.IS_FOR_EDIT, isForEdit)
+        bundle.putInt(Constants.INCOME_MONTH_KEY, selectedMonth)
+        bundle.putInt(Constants.INCOME_YEAR_KEY, selectedYear)
+
+        if (isForEdit) {
+
+            bundle.putString(Constants.DOCUMENT_KEY, incomeKey)
+        }
+
+        requireActivity().supportFragmentManager.let { fragmentManager ->
+
+            AddIncomeBottomSheetFragment.newInstance(
+                bundle
+            ).apply {
+                show(fragmentManager, TAG)
+            }
+        }
     }
 
     private fun getMessage() {

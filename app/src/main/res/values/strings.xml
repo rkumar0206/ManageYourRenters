@@ -403,6 +403,7 @@
     <string name="add_income">Add income</string>
     <string name="next_month">Next month</string>
     <string name="linked_payment_methods">Linked payment methods</string>
+    <string name="edit_income">Edit Income</string>
 
     <string-array name="interest_time_schedule">
 

@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.budgetAndIncome
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -19,6 +20,24 @@ class IncomeRVAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         init {
+
+            binding.root.setOnClickListener {
+                if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
+
+                    mListener!!.onItemClick(getItem(absoluteAdapterPosition))
+                }
+            }
+
+            binding.incomeMenuBtn.setOnClickListener {
+
+                if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
+
+                    mListener!!.onIncomeItemMenuBtnClicked(
+                        getItem(absoluteAdapterPosition),
+                        binding.incomeMenuBtn
+                    )
+                }
+            }
 
         }
 
@@ -70,6 +89,7 @@ class IncomeRVAdapter(
     interface OnClickListener {
 
         fun onItemClick(income: Income)
+        fun onIncomeItemMenuBtnClicked(income: Income, view: View)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

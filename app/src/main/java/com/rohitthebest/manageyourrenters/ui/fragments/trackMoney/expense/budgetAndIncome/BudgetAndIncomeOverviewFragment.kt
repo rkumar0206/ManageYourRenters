@@ -13,6 +13,7 @@ import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAda
 import com.rohitthebest.manageyourrenters.database.model.Budget
 import com.rohitthebest.manageyourrenters.databinding.FragmentBudgetBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.MonthAndYearPickerDialog
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.IncomeViewModel
@@ -30,7 +31,7 @@ private const val TAG = "BudgetAndIncomeFragment"
 
 @AndroidEntryPoint
 class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View.OnClickListener,
-    BudgetRVAdapter.OnClickListener {
+    BudgetRVAdapter.OnClickListener, MonthAndYearPickerDialog.OnMonthAndYearDialogDismissListener {
 
     private var _binding: FragmentBudgetBinding? = null
     private val binding get() = _binding!!
@@ -133,27 +134,27 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        binding.iabDateNextBtn.setOnClickListener(this)
-        binding.iabDateTV.setOnClickListener(this)
-        binding.iabDatePreviousBtn.setOnClickListener(this)
+        binding.nextMonthBtn.setOnClickListener(this)
+        binding.previousMonthBtn.setOnClickListener(this)
         binding.iabIncomeAddBtn.setOnClickListener(this)
         binding.iabBudgetMCV.setOnClickListener(this)
         binding.iabSavingMCV.setOnClickListener(this)
         binding.iabExpenseMCV.setOnClickListener(this)
         binding.iabIncomeMCV.setOnClickListener(this)
         binding.iabAddBudgetFAB.setOnClickListener(this)
+        binding.monthMCV.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
 
         when (v?.id) {
 
-            binding.iabDateNextBtn.id -> {
+            binding.nextMonthBtn.id -> {
 
                 handleNextDateButton()
             }
 
-            binding.iabDatePreviousBtn.id -> {
+            binding.previousMonthBtn.id -> {
                 handlePreviousDateButton()
             }
 
@@ -193,15 +194,42 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
                     )
                 findNavController().navigate(action)
             }
+
+            binding.monthMCV.id -> {
+
+                val bundle = Bundle()
+                bundle.putInt(Constants.MONTH_YEAR_PICKER_MONTH_KEY, selectedMonth)
+                bundle.putInt(Constants.MONTH_YEAR_PICKER_YEAR_KEY, selectedYear)
+                bundle.putInt(Constants.MONTH_YEAR_PICKER_MIN_YEAR_KEY, 1998)
+                bundle.putInt(
+                    Constants.MONTH_YEAR_PICKER_MAX_YEAR_KEY,
+                    WorkingWithDateAndTime.getCurrentYear()
+                )
+
+                requireActivity().supportFragmentManager.let { fm ->
+                    MonthAndYearPickerDialog.newInstance(
+                        bundle
+                    ).apply {
+                        show(fm, TAG)
+                    }
+                }.setOnMonthAndYearDialogDismissListener(this)
+            }
         }
     }
 
-//    override fun onIncomeBottomSheetDismissed(isIncomeAdded: Boolean) {
-//
-//        if (isIncomeAdded) {
-//            showTotalIncomeAdded()
-//        }
-//    }
+    override fun onMonthAndYearDialogDismissed(
+        isMonthAndYearSelected: Boolean,
+        selectedMonth: Int,
+        selectedYear: Int
+    ) {
+
+        if (isMonthAndYearSelected) {
+
+            this.selectedMonth = selectedMonth
+            this.selectedYear = selectedYear
+            handleUiAfterDateChange()
+        }
+    }
 
 
     private fun handlePreviousDateButton() {
@@ -232,7 +260,7 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
         setMonthAndYearInTextView()
 
         getAllBudgets()
-        showExpenseTotal()
+        showTotalExpense()
         showTotalBudget()
         showTotalIncomeAdded()
         showTotalSavings()
@@ -240,11 +268,7 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
     private fun showTotalSavings() {
 
-        lifecycleScope.launch {
-            delay(150)
-            binding.iabSavingValueTV.text = (totalIncome - totalExpense).format(2)
-        }
-
+        binding.iabSavingValueTV.text = (totalIncome - totalExpense).format(2)
     }
 
     private fun showTotalIncomeAdded() {
@@ -268,7 +292,7 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
     }
 
 
-    private fun showExpenseTotal() {
+    private fun showTotalExpense() {
 
         val datePairForExpense =
             WorkingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonthForGivenMonthAndYear(
@@ -299,6 +323,7 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
                     }
                 } else {
                     binding.iabExpenseValueTV.text = getString(R.string._0_0)
+                    totalExpense = 0.0
                 }
             }
     }

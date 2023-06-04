@@ -1,7 +1,5 @@
 
-- create an income fragment where user can see all the incomes user added by the month number also can add/edit/delete
-- show total income of the month in the budgetFragment
-- show total expense of the month in the BudgetFragment
+
 - handle selection of date in BudgetFragment and AddBudgetFragment
 - insert/update/delete budget on firestore
 - insert/update/delete income on firestore
@@ -15,8 +13,9 @@
 - show total budget of the month in the BudgetFragment
 - handle the AddIncome button in BudgetFragment
 - create a fragment to add income for that month
-
-
+- create an income fragment where user can see all the incomes user added by the month number also can add/edit/delete
+- show total income of the month in the budgetAndIncomeOverviewFragment
+- show total expense of the month in the budgetAndIncomeOverviewFragment
 
 
 

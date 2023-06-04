@@ -10,6 +10,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.budgetAndIncome.BudgetRVAdapter
+import com.rohitthebest.manageyourrenters.data.CustomDateRange
+import com.rohitthebest.manageyourrenters.data.ShowExpenseBottomSheetTagsEnum
+import com.rohitthebest.manageyourrenters.data.filter.BudgetAndIncomeExpenseFilter
 import com.rohitthebest.manageyourrenters.database.model.Budget
 import com.rohitthebest.manageyourrenters.databinding.FragmentBudgetBinding
 import com.rohitthebest.manageyourrenters.others.Constants
@@ -22,6 +25,7 @@ import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfViewOnScrolled
 import com.rohitthebest.manageyourrenters.utils.format
 import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.isNotValid
 import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -74,6 +78,12 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
             binding.noBudgetAddedTV.isVisible = budgets.isEmpty()
 
+            if (budgets.isNotEmpty()) {
+                binding.iabAddBudgetFAB.text = getString(R.string.modify_budgets)
+            } else {
+                binding.iabAddBudgetFAB.text = getString(R.string.add_budget)
+            }
+
             budgetAdapter.submitList(budgets)
             binding.progressBar.hide()
         }
@@ -95,7 +105,7 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
     override fun onItemClick(budget: Budget) {
 
-        requireContext().showToast(budget.toString())
+        showExpensesInBottomSheet(budget.expenseCategoryKey)
     }
 
     override fun onMenuBtnClick(budget: Budget) {
@@ -200,6 +210,66 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
                 handleMonthAndYearSelection()
             }
+
+            binding.iabExpenseMCV.id -> {
+                showExpensesInBottomSheet()
+            }
+        }
+    }
+
+    private fun showExpensesInBottomSheet(categoryKey: String = "") {
+
+        val datePairForExpense =
+            WorkingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonthForGivenMonthAndYear(
+                selectedMonth, selectedYear
+            )
+
+        if (categoryKey.isNotValid()) {
+
+            // show all the expenses of the category for which budget is added
+
+            budgetViewModel.getAllExpenseCategoryOfBudgetsByMonthAndYear(
+                selectedMonth, selectedYear
+            )
+                .observe(viewLifecycleOwner) { categoryKeys ->
+
+                    if (categoryKeys.isNotEmpty()) {
+
+                        val action =
+                            BudgetAndIncomeOverviewFragmentDirections.actionBudgetAndIncomeFragmentToShowExpenseBottomSheetFragment(
+                                null,
+                                CustomDateRange.CUSTOM_DATE_RANGE,
+                                datePairForExpense.first,
+                                datePairForExpense.second,
+                                ShowExpenseBottomSheetTagsEnum.BUDGET_AND_INCOME_FRAGMENT,
+                                BudgetAndIncomeExpenseFilter(categoryKeys, emptyList())
+                            )
+
+                        findNavController().navigate(action)
+
+                    } else {
+                        showToast(
+                            requireContext(),
+                            getString(R.string.click_on_add_budget_button_to_add_budgets_for_this_month)
+                        )
+                    }
+                }
+
+        } else {
+
+            // show all the expenses for a clicked budget category
+
+            val action =
+                BudgetAndIncomeOverviewFragmentDirections.actionBudgetAndIncomeFragmentToShowExpenseBottomSheetFragment(
+                    null,
+                    CustomDateRange.CUSTOM_DATE_RANGE,
+                    datePairForExpense.first,
+                    datePairForExpense.second,
+                    ShowExpenseBottomSheetTagsEnum.BUDGET_AND_INCOME_FRAGMENT,
+                    BudgetAndIncomeExpenseFilter(listOf(categoryKey), emptyList())
+                )
+
+            findNavController().navigate(action)
         }
     }
 

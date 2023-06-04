@@ -18,6 +18,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.IncomeViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
+import com.rohitthebest.manageyourrenters.utils.format
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.show
 import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
@@ -289,6 +290,25 @@ class IncomeFragment : Fragment(R.layout.fragment_income), IncomeRVAdapter.OnCli
                 setUpRecyclerView()
                 getAllIncomes()
             }
+
+        getTotalIncome()
+    }
+
+    private fun getTotalIncome() {
+
+        incomeViewModel.getTotalIncomeAddedByMonthAndYear(
+            selectedMonth, selectedYear
+        ).observe(viewLifecycleOwner) { total ->
+
+            try {
+
+                binding.toolbar.subtitle = getString(R.string.total_with_arg, total.format(2))
+            } catch (e: NullPointerException) {
+
+                binding.toolbar.subtitle =
+                    getString(R.string.total_with_arg, getString(R.string._0_0))
+            }
+        }
     }
 
     private fun getAllIncomes() {
@@ -306,6 +326,7 @@ class IncomeFragment : Fragment(R.layout.fragment_income), IncomeRVAdapter.OnCli
                 }
 
                 incomeRVAdapter.submitList(incomes)
+                getTotalIncome()
             }
     }
 

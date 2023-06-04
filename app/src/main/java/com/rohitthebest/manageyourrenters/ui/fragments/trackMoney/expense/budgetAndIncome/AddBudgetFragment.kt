@@ -8,19 +8,25 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAdapters.budgetAndIncome.SetBudgetExpenseCategoryAdapter
+import com.rohitthebest.manageyourrenters.data.CustomDateRange
+import com.rohitthebest.manageyourrenters.data.ShowExpenseBottomSheetTagsEnum
+import com.rohitthebest.manageyourrenters.data.filter.BudgetAndIncomeExpenseFilter
 import com.rohitthebest.manageyourrenters.database.model.Budget
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddBudgetBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.MonthAndYearPickerDialog
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.convertToJsonString
 import com.rohitthebest.manageyourrenters.utils.executeAfterDelay
+import com.rohitthebest.manageyourrenters.utils.format
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.isValid
@@ -78,6 +84,31 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         }
         setBudgetExpenseCategoryAdapter.setOnClickListener(this)
 
+    }
+
+    override fun onItemClicked(expenseCategoryKey: String, isBudgetLimitAdded: Boolean) {
+
+        if (!isBudgetLimitAdded) {
+            showToast(requireContext(), getString(R.string.please_add_limit_for_this_category))
+            return
+        }
+
+        val datePairForExpense =
+            WorkingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonthForGivenMonthAndYear(
+                selectedMonth, selectedYear
+            )
+
+        val action =
+            AddBudgetFragmentDirections.actionAddBudgetFragmentToShowExpenseBottomSheetFragment(
+                null,
+                CustomDateRange.CUSTOM_DATE_RANGE,
+                datePairForExpense.first,
+                datePairForExpense.second,
+                ShowExpenseBottomSheetTagsEnum.BUDGET_AND_INCOME_FRAGMENT,
+                BudgetAndIncomeExpenseFilter(listOf(expenseCategoryKey), emptyList())
+            )
+
+        findNavController().navigate(action)
     }
 
     override fun onAddBudgetClicked(budget: Budget, position: Int) {
@@ -212,6 +243,7 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         budgetViewModel.getAllExpenseCategoryAsBudget(selectedMonth, selectedYear)
         budgetViewModel.allExpenseCategoryAsBudgets.observe(viewLifecycleOwner) { budgets ->
             setUpSearchViewMenu(budgets)
+            getTotalBudget()
             binding.progressBar.hide()
         }
     }
@@ -379,6 +411,23 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
             binding.setBudgetRV.scrollToPosition(0)
         } catch (_: Exception) {
         }
+
+        getTotalBudget()
+    }
+
+    private fun getTotalBudget() {
+
+        budgetViewModel.getTotalBudgetByMonthAndYear(selectedMonth, selectedYear)
+            .observe(viewLifecycleOwner) { totalBudget ->
+                try {
+                    binding.toolbar.subtitle =
+                        getString(R.string.total_with_arg, totalBudget.format(2))
+                } catch (e: NullPointerException) {
+                    e.printStackTrace()
+                    binding.toolbar.subtitle =
+                        getString(R.string.total_with_arg, getString(R.string._0_0))
+                }
+            }
     }
 
 
@@ -386,6 +435,4 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         super.onDestroyView()
         _binding = null
     }
-
-
 }

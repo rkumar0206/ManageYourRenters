@@ -19,6 +19,8 @@
 - create a dialog for selecting month and year
 - handle selection of date in BudgetAndIncomeOverviewFragment
 - handle selection of date in AddBudgetFragment and IncomeFragment
+- show expense list when clicked on Expense MaterialCardview in BudgetAndIncomeOverview
+- show expense list when clicked on any budget in BudgetAndIncomeOverview
 
 
 

@@ -404,7 +404,7 @@ class ExpenseViewModel @Inject constructor(
         return mExpenses
     }
 
-    private fun applyFilterByPaymentMethods(
+    fun applyFilterByPaymentMethods(
         paymentMethodKeys: List<String>,
         expenses: List<Expense>
     ): List<Expense> {
@@ -435,5 +435,11 @@ class ExpenseViewModel @Inject constructor(
         date2
     ).asLiveData()
 
+    fun getExpenseByCategoryKeysAndDateRange(
+        expenseCategoryKeys: List<String>,
+        date1: Long,
+        date2: Long
+    ) = expenseRepository.getExpenseByCategoryKeysAndDateRange(expenseCategoryKeys, date1, date2)
+        .asLiveData()
 
 }

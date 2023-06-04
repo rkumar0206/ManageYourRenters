@@ -67,6 +67,13 @@ interface ExpenseDAO {
         date2: Long
     ): Flow<Double>
 
+    @Query("SELECT * FROM expense_table WHERE categoryKey IN (:expenseCategoryKeys) AND created BETWEEN :date1 AND :date2 order by created DESC")
+    fun getExpenseByCategoryKeysAndDateRange(
+        expenseCategoryKeys: List<String>,
+        date1: Long,
+        date2: Long
+    ): Flow<List<Expense>>
+
 
     @Query("SELECT * FROM expense_table WHERE `key` = :expenseKey")
     fun getExpenseByKey(expenseKey: String): Flow<Expense?>

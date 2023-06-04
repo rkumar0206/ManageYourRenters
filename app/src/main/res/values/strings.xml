@@ -404,6 +404,9 @@
     <string name="next_month">Next month</string>
     <string name="linked_payment_methods">Linked payment methods</string>
     <string name="edit_income">Edit Income</string>
+    <string name="modify_budgets">Modify budgets</string>
+    <string name="total_with_arg">Total: %1$s</string>
+    <string name="please_add_limit_for_this_category">Please add limit for this category</string>
 
     <string-array name="interest_time_schedule">
 

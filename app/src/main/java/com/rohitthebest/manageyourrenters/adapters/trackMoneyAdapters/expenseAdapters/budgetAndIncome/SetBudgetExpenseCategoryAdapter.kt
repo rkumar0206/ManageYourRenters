@@ -52,6 +52,15 @@ class SetBudgetExpenseCategoryAdapter :
                     )
                 }
             }
+
+            binding.root.setOnClickListener {
+                if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
+                    mListener!!.onItemClicked(
+                        getItem(absoluteAdapterPosition).expenseCategoryKey,
+                        getItem(absoluteAdapterPosition).budgetLimit != 0.0
+                    )
+                }
+            }
         }
 
         fun setData(budget: Budget?) {
@@ -183,6 +192,7 @@ class SetBudgetExpenseCategoryAdapter :
 
     interface OnClickListener {
 
+        fun onItemClicked(expenseCategoryKey: String, isBudgetLimitAdded: Boolean)
         fun onAddBudgetClicked(budget: Budget, position: Int)
         fun onBudgetMenuBtnClicked(budget: Budget, view: View, position: Int)
     }

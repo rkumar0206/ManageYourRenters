@@ -333,6 +333,11 @@
             android:name="paymentMethodKey"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="expenseFilterForBudgetAndIncome"
+            android:defaultValue="@null"
+            app:argType="com.rohitthebest.manageyourrenters.data.filter.BudgetAndIncomeExpenseFilter"
+            app:nullable="true" />
     </dialog>
     <fragment
         android:id="@+id/paymentMethodsFragment"
@@ -364,6 +369,9 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_budgetAndIncomeFragment_to_showExpenseBottomSheetFragment"
+            app:destination="@id/showExpenseBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/addBudgetFragment"
@@ -378,6 +386,9 @@
             android:name="yearMessage"
             android:defaultValue="2023"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_addBudgetFragment_to_showExpenseBottomSheetFragment"
+            app:destination="@id/showExpenseBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/incomeFragment"

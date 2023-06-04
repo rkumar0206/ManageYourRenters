@@ -42,6 +42,7 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
     private var selectedMonth: Int = 0
     private var selectedYear: Int = 0
+    private var oldestYearWhenBudgetWasSaved = 2000
     private var monthList: List<String> = emptyList()
 
     private lateinit var budgetAdapter: BudgetRVAdapter
@@ -120,7 +121,7 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
         budgetViewModel.getTheOldestSavedBudgetYear().observe(viewLifecycleOwner) { year ->
             try {
                 if (year != null) {
-                    //todo: initialize year spinner from this year
+                    oldestYearWhenBudgetWasSaved = year
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -197,24 +198,32 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
             binding.monthMCV.id -> {
 
-                val bundle = Bundle()
-                bundle.putInt(Constants.MONTH_YEAR_PICKER_MONTH_KEY, selectedMonth)
-                bundle.putInt(Constants.MONTH_YEAR_PICKER_YEAR_KEY, selectedYear)
-                bundle.putInt(Constants.MONTH_YEAR_PICKER_MIN_YEAR_KEY, 1998)
-                bundle.putInt(
-                    Constants.MONTH_YEAR_PICKER_MAX_YEAR_KEY,
-                    WorkingWithDateAndTime.getCurrentYear()
-                )
-
-                requireActivity().supportFragmentManager.let { fm ->
-                    MonthAndYearPickerDialog.newInstance(
-                        bundle
-                    ).apply {
-                        show(fm, TAG)
-                    }
-                }.setOnMonthAndYearDialogDismissListener(this)
+                handleMonthAndYearSelection()
             }
         }
+    }
+
+    private fun handleMonthAndYearSelection() {
+
+        val bundle = Bundle()
+        bundle.putInt(Constants.MONTH_YEAR_PICKER_MONTH_KEY, selectedMonth)
+        bundle.putInt(Constants.MONTH_YEAR_PICKER_YEAR_KEY, selectedYear)
+        bundle.putInt(
+            Constants.MONTH_YEAR_PICKER_MIN_YEAR_KEY,
+            oldestYearWhenBudgetWasSaved - 4
+        )
+        bundle.putInt(
+            Constants.MONTH_YEAR_PICKER_MAX_YEAR_KEY,
+            WorkingWithDateAndTime.getCurrentYear()
+        )
+
+        requireActivity().supportFragmentManager.let { fm ->
+            MonthAndYearPickerDialog.newInstance(
+                bundle
+            ).apply {
+                show(fm, TAG)
+            }
+        }.setOnMonthAndYearDialogDismissListener(this)
     }
 
     override fun onMonthAndYearDialogDismissed(

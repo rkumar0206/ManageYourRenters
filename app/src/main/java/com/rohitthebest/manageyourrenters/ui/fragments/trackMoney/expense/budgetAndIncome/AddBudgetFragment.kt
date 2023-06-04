@@ -15,6 +15,7 @@ import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAda
 import com.rohitthebest.manageyourrenters.database.model.Budget
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddBudgetBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.MonthAndYearPickerDialog
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
@@ -36,7 +37,8 @@ private const val TAG = "AddBudgetFragment"
 @AndroidEntryPoint
 class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
     SetBudgetExpenseCategoryAdapter.OnClickListener,
-    AddBudgetLimitBottomSheetFragment.OnBottomSheetDismissListener {
+    AddBudgetLimitBottomSheetFragment.OnBottomSheetDismissListener,
+    MonthAndYearPickerDialog.OnMonthAndYearDialogDismissListener {
 
     private var _binding: FragmentAddBudgetBinding? = null
     private val binding get() = _binding!!
@@ -51,6 +53,7 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
     private var adapterPosition = 0
     private var searchView: SearchView? = null
 
+    private var oldestYearWhenBudgetWasSaved = 2000
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentAddBudgetBinding.bind(view)
@@ -278,17 +281,58 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        binding.setBudgetNextDateBtn.setOnClickListener {
+        binding.nextMonthBtn.setOnClickListener {
             handleNextDateButton()
         }
-        binding.setBudgetPreviousDateBtn.setOnClickListener {
+        binding.previousMonthBtn.setOnClickListener {
             handlePreviousDateButton()
+        }
+        binding.monthMCV.setOnClickListener {
+            handleMonthAndYearSelection()
         }
     }
 
+    private fun handleMonthAndYearSelection() {
+
+        val bundle = Bundle()
+        bundle.putInt(Constants.MONTH_YEAR_PICKER_MONTH_KEY, selectedMonth)
+        bundle.putInt(Constants.MONTH_YEAR_PICKER_YEAR_KEY, selectedYear)
+        bundle.putInt(
+            Constants.MONTH_YEAR_PICKER_MIN_YEAR_KEY,
+            oldestYearWhenBudgetWasSaved - 4
+        )
+        bundle.putInt(
+            Constants.MONTH_YEAR_PICKER_MAX_YEAR_KEY,
+            WorkingWithDateAndTime.getCurrentYear()
+        )
+
+        requireActivity().supportFragmentManager.let { fm ->
+            MonthAndYearPickerDialog.newInstance(
+                bundle
+            ).apply {
+                show(fm, TAG)
+            }
+        }.setOnMonthAndYearDialogDismissListener(this)
+    }
+
+    override fun onMonthAndYearDialogDismissed(
+        isMonthAndYearSelected: Boolean,
+        selectedMonth: Int,
+        selectedYear: Int
+    ) {
+
+        if (isMonthAndYearSelected) {
+
+            this.selectedMonth = selectedMonth
+            this.selectedYear = selectedYear
+            handleUiAfterDateChange()
+        }
+    }
+
+
     private fun initUI() {
 
-        binding.setBudgetDateTV.text =
+        binding.monthAndYearTV.text =
             getString(R.string.month_and_year, monthList[selectedMonth], selectedYear.toString())
 
         handleUiAfterDateChange()
@@ -296,7 +340,7 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         budgetViewModel.getTheOldestSavedBudgetYear().observe(viewLifecycleOwner) { year ->
             try {
                 if (year != null) {
-                    //todo: initialize year spinner from this year
+                    oldestYearWhenBudgetWasSaved = year
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -327,7 +371,7 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
 
     private fun handleUiAfterDateChange() {
 
-        binding.setBudgetDateTV.text =
+        binding.monthAndYearTV.text =
             getString(R.string.month_and_year, monthList[selectedMonth], selectedYear.toString())
 
         getAllExpenseCategoriesAsBudget()

@@ -12,6 +12,8 @@ import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAda
 import com.rohitthebest.manageyourrenters.database.model.Income
 import com.rohitthebest.manageyourrenters.databinding.FragmentIncomeBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.ui.fragments.MonthAndYearPickerDialog
+import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.IncomeViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
@@ -26,12 +28,14 @@ import kotlinx.coroutines.launch
 private const val TAG = "IncomeFragment"
 
 @AndroidEntryPoint
-class IncomeFragment : Fragment(R.layout.fragment_income), IncomeRVAdapter.OnClickListener {
+class IncomeFragment : Fragment(R.layout.fragment_income), IncomeRVAdapter.OnClickListener,
+    MonthAndYearPickerDialog.OnMonthAndYearDialogDismissListener {
 
     private var _binding: FragmentIncomeBinding? = null
     private val binding get() = _binding!!
 
     private val incomeViewModel by viewModels<IncomeViewModel>()
+    private val budgetViewModel by viewModels<BudgetViewModel>()
     private val paymentMethodViewModel by viewModels<PaymentMethodViewModel>()
 
     private var selectedMonth: Int = 0
@@ -40,6 +44,7 @@ class IncomeFragment : Fragment(R.layout.fragment_income), IncomeRVAdapter.OnCli
 
     private lateinit var incomeRVAdapter: IncomeRVAdapter
 
+    private var oldestYearWhenBudgetWasSaved = 2000
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentIncomeBinding.bind(view)
@@ -134,7 +139,48 @@ class IncomeFragment : Fragment(R.layout.fragment_income), IncomeRVAdapter.OnCli
             showAddEditIncomeBottomSheetFragment(false)
 
         }
+
+        binding.monthMCV.setOnClickListener {
+            handleMonthAndYearSelection()
+        }
     }
+
+    private fun handleMonthAndYearSelection() {
+
+        val bundle = Bundle()
+        bundle.putInt(Constants.MONTH_YEAR_PICKER_MONTH_KEY, selectedMonth)
+        bundle.putInt(Constants.MONTH_YEAR_PICKER_YEAR_KEY, selectedYear)
+        bundle.putInt(
+            Constants.MONTH_YEAR_PICKER_MIN_YEAR_KEY,
+            oldestYearWhenBudgetWasSaved - 4
+        )
+        bundle.putInt(
+            Constants.MONTH_YEAR_PICKER_MAX_YEAR_KEY,
+            WorkingWithDateAndTime.getCurrentYear()
+        )
+
+        requireActivity().supportFragmentManager.let { fm ->
+            MonthAndYearPickerDialog.newInstance(
+                bundle
+            ).apply {
+                show(fm, TAG)
+            }
+        }.setOnMonthAndYearDialogDismissListener(this)
+    }
+
+    override fun onMonthAndYearDialogDismissed(
+        isMonthAndYearSelected: Boolean,
+        selectedMonth: Int,
+        selectedYear: Int
+    ) {
+
+        if (isMonthAndYearSelected) {
+            this.selectedMonth = selectedMonth
+            this.selectedYear = selectedYear
+            handleUiAfterDateChange()
+        }
+    }
+
 
     private fun showAddEditIncomeBottomSheetFragment(isForEdit: Boolean, incomeKey: String = "") {
 
@@ -197,15 +243,15 @@ class IncomeFragment : Fragment(R.layout.fragment_income), IncomeRVAdapter.OnCli
 
         handleUiAfterDateChange()
 
-//        budgetViewModel.getTheOldestSavedBudgetYear().observe(viewLifecycleOwner) { year ->
-//            try {
-//                if (year != null) {
-//                    //todo: initialize year spinner from this year
-//                }
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//            }
-//        }
+        budgetViewModel.getTheOldestSavedBudgetYear().observe(viewLifecycleOwner) { year ->
+            try {
+                if (year != null) {
+                    oldestYearWhenBudgetWasSaved = year
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     private fun handlePreviousDateButton() {
@@ -268,4 +314,5 @@ class IncomeFragment : Fragment(R.layout.fragment_income), IncomeRVAdapter.OnCli
         super.onDestroyView()
         _binding = null
     }
+
 }

@@ -1,6 +1,6 @@
 
 
-- handle selection of date in BudgetFragment and AddBudgetFragment
+- add a filter option in budgetAndIncomeOverviewFragment to filter the results by PaymentMethods
 - insert/update/delete budget on firestore
 - insert/update/delete income on firestore
 
@@ -16,7 +16,9 @@
 - create an income fragment where user can see all the incomes user added by the month number also can add/edit/delete
 - show total income of the month in the budgetAndIncomeOverviewFragment
 - show total expense of the month in the budgetAndIncomeOverviewFragment
-
+- create a dialog for selecting month and year
+- handle selection of date in BudgetAndIncomeOverviewFragment
+- handle selection of date in AddBudgetFragment and IncomeFragment
 
 
 

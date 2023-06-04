@@ -26,61 +26,118 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView28"
         android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"
+        android:layout_height="60dp"
         android:layout_below="@+id/appBar"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true">
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBar">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/previous_month_btn"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                app:cardBackgroundColor="@color/color_green"
+                app:cardCornerRadius="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
 
-        <ImageButton
-            android:id="@+id/setBudgetPreviousDateBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/activity_fragment_background"
-            android:contentDescription="@string/previous_budget_date"
-            android:minHeight="48dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_keyboard_arrow_left_24" />
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/previous_month"
+                    app:srcCompat="@drawable/ic_baseline_keyboard_arrow_white_24" />
 
-        <ImageButton
-            android:id="@+id/setBudgetNextDateBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/activity_fragment_background"
-            android:contentDescription="@string/next_budget_date"
-            android:minHeight="48dp"
-            android:rotation="180"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_keyboard_arrow_left_24" />
+            </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            android:id="@+id/setBudgetDateTV"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="3dp"
-            android:textSize="24sp"
-            android:typeface="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/setBudgetNextDateBtn"
-            app:layout_constraintStart_toEndOf="@+id/setBudgetPreviousDateBtn"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            tools:text="May, 2023" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/next_month_btn"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                app:cardBackgroundColor="@color/color_green"
+                app:cardCornerRadius="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/imageView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/next_month"
+                    android:rotation="180"
+                    app:srcCompat="@drawable/ic_baseline_keyboard_arrow_white_24" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/monthMCV"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/next_month_btn"
+                app:layout_constraintStart_toEndOf="@+id/previous_month_btn"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/month_and_year_TV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textSize="24sp"
+                        app:autoSizeTextType="uniform"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.5"
+                        tools:text="May, 2023" />
+
+                    <View
+                        android:id="@+id/divider117"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="1dp"
+                        android:background="?android:attr/listDivider"
+                        app:layout_constraintEnd_toEndOf="@+id/month_and_year_TV"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="@+id/month_and_year_TV"
+                        app:layout_constraintTop_toBottomOf="@+id/month_and_year_TV" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/setBudgetRV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/cl"
-        android:layout_marginTop="2dp"
+        android:layout_below="@+id/cardView28"
+        android:layout_marginTop="8dp"
         tools:listitem="@layout/adapter_set_budget_expense_category" />
 
     <TextView

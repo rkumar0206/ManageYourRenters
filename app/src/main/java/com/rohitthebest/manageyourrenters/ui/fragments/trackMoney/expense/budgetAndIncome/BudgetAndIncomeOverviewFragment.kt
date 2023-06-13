@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budge
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,16 +14,19 @@ import com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAda
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.data.ShowExpenseBottomSheetTagsEnum
 import com.rohitthebest.manageyourrenters.data.filter.BudgetAndIncomeExpenseFilter
+import com.rohitthebest.manageyourrenters.data.filter.ExpenseFilterDto
 import com.rohitthebest.manageyourrenters.database.model.Budget
 import com.rohitthebest.manageyourrenters.databinding.FragmentBudgetBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.MonthAndYearPickerDialog
+import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.ShowPaymentMethodSelectorDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.IncomeViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfViewOnScrolled
+import com.rohitthebest.manageyourrenters.utils.convertToJsonString
 import com.rohitthebest.manageyourrenters.utils.format
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.isNotValid
@@ -35,7 +39,8 @@ private const val TAG = "BudgetAndIncomeFragment"
 
 @AndroidEntryPoint
 class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View.OnClickListener,
-    BudgetRVAdapter.OnClickListener, MonthAndYearPickerDialog.OnMonthAndYearDialogDismissListener {
+    BudgetRVAdapter.OnClickListener, MonthAndYearPickerDialog.OnMonthAndYearDialogDismissListener,
+    ShowPaymentMethodSelectorDialogFragment.OnClickListener {
 
     private var _binding: FragmentBudgetBinding? = null
     private val binding get() = _binding!!
@@ -51,6 +56,8 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
     private lateinit var budgetAdapter: BudgetRVAdapter
 
+    private var expenseFilterDto: ExpenseFilterDto? = null
+
     private var totalIncome = 0.0
     private var totalExpense = 0.0
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,14 +72,12 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
         binding.progressBar.show()
 
+        observeBudgetList()
+
         initUI()
     }
 
-    private fun getAllBudgets() {
-
-        budgetViewModel.getAllBudgetsByMonthAndYear(
-            selectedMonth, selectedYear
-        )
+    private fun observeBudgetList() {
 
         budgetViewModel.allBudgetListByMonthAndYear.observe(viewLifecycleOwner) { budgets ->
 
@@ -154,7 +159,60 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
         binding.iabIncomeMCV.setOnClickListener(this)
         binding.iabAddBudgetFAB.setOnClickListener(this)
         binding.monthMCV.setOnClickListener(this)
+
+        binding.toolbar.menu.findItem(R.id.menu_filter_income_and_budget_overview)
+            .setOnMenuItemClickListener {
+
+                showPaymentMethodSelectorDialog()
+
+                true
+            }
     }
+
+    private fun showPaymentMethodSelectorDialog() {
+
+        requireActivity().supportFragmentManager.let { fragmentManager ->
+
+            val bundle = Bundle()
+            bundle.putString(
+                Constants.EXPENSE_FILTER_KEY,
+                if (expenseFilterDto == null) "" else expenseFilterDto.convertToJsonString()
+            )
+
+            ShowPaymentMethodSelectorDialogFragment.newInstance(
+                bundle
+            ).apply {
+                show(fragmentManager, TAG)
+            }.setOnClickListener(this)
+        }
+    }
+
+    override fun onFilterApply(selectedPaymentMethods: List<String>?) {
+
+        binding.toolbar.menu.findItem(R.id.menu_filter_income_and_budget_overview).apply {
+
+            if (selectedPaymentMethods.isNullOrEmpty()) {
+                this.icon =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.baseline_filter_list_24)
+
+                expenseFilterDto = null
+
+            } else {
+                this.icon = ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.baseline_filter_list_colored_24
+                )
+
+                expenseFilterDto = ExpenseFilterDto()
+                expenseFilterDto!!.isPaymentMethodEnabled = true
+                expenseFilterDto!!.paymentMethods = selectedPaymentMethods
+            }
+        }
+
+        // apply payment filter on income and expense
+        handleUiAfterDateChange()
+    }
+
 
     override fun onClick(v: View?) {
 
@@ -338,7 +396,20 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
         setMonthAndYearInTextView()
 
-        getAllBudgets()
+        // get all budgets (this list is being observed in the method observeBudgetList())
+        budgetViewModel.getAllBudgetsByMonthAndYear(
+            selectedMonth,
+            selectedYear,
+            if (expenseFilterDto == null) emptyList() else expenseFilterDto!!.paymentMethods
+        )
+
+        binding.progressBar.show()
+
+        lifecycleScope.launch {
+            delay(350)
+            budgetAdapter.notifyDataSetChanged()
+        }
+
         showTotalExpense()
         showTotalBudget()
         showTotalIncomeAdded()
@@ -384,27 +455,55 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
             .observe(viewLifecycleOwner) { categoryKeys ->
 
                 if (categoryKeys.isNotEmpty()) {
-                    expenseViewModel.getTotalExpenseByCategoryKeysAndDateRange(
-                        categoryKeys,
-                        datePairForExpense.first,
-                        datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
-                    ).observe(viewLifecycleOwner) { total ->
-                        try {
-                            totalExpense = total
-                            binding.iabExpenseValueTV.text = total.format(2)
-                        } catch (e: NullPointerException) {
-                            e.printStackTrace()
-                            totalExpense = 0.0
-                            binding.iabExpenseValueTV.text = getString(R.string._0_0)
+
+                    if (expenseFilterDto != null && expenseFilterDto!!.paymentMethods.isNotEmpty()) {
+
+                        // get total expense by filtering the list by paymentMethods
+                        expenseViewModel.getExpenseByCategoryKeysAndDateRange(
+                            categoryKeys,
+                            datePairForExpense.first,
+                            datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
+                        ).observe(viewLifecycleOwner) { expenses ->
+
+                            val tempExpense = expenseViewModel.applyFilterByPaymentMethods(
+                                expenseFilterDto!!.paymentMethods,
+                                expenses
+                            )
+                            val total = tempExpense.sumOf { it.amount }
+
+                            updateExpenseTotalUI(total)
                         }
 
-                        showTotalSavings()
+                    } else {
+
+                        expenseViewModel.getTotalExpenseByCategoryKeysAndDateRange(
+                            categoryKeys,
+                            datePairForExpense.first,
+                            datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
+                        ).observe(viewLifecycleOwner) { total ->
+
+                            updateExpenseTotalUI(total)
+                        }
                     }
                 } else {
                     binding.iabExpenseValueTV.text = getString(R.string._0_0)
                     totalExpense = 0.0
                 }
             }
+    }
+
+    private fun updateExpenseTotalUI(total: Double) {
+
+        try {
+            totalExpense = total
+            binding.iabExpenseValueTV.text = total.format(2)
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+            totalExpense = 0.0
+            binding.iabExpenseValueTV.text = getString(R.string._0_0)
+        }
+
+        showTotalSavings()
     }
 
     private fun showTotalBudget() {

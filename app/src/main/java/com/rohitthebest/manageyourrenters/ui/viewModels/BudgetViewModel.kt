@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.model.Budget
+import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.repositories.BudgetRepository
@@ -54,7 +55,8 @@ class BudgetViewModel @Inject constructor(
 
     fun getAllBudgetsByMonthAndYear(
         month: Int = WorkingWithDateAndTime.getCurrentMonth(),
-        year: Int = WorkingWithDateAndTime.getCurrentYear()
+        year: Int = WorkingWithDateAndTime.getCurrentYear(),
+        selectedPaymentMethods: List<String> = emptyList()
     ) {
 
         viewModelScope.launch {
@@ -75,7 +77,12 @@ class BudgetViewModel @Inject constructor(
             allBudgets = allBudgets.sortedBy { it.expenseCategoryKey }
             expenseCategories = expenseCategories.sortedBy { it.key }
 
-            addOtherDetailsToBudget(allBudgets, expenseCategories, datePairForExpense)
+            addOtherDetailsToBudget(
+                allBudgets,
+                expenseCategories,
+                datePairForExpense,
+                selectedPaymentMethods
+            )
 
             _allBudgetListByMonthAndYear.value = allBudgets
         }
@@ -153,7 +160,8 @@ class BudgetViewModel @Inject constructor(
     private suspend fun addOtherDetailsToBudget(
         allBudgets: List<Budget>,
         expenseCategories: List<ExpenseCategory>,
-        datePairForExpense: Pair<Long, Long>
+        datePairForExpense: Pair<Long, Long>,
+        selectedPaymentMethods: List<String> = emptyList()
     ) {
 
         allBudgets.forEachIndexed { index, budget ->
@@ -162,11 +170,26 @@ class BudgetViewModel @Inject constructor(
             budget.categoryImageUrl = expenseCategories[index].imageUrl ?: ""
 
             val currentExpense = try {
-                expenseRepository.getTotalExpenseAmountByCategoryKeyAndDateRange(
-                    expenseCategories[index].key,
-                    datePairForExpense.first,
-                    datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
-                ).first()
+                if (selectedPaymentMethods.isEmpty()) {
+                    expenseRepository.getTotalExpenseAmountByCategoryKeyAndDateRange(
+                        expenseCategories[index].key,
+                        datePairForExpense.first,
+                        datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
+                    ).first()
+                } else {
+                    val tempExpense = expenseRepository.getExpenseByDateRangeAndExpenseCategoryKey(
+                        expenseCategories[index].key,
+                        datePairForExpense.first,
+                        datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
+                    ).first()
+
+                    val expenseAfterPaymentMethodFilter = applyExpenseFilterByPaymentMethods(
+                        selectedPaymentMethods,
+                        tempExpense
+                    )
+
+                    expenseAfterPaymentMethodFilter.sumOf { it.amount }
+                }
             } catch (e: Exception) {
                 0.0
             }
@@ -179,6 +202,27 @@ class BudgetViewModel @Inject constructor(
             budget.currentExpenseAmount = currentExpense
         }
 
+    }
+
+    private fun applyExpenseFilterByPaymentMethods(
+        paymentMethodKeys: List<String>,
+        expenses: List<Expense>
+    ): List<Expense> {
+
+        val isOtherPaymentMethodKeyPresent =
+            paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
+
+        val resultExpenses = expenses.filter { expense ->
+
+            if (isOtherPaymentMethodKeyPresent) {
+                // for other payment method, get all the expenses where payment methods is null as well as payment method is other
+                expense.paymentMethods == null || expense.paymentMethods!!.any { it in paymentMethodKeys }
+            } else {
+                expense.paymentMethods != null && expense.paymentMethods!!.any { it in paymentMethodKeys }
+            }
+        }
+
+        return resultExpenses
     }
 
 

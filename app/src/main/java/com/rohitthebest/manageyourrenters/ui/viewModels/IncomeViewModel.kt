@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.model.Income
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.repositories.IncomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -47,4 +48,26 @@ class IncomeViewModel @Inject constructor(
         repository.getTotalIncomeAddedByMonthAndYear(month, year).asLiveData()
 
     fun getAllIncomeSources() = repository.getAllIncomeSources().asLiveData()
+
+    fun applyFilterByPaymentMethods(
+        paymentMethodKeys: List<String>,
+        incomes: List<Income>
+    ): List<Income> {
+
+        val isOtherPaymentMethodKeyPresent =
+            paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
+
+        val resultIncomes = incomes.filter { income ->
+
+            if (isOtherPaymentMethodKeyPresent) {
+                // for other payment method, get all the expenses where payment methods is null as well as payment method is other
+                income.linkedPaymentMethods == null || income.linkedPaymentMethods!!.any { it in paymentMethodKeys }
+            } else {
+                income.linkedPaymentMethods != null && income.linkedPaymentMethods!!.any { it in paymentMethodKeys }
+            }
+        }
+
+        return resultIncomes
+    }
+
 }

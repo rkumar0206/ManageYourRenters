@@ -300,7 +300,10 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
                                 datePairForExpense.first,
                                 datePairForExpense.second,
                                 ShowExpenseBottomSheetTagsEnum.BUDGET_AND_INCOME_FRAGMENT,
-                                BudgetAndIncomeExpenseFilter(categoryKeys, emptyList())
+                                BudgetAndIncomeExpenseFilter(
+                                    categoryKeys,
+                                    if (expenseFilterDto == null) emptyList() else expenseFilterDto!!.paymentMethods
+                                )
                             )
 
                         findNavController().navigate(action)
@@ -324,7 +327,10 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
                     datePairForExpense.first,
                     datePairForExpense.second,
                     ShowExpenseBottomSheetTagsEnum.BUDGET_AND_INCOME_FRAGMENT,
-                    BudgetAndIncomeExpenseFilter(listOf(categoryKey), emptyList())
+                    BudgetAndIncomeExpenseFilter(
+                        listOf(categoryKey),
+                        if (expenseFilterDto == null) emptyList() else expenseFilterDto!!.paymentMethods
+                    )
                 )
 
             findNavController().navigate(action)
@@ -413,7 +419,11 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
         showTotalExpense()
         showTotalBudget()
         showTotalIncomeAdded()
-        showTotalSavings()
+
+        lifecycleScope.launch {
+            delay(250)
+            showTotalSavings()
+        }
     }
 
     private fun showTotalSavings() {
@@ -428,35 +438,37 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
             incomeViewModel.getAllIncomesByMonthAndYear(selectedMonth, selectedYear)
                 .observe(viewLifecycleOwner) { incomes ->
 
-                    val tempIncome = incomeViewModel.applyFilterByPaymentMethods(
-                        expenseFilterDto!!.paymentMethods, incomes
-                    )
+                    if (incomes.isEmpty()) {
+                        updateIncomeTotalUI(0.0)
+                    } else {
+                        val tempIncome = incomeViewModel.applyFilterByPaymentMethods(
+                            expenseFilterDto!!.paymentMethods, incomes
+                        )
 
-                    updateIncomeTotalUI(tempIncome.sumOf { it.income })
+                        updateIncomeTotalUI(tempIncome.sumOf { it.income })
+                    }
                 }
         } else {
             incomeViewModel.getTotalIncomeAddedByMonthAndYear(
                 selectedMonth, selectedYear
             ).observe(viewLifecycleOwner) { totalIncomeAdded ->
 
-                updateIncomeTotalUI(totalIncomeAdded)
-
-                showTotalSavings()
+                try {
+                    updateIncomeTotalUI(totalIncomeAdded)
+                } catch (e: NullPointerException) {
+                    e.printStackTrace()
+                    totalIncome = 0.0
+                    binding.iabIncomeValueTV.text = getString(R.string._0_0)
+                }
             }
         }
     }
 
     private fun updateIncomeTotalUI(totalIncomeAdded: Double) {
 
-        try {
-            totalIncome = totalIncomeAdded
-            binding.iabIncomeValueTV.text = totalIncomeAdded.format(2)
-        } catch (e: NullPointerException) {
-            e.printStackTrace()
-            totalIncome = 0.0
-            binding.iabIncomeValueTV.text = getString(R.string._0_0)
-        }
-
+        totalIncome = totalIncomeAdded
+        binding.iabIncomeValueTV.text = totalIncomeAdded.format(2)
+        showTotalSavings()
     }
 
 
@@ -483,12 +495,16 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
                             datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
                         ).observe(viewLifecycleOwner) { expenses ->
 
-                            val tempExpense = expenseViewModel.applyFilterByPaymentMethods(
-                                expenseFilterDto!!.paymentMethods,
-                                expenses
-                            )
+                            if (expenses.isEmpty()) {
+                                updateExpenseTotalUI(0.0)
+                            } else {
+                                val tempExpense = expenseViewModel.applyFilterByPaymentMethods(
+                                    expenseFilterDto!!.paymentMethods,
+                                    expenses
+                                )
 
-                            updateExpenseTotalUI(tempExpense.sumOf { it.amount })
+                                updateExpenseTotalUI(tempExpense.sumOf { it.amount })
+                            }
                         }
 
                     } else {
@@ -499,7 +515,13 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
                             datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
                         ).observe(viewLifecycleOwner) { total ->
 
-                            updateExpenseTotalUI(total)
+                            try {
+                                updateExpenseTotalUI(total)
+                            } catch (e: NullPointerException) {
+                                e.printStackTrace()
+                                totalExpense = 0.0
+                                binding.iabExpenseValueTV.text = getString(R.string._0_0)
+                            }
                         }
                     }
                 } else {
@@ -511,15 +533,8 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
     private fun updateExpenseTotalUI(total: Double) {
 
-        try {
-            totalExpense = total
-            binding.iabExpenseValueTV.text = total.format(2)
-        } catch (e: NullPointerException) {
-            e.printStackTrace()
-            totalExpense = 0.0
-            binding.iabExpenseValueTV.text = getString(R.string._0_0)
-        }
-
+        totalExpense = total
+        binding.iabExpenseValueTV.text = total.format(2)
         showTotalSavings()
     }
 

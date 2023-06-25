@@ -1,9 +1,9 @@
 
-
-- add a filter option in budgetAndIncomeOverviewFragment to filter the results by PaymentMethods
-    - continue with income and budget total
 - insert/update/delete budget on firestore
 - insert/update/delete income on firestore
+- add graph fragment for budget and income
+    - add individual budget category graph
+    - add income graph
 
 ----------------------------------------------------------------------------------------------------
 
@@ -22,8 +22,9 @@
 - handle selection of date in AddBudgetFragment and IncomeFragment
 - show expense list when clicked on Expense MaterialCardview in BudgetAndIncomeOverview
 - show expense list when clicked on any budget in BudgetAndIncomeOverview
-
-
+- add a filter option in budgetAndIncomeOverviewFragment to filter the results by PaymentMethods
+    - continue with income and budget total
+- show expenses by filter in budgetAndIncomeOverviewFragment
 
 
 

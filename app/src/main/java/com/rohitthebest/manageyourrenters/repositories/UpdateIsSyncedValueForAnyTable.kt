@@ -7,6 +7,7 @@ import com.rohitthebest.manageyourrenters.database.dao.EMIDao
 import com.rohitthebest.manageyourrenters.database.dao.EMIPaymentDao
 import com.rohitthebest.manageyourrenters.database.dao.ExpenseCategoryDAO
 import com.rohitthebest.manageyourrenters.database.dao.ExpenseDAO
+import com.rohitthebest.manageyourrenters.database.dao.IncomeDao
 import com.rohitthebest.manageyourrenters.database.dao.MonthlyPaymentCategoryDao
 import com.rohitthebest.manageyourrenters.database.dao.MonthlyPaymentDao
 import com.rohitthebest.manageyourrenters.database.dao.PaymentMethodDao
@@ -27,7 +28,8 @@ class UpdateIsSyncedValueForAnyTableRepository @Inject constructor(
     private val expenseCategoryDAO: ExpenseCategoryDAO,
     private val monthlyPaymentDao: MonthlyPaymentDao,
     private val monthlyPaymentCategoryDAO: MonthlyPaymentCategoryDao,
-    private val budgetDao: BudgetDao
+    private val budgetDao: BudgetDao,
+    private val incomeDao: IncomeDao
 ) {
 
     suspend fun updateIsSyncValueToFalse(collection: String, key: String) {
@@ -79,6 +81,10 @@ class UpdateIsSyncedValueForAnyTableRepository @Inject constructor(
 
             FirestoreCollectionsConstants.BUDGETS -> {
                 budgetDao.updateIsSyncedValueToFalse(key)
+            }
+
+            FirestoreCollectionsConstants.INCOMES -> {
+                incomeDao.updateIsSyncedValueToFalse(key)
             }
         }
     }

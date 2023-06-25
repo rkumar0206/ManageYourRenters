@@ -22,6 +22,7 @@ import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.E
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EMIs
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE_CATEGORIES
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.INCOMES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENT_CATEGORIES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.PAYMENT_METHODS
@@ -82,6 +83,9 @@ class UploadService : Service() {
 
     @Inject
     lateinit var budgetRepository: BudgetRepository
+
+    @Inject
+    lateinit var incomeRepository: IncomeRepository
 
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -187,6 +191,10 @@ class UploadService : Service() {
                 BUDGETS -> {
 
                     model = budgetRepository.getBudgetByKey(key).first()
+                }
+
+                INCOMES -> {
+                    model = incomeRepository.getIncomeByKey(key).first()
                 }
 
                 else -> {

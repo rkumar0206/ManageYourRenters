@@ -252,7 +252,6 @@ class AddIncomeBottomSheetFragment : BottomSheetDialogFragment(),
 
             income.apply {
                 this.created = System.currentTimeMillis()
-                this.modified = System.currentTimeMillis()
                 this.uid = Functions.getUid()!!
                 this.key = Functions.generateKey("_${Functions.getUid()}")
                 this.month = receivedMonth
@@ -271,6 +270,8 @@ class AddIncomeBottomSheetFragment : BottomSheetDialogFragment(),
 
         income.linkedPaymentMethods =
             selectedPaymentMethods.ifEmpty { listOf(Constants.PAYMENT_METHOD_OTHER_KEY) }
+
+        income.modified = System.currentTimeMillis()
 
         if (!isForEdit) {
             incomeViewModel.insertIncome(income)

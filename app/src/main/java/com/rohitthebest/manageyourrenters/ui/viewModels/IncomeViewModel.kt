@@ -1,21 +1,45 @@
 package com.rohitthebest.manageyourrenters.ui.viewModels
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.model.Income
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
 import com.rohitthebest.manageyourrenters.repositories.IncomeRepository
+import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.compareObjects
+import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
+import com.rohitthebest.manageyourrenters.utils.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class IncomeViewModel @Inject constructor(
+    app: Application,
     private val repository: IncomeRepository
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
     fun insertIncome(income: Income) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
+
+        if (context.isInternetAvailable()) {
+
+            income.isSynced = true
+
+            uploadDocumentToFireStore(
+                context, FirestoreCollectionsConstants.INCOMES, income.key
+            )
+        } else {
+
+            income.isSynced = false
+        }
+
         repository.insertIncome(income)
     }
 
@@ -23,11 +47,56 @@ class IncomeViewModel @Inject constructor(
         repository.insertAllIncome(incomes)
     }
 
-    fun updateIncome(oldIncome: Income, updatedIncome: Income) = viewModelScope.launch {
-        repository.updateIncome(updatedIncome)
+    fun updateIncome(oldValue: Income, newValue: Income) = viewModelScope.launch {
+        val context = getApplication<Application>().applicationContext
+
+        if (Functions.isInternetAvailable(context)) {
+
+            newValue.isSynced = true
+
+            if (!oldValue.isSynced) {
+                uploadDocumentToFireStore(
+                    context,
+                    FirestoreCollectionsConstants.INCOMES,
+                    newValue.key
+                )
+            } else {
+
+                val map = compareObjects(
+                    oldData = oldValue,
+                    newData = newValue,
+                    notToCompareFields = listOf("modified", "isSynced")
+                )
+
+                if (map.isNotEmpty()) {
+
+                    map["modified"] = newValue.modified
+
+                    updateDocumentOnFireStore(
+                        context,
+                        map,
+                        FirestoreCollectionsConstants.INCOMES,
+                        oldValue.key
+                    )
+                }
+            }
+        } else {
+            newValue.isSynced = false
+        }
+
+        repository.updateIncome(newValue)
     }
 
     fun deleteIncome(income: Income) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
+
+        deleteDocumentFromFireStore(
+            context,
+            FirestoreCollectionsConstants.INCOMES,
+            income.key
+        )
+
         repository.deleteIncome(income)
     }
 

@@ -36,4 +36,7 @@ interface IncomeDao {
 
     @Query("SELECT source FROM income_table")
     fun getAllIncomeSources(): Flow<List<String>>
+
+    @Query("UPDATE income_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
 }

@@ -16,4 +16,5 @@ object FirestoreCollectionsConstants {
     const val APP_UPDATES = "AppUpdates"
     const val PAYMENT_METHODS = "PaymentMethods"
     const val BUDGETS = "Budgets"
+    const val INCOMES = "Incomes"
 }

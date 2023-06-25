@@ -1,11 +1,57 @@
 package com.rohitthebest.manageyourrenters.utils
 
-import com.rohitthebest.manageyourrenters.database.model.*
+import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
+import com.rohitthebest.manageyourrenters.database.model.EMI
+import com.rohitthebest.manageyourrenters.database.model.EMIPayment
+import com.rohitthebest.manageyourrenters.database.model.Expense
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
+import com.rohitthebest.manageyourrenters.database.model.Renter
+import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 
 /**
  * This class helps to compare the main fields of
  * old and new model and return a map of unmatched fields
  */
+
+// generic
+fun <T> compareObjects(
+    oldData: T,
+    newData: T,
+    notToCompareFields: List<String>
+): HashMap<String, Any?> {
+
+    return try {
+
+        val result = HashMap<String, Any?>()
+        val fields = oldData!!::class.java.declaredFields
+
+        for (field in fields) {
+
+            field.isAccessible = true
+
+            if (field.name != "key"
+                && field.name != "id"
+                && field.name != "uid"
+                && !notToCompareFields.contains(field.name)
+            ) {
+
+                val oldValue = field.get(oldData)
+                val newValue = field.get(newData)
+
+                if (oldValue != newValue) {
+                    result[field.name] = newValue
+                }
+            }
+        }
+
+        return result
+    } catch (e: Exception) {
+        HashMap()
+    }
+}
 
 fun compareBorrowerPaymentModel(
     oldData: BorrowerPayment,
@@ -221,7 +267,6 @@ fun comparePaymentMethod(oldData: PaymentMethod, newData: PaymentMethod): HashMa
 
     val map: HashMap<String, Any?> = HashMap()
 
-    if (oldData.isSynced != newData.isSynced) map["synced"] = newData.isSynced
     if (oldData.paymentMethod != newData.paymentMethod) map["paymentMethod"] = newData.paymentMethod
 
     return map

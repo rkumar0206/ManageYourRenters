@@ -1,6 +1,6 @@
 
-- insert/update/delete budget on firestore
 - insert/update/delete income on firestore
+- sync budgets and income when user logins
 - add graph fragment for budget and income
     - add individual budget category graph
     - add income graph
@@ -25,6 +25,7 @@
 - add a filter option in budgetAndIncomeOverviewFragment to filter the results by PaymentMethods
     - continue with income and budget total
 - show expenses by filter in budgetAndIncomeOverviewFragment
+- insert/update/delete budget on firestore
 
 
 

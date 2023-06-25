@@ -4,20 +4,36 @@ import android.app.Application
 import android.content.Context
 import android.os.Parcelable
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BUDGETS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSE_CATEGORIES
+import com.rohitthebest.manageyourrenters.repositories.BudgetRepository
 import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
-import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.compareExpenseCategoryModel
+import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
+import com.rohitthebest.manageyourrenters.utils.deleteAllDocumentsUsingKeyFromFirestore
+import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
+import com.rohitthebest.manageyourrenters.utils.deleteFileFromFirebaseStorage
+import com.rohitthebest.manageyourrenters.utils.isValid
+import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.set
 
 private const val TAG = "ExpenseCategoryViewMode"
 
@@ -26,6 +42,7 @@ class ExpenseCategoryViewModel @Inject constructor(
     app: Application,
     private val expenseCategoryRepository: ExpenseCategoryRepository,
     private val expenseRepository: ExpenseRepository,
+    private val budgetRepository: BudgetRepository,
     private val monthlyPaymentRepository: MonthlyPaymentRepository,
     private val state: SavedStateHandle
 ) : AndroidViewModel(app) {
@@ -68,13 +85,13 @@ class ExpenseCategoryViewModel @Inject constructor(
 
         } else {
 
-                expenseCategory.isSynced = false
-            }
-
-            expenseCategoryRepository.insertExpenseCategory(expenseCategory)
-
-            Functions.showToast(context, "Expense Category saved")
+            expenseCategory.isSynced = false
         }
+
+        expenseCategoryRepository.insertExpenseCategory(expenseCategory)
+
+        Functions.showToast(context, "Expense Category saved")
+    }
 
     fun updateExpenseCategory(
         oldValue: ExpenseCategory,
@@ -140,6 +157,7 @@ class ExpenseCategoryViewModel @Inject constructor(
                 }
 
                 val expenseKeys = expenseRepository.getKeysByExpenseCategoryKey(expenseCategory.key)
+                val budgetKeys = budgetRepository.getKeysByExpenseCategoryKey(expenseCategory.key)
 
                 unlinkMonthlyPaymentsIfAny(context, expenseKeys)
 
@@ -152,9 +170,19 @@ class ExpenseCategoryViewModel @Inject constructor(
                     )
                 }
 
+                if (budgetKeys.isNotEmpty()) {
+
+                    deleteAllDocumentsUsingKeyFromFirestore(
+                        context,
+                        BUDGETS,
+                        convertStringListToJSON(budgetKeys)
+                    )
+                }
+
             }
 
             expenseRepository.deleteExpenseByExpenseCategoryKey(expenseCategory.key)
+            budgetRepository.deleteBudgetsByExpenseCategoryKey(expenseCategory.key)
             expenseCategoryRepository.deleteExpenseCategory(expenseCategory)
         }
 

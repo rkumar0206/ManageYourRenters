@@ -1,6 +1,17 @@
 package com.rohitthebest.manageyourrenters.repositories
 
-import com.rohitthebest.manageyourrenters.database.dao.*
+import com.rohitthebest.manageyourrenters.database.dao.BorrowerDao
+import com.rohitthebest.manageyourrenters.database.dao.BorrowerPaymentDao
+import com.rohitthebest.manageyourrenters.database.dao.BudgetDao
+import com.rohitthebest.manageyourrenters.database.dao.EMIDao
+import com.rohitthebest.manageyourrenters.database.dao.EMIPaymentDao
+import com.rohitthebest.manageyourrenters.database.dao.ExpenseCategoryDAO
+import com.rohitthebest.manageyourrenters.database.dao.ExpenseDAO
+import com.rohitthebest.manageyourrenters.database.dao.MonthlyPaymentCategoryDao
+import com.rohitthebest.manageyourrenters.database.dao.MonthlyPaymentDao
+import com.rohitthebest.manageyourrenters.database.dao.PaymentMethodDao
+import com.rohitthebest.manageyourrenters.database.dao.RenterDao
+import com.rohitthebest.manageyourrenters.database.dao.RenterPaymentDao
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
 import javax.inject.Inject
 
@@ -15,7 +26,8 @@ class UpdateIsSyncedValueForAnyTableRepository @Inject constructor(
     private val expenseDAO: ExpenseDAO,
     private val expenseCategoryDAO: ExpenseCategoryDAO,
     private val monthlyPaymentDao: MonthlyPaymentDao,
-    private val monthlyPaymentCategoryDAO: MonthlyPaymentCategoryDao
+    private val monthlyPaymentCategoryDAO: MonthlyPaymentCategoryDao,
+    private val budgetDao: BudgetDao
 ) {
 
     suspend fun updateIsSyncValueToFalse(collection: String, key: String) {
@@ -63,6 +75,10 @@ class UpdateIsSyncedValueForAnyTableRepository @Inject constructor(
 
             FirestoreCollectionsConstants.PAYMENT_METHODS -> {
                 paymentMethodDao.updateIsSyncedValueToFalse(key)
+            }
+
+            FirestoreCollectionsConstants.BUDGETS -> {
+                budgetDao.updateIsSyncedValueToFalse(key)
             }
         }
     }

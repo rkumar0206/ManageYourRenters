@@ -11,10 +11,17 @@ import com.rohitthebest.manageyourrenters.database.model.Budget
 import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.BUDGETS
 import com.rohitthebest.manageyourrenters.repositories.BudgetRepository
 import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.compareObjects
+import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
+import com.rohitthebest.manageyourrenters.utils.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -31,6 +38,21 @@ class BudgetViewModel @Inject constructor(
 ) : AndroidViewModel(app) {
 
     fun insertBudget(budget: Budget) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
+
+        if (context.isInternetAvailable()) {
+
+            budget.isSynced = true
+
+            uploadDocumentToFireStore(
+                context, BUDGETS, budget.key
+            )
+        } else {
+
+            budget.isSynced = false
+        }
+
         budgetRepository.insertBudget(budget)
     }
 
@@ -38,11 +60,59 @@ class BudgetViewModel @Inject constructor(
         budgetRepository.insertAllBudget(budgets)
     }
 
-    fun updateBudget(oldBudget: Budget, newBudget: Budget) = viewModelScope.launch {
-        budgetRepository.updateBudget(newBudget)
+    fun updateBudget(oldValue: Budget, newValue: Budget) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
+
+        if (Functions.isInternetAvailable(context)) {
+
+            newValue.isSynced = true
+
+            if (!oldValue.isSynced) {
+                uploadDocumentToFireStore(
+                    context,
+                    BUDGETS,
+                    newValue.key
+                )
+            } else {
+
+                val map = compareObjects(
+                    oldData = oldValue,
+                    newData = newValue,
+                    notToCompareFields = listOf("modified")
+                )
+
+                Log.d(TAG, "updateBudget: difference: $map")
+
+                if (map.isNotEmpty()) {
+
+                    map["modified"] = newValue.modified
+
+                    updateDocumentOnFireStore(
+                        context,
+                        map,
+                        BUDGETS,
+                        oldValue.key
+                    )
+                }
+            }
+        } else {
+            newValue.isSynced = false
+        }
+
+        budgetRepository.updateBudget(newValue)
     }
 
     fun deleteBudget(budget: Budget) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
+
+        deleteDocumentFromFireStore(
+            context,
+            BUDGETS,
+            budget.key
+        )
+
         budgetRepository.deleteBudget(budget)
     }
 

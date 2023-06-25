@@ -22,6 +22,9 @@ interface BudgetDao {
     @Query("DELETE FROM budget_table")
     suspend fun deleteAllBudgets()
 
+    @Query("DELETE FROM budget_table WHERE expenseCategoryKey = :expenseCategoryKey")
+    suspend fun deleteBudgetsByExpenseCategoryKey(expenseCategoryKey: String)
+
     @Query("SELECT * FROM budget_table")
     fun getAllBudgets(): Flow<List<Budget>>
 
@@ -39,4 +42,10 @@ interface BudgetDao {
 
     @Query("SELECT SUM(budgetLimit) FROM budget_table where month = :month and year = :year")
     fun getTotalBudgetByMonthAndYear(month: Int, year: Int): Flow<Double>
+
+    @Query("UPDATE budget_table SET isSynced = 0 WHERE `key` = :key")
+    suspend fun updateIsSyncedValueToFalse(key: String)
+
+    @Query("SELECT `key` FROM budget_table WHERE expenseCategoryKey = :expenseCategoryKey")
+    suspend fun getKeysByExpenseCategoryKey(expenseCategoryKey: String): List<String>
 }

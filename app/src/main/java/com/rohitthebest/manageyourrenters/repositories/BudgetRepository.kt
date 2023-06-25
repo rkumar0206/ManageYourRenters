@@ -21,6 +21,9 @@ class BudgetRepository @Inject constructor(
 
     suspend fun deleteAllBudgets() = dao.deleteAllBudgets()
 
+    suspend fun deleteBudgetsByExpenseCategoryKey(expenseCategoryKey: String) =
+        dao.deleteBudgetsByExpenseCategoryKey(expenseCategoryKey)
+
     fun getAllBudgets() = dao.getAllBudgets()
 
     fun getAllBudgetsByMonthAndYear(month: Int, year: Int) =
@@ -36,5 +39,10 @@ class BudgetRepository @Inject constructor(
     fun getExpenseCategoryKeysOfAllBudgetsByMonthAndYear(month: Int, year: Int) =
         dao.getExpenseCategoryKeysOfAllBudgetsByMonthAndYear(
             month, year
+        )
+
+    suspend fun getKeysByExpenseCategoryKey(expenseCategoryKey: String) =
+        dao.getKeysByExpenseCategoryKey(
+            expenseCategoryKey
         )
 }

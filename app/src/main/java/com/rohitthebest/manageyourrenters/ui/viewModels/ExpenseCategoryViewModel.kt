@@ -18,6 +18,7 @@ import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.E
 import com.rohitthebest.manageyourrenters.repositories.BudgetRepository
 import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
+import com.rohitthebest.manageyourrenters.repositories.IncomeRepository
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -43,6 +44,7 @@ class ExpenseCategoryViewModel @Inject constructor(
     private val expenseCategoryRepository: ExpenseCategoryRepository,
     private val expenseRepository: ExpenseRepository,
     private val budgetRepository: BudgetRepository,
+    private val incomeRepository: IncomeRepository,
     private val monthlyPaymentRepository: MonthlyPaymentRepository,
     private val state: SavedStateHandle
 ) : AndroidViewModel(app) {
@@ -230,6 +232,8 @@ class ExpenseCategoryViewModel @Inject constructor(
 
         expenseCategoryRepository.deleteAllExpenseCategories()
         expenseRepository.deleteAllExpenses()
+        budgetRepository.deleteAllBudgets()
+        incomeRepository.deleteAllIncomes()
     }
 
     fun getExpenseCategoryByKey(key: String) =

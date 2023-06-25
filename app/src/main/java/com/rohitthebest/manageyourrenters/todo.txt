@@ -26,7 +26,7 @@
 - insert/update/delete budget on firestore
 - insert/update/delete income on firestore
 - sync budgets and income when user logins
-
+- fix re-sync button error: user has to login again to sync with cloud
 
 
 

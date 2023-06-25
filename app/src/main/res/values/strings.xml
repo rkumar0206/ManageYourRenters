@@ -407,6 +407,7 @@
     <string name="modify_budgets">Modify budgets</string>
     <string name="total_with_arg">Total: %1$s</string>
     <string name="please_add_limit_for_this_category">Please add limit for this category</string>
+    <string name="syncing_values_now">Syncing values now…</string>
 
     <string-array name="interest_time_schedule">
 

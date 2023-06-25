@@ -1,5 +1,4 @@
 
-- sync budgets and income when user logins
 - add graph fragment for budget and income
     - add individual budget category graph
     - add income graph
@@ -26,7 +25,7 @@
 - show expenses by filter in budgetAndIncomeOverviewFragment
 - insert/update/delete budget on firestore
 - insert/update/delete income on firestore
-
+- sync budgets and income when user logins
 
 
 

@@ -45,4 +45,6 @@ class BudgetRepository @Inject constructor(
         dao.getKeysByExpenseCategoryKey(
             expenseCategoryKey
         )
+
+    suspend fun deleteByIsSyncedValue(isSynced: Boolean) = dao.deleteByIsSyncedValue(isSynced)
 }

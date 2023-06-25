@@ -19,6 +19,9 @@ interface IncomeDao {
     @Delete
     suspend fun deleteIncome(income: Income)
 
+    @Query("DELETE FROM income_table WHERE isSynced = :isSynced")
+    suspend fun deleteByIsSyncedValue(isSynced: Boolean)
+
     @Query("DELETE FROM income_table")
     suspend fun deleteAllIncomes()
 

@@ -7,6 +7,8 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.YearMonth
 import java.util.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 @SuppressLint("SimpleDateFormat")
 object WorkingWithDateAndTime {
@@ -291,10 +293,42 @@ object WorkingWithDateAndTime {
         return Pair(firstCal.timeInMillis, lastCal.timeInMillis)
     }
 
-    fun getCurrentMonthAndYearString(): String {
+    fun getMonthAndYearString(month: Int, year: Int): String {
 
-        return "${getCurrentMonth()}_${getCurrentYear()}"
+        return "${month}_${year}"
     }
+
+    fun extractMonthAndYearFromMonthAndYearString(monthYearString: String): Pair<Int, Int> {
+
+        return try {
+
+            val pattern = "(\\d+)_(\\d+)"
+            val regex: Pattern = Pattern.compile(pattern)
+            val matcher: Matcher = regex.matcher(monthYearString)
+
+            if (matcher.find()) {
+
+                val month = matcher.group(1)?.toInt()
+                val year = matcher.group(2)?.toInt()
+
+                return if (month != null && year != null) {
+
+                    Pair(month, year)
+                } else {
+                    Pair(0, 0)
+                }
+
+            } else {
+                return Pair(0, 0)
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Pair(0, 0)
+        }
+
+    }
+
 
     fun getNextMonth(selectedMonth: Int): Int {
 

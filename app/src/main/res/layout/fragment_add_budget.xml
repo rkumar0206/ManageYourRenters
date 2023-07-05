@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
-            app:menu="@menu/search_menu"
+            app:menu="@menu/menu_add_budget"
             app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
             app:title="Budgets" />
 

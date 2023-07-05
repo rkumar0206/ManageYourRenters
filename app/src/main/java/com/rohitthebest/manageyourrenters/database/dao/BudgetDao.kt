@@ -51,4 +51,10 @@ interface BudgetDao {
 
     @Query("SELECT `key` FROM budget_table WHERE expenseCategoryKey = :expenseCategoryKey")
     suspend fun getKeysByExpenseCategoryKey(expenseCategoryKey: String): List<String>
+
+    @Query("SELECT DISTINCT monthYearString FROM budget_table")
+    fun getAllBudgetMonthAndYearForWhichBudgetIsAdded(): Flow<List<String>>
+
+    @Query("SELECT `key` FROM budget_table WHERE monthYearString = :monthYearString LIMIT 2")
+    fun isAnyBudgetAddedForThisMonthAndYear(monthYearString: String): Flow<List<String>>
 }

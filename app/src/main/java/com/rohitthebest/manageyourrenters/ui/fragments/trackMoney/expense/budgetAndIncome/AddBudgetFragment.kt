@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budgetAndIncome
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
@@ -24,6 +25,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
 import com.rohitthebest.manageyourrenters.utils.convertToJsonString
 import com.rohitthebest.manageyourrenters.utils.executeAfterDelay
 import com.rohitthebest.manageyourrenters.utils.format
@@ -44,7 +46,8 @@ private const val TAG = "AddBudgetFragment"
 class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
     SetBudgetExpenseCategoryAdapter.OnClickListener,
     AddBudgetLimitBottomSheetFragment.OnBottomSheetDismissListener,
-    MonthAndYearPickerDialog.OnMonthAndYearDialogDismissListener {
+    MonthAndYearPickerDialog.OnMonthAndYearDialogDismissListener,
+    ChooseMonthAndYearBottomSheetFragment.OnBottomSheetDismissListener {
 
     private var _binding: FragmentAddBudgetBinding? = null
     private val binding get() = _binding!!
@@ -143,7 +146,7 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         adapterPosition = position
 
         val popupMenu = PopupMenu(requireContext(), view)
-        popupMenu.menuInflater.inflate(R.menu.menu_add_budget, popupMenu.menu)
+        popupMenu.menuInflater.inflate(R.menu.menu_add_budget_item, popupMenu.menu)
 
         popupMenu.show()
 
@@ -252,7 +255,7 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
     private fun setUpSearchViewMenu(budgets: List<Budget>) {
 
         searchView =
-            binding.toolbar.menu.findItem(R.id.menu_search).actionView as SearchView
+            binding.toolbar.menu.findItem(R.id.menu_search_budget_list).actionView as SearchView
 
         searchView?.let { sv ->
 
@@ -322,7 +325,106 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         binding.monthMCV.setOnClickListener {
             handleMonthAndYearSelection()
         }
+        binding.toolbar.menu.findItem(R.id.copy_previous_months_budget).setOnMenuItemClickListener {
+
+            var isRefreshEnabled = true
+
+            budgetViewModel.getAllBudgetMonthAndYearForWhichBudgetIsAdded()
+                .observe(viewLifecycleOwner) { monthYearStringList ->
+
+                    if (isRefreshEnabled) {
+
+                        Log.d(TAG, "initListeners: monthYearString: $monthYearStringList")
+
+                        val monthYearStringForSelectedMonthAndYear =
+                            WorkingWithDateAndTime.getMonthAndYearString(
+                                selectedMonth,
+                                selectedYear
+                            )
+
+                        // todo: remove the monthYearString from list for selected month
+                        // todo: find a way to sort this list according to month and year both
+
+                        if (monthYearStringList.isNotEmpty()) {
+
+
+                            budgetViewModel.isAnyBudgetAddedForThisMonthAndYear(
+                                monthYearStringForSelectedMonthAndYear
+                            ).observe(viewLifecycleOwner) { budgetKeys ->
+
+                                if (isRefreshEnabled) {
+                                    if (budgetKeys.isNotEmpty()) {
+                                        MaterialAlertDialogBuilder(requireContext())
+                                            .setTitle(getString(R.string.are_you_sure))
+                                            .setMessage(getString(R.string.replace_the_current_budget_limit_for_this_month))
+                                            .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+
+                                                showPreviousMonthAndYearListForWhichBudgetIsAdded(
+                                                    monthYearStringList
+                                                )
+                                                dialog.dismiss()
+                                            }
+                                            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                                                dialog.dismiss()
+                                            }
+                                            .create()
+                                            .show()
+
+                                    } else {
+
+                                        showPreviousMonthAndYearListForWhichBudgetIsAdded(
+                                            monthYearStringList
+                                        )
+                                    }
+                                }
+                                isRefreshEnabled = false
+                            }
+
+                        } else {
+
+                            showToast(
+                                requireContext(),
+                                getString(R.string.no_budget_limit_added_yet_for_any_month)
+                            )
+                        }
+
+                    }
+                }
+
+            true
+        }
     }
+
+    private fun showPreviousMonthAndYearListForWhichBudgetIsAdded(monthYearStringList: List<String>?) {
+
+        Log.d(TAG, "showPreviousMonthAndYearListForWhichBudgetIsAdded: monthYearString")
+
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.COPY_BUDGET_MONTH_AND_YEAR_KEY,
+            convertStringListToJSON(monthYearStringList?.sortedDescending() ?: listOf(""))
+        )
+
+        requireActivity().supportFragmentManager.let { fm ->
+
+            ChooseMonthAndYearBottomSheetFragment.newInstance(bundle)
+                .apply {
+                    show(fm, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
+
+    override fun onMonthAndYearSelectedForCopyingBudget(
+        isMonthAndYearSelected: Boolean,
+        selectedMonthYearString: String
+    ) {
+
+        // todo: if the budget is already added for this month first delete all the budget for this month and
+        // then add the budget of the selectedMonthAndYear
+
+        showToast(requireContext(), selectedMonthYearString)
+    }
+
 
     private fun handleMonthAndYearSelection() {
 
@@ -435,4 +537,5 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         super.onDestroyView()
         _binding = null
     }
+
 }

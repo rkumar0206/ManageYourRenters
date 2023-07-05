@@ -49,4 +49,5 @@ data class Budget(
     fun generateMonthYearString(): String {
         return "${this.month}_${this.year}"
     }
+
 }

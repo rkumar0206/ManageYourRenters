@@ -1,4 +1,6 @@
 
+- add option to duplicate the budget of any month in the current month
+- handle menu button in BudgetAndIncomeOverview fragment in budget list item
 - add graph fragment for budget and income
     - add individual budget category graph
     - add income graph

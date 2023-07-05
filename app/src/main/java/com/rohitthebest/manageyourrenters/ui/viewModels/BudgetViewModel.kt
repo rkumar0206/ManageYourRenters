@@ -302,4 +302,10 @@ class BudgetViewModel @Inject constructor(
 
     fun getTotalBudgetByMonthAndYear(month: Int, year: Int) =
         budgetRepository.getTotalBudgetByMonthAndYear(month, year).asLiveData()
+
+    fun getAllBudgetMonthAndYearForWhichBudgetIsAdded() =
+        budgetRepository.getAllBudgetMonthAndYearForWhichBudgetIsAdded().asLiveData()
+
+    fun isAnyBudgetAddedForThisMonthAndYear(monthYearString: String) =
+        budgetRepository.isAnyBudgetAddedForThisMonthAndYear(monthYearString).asLiveData()
 }

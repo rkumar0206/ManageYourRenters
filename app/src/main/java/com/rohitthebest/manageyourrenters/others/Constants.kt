@@ -111,4 +111,6 @@ object Constants {
     const val MONTH_YEAR_PICKER_MIN_YEAR_KEY = "sdhbsjhhjsvgsvghsvhgshhgs"
     const val MONTH_YEAR_PICKER_MAX_YEAR_KEY = "jbhjsvgsygsfrtsfgctradxaa"
     //--------------------------------------------------------------------------------
+
+    const val COPY_BUDGET_MONTH_AND_YEAR_KEY = "rdnjshbhsvygacfcfacfca"
 }

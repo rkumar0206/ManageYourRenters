@@ -47,4 +47,12 @@ class BudgetRepository @Inject constructor(
         )
 
     suspend fun deleteByIsSyncedValue(isSynced: Boolean) = dao.deleteByIsSyncedValue(isSynced)
+
+    fun getAllBudgetMonthAndYearForWhichBudgetIsAdded() =
+        dao.getAllBudgetMonthAndYearForWhichBudgetIsAdded()
+
+    fun isAnyBudgetAddedForThisMonthAndYear(monthYearString: String) =
+        dao.isAnyBudgetAddedForThisMonthAndYear(
+            monthYearString
+        )
 }

@@ -342,11 +342,14 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
                                 selectedYear
                             )
 
-                        // todo: remove the monthYearString from list for selected month
-                        // todo: find a way to sort this list according to month and year both
+                        val monthYearStringListAfterRemovingSelectedMonth =
+                            ArrayList(monthYearStringList)
 
-                        if (monthYearStringList.isNotEmpty()) {
+                        monthYearStringListAfterRemovingSelectedMonth.remove(
+                            monthYearStringForSelectedMonthAndYear
+                        )
 
+                        if (monthYearStringListAfterRemovingSelectedMonth.isNotEmpty()) {
 
                             budgetViewModel.isAnyBudgetAddedForThisMonthAndYear(
                                 monthYearStringForSelectedMonthAndYear
@@ -360,7 +363,7 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
                                             .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
 
                                                 showPreviousMonthAndYearListForWhichBudgetIsAdded(
-                                                    monthYearStringList
+                                                    monthYearStringListAfterRemovingSelectedMonth
                                                 )
                                                 dialog.dismiss()
                                             }
@@ -402,7 +405,7 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         val bundle = Bundle()
         bundle.putString(
             Constants.COPY_BUDGET_MONTH_AND_YEAR_KEY,
-            convertStringListToJSON(monthYearStringList?.sortedDescending() ?: listOf(""))
+            convertStringListToJSON(monthYearStringList ?: listOf(""))
         )
 
         requireActivity().supportFragmentManager.let { fm ->

@@ -25,14 +25,23 @@ interface BudgetDao {
     @Query("DELETE FROM budget_table WHERE expenseCategoryKey = :expenseCategoryKey")
     suspend fun deleteBudgetsByExpenseCategoryKey(expenseCategoryKey: String)
 
+    @Query("DELETE FROM budget_table WHERE month = :month AND year = :year")
+    suspend fun deleteBudgetsByMonthAndYear(month: Int, year: Int)
+
     @Query("DELETE FROM budget_table WHERE isSynced = :isSynced")
     suspend fun deleteByIsSyncedValue(isSynced: Boolean)
 
     @Query("SELECT * FROM budget_table")
     fun getAllBudgets(): Flow<List<Budget>>
 
+    @Query("SELECT * FROM budget_table WHERE `key` IN (:keyList)")
+    fun getAllBudgetsByKey(keyList: List<String?>): Flow<List<Budget>>
+
     @Query("SELECT * FROM budget_table where month = :month and year = :year order by created DESC")
     fun getAllBudgetsByMonthAndYear(month: Int, year: Int): Flow<List<Budget>>
+
+    @Query("SELECT * FROM budget_table where monthYearString = :monthYearString order by created DESC")
+    fun getAllBudgetsByMonthAndYearString(monthYearString: String): Flow<List<Budget>>
 
     @Query("SELECT year FROM budget_table order by year ASC LIMIT 1")
     fun getTheOldestSavedBudgetYear(): Flow<Int>
@@ -51,6 +60,9 @@ interface BudgetDao {
 
     @Query("SELECT `key` FROM budget_table WHERE expenseCategoryKey = :expenseCategoryKey")
     suspend fun getKeysByExpenseCategoryKey(expenseCategoryKey: String): List<String>
+
+    @Query("SELECT `key` FROM budget_table WHERE month = :month  AND year = :year")
+    suspend fun getKeysByMonthAndYear(month: Int, year: Int): List<String>
 
     @Query("SELECT DISTINCT monthYearString FROM budget_table ORDER BY year DESC, month DESC")
     fun getAllBudgetMonthAndYearForWhichBudgetIsAdded(): Flow<List<String>>

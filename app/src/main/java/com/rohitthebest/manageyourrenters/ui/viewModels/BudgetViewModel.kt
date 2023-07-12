@@ -18,11 +18,15 @@ import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.compareObjects
+import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
+import com.rohitthebest.manageyourrenters.utils.deleteAllDocumentsUsingKeyFromFirestore
 import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
 import com.rohitthebest.manageyourrenters.utils.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
 import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
+import com.rohitthebest.manageyourrenters.utils.uploadListOfDataToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -54,10 +58,6 @@ class BudgetViewModel @Inject constructor(
         }
 
         budgetRepository.insertBudget(budget)
-    }
-
-    fun insertAllBudget(budgets: List<Budget>) = viewModelScope.launch {
-        budgetRepository.insertAllBudget(budgets)
     }
 
     fun updateBudget(oldValue: Budget, newValue: Budget) = viewModelScope.launch {
@@ -308,4 +308,83 @@ class BudgetViewModel @Inject constructor(
 
     fun isAnyBudgetAddedForThisMonthAndYear(monthYearString: String) =
         budgetRepository.isAnyBudgetAddedForThisMonthAndYear(monthYearString).asLiveData()
+
+    fun duplicateBudgetOfPreviouslyAddedBudgetMonth(
+        isBudgetAddedForSelectedMonth: Boolean,
+        selectedMonthAndYear: Pair<Int, Int>,
+        monthAndYearFromWhichBudgetHasToBeDuplicated: String
+    ) {
+
+        viewModelScope.launch {
+
+            if (isBudgetAddedForSelectedMonth) {
+
+                // delete all the budgets already added for this month
+                deleteAllBudgetsByMonthAndYear(
+                    selectedMonthAndYear.first,
+                    selectedMonthAndYear.second
+                )
+
+                delay(120)
+            }
+
+            // getting all the budgets
+            val allBudgetsOfMonthFromWhichBudgetHasToBeDuplicated =
+                budgetRepository.getAllBudgetsByMonthAndYearString(
+                    monthAndYearFromWhichBudgetHasToBeDuplicated
+                ).first()
+
+            val duplicatedBudgetList =
+                allBudgetsOfMonthFromWhichBudgetHasToBeDuplicated.toMutableList()
+
+
+            duplicatedBudgetList.forEach { budget ->
+
+                budget.key = Functions.generateKey("_${Functions.getUid()}")
+                budget.created = System.currentTimeMillis()
+                budget.modified = System.currentTimeMillis()
+                budget.month = selectedMonthAndYear.first
+                budget.year = selectedMonthAndYear.second
+                budget.monthYearString = budget.generateMonthYearString()
+                budget.isSynced = true
+            }
+
+            insertAllBudget(duplicatedBudgetList)
+        }
+    }
+
+    private fun deleteAllBudgetsByMonthAndYear(month: Int, year: Int) {
+
+        viewModelScope.launch {
+
+            val context = getApplication<Application>().applicationContext
+
+            val budgetKeys = budgetRepository.getKeysByMonthAndYear(month, year)
+
+            if (budgetKeys.isNotEmpty()) {
+
+                deleteAllDocumentsUsingKeyFromFirestore(
+                    context,
+                    BUDGETS,
+                    convertStringListToJSON(budgetKeys)
+                )
+            }
+
+            budgetRepository.deleteBudgetsByMonthAndYear(month, year)
+        }
+
+    }
+
+    private fun insertAllBudget(budgets: List<Budget>) = viewModelScope.launch {
+
+        val context = getApplication<Application>().applicationContext
+
+        uploadListOfDataToFireStore(
+            context,
+            BUDGETS,
+            convertStringListToJSON(budgets.map { it.key })
+        )
+
+        budgetRepository.insertAllBudget(budgets)
+    }
 }

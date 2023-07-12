@@ -24,10 +24,18 @@ class BudgetRepository @Inject constructor(
     suspend fun deleteBudgetsByExpenseCategoryKey(expenseCategoryKey: String) =
         dao.deleteBudgetsByExpenseCategoryKey(expenseCategoryKey)
 
+    suspend fun deleteBudgetsByMonthAndYear(month: Int, year: Int) =
+        dao.deleteBudgetsByMonthAndYear(month, year)
+
     fun getAllBudgets() = dao.getAllBudgets()
+
+    fun getAllBudgetsByKey(keyList: List<String?>) = dao.getAllBudgetsByKey(keyList)
 
     fun getAllBudgetsByMonthAndYear(month: Int, year: Int) =
         dao.getAllBudgetsByMonthAndYear(month, year)
+
+    fun getAllBudgetsByMonthAndYearString(monthYearString: String) =
+        dao.getAllBudgetsByMonthAndYearString(monthYearString)
 
     fun getTheOldestSavedBudgetYear() = dao.getTheOldestSavedBudgetYear()
 
@@ -45,6 +53,10 @@ class BudgetRepository @Inject constructor(
         dao.getKeysByExpenseCategoryKey(
             expenseCategoryKey
         )
+
+    suspend fun getKeysByMonthAndYear(month: Int, year: Int) = dao.getKeysByMonthAndYear(
+        month, year
+    )
 
     suspend fun deleteByIsSyncedValue(isSynced: Boolean) = dao.deleteByIsSyncedValue(isSynced)
 

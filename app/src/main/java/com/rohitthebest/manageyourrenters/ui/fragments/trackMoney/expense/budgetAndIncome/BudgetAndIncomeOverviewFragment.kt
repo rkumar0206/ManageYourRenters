@@ -438,14 +438,20 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
             incomeViewModel.getAllIncomesByMonthAndYear(selectedMonth, selectedYear)
                 .observe(viewLifecycleOwner) { incomes ->
 
-                    if (incomes.isEmpty()) {
-                        updateIncomeTotalUI(0.0)
-                    } else {
-                        val tempIncome = incomeViewModel.applyFilterByPaymentMethods(
-                            expenseFilterDto!!.paymentMethods, incomes
-                        )
+                    try {
+                        if (incomes.isEmpty()) {
+                            updateIncomeTotalUI(0.0)
+                        } else {
+                            val tempIncome = incomeViewModel.applyFilterByPaymentMethods(
+                                expenseFilterDto!!.paymentMethods, incomes
+                            )
 
-                        updateIncomeTotalUI(tempIncome.sumOf { it.income })
+                            updateIncomeTotalUI(tempIncome.sumOf { it.income })
+                        }
+                    } catch (e: NullPointerException) {
+                        e.printStackTrace()
+                        totalIncome = 0.0
+                        binding.iabIncomeValueTV.text = getString(R.string._0_0)
                     }
                 }
         } else {

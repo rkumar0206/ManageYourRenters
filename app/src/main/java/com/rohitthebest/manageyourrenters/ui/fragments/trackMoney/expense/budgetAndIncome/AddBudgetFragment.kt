@@ -75,6 +75,16 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         getMessage()
         initListeners()
         setUpRecyclerView()
+        observerBudgetList()
+    }
+
+    private fun observerBudgetList() {
+
+        budgetViewModel.allExpenseCategoryAsBudgets.observe(viewLifecycleOwner) { budgets ->
+            setUpSearchViewMenu(budgets)
+            getTotalBudget()
+            binding.progressBar.hide()
+        }
     }
 
     private fun setUpRecyclerView() {
@@ -244,11 +254,6 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
     private fun getAllExpenseCategoriesAsBudget() {
 
         budgetViewModel.getAllExpenseCategoryAsBudget(selectedMonth, selectedYear)
-        budgetViewModel.allExpenseCategoryAsBudgets.observe(viewLifecycleOwner) { budgets ->
-            setUpSearchViewMenu(budgets)
-            getTotalBudget()
-            binding.progressBar.hide()
-        }
     }
 
     private var searchTextDelayJob: Job? = null
@@ -327,75 +332,83 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
         }
         binding.toolbar.menu.findItem(R.id.copy_previous_months_budget).setOnMenuItemClickListener {
 
-            var isRefreshEnabled = true
-
-            budgetViewModel.getAllBudgetMonthAndYearForWhichBudgetIsAdded()
-                .observe(viewLifecycleOwner) { monthYearStringList ->
-
-                    if (isRefreshEnabled) {
-
-                        Log.d(TAG, "initListeners: monthYearString: $monthYearStringList")
-
-                        val monthYearStringForSelectedMonthAndYear =
-                            WorkingWithDateAndTime.getMonthAndYearString(
-                                selectedMonth,
-                                selectedYear
-                            )
-
-                        val monthYearStringListAfterRemovingSelectedMonth =
-                            ArrayList(monthYearStringList)
-
-                        monthYearStringListAfterRemovingSelectedMonth.remove(
-                            monthYearStringForSelectedMonthAndYear
-                        )
-
-                        if (monthYearStringListAfterRemovingSelectedMonth.isNotEmpty()) {
-
-                            budgetViewModel.isAnyBudgetAddedForThisMonthAndYear(
-                                monthYearStringForSelectedMonthAndYear
-                            ).observe(viewLifecycleOwner) { budgetKeys ->
-
-                                if (isRefreshEnabled) {
-                                    if (budgetKeys.isNotEmpty()) {
-                                        MaterialAlertDialogBuilder(requireContext())
-                                            .setTitle(getString(R.string.are_you_sure))
-                                            .setMessage(getString(R.string.replace_the_current_budget_limit_for_this_month))
-                                            .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-
-                                                showPreviousMonthAndYearListForWhichBudgetIsAdded(
-                                                    monthYearStringListAfterRemovingSelectedMonth
-                                                )
-                                                dialog.dismiss()
-                                            }
-                                            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
-                                                dialog.dismiss()
-                                            }
-                                            .create()
-                                            .show()
-
-                                    } else {
-
-                                        showPreviousMonthAndYearListForWhichBudgetIsAdded(
-                                            monthYearStringList
-                                        )
-                                    }
-                                }
-                                isRefreshEnabled = false
-                            }
-
-                        } else {
-
-                            showToast(
-                                requireContext(),
-                                getString(R.string.no_budget_limit_added_yet_for_any_month)
-                            )
-                        }
-
-                    }
-                }
-
+            handleCopyPreviousMonthBudgetMenu()
             true
         }
+    }
+
+    private var isBudgetAddedForSelectedMonth = false
+    private fun handleCopyPreviousMonthBudgetMenu() {
+
+        var isRefreshEnabled = true
+
+        budgetViewModel.getAllBudgetMonthAndYearForWhichBudgetIsAdded()
+            .observe(viewLifecycleOwner) { monthYearStringList ->
+
+                if (isRefreshEnabled) {
+
+                    Log.d(TAG, "initListeners: monthYearString: $monthYearStringList")
+
+                    val monthYearStringForSelectedMonthAndYear =
+                        WorkingWithDateAndTime.getMonthAndYearString(
+                            selectedMonth,
+                            selectedYear
+                        )
+
+                    val monthYearStringListAfterRemovingSelectedMonth =
+                        ArrayList(monthYearStringList)
+
+                    monthYearStringListAfterRemovingSelectedMonth.remove(
+                        monthYearStringForSelectedMonthAndYear
+                    )
+
+                    if (monthYearStringListAfterRemovingSelectedMonth.isNotEmpty()) {
+
+                        budgetViewModel.isAnyBudgetAddedForThisMonthAndYear(
+                            monthYearStringForSelectedMonthAndYear
+                        ).observe(viewLifecycleOwner) { budgetKeys ->
+
+                            if (isRefreshEnabled) {
+                                if (budgetKeys.isNotEmpty()) {
+                                    MaterialAlertDialogBuilder(requireContext())
+                                        .setTitle(getString(R.string.are_you_sure))
+                                        .setMessage(getString(R.string.replace_the_current_budget_limit_for_this_month))
+                                        .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+
+                                            isBudgetAddedForSelectedMonth = true
+                                            showPreviousMonthAndYearListForWhichBudgetIsAdded(
+                                                monthYearStringListAfterRemovingSelectedMonth
+                                            )
+                                            dialog.dismiss()
+                                        }
+                                        .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                                            dialog.dismiss()
+                                        }
+                                        .create()
+                                        .show()
+
+                                } else {
+
+                                    isBudgetAddedForSelectedMonth = false
+                                    showPreviousMonthAndYearListForWhichBudgetIsAdded(
+                                        monthYearStringList
+                                    )
+                                }
+                            }
+                            isRefreshEnabled = false
+                        }
+
+                    } else {
+
+                        showToast(
+                            requireContext(),
+                            getString(R.string.no_budget_limit_added_yet_for_any_month)
+                        )
+                    }
+
+                }
+            }
+
     }
 
     private fun showPreviousMonthAndYearListForWhichBudgetIsAdded(monthYearStringList: List<String>?) {
@@ -419,13 +432,23 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
 
     override fun onMonthAndYearSelectedForCopyingBudget(
         isMonthAndYearSelected: Boolean,
-        selectedMonthYearString: String
+        selectedMonthYearString: String     // this is the month from which user want to copy/duplicate the budget
     ) {
 
-        // todo: if the budget is already added for this month first delete all the budget for this month and
-        // then add the budget of the selectedMonthAndYear
+        budgetViewModel.duplicateBudgetOfPreviouslyAddedBudgetMonth(
+            isBudgetAddedForSelectedMonth,
+            Pair(selectedMonth, selectedYear),
+            selectedMonthYearString
+        )
 
-        showToast(requireContext(), selectedMonthYearString)
+        lifecycleScope.launch {
+            binding.progressBar.show()
+
+            delay(200)
+
+            getAllExpenseCategoriesAsBudget()
+
+        }
     }
 
 

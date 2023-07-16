@@ -14,4 +14,9 @@
         android:title="@string/copy_previous_month_s_budget"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/delete_all_budget_limit"
+        android:title="@string/delete_all_budget_for_this_month"
+        app:showAsAction="never" />
+
 </menu>

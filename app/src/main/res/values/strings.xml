@@ -411,6 +411,8 @@
     <string name="copy_previous_month_s_budget">Copy previous month\'s budget</string>
     <string name="replace_the_current_budget_limit_for_this_month">Replace the current budget limit for this month</string>
     <string name="no_budget_limit_added_yet_for_any_month">No budget limit added yet for any month</string>
+    <string name="delete_all_budget_for_this_month">Delete all budget for this month</string>
+    <string name="all_the_budget_limits_for_this_month_will_be_reset">All the budget limits for this month will be reset.</string>
 
     <string-array name="interest_time_schedule">
 

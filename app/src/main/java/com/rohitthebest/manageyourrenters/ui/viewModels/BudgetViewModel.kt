@@ -353,7 +353,7 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
-    private fun deleteAllBudgetsByMonthAndYear(month: Int, year: Int) {
+    fun deleteAllBudgetsByMonthAndYear(month: Int, year: Int) {
 
         viewModelScope.launch {
 

@@ -29,6 +29,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/budgetCategoryNameTV" />
 
+        <ImageButton
+            android:id="@+id/budget_syncBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
+            android:rotation="90"
+            android:src="@drawable/ic_baseline_sync_24"
+            app:layout_constraintBottom_toBottomOf="@+id/budget_menuBtn"
+            app:layout_constraintEnd_toStartOf="@+id/budget_menuBtn"
+            app:layout_constraintTop_toTopOf="@+id/budget_menuBtn" />
+
         <ImageView
             android:id="@+id/categoryImage"
             android:layout_width="100dp"
@@ -45,13 +56,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="4dp"
             android:ellipsize="middle"
             android:maxLines="1"
             android:padding="3dp"
             android:textColor="@color/primaryTextColor"
             android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@+id/budget_menuBtn"
+            app:layout_constraintEnd_toStartOf="@+id/budget_syncBtn"
             app:layout_constraintStart_toEndOf="@+id/categoryImage"
             app:layout_constraintTop_toTopOf="@+id/categoryImage"
             tools:text="Shopping" />

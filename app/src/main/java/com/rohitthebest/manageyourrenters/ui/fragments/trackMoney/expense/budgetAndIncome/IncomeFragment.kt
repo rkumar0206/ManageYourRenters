@@ -16,10 +16,12 @@ import com.rohitthebest.manageyourrenters.ui.fragments.MonthAndYearPickerDialog
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.IncomeViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
 import com.rohitthebest.manageyourrenters.utils.format
 import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.show
 import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
 import dagger.hilt.android.AndroidEntryPoint
@@ -100,6 +102,22 @@ class IncomeFragment : Fragment(R.layout.fragment_income), IncomeRVAdapter.OnCli
             }
 
         }
+    }
+
+    override fun onSyncBtnCLicked(income: Income, position: Int) {
+
+        if (requireContext().isInternetAvailable()) {
+
+            if (!income.isSynced) {
+
+                incomeViewModel.insertIncome(income)
+                incomeRVAdapter.notifyItemChanged(position)
+            }
+
+        } else {
+            Functions.showNoInternetMessage(requireContext())
+        }
+
     }
 
     private fun deleteIncome(income: Income) {

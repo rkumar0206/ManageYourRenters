@@ -55,7 +55,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginBottom="5dp"
             android:ellipsize="middle"
             android:maxLines="3"
@@ -63,7 +62,7 @@
             android:text="@string/Null"
             android:textSize="17sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/incomeMenuBtn"
+            app:layout_constraintEnd_toStartOf="@+id/incomeSyncBtn"
             app:layout_constraintStart_toStartOf="@+id/textView100"
             app:layout_constraintTop_toTopOf="@+id/incomeMenuBtn"
             tools:text="CASH | HDFC | BOI | PNB | KOTAK |  OTHERS" />
@@ -136,6 +135,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView100"
             app:srcCompat="@drawable/ic_baseline_more_vert_24" />
+
+        <ImageButton
+            android:id="@+id/incomeSyncBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:contentDescription="@string/menubtn"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="@+id/incomeMenuBtn"
+            app:layout_constraintEnd_toStartOf="@+id/incomeMenuBtn"
+            app:layout_constraintTop_toTopOf="@+id/incomeMenuBtn"
+            app:srcCompat="@drawable/ic_baseline_sync_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

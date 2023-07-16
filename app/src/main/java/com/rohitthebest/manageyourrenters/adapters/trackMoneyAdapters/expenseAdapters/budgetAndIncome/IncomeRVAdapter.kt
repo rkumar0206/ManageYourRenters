@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAd
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -39,6 +40,17 @@ class IncomeRVAdapter(
                 }
             }
 
+            binding.incomeSyncBtn.setOnClickListener {
+
+                if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
+
+                    mListener!!.onSyncBtnCLicked(
+                        getItem(absoluteAdapterPosition),
+                        absoluteAdapterPosition
+                    )
+                }
+            }
+
         }
 
         fun setData(income: Income?) {
@@ -49,6 +61,7 @@ class IncomeRVAdapter(
 
                     incomeValueTV.text = myIncome.income.format(2)
                     incomeSourceValueTV.text = myIncome.source
+                    incomeSyncBtn.isVisible = !myIncome.isSynced
 
                     if (linkedPaymentMethodsMap.isNotEmpty()) {
                         lincomeLinkedPaymentMethodsTV.text = myIncome.getPaymentMethodString(
@@ -90,6 +103,7 @@ class IncomeRVAdapter(
 
         fun onItemClick(income: Income)
         fun onIncomeItemMenuBtnClicked(income: Income, view: View)
+        fun onSyncBtnCLicked(income: Income, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

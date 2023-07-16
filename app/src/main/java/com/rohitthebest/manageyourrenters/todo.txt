@@ -1,6 +1,4 @@
 
-- add ui for syncing data in BudgetFragment and IncomeFragment
-- create a menu button in AddBudgetFragment for deleting all the budget limits
 - handle menu button in BudgetAndIncomeOverview fragment in budget list item
 - add graph fragment for budget and income
     - add individual budget category graph
@@ -31,7 +29,8 @@
 - sync budgets and income when user logins
 - fix re-sync button error: user has to login again to sync with cloud
 - add option to duplicate the budget of any month in the current month
-
+- add ui for syncing data in BudgetFragment and IncomeFragment
+- create a menu button in AddBudgetFragment for deleting all the budget limits
 
 
 

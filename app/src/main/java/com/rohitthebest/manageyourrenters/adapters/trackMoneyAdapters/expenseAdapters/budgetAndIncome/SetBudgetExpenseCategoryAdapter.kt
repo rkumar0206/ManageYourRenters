@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -53,6 +54,17 @@ class SetBudgetExpenseCategoryAdapter :
                 }
             }
 
+            binding.budgetSyncBtn.setOnClickListener {
+
+                if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
+
+                    mListener!!.onBudgetSyncBtnClicked(
+                        getItem(absoluteAdapterPosition),
+                        absoluteAdapterPosition
+                    )
+                }
+            }
+
             binding.root.setOnClickListener {
                 if (mListener != null && absoluteAdapterPosition != RecyclerView.NO_POSITION) {
                     mListener!!.onItemClicked(
@@ -95,10 +107,13 @@ class SetBudgetExpenseCategoryAdapter :
                         budgetAddLimitBtn.show()
                         budgetLimitTV.hide()
                         budgetMenuBtn.hide()
+                        budgetSyncBtn.hide()
                     } else {
                         budgetAddLimitBtn.hide()
                         budgetLimitTV.show()
                         budgetMenuBtn.show()
+
+                        budgetSyncBtn.isVisible = !myBudget.isSynced
 
                         budgetLimitTV.text = myBudget.budgetLimit.format(2)
 
@@ -195,6 +210,8 @@ class SetBudgetExpenseCategoryAdapter :
         fun onItemClicked(expenseCategoryKey: String, isBudgetLimitAdded: Boolean)
         fun onAddBudgetClicked(budget: Budget, position: Int)
         fun onBudgetMenuBtnClicked(budget: Budget, view: View, position: Int)
+
+        fun onBudgetSyncBtnClicked(budget: Budget, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

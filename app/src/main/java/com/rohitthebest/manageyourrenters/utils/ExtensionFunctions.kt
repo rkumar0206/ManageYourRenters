@@ -237,17 +237,18 @@ inline fun EditText.onTextChangedListener(
 inline fun showAlertDialogForDeletion(
     context: Context,
     crossinline positiveButtonListener: (DialogInterface) -> Unit,
-    crossinline negativeButtonListener: (DialogInterface) -> Unit
+    crossinline negativeButtonListener: (DialogInterface) -> Unit,
+    message: String = ""
 ) {
 
     MaterialAlertDialogBuilder(context)
-        .setTitle("Are you sure?")
-        .setMessage(context.getString(R.string.delete_warning_message))
-        .setPositiveButton("Delete") { dialogInterface, _ ->
+        .setTitle(context.getString(R.string.are_you_sure))
+        .setMessage(if (message.isNotValid()) context.getString(R.string.delete_warning_message) else message)
+        .setPositiveButton(context.getString(R.string._delete)) { dialogInterface, _ ->
 
             positiveButtonListener(dialogInterface)
         }
-        .setNegativeButton("Cancel") { dialogInterface, _ ->
+        .setNegativeButton(context.getText(R.string.cancel)) { dialogInterface, _ ->
 
             negativeButtonListener(dialogInterface)
         }

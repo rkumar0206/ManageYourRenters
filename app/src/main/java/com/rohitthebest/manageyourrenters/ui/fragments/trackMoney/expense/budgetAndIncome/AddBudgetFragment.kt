@@ -22,6 +22,7 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentAddBudgetBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.MonthAndYearPickerDialog
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
@@ -35,6 +36,7 @@ import com.rohitthebest.manageyourrenters.utils.isValid
 import com.rohitthebest.manageyourrenters.utils.onTextChanged
 import com.rohitthebest.manageyourrenters.utils.onTextSubmit
 import com.rohitthebest.manageyourrenters.utils.show
+import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -179,6 +181,21 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
                 else -> false
             }
 
+        }
+    }
+
+    override fun onBudgetSyncBtnClicked(budget: Budget, position: Int) {
+
+        if (isInternetAvailable(requireContext())) {
+
+            if (!budget.isSynced) {
+
+                budgetViewModel.insertBudget(budget)
+                setBudgetExpenseCategoryAdapter.notifyItemChanged(position)
+            }
+
+        } else {
+            showNoInternetMessage(requireContext())
         }
     }
 
@@ -335,6 +352,33 @@ class AddBudgetFragment : Fragment(R.layout.fragment_add_budget),
             handleCopyPreviousMonthBudgetMenu()
             true
         }
+        binding.toolbar.menu.findItem(R.id.delete_all_budget_limit).setOnMenuItemClickListener {
+            handleDeleteAllBudgetLimitMenu()
+            true
+        }
+
+    }
+
+    private fun handleDeleteAllBudgetLimitMenu() {
+
+        showAlertDialogForDeletion(
+            context = requireContext(),
+            message = getString(R.string.all_the_budget_limits_for_this_month_will_be_reset),
+            positiveButtonListener = {
+
+                if (isInternetAvailable(requireContext())) {
+                    budgetViewModel.deleteAllBudgetsByMonthAndYear(selectedMonth, selectedYear)
+                    getAllExpenseCategoriesAsBudget()
+                } else {
+                    showNoInternetMessage(requireContext())
+                }
+
+                it.dismiss()
+            },
+            negativeButtonListener = {
+                it.dismiss()
+            }
+        )
     }
 
     private var isBudgetAddedForSelectedMonth = false

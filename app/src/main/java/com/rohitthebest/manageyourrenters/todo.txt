@@ -31,6 +31,7 @@
 - add option to duplicate the budget of any month in the current month
 - add ui for syncing data in BudgetFragment and IncomeFragment
 - create a menu button in AddBudgetFragment for deleting all the budget limits
+- calculate per day expense using other formula (myBudget.budgetLimit - myBudget.currentExpenseAmount) / numberOfDaysLeftInMonth)
 
 
 

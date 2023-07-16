@@ -389,7 +389,7 @@
     <string name="click_on_add_budget_button_to_add_budgets_for_this_month">Click on ADD BUDGET button to add budgets for this month</string>
     <string name="month_and_year">%1$s\u0020,\u0020%2$s</string>
     <string name="spentVsLimit">Spent\u0020%1$s\u0020from\u0020%2$s</string>
-    <string name="budgetPerDay">%1$s\u0020per day</string>
+    <string name="budgetPerDay">%1$s\u0020per day (%2$s day(s) left)</string>
     <string name="enter_budget_limit">Enter budget limit</string>
     <string name="add_budget_limit">Add budget limit</string>
     <string name="budget_limit_should_be_grater_than_0">Budget limit should be greater than 0</string>
@@ -413,6 +413,7 @@
     <string name="no_budget_limit_added_yet_for_any_month">No budget limit added yet for any month</string>
     <string name="delete_all_budget_for_this_month">Delete all budget for this month</string>
     <string name="all_the_budget_limits_for_this_month_will_be_reset">All the budget limits for this month will be reset.</string>
+    <string name="_100">100%</string>
 
     <string-array name="interest_time_schedule">
 

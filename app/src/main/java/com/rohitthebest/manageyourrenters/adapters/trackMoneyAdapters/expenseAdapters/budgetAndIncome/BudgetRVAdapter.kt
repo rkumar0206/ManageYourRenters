@@ -80,22 +80,28 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
 
                     //Log.d(TAG, "setData: budget: $myBudget")
 
-                    val numberOfDaysInMonth = WorkingWithDateAndTime.getNumberOfDaysInMonth(
-                        myBudget.month, myBudget.year
-                    )
+                    val numberOfDaysLeftInMonth =
+                        WorkingWithDateAndTime.getNumberOfDaysLeftInAnyMonth(
+                            myBudget.month, myBudget.year
+                        )
 
-                    //Log.d(TAG, "setData: numberOfDaysInMonth: $numberOfDaysInMonth")
+                    //Log.d(TAG, "setData: numberOfDaysLeftInMonth: $numberOfDaysLeftInMonth")
+
+                    var perDayExpense =
+                        (myBudget.budgetLimit - myBudget.currentExpenseAmount) / numberOfDaysLeftInMonth
+
+                    if (perDayExpense < 0) perDayExpense = 0.0
 
                     baPerDayExpenseTV.text = binding.root.context.getString(
-                        R.string.budgetPerDay,
-                        (myBudget.budgetLimit / numberOfDaysInMonth).format(2)
+                        R.string.budgetPerDay, perDayExpense.format(2),
+                        numberOfDaysLeftInMonth.toString()
                     )
 
                     val progressInPercent =
                         ((myBudget.currentExpenseAmount / myBudget.budgetLimit) * 100).toInt()
 
                     percentTV.text = if (progressInPercent > 100.0) {
-                        "100%"
+                        binding.root.context.getString(R.string._100)
                     } else {
                         "$progressInPercent%"
                     }

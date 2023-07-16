@@ -363,4 +363,22 @@ object WorkingWithDateAndTime {
         return yearMonth.lengthOfMonth()
     }
 
+    fun getNumberOfDaysLeftInAnyMonth(month: Int, year: Int): Int {
+
+        val currentYear = getCurrentYear()
+        val currentMonth = getCurrentMonth()
+        val numberOfDaysInMonth = getNumberOfDaysInMonth(month, year)
+
+        if (year < currentYear) return 0
+        if (year > currentYear) return numberOfDaysInMonth
+
+        if (month < currentMonth) return 0
+        if (month > currentMonth) return numberOfDaysInMonth
+
+        // year = current year and month = current month
+        val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+
+        return numberOfDaysInMonth - currentDay
+    }
+
 }

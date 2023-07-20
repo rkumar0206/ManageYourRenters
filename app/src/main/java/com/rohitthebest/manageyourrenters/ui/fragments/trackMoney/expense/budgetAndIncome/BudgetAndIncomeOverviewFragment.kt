@@ -167,6 +167,18 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
                 true
             }
+
+        binding.toolbar.menu.findItem(R.id.menu_budget_and_income_graph)
+            .setOnMenuItemClickListener {
+
+                openGraphFragment()
+                true
+            }
+    }
+
+    private fun openGraphFragment() {
+
+        findNavController().navigate(R.id.action_budgetAndIncomeFragment_to_budgetAndIncomeGraphFragment)
     }
 
     private fun showPaymentMethodSelectorDialog() {

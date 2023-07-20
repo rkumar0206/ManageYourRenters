@@ -7,4 +7,9 @@
         android:icon="@drawable/baseline_filter_list_24"
         android:title="@string/add_filter"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_budget_and_income_graph"
+        android:icon="@drawable/ic_baseline_bar_chart_24"
+        android:title="@string/graphs"
+        app:showAsAction="always" />
 </menu>

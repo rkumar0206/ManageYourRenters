@@ -414,6 +414,7 @@
     <string name="delete_all_budget_for_this_month">Delete all budget for this month</string>
     <string name="all_the_budget_limits_for_this_month_will_be_reset">All the budget limits for this month will be reset.</string>
     <string name="_100">100%</string>
+    <string name="insights">Insights</string>
 
     <string-array name="interest_time_schedule">
 

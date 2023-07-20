@@ -372,6 +372,9 @@
         <action
             android:id="@+id/action_budgetAndIncomeFragment_to_showExpenseBottomSheetFragment"
             app:destination="@id/showExpenseBottomSheetFragment" />
+        <action
+            android:id="@+id/action_budgetAndIncomeFragment_to_budgetAndIncomeGraphFragment"
+            app:destination="@id/budgetAndIncomeGraphFragment" />
     </fragment>
     <fragment
         android:id="@+id/addBudgetFragment"
@@ -404,4 +407,14 @@
             android:defaultValue="2023"
             app:argType="integer" />
     </fragment>
+    <fragment
+        android:id="@+id/budgetAndIncomeGraphFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budgetAndIncome.BudgetAndIncomeGraphFragment"
+        android:label="BudgetAndIncomeGraphFragment"
+        app:enterAnim="@anim/fade_in"
+
+        app:exitAnim="@anim/slide_out_left"
+        app:popEnterAnim="@anim/slide_in_left"
+        app:popExitAnim="@anim/fade_out"
+        tools:layout="@layout/fragment_budget_and_income_graph" />
 </navigation>

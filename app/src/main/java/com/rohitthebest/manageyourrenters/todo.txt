@@ -1,9 +1,12 @@
 
 - handle menu button in BudgetAndIncomeOverview fragment in budget list item
+    - edit menu
+    - add option to add expenses directly from budget and overview fragment,
+        - it should be a menu option for all the budgets present in BudgetAndOverviewFragment
 - add graph fragment for budget and income
     - add individual budget category graph
     - add income graph
-
+- in BudgetFragment add a menu for adding same budget limit for all the categories
 ----------------------------------------------------------------------------------------------------
 
 // done

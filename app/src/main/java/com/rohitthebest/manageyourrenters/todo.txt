@@ -3,9 +3,6 @@
     - edit menu
     - add option to add expenses directly from budget and overview fragment,
         - it should be a menu option for all the budgets present in BudgetAndOverviewFragment
-- add graph fragment for budget and income
-    - add individual budget category graph
-    - add income graph
 - in BudgetFragment add a menu for adding same budget limit for all the categories
 ----------------------------------------------------------------------------------------------------
 
@@ -35,7 +32,9 @@
 - add ui for syncing data in BudgetFragment and IncomeFragment
 - create a menu button in AddBudgetFragment for deleting all the budget limits
 - calculate per day expense using other formula (myBudget.budgetLimit - myBudget.currentExpenseAmount) / numberOfDaysLeftInMonth)
-
+- add graph fragment for budget and income
+    - add income vs budget vs expense graph
+    - add savings growth graph -- will implement later
 
 
 

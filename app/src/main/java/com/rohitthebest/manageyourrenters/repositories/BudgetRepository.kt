@@ -44,6 +44,8 @@ class BudgetRepository @Inject constructor(
     fun getTotalBudgetByMonthAndYear(month: Int, year: Int) =
         dao.getTotalBudgetByMonthAndYear(month, year)
 
+    fun getAllTotalBudgetByYear(year: Int) = dao.getAllTotalBudgetByYear(year)
+
     fun getExpenseCategoryKeysOfAllBudgetsByMonthAndYear(month: Int, year: Int) =
         dao.getExpenseCategoryKeysOfAllBudgetsByMonthAndYear(
             month, year

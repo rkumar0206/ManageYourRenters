@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.database.dao
 
 import androidx.room.*
+import com.rohitthebest.manageyourrenters.data.MonthAndTotalSum
 import com.rohitthebest.manageyourrenters.database.model.Budget
 import kotlinx.coroutines.flow.Flow
 
@@ -54,6 +55,9 @@ interface BudgetDao {
 
     @Query("SELECT SUM(budgetLimit) FROM budget_table where month = :month and year = :year")
     fun getTotalBudgetByMonthAndYear(month: Int, year: Int): Flow<Double>
+
+    @Query("SELECT month, SUM(budgetLimit) AS total FROM budget_table where year = :year GROUP BY month, year")
+    fun getAllTotalBudgetByYear(year: Int): Flow<List<MonthAndTotalSum>>
 
     @Query("UPDATE budget_table SET isSynced = 0 WHERE `key` = :key")
     suspend fun updateIsSyncedValueToFalse(key: String)

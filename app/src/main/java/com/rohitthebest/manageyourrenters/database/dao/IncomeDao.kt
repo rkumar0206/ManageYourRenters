@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.database.dao
 
 import androidx.room.*
+import com.rohitthebest.manageyourrenters.data.MonthAndTotalSum
 import com.rohitthebest.manageyourrenters.database.model.Income
 import kotlinx.coroutines.flow.Flow
 
@@ -36,6 +37,10 @@ interface IncomeDao {
 
     @Query("SELECT SUM(income) FROM income_table where month = :month AND year = :year")
     fun getTotalIncomeAddedByMonthAndYear(month: Int, year: Int): Flow<Double>
+
+    @Query("SELECT month, SUM(income) AS total FROM income_table where year = :year GROUP BY month, year")
+    fun getAllTotalIncomeByYear(year: Int): Flow<List<MonthAndTotalSum>>
+
 
     @Query("SELECT source FROM income_table")
     fun getAllIncomeSources(): Flow<List<String>>

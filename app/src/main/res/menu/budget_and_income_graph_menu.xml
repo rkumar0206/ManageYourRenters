@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Savings Growth" />
+    <item
+        android:id="@+id/menu_saving_growth"
+        android:title="@string/savings_growth" />
 </menu>

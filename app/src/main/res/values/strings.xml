@@ -415,6 +415,8 @@
     <string name="all_the_budget_limits_for_this_month_will_be_reset">All the budget limits for this month will be reset.</string>
     <string name="_100">100%</string>
     <string name="insights">Insights</string>
+    <string name="income_vs_budget_vs_expense">Income vs Budget vs Expense</string>
+    <string name="savings_growth">Savings Growth</string>
 
     <string-array name="interest_time_schedule">
 

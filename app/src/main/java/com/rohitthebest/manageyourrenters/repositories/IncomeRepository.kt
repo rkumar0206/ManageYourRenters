@@ -31,6 +31,8 @@ class IncomeRepository @Inject constructor(
     fun getTotalIncomeAddedByMonthAndYear(month: Int, year: Int) =
         dao.getTotalIncomeAddedByMonthAndYear(month, year)
 
+    fun getAllTotalIncomeByYear(year: Int) = dao.getAllTotalIncomeByYear(year)
+
     fun getAllIncomeSources() = dao.getAllIncomeSources()
     suspend fun deleteByIsSyncedValue(isSynced: Boolean) = dao.deleteByIsSyncedValue(isSynced)
 }

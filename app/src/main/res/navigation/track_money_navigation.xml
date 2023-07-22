@@ -374,7 +374,18 @@
             app:destination="@id/showExpenseBottomSheetFragment" />
         <action
             android:id="@+id/action_budgetAndIncomeFragment_to_budgetAndIncomeGraphFragment"
-            app:destination="@id/budgetAndIncomeGraphFragment" />
+            app:destination="@id/budgetAndIncomeGraphFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_budgetAndIncomeFragment_to_addEditExpense"
+            app:destination="@id/addEditExpense"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/addBudgetFragment"

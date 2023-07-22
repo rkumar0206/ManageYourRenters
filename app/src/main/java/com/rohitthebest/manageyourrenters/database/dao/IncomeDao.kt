@@ -42,7 +42,7 @@ interface IncomeDao {
     fun getAllTotalIncomeByYear(year: Int): Flow<List<MonthAndTotalSum>>
 
 
-    @Query("SELECT source FROM income_table")
+    @Query("SELECT DISTINCT source FROM income_table")
     fun getAllIncomeSources(): Flow<List<String>>
 
     @Query("UPDATE income_table SET isSynced = 0 WHERE `key` = :key")

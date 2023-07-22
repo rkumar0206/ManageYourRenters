@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budge
 
 import android.os.Bundle
 import android.view.View
+import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -40,7 +41,8 @@ private const val TAG = "BudgetAndIncomeFragment"
 @AndroidEntryPoint
 class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View.OnClickListener,
     BudgetRVAdapter.OnClickListener, MonthAndYearPickerDialog.OnMonthAndYearDialogDismissListener,
-    ShowPaymentMethodSelectorDialogFragment.OnClickListener {
+    ShowPaymentMethodSelectorDialogFragment.OnClickListener,
+    AddBudgetLimitBottomSheetFragment.OnBottomSheetDismissListener {
 
     private var _binding: FragmentBudgetBinding? = null
     private val binding get() = _binding!!
@@ -113,9 +115,73 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
         showExpensesInBottomSheet(budget.expenseCategoryKey)
     }
 
-    override fun onMenuBtnClick(budget: Budget) {
+    private var adapterPosition = 0
+    override fun onMenuBtnClick(budget: Budget, view: View, position: Int) {
 
-        requireContext().showToast(budget.currentExpenseAmount)
+        //todo: add popup menu with menus : edit and add expense
+
+        adapterPosition = position
+        val popupMenu = PopupMenu(requireActivity(), view)
+
+        popupMenu.menuInflater.inflate(R.menu.budget_overview_item_menu, popupMenu.menu)
+
+        popupMenu.show()
+
+        popupMenu.setOnMenuItemClickListener {
+
+            return@setOnMenuItemClickListener when (it.itemId) {
+
+                R.id.menuEditBudgetLimit_bo -> {
+
+                    handleEditBudgetMenu(budget)
+                    true
+                }
+
+                R.id.menuAddExpense_bo -> {
+
+                    handleAddExpenseMenu(budget)
+                    true
+                }
+
+                else -> {
+                    false
+                }
+            }
+        }
+
+    }
+
+    private fun handleAddExpenseMenu(budget: Budget) {
+        val action =
+            BudgetAndIncomeOverviewFragmentDirections.actionBudgetAndIncomeFragmentToAddEditExpense(
+                budget.expenseCategoryKey, ""
+            )
+        findNavController().navigate(action)
+    }
+
+    private fun handleEditBudgetMenu(budget: Budget) {
+
+        val bundle = Bundle()
+        bundle.putBoolean(Constants.IS_FOR_EDIT, true)
+        bundle.putString(Constants.DOCUMENT_KEY, budget.key)
+
+        requireActivity().supportFragmentManager.let { fm ->
+
+            AddBudgetLimitBottomSheetFragment.newInstance(bundle)
+                .apply {
+                    show(fm, TAG)
+                }.setOnBottomSheetDismissListener(this)
+        }
+    }
+
+    override fun onBottomSheetDismissed(isBudgetLimitAdded: Boolean) {
+
+        if (isBudgetLimitAdded) {
+            lifecycleScope.launch {
+                delay(200)
+                handleUiAfterChange()
+            }
+        }
     }
 
     private fun initUI() {
@@ -130,7 +196,7 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
         lifecycleScope.launch {
             delay(300)
-            handleUiAfterDateChange()
+            handleUiAfterChange()
         }
 
         budgetViewModel.getTheOldestSavedBudgetYear().observe(viewLifecycleOwner) { year ->
@@ -222,7 +288,7 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
         }
 
         // apply payment filter on income and expense
-        handleUiAfterDateChange()
+        handleUiAfterChange()
     }
 
 
@@ -382,7 +448,7 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
             this.selectedMonth = selectedMonth
             this.selectedYear = selectedYear
-            handleUiAfterDateChange()
+            handleUiAfterChange()
         }
     }
 
@@ -395,7 +461,7 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
         selectedMonth = WorkingWithDateAndTime.getPreviousMonth(selectedMonth)
 
-        handleUiAfterDateChange()
+        handleUiAfterChange()
     }
 
     private fun handleNextDateButton() {
@@ -405,10 +471,10 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
         }
 
         selectedMonth = WorkingWithDateAndTime.getNextMonth(selectedMonth)
-        handleUiAfterDateChange()
+        handleUiAfterChange()
     }
 
-    private fun handleUiAfterDateChange() {
+    private fun handleUiAfterChange() {
 
         binding.progressBar.show()
 

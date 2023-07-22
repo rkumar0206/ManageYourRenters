@@ -3,6 +3,7 @@ package com.rohitthebest.manageyourrenters.adapters.trackMoneyAdapters.expenseAd
 import android.content.res.ColorStateList
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -38,7 +39,11 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
 
             binding.baMenuBtn.setOnClickListener {
                 if (isPositionAndMlistenerValid()) {
-                    mListener!!.onMenuBtnClick(getItem(absoluteAdapterPosition))
+                    mListener!!.onMenuBtnClick(
+                        getItem(absoluteAdapterPosition),
+                        binding.baMenuBtn,
+                        absoluteAdapterPosition
+                    )
                 }
             }
         }
@@ -199,7 +204,7 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
     interface OnClickListener {
 
         fun onItemClick(budget: Budget)
-        fun onMenuBtnClick(budget: Budget)
+        fun onMenuBtnClick(budget: Budget, view: View, position: Int)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

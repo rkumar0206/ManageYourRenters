@@ -118,8 +118,6 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
     private var adapterPosition = 0
     override fun onMenuBtnClick(budget: Budget, view: View, position: Int) {
 
-        //todo: add popup menu with menus : edit and add expense
-
         adapterPosition = position
         val popupMenu = PopupMenu(requireActivity(), view)
 

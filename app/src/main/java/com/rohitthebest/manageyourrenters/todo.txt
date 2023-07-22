@@ -1,4 +1,5 @@
 
+- add a payment method filter in BudgetAndIncomeGraph fragment
 - in BudgetFragment add a menu for adding same budget limit for all the categories
 ----------------------------------------------------------------------------------------------------
 

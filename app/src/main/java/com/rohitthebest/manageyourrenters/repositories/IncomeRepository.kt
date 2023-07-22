@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.repositories
 
 import com.rohitthebest.manageyourrenters.database.dao.IncomeDao
 import com.rohitthebest.manageyourrenters.database.model.Income
+import com.rohitthebest.manageyourrenters.others.Constants
 import javax.inject.Inject
 
 class IncomeRepository @Inject constructor(
@@ -35,4 +36,26 @@ class IncomeRepository @Inject constructor(
 
     fun getAllIncomeSources() = dao.getAllIncomeSources()
     suspend fun deleteByIsSyncedValue(isSynced: Boolean) = dao.deleteByIsSyncedValue(isSynced)
+
+    fun applyFilterByPaymentMethods(
+        paymentMethodKeys: List<String>,
+        incomes: List<Income>
+    ): List<Income> {
+
+        val isOtherPaymentMethodKeyPresent =
+            paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
+
+        val resultIncomes = incomes.filter { income ->
+
+            if (isOtherPaymentMethodKeyPresent) {
+                // for other payment method, get all the expenses where payment methods is null as well as payment method is other
+                income.linkedPaymentMethods == null || income.linkedPaymentMethods!!.any { it in paymentMethodKeys }
+            } else {
+                income.linkedPaymentMethods != null && income.linkedPaymentMethods!!.any { it in paymentMethodKeys }
+            }
+        }
+
+        return resultIncomes
+    }
+
 }

@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.database.model.Income
-import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
 import com.rohitthebest.manageyourrenters.repositories.IncomeRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
@@ -123,20 +122,7 @@ class IncomeViewModel @Inject constructor(
         incomes: List<Income>
     ): List<Income> {
 
-        val isOtherPaymentMethodKeyPresent =
-            paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
-
-        val resultIncomes = incomes.filter { income ->
-
-            if (isOtherPaymentMethodKeyPresent) {
-                // for other payment method, get all the expenses where payment methods is null as well as payment method is other
-                income.linkedPaymentMethods == null || income.linkedPaymentMethods!!.any { it in paymentMethodKeys }
-            } else {
-                income.linkedPaymentMethods != null && income.linkedPaymentMethods!!.any { it in paymentMethodKeys }
-            }
-        }
-
-        return resultIncomes
+        return repository.applyFilterByPaymentMethods(paymentMethodKeys, incomes)
     }
 
 }

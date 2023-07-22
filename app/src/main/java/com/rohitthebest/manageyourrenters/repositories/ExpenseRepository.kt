@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.repositories
 
 import com.rohitthebest.manageyourrenters.database.dao.ExpenseDAO
 import com.rohitthebest.manageyourrenters.database.model.Expense
+import com.rohitthebest.manageyourrenters.others.Constants
 import javax.inject.Inject
 
 class ExpenseRepository @Inject constructor(
@@ -92,4 +93,25 @@ class ExpenseRepository @Inject constructor(
 
     suspend fun getKeysByExpenseCategoryKey(expenseCategoryKey: String) =
         dao.getKeysByExpenseCategoryKey(expenseCategoryKey)
+
+    fun applyExpenseFilterByPaymentMethods(
+        paymentMethodKeys: List<String>,
+        expenses: List<Expense>
+    ): List<Expense> {
+
+        val isOtherPaymentMethodKeyPresent =
+            paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
+
+        val resultExpenses = expenses.filter { expense ->
+
+            if (isOtherPaymentMethodKeyPresent) {
+                // for other payment method, get all the expenses where payment methods is null as well as payment method is other
+                expense.paymentMethods == null || expense.paymentMethods!!.any { it in paymentMethodKeys }
+            } else {
+                expense.paymentMethods != null && expense.paymentMethods!!.any { it in paymentMethodKeys }
+            }
+        }
+
+        return resultExpenses
+    }
 }

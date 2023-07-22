@@ -33,7 +33,10 @@ class BudgetAndIncomeGraphViewModel @Inject constructor(
 
     val incomeBudgetAndExpenseBarEntryData get() = _incomeBudgetAndExpenseBarEntryData
 
-    fun getBarEntryDataForIncomeBudgetAndExpenseByYear(year: Int) {
+    fun getBarEntryDataForIncomeBudgetAndExpenseByYear(
+        year: Int,
+        paymentMethodKeys: List<String> = emptyList()
+    ) {
 
         viewModelScope.launch {
 
@@ -42,7 +45,14 @@ class BudgetAndIncomeGraphViewModel @Inject constructor(
             val budgetBarEntry = getBudgetBarEntry(budgetTotals)
 
             // income
-            val incomeTotals = incomeRepository.getAllTotalIncomeByYear(year).first()
+            val incomeTotals = if (paymentMethodKeys.isNotEmpty()) {
+                incomeTotalAfterApplyingPaymentMethodFilter(
+                    year, listOf(Constants.PAYMENT_METHOD_CASH_KEY)
+                )
+            } else {
+                incomeRepository.getAllTotalIncomeByYear(year).first()
+            }
+
             val incomeBarEntry = getIncomeBarEntry(incomeTotals)
 
             // expense
@@ -61,11 +71,18 @@ class BudgetAndIncomeGraphViewModel @Inject constructor(
 
 
                 val total: Double = try {
-                    expenseRepository.getTotalExpenseByCategoryKeysAndDateRange(
-                        categoryKeys,
-                        datePairForExpense.first,
-                        datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
-                    ).first()
+
+                    if (paymentMethodKeys.isNotEmpty()) {
+                        getExpenseTotalAfterApplyingPaymentMethodFilter(
+                            datePairForExpense, categoryKeys, paymentMethodKeys
+                        )
+                    } else {
+                        expenseRepository.getTotalExpenseByCategoryKeysAndDateRange(
+                            categoryKeys,
+                            datePairForExpense.first,
+                            datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
+                        ).first()
+                    }
                 } catch (e: NullPointerException) {
                     0.0
                 }
@@ -136,5 +153,64 @@ class BudgetAndIncomeGraphViewModel @Inject constructor(
         return expenseList
     }
 
+    private suspend fun incomeTotalAfterApplyingPaymentMethodFilter(
+        year: Int,
+        paymentMethods: List<String>
+    ): List<MonthAndTotalSum> {
+
+        val incomeTotals: ArrayList<MonthAndTotalSum> = ArrayList()
+
+        for (month in 0..11) {
+
+            val incomes = incomeRepository.getAllIncomesByMonthAndYear(month, year).first()
+
+            val total: Double = try {
+                if (incomes.isEmpty()) {
+                    0.0
+                } else {
+                    val tempIncome =
+                        incomeRepository.applyFilterByPaymentMethods(paymentMethods, incomes)
+
+                    tempIncome.sumOf { it.income }
+                }
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
+                0.0
+            }
+
+            incomeTotals.add(MonthAndTotalSum(month, total))
+        }
+
+        return incomeTotals
+    }
+
+    private suspend fun getExpenseTotalAfterApplyingPaymentMethodFilter(
+        datePairForExpense: Pair<Long, Long>,
+        categoryKeys: List<String>,
+        paymentMethodKeys: List<String>
+    ): Double {
+
+        val expenses = expenseRepository.getExpenseByCategoryKeysAndDateRange(
+            categoryKeys,
+            datePairForExpense.first,
+            datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
+        ).first()
+
+        return try {
+            if (expenses.isEmpty()) {
+                0.0
+            } else {
+                val tempExpense = expenseRepository.applyExpenseFilterByPaymentMethods(
+                    paymentMethodKeys,
+                    expenses
+                )
+
+                tempExpense.sumOf { it.amount }
+            }
+        } catch (e: Exception) {
+            0.0
+        }
+
+    }
 
 }

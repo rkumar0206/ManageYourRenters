@@ -1,5 +1,4 @@
 
-- add a payment method filter in BudgetAndIncomeGraph fragment
 - in BudgetFragment add a menu for adding same budget limit for all the categories
 ----------------------------------------------------------------------------------------------------
 
@@ -36,7 +35,7 @@
     - edit menu
     - add option to add expenses directly from budget and overview fragment,
         - it should be a menu option for all the budgets present in BudgetAndOverviewFragment
-
+- add a payment method filter in BudgetAndIncomeGraph fragment
 
 
 

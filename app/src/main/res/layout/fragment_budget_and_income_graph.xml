@@ -25,24 +25,38 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <RelativeLayout
-        android:id="@+id/relativeLayout"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/mcv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="10dp"
+        app:strokeColor="@color/color_green"
+        app:strokeWidth="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
-        <Spinner
-            android:id="@+id/year_spinner"
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:contentDescription="@string/select_from_year"
-            android:minHeight="48dp" />
+            android:layout_height="wrap_content">
 
-    </RelativeLayout>
+            <Spinner
+                android:id="@+id/year_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:contentDescription="@string/select_from_year"
+                android:minHeight="48dp" />
+
+        </RelativeLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 
     <com.github.mikephil.charting.charts.BarChart
@@ -54,7 +68,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/mcv" />
 
     <ProgressBar
         android:id="@+id/progressBar"

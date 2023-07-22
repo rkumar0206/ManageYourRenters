@@ -409,20 +409,7 @@ class ExpenseViewModel @Inject constructor(
         expenses: List<Expense>
     ): List<Expense> {
 
-        val isOtherPaymentMethodKeyPresent =
-            paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
-
-        val resultExpenses = expenses.filter { expense ->
-
-            if (isOtherPaymentMethodKeyPresent) {
-                // for other payment method, get all the expenses where payment methods is null as well as payment method is other
-                expense.paymentMethods == null || expense.paymentMethods!!.any { it in paymentMethodKeys }
-            } else {
-                expense.paymentMethods != null && expense.paymentMethods!!.any { it in paymentMethodKeys }
-            }
-        }
-
-        return resultExpenses
+        return expenseRepository.applyExpenseFilterByPaymentMethods(paymentMethodKeys, expenses)
     }
 
     fun getTotalExpenseByCategoryKeysAndDateRange(

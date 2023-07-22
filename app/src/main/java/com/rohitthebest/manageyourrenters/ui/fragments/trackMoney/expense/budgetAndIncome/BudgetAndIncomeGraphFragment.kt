@@ -11,12 +11,16 @@ import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.filter.ExpenseFilterDto
 import com.rohitthebest.manageyourrenters.databinding.FragmentBudgetAndIncomeGraphBinding
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
+import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.ShowPaymentMethodSelectorDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetAndIncomeGraphViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.BudgetViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.convertToJsonString
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.setListToSpinner
 import com.rohitthebest.manageyourrenters.utils.show
@@ -25,7 +29,8 @@ import dagger.hilt.android.AndroidEntryPoint
 private const val TAG = "BudgetAndIncomeGraphFragment"
 
 @AndroidEntryPoint
-class BudgetAndIncomeGraphFragment : Fragment(R.layout.fragment_budget_and_income_graph) {
+class BudgetAndIncomeGraphFragment : Fragment(R.layout.fragment_budget_and_income_graph),
+    ShowPaymentMethodSelectorDialogFragment.OnClickListener {
 
     private var _binding: FragmentBudgetAndIncomeGraphBinding? = null
     private val binding get() = _binding!!
@@ -35,6 +40,8 @@ class BudgetAndIncomeGraphFragment : Fragment(R.layout.fragment_budget_and_incom
 
     private var oldestYearWhenBudgetWasSaved = 2000
     private var selectedYear = 2020
+
+    private var expenseFilterDto: ExpenseFilterDto? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -97,10 +104,15 @@ class BudgetAndIncomeGraphFragment : Fragment(R.layout.fragment_budget_and_incom
             position = { position ->
 
                 selectedYear = yearList[position]
-                budgetAndIncomeGraphViewModel.getBarEntryDataForIncomeBudgetAndExpenseByYear(
-                    selectedYear
-                )
+                handleGraphData()
             }, {}
+        )
+    }
+
+    private fun handleGraphData() {
+
+        budgetAndIncomeGraphViewModel.getBarEntryDataForIncomeBudgetAndExpenseByYear(
+            selectedYear, expenseFilterDto?.paymentMethods ?: emptyList()
         )
     }
 
@@ -166,6 +178,62 @@ class BudgetAndIncomeGraphFragment : Fragment(R.layout.fragment_budget_and_incom
             showToast(requireContext(), getString(R.string.coming_soon))
             true
         }
+
+        binding.toolbar.menu.findItem(R.id.menu_filter_income_budget_graph_by_paymentMethods)
+            .setOnMenuItemClickListener {
+
+                showPaymentMethodSelectorDialog()
+
+                true
+            }
+
+    }
+
+    private fun showPaymentMethodSelectorDialog() {
+
+        requireActivity().supportFragmentManager.let { fragmentManager ->
+
+            val bundle = Bundle()
+            bundle.putString(
+                Constants.EXPENSE_FILTER_KEY,
+                if (expenseFilterDto == null) "" else expenseFilterDto.convertToJsonString()
+            )
+
+            ShowPaymentMethodSelectorDialogFragment.newInstance(
+                bundle
+            ).apply {
+                show(fragmentManager, TAG)
+            }.setOnClickListener(this)
+        }
+    }
+
+    override fun onFilterApply(selectedPaymentMethods: List<String>?) {
+
+        binding.toolbar.menu.findItem(R.id.menu_filter_income_budget_graph_by_paymentMethods)
+            .apply {
+
+                if (selectedPaymentMethods.isNullOrEmpty()) {
+                    this.icon =
+                        ContextCompat.getDrawable(
+                            requireContext(),
+                            R.drawable.baseline_filter_list_24
+                        )
+
+                    expenseFilterDto = null
+
+                } else {
+                    this.icon = ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.baseline_filter_list_colored_24
+                    )
+
+                    expenseFilterDto = ExpenseFilterDto()
+                    expenseFilterDto!!.isPaymentMethodEnabled = true
+                    expenseFilterDto!!.paymentMethods = selectedPaymentMethods
+                }
+            }
+
+        handleGraphData()
     }
 
     override fun onDestroyView() {

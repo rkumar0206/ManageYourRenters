@@ -2,7 +2,9 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.github.mikephil.charting.data.BarEntry
@@ -18,6 +20,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val TAG = "BudgetAndIncomeGraphViewModel"
+
 @HiltViewModel
 class BudgetAndIncomeGraphViewModel @Inject constructor(
     app: Application,
@@ -31,7 +35,8 @@ class BudgetAndIncomeGraphViewModel @Inject constructor(
             emptyMap()
         )
 
-    val incomeBudgetAndExpenseBarEntryData get() = _incomeBudgetAndExpenseBarEntryData
+    val incomeBudgetAndExpenseBarEntryData: LiveData<Map<String, MutableList<BarEntry>>>
+        get() = _incomeBudgetAndExpenseBarEntryData
 
     fun getBarEntryDataForIncomeBudgetAndExpenseByYear(
         year: Int,
@@ -47,11 +52,16 @@ class BudgetAndIncomeGraphViewModel @Inject constructor(
             // income
             val incomeTotals = if (paymentMethodKeys.isNotEmpty()) {
                 incomeTotalAfterApplyingPaymentMethodFilter(
-                    year, listOf(Constants.PAYMENT_METHOD_CASH_KEY)
+                    year, paymentMethodKeys
                 )
             } else {
                 incomeRepository.getAllTotalIncomeByYear(year).first()
             }
+
+            Log.d(
+                TAG,
+                "getBarEntryDataForIncomeBudgetAndExpenseByYear: incomeTotals: $incomeTotals"
+            )
 
             val incomeBarEntry = getIncomeBarEntry(incomeTotals)
 
@@ -70,7 +80,7 @@ class BudgetAndIncomeGraphViewModel @Inject constructor(
                     ).first()
 
 
-                val total: Double = try {
+                val expenseTotal: Double = try {
 
                     if (paymentMethodKeys.isNotEmpty()) {
                         getExpenseTotalAfterApplyingPaymentMethodFilter(
@@ -87,7 +97,7 @@ class BudgetAndIncomeGraphViewModel @Inject constructor(
                     0.0
                 }
 
-                monthAndTotalExpenseList.add(MonthAndTotalSum(i, total))
+                monthAndTotalExpenseList.add(MonthAndTotalSum(i, expenseTotal))
             }
 
             val expenseBarEntry = getExpenseBarEntry(monthAndTotalExpenseList)
@@ -97,6 +107,13 @@ class BudgetAndIncomeGraphViewModel @Inject constructor(
             consolidatedBarEntries[FirestoreCollectionsConstants.BUDGETS] = budgetBarEntry
             consolidatedBarEntries[FirestoreCollectionsConstants.INCOMES] = incomeBarEntry
             consolidatedBarEntries[FirestoreCollectionsConstants.EXPENSES] = expenseBarEntry
+
+            Log.d(
+                TAG,
+                "getBarEntryDataForIncomeBudgetAndExpenseByYear: ${
+                    consolidatedBarEntries[FirestoreCollectionsConstants.EXPENSES]
+                }"
+            )
 
             _incomeBudgetAndExpenseBarEntryData.value = consolidatedBarEntries
         }

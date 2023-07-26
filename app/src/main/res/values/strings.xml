@@ -417,6 +417,8 @@
     <string name="insights">Insights</string>
     <string name="income_vs_budget_vs_expense">Income vs Budget vs Expense</string>
     <string name="savings_growth">Savings Growth</string>
+    <string name="renter_dues">Renter dues</string>
+    <string name="revenue_all_time">Revenue - All Time</string>
 
     <string-array name="interest_time_schedule">
 

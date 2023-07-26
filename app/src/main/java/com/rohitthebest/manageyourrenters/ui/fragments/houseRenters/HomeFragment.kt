@@ -32,7 +32,7 @@ import com.rohitthebest.manageyourrenters.ui.activities.ShowImageActivity
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.fragments.SupportingDocumentDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.RenterViewModel
-import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getMillisecondsOfStartAndEndUsingConstants
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getPairOfDateInMillisInStringInDateString
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
@@ -40,11 +40,24 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAv
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showDateRangePickerDialog
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
+import com.rohitthebest.manageyourrenters.utils.convertRenterToJSONString
+import com.rohitthebest.manageyourrenters.utils.convertToJsonString
+import com.rohitthebest.manageyourrenters.utils.deleteFileFromFirebaseStorage
+import com.rohitthebest.manageyourrenters.utils.executeAfterDelay
+import com.rohitthebest.manageyourrenters.utils.format
+import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.isValid
+import com.rohitthebest.manageyourrenters.utils.onTextChanged
+import com.rohitthebest.manageyourrenters.utils.onTextSubmit
+import com.rohitthebest.manageyourrenters.utils.show
+import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Locale
+import kotlin.math.abs
 
 private const val TAG = "HomeFragment"
 
@@ -68,6 +81,9 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
     private var searchView: SearchView? = null
     private var listSize = 0
+
+    private var renterNameWithTheirDues: Map<String, Double>? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -103,6 +119,15 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         initListeners()
 
         observeRevenueGenerated()
+        observeRenterDues()
+    }
+
+    private fun observeRenterDues() {
+
+        renterViewModel.renterNameWithTheirDues.observe(viewLifecycleOwner) { renterNameAndTheirDuesMap ->
+
+            renterNameWithTheirDues = renterNameAndTheirDuesMap
+        }
     }
 
     private fun getRvState() {
@@ -564,7 +589,8 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
             .setOnMenuItemClickListener(this)
         binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_renter_revenue_custom_range)
             .setOnMenuItemClickListener(this)
-
+        binding.houseRentersHomeToolBar.menu.findItem(R.id.menu_renter_dues)
+            .setOnMenuItemClickListener(this)
     }
 
     private var d1 = System.currentTimeMillis() - (30 * Constants.ONE_DAY_MILLISECONDS)
@@ -588,6 +614,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
                 true
             }
+
             R.id.menu_show_deleted_renters -> {
 
                 findNavController().navigate(R.id.action_homeFragment_to_deletedRentersFragment)
@@ -657,14 +684,45 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
             R.id.menu_renter_revenue_all_time -> {
 
                 isRevenueObserveEnabled = true
-                revenueTitle = "Revenue - All Time"
+                revenueTitle = getString(R.string.revenue_all_time)
                 renterViewModel.getRentersWithTheirAmountPaid()
+
+                true
+            }
+
+            R.id.menu_renter_dues -> {
+
+                showDuesInAlertDialogBox()
 
                 true
             }
 
             else -> false
         }
+    }
+
+    private fun showDuesInAlertDialogBox() {
+
+        var totalDues = 0.0
+
+        val message = StringBuilder()
+
+        if (renterNameWithTheirDues != null && renterNameWithTheirDues!!.isNotEmpty()) {
+
+            renterNameWithTheirDues!!.forEach { entry ->
+                totalDues += abs(entry.value)
+                message.append("${entry.key}  ===>  ${abs(entry.value).format(2)}\n\n")
+            }
+        }
+
+        message.append("----------------------------------------\n\n")
+        message.append("     Total :   ${totalDues.format(2)}")
+
+
+        showAlertDialogWithTitleAndMessage(
+            getString(R.string.renter_dues),
+            message.toString()
+        )
     }
 
     private fun showRevenueMessageByDateRange(
@@ -737,7 +795,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton("Ok") { dialog, _ ->
+            .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
 
                 dialog.dismiss()
             }

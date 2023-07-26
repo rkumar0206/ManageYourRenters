@@ -55,6 +55,10 @@ interface RenterDao {
         endDate: Long
     ): Flow<Map<String, List<Double>>>
 
+    @MapInfo(keyColumn = "renterName", valueColumn = "dues")
+    @Query("SELECT renter_table.name AS renterName, renter_table.dueOrAdvanceAmount AS dues FROM renter_table WHERE dues < 0")
+    fun getRentersWithTheirDues(): Flow<Map<String, Double>>
+
     @Query("SELECT DISTINCT address FROM renter_table")
     fun getAllDistinctAddress(): Flow<List<String>>
 

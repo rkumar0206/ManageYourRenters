@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -32,6 +33,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_FRAGMENT_NAM
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_HOUSE_RENTERS
 import com.rohitthebest.manageyourrenters.others.Constants.SHORTCUT_MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.APP_UPDATES
+import com.rohitthebest.manageyourrenters.services.SyncDocumentsFromFirestoreService
 import com.rohitthebest.manageyourrenters.ui.ProfileBottomSheet
 import com.rohitthebest.manageyourrenters.ui.viewModels.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
@@ -228,15 +230,19 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
             SHORTCUT_EXPENSE -> {
                 onClick(binding.shortcutExpenses)
             }
+
             SHORTCUT_MONTHLY_PAYMENTS -> {
                 onClick(binding.shortcutMonthlyPayments)
             }
+
             SHORTCUT_EMI -> {
                 onClick(binding.shortcutEmis)
             }
+
             SHORTCUT_HOUSE_RENTERS -> {
                 onItemClick(RenterTypes(1, "", 0))
             }
+
             SHORTCUT_BORROWERS -> {
                 onItemClick(RenterTypes(2, "", 0))
             }
@@ -386,7 +392,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
                 if (isInternetAvailable(this)) {
 
-                    changeIsSyncedValue()
+                    changeIsSyncedValueToFalse(syncValuesAgain = true)
                     d.dismiss()
                 } else {
 
@@ -481,14 +487,15 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
             expenseCategoryViewModel.deleteAllExpenseCategories()
             monthlyPaymentCategoryViewModel.deleteAllMonthlyPaymentCategories()
             paymentMethodViewModel.deleteAllPaymentMethods()
-            changeIsSyncedValue()
+
+            changeIsSyncedValueToFalse(syncValuesAgain = false)
 
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private fun changeIsSyncedValue() {
+    private fun changeIsSyncedValueToFalse(syncValuesAgain: Boolean = false) {
 
         try {
 
@@ -507,7 +514,11 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
 
                 withContext(Dispatchers.Main) {
 
-                    navigateToLoginActivity()
+                    if (syncValuesAgain) {
+                        syncDataFromFirestore()
+                    } else {
+                        navigateToLoginActivity()
+                    }
                 }
             }
 
@@ -515,4 +526,16 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
             Log.e(TAG, "saveData: ${e.message}")
         }
     }
+
+    private fun syncDataFromFirestore() {
+
+        showToast(getString(R.string.syncing_values_now))
+
+        val foregroundService = Intent(
+            applicationContext,
+            SyncDocumentsFromFirestoreService::class.java
+        )
+        ContextCompat.startForegroundService(applicationContext, foregroundService)
+    }
+
 }

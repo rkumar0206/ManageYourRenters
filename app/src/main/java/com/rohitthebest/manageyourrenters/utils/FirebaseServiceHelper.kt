@@ -11,8 +11,16 @@ import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.COLLECTION_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DELETE_FILE_FROM_FIREBASE_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.DOCUMENT_KEY
+import com.rohitthebest.manageyourrenters.others.Constants.KEY_LIST_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPLOAD_DATA_KEY
-import com.rohitthebest.manageyourrenters.services.*
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
+import com.rohitthebest.manageyourrenters.services.DeleteAllDocumentsService
+import com.rohitthebest.manageyourrenters.services.DeleteFileFromFirebaseStorageService
+import com.rohitthebest.manageyourrenters.services.DeleteService
+import com.rohitthebest.manageyourrenters.services.UpdateService
+import com.rohitthebest.manageyourrenters.services.UploadDocumentListToFireStoreService
+import com.rohitthebest.manageyourrenters.services.UploadFileToCloudStorageService
+import com.rohitthebest.manageyourrenters.services.UploadService
 import kotlinx.coroutines.tasks.await
 import kotlin.random.Random
 
@@ -124,8 +132,14 @@ fun uploadListOfDataToFireStore(
         uploadData
     )
 
-    ContextCompat.startForegroundService(context, foregroundService)
+    if (collection != FirestoreCollectionsConstants.PARTIAL_PAYMENTS) {
+        foregroundService.putExtra(
+            KEY_LIST_KEY,
+            uploadData
+        )
+    }
 
+    ContextCompat.startForegroundService(context, foregroundService)
 }
 
 fun deleteAllDocumentsUsingKeyFromFirestore(
@@ -142,7 +156,7 @@ fun deleteAllDocumentsUsingKeyFromFirestore(
     )
 
     foregroundService.putExtra(
-        Constants.KEY_LIST_KEY,
+        KEY_LIST_KEY,
         keyList
     )
 

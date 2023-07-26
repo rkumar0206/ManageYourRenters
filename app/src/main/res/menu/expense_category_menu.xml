@@ -23,6 +23,9 @@
         android:id="@+id/menu_item_payment_methods_expense"
         android:title="@string/payment_methods"
         app:showAsAction="never" />
-
+    <item
+        android:id="@+id/menu_create_budget"
+        android:title="@string/budget_and_income"
+        app:showAsAction="never" />
 
 </menu>

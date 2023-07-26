@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_search_budget_list"
+        android:icon="@drawable/ic_baseline_search_24"
+        android:title="@string/search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/copy_previous_months_budget"
+        android:title="@string/copy_previous_month_s_budget"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/delete_all_budget_limit"
+        android:title="@string/delete_all_budget_for_this_month"
+        app:showAsAction="never" />
+
+</menu>

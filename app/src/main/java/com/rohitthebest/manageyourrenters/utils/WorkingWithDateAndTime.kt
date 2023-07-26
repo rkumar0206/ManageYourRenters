@@ -5,7 +5,10 @@ import android.util.Log
 import java.sql.Timestamp
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.YearMonth
 import java.util.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 @SuppressLint("SimpleDateFormat")
 object WorkingWithDateAndTime {
@@ -288,6 +291,94 @@ object WorkingWithDateAndTime {
         }
 
         return Pair(firstCal.timeInMillis, lastCal.timeInMillis)
+    }
+
+    fun getMonthAndYearString(month: Int, year: Int): String {
+
+        return "${month}_${year}"
+    }
+
+    fun extractMonthAndYearFromMonthAndYearString(monthYearString: String): Pair<Int, Int> {
+
+        return try {
+
+            val pattern = "(\\d+)_(\\d+)"
+            val regex: Pattern = Pattern.compile(pattern)
+            val matcher: Matcher = regex.matcher(monthYearString)
+
+            if (matcher.find()) {
+
+                val month = matcher.group(1)?.toInt()
+                val year = matcher.group(2)?.toInt()
+
+                return if (month != null && year != null) {
+
+                    Pair(month, year)
+                } else {
+                    Pair(0, 0)
+                }
+
+            } else {
+                return Pair(0, 0)
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Pair(0, 0)
+        }
+
+    }
+
+
+    fun getNextMonth(selectedMonth: Int): Int {
+
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.MONTH, selectedMonth)
+        cal.add(Calendar.MONTH, 1)
+        return cal.get(Calendar.MONTH)
+    }
+
+    fun getPreviousMonth(selectedMonth: Int): Int {
+
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.MONTH, selectedMonth)
+        cal.add(Calendar.MONTH, -1)
+        return cal.get(Calendar.MONTH)
+    }
+
+    fun getMillisecondsOfStartAndEndDayOfMonthForGivenMonthAndYear(
+        month: Int,
+        year: Int
+    ): Pair<Long, Long> {
+
+        val calendar = Calendar.getInstance()
+        calendar.set(year, month, 5)
+        val dateInMillis = calendar.timeInMillis
+        return getMillisecondsOfStartAndEndDayOfMonth(dateInMillis)
+    }
+
+    fun getNumberOfDaysInMonth(month: Int, year: Int): Int {
+
+        val yearMonth = YearMonth.of(year, month + 1)
+        return yearMonth.lengthOfMonth()
+    }
+
+    fun getNumberOfDaysLeftInAnyMonth(month: Int, year: Int): Int {
+
+        val currentYear = getCurrentYear()
+        val currentMonth = getCurrentMonth()
+        val numberOfDaysInMonth = getNumberOfDaysInMonth(month, year)
+
+        if (year < currentYear) return 0
+        if (year > currentYear) return numberOfDaysInMonth
+
+        if (month < currentMonth) return 0
+        if (month > currentMonth) return numberOfDaysInMonth
+
+        // year = current year and month = current month
+        val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+
+        return numberOfDaysInMonth - currentDay
     }
 
 }

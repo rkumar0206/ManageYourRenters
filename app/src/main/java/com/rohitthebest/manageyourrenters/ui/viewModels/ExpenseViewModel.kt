@@ -3,22 +3,36 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.*
-import com.rohitthebest.manageyourrenters.data.filter.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import com.rohitthebest.manageyourrenters.data.filter.ExpenseFilterDto
+import com.rohitthebest.manageyourrenters.data.filter.IntFilterOptions
+import com.rohitthebest.manageyourrenters.data.filter.SortFilter
+import com.rohitthebest.manageyourrenters.data.filter.SortOrder
+import com.rohitthebest.manageyourrenters.data.filter.StringFilterOptions
 import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.EXPENSES
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.MONTHLY_PAYMENTS
 import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
-import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.compareExpenseModel
+import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
+import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Calendar
 import java.util.regex.Pattern
 import javax.inject.Inject
+import kotlin.collections.set
 
 private const val TAG = "ExpenseViewModel"
 
@@ -390,25 +404,29 @@ class ExpenseViewModel @Inject constructor(
         return mExpenses
     }
 
-    private fun applyFilterByPaymentMethods(
+    fun applyFilterByPaymentMethods(
         paymentMethodKeys: List<String>,
         expenses: List<Expense>
     ): List<Expense> {
 
-        val isOtherPaymentMethodKeyPresent =
-            paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
-
-        val resultExpenses = expenses.filter { expense ->
-
-            if (isOtherPaymentMethodKeyPresent) {
-                // for other payment method, get all the expenses where payment methods is null as well as payment method is other
-                expense.paymentMethods == null || expense.paymentMethods!!.any { it in paymentMethodKeys }
-            } else {
-                expense.paymentMethods != null && expense.paymentMethods!!.any { it in paymentMethodKeys }
-            }
-        }
-
-        return resultExpenses
+        return expenseRepository.applyExpenseFilterByPaymentMethods(paymentMethodKeys, expenses)
     }
+
+    fun getTotalExpenseByCategoryKeysAndDateRange(
+        expenseCategoryKeys: List<String>,
+        date1: Long,
+        date2: Long
+    ) = expenseRepository.getTotalExpenseByCategoryKeysAndDateRange(
+        expenseCategoryKeys,
+        date1,
+        date2
+    ).asLiveData()
+
+    fun getExpenseByCategoryKeysAndDateRange(
+        expenseCategoryKeys: List<String>,
+        date1: Long,
+        date2: Long
+    ) = expenseRepository.getExpenseByCategoryKeysAndDateRange(expenseCategoryKeys, date1, date2)
+        .asLiveData()
 
 }

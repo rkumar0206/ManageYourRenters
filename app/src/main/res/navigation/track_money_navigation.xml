@@ -156,6 +156,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_expenseCategoryFragment_to_budgetAndIncomeFragment"
+            app:destination="@id/budgetAndIncomeFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/addEditExpenseCategoryFragment"
@@ -326,6 +333,11 @@
             android:name="paymentMethodKey"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="expenseFilterForBudgetAndIncome"
+            android:defaultValue="@null"
+            app:argType="com.rohitthebest.manageyourrenters.data.filter.BudgetAndIncomeExpenseFilter"
+            app:nullable="true" />
     </dialog>
     <fragment
         android:id="@+id/paymentMethodsFragment"
@@ -336,4 +348,84 @@
             android:id="@+id/action_paymentMethodsFragment_to_showExpenseBottomSheetFragment"
             app:destination="@id/showExpenseBottomSheetFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/budgetAndIncomeFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budgetAndIncome.BudgetAndIncomeOverviewFragment"
+        android:label="BudgetAndIncomeFragment"
+        tools:layout="@layout/fragment_budget">
+        <action
+            android:id="@+id/action_budgetAndIncomeFragment_to_addBudgetFragment"
+            app:destination="@id/addBudgetFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_budgetAndIncomeFragment_to_incomeFragment"
+            app:destination="@id/incomeFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_budgetAndIncomeFragment_to_showExpenseBottomSheetFragment"
+            app:destination="@id/showExpenseBottomSheetFragment" />
+        <action
+            android:id="@+id/action_budgetAndIncomeFragment_to_budgetAndIncomeGraphFragment"
+            app:destination="@id/budgetAndIncomeGraphFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_budgetAndIncomeFragment_to_addEditExpense"
+            app:destination="@id/addEditExpense"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/addBudgetFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budgetAndIncome.AddBudgetFragment"
+        android:label="AddBudgetFragment"
+        tools:layout="@layout/fragment_add_budget">
+        <argument
+            android:name="monthMessage"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="yearMessage"
+            android:defaultValue="2023"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_addBudgetFragment_to_showExpenseBottomSheetFragment"
+            app:destination="@id/showExpenseBottomSheetFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/incomeFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budgetAndIncome.IncomeFragment"
+        android:label="IncomeFragment"
+        tools:layout="@layout/fragment_income">
+        <argument
+            android:name="monthMessage"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="yearMessage"
+            android:defaultValue="2023"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/budgetAndIncomeGraphFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budgetAndIncome.BudgetAndIncomeGraphFragment"
+        android:label="BudgetAndIncomeGraphFragment"
+        app:enterAnim="@anim/fade_in"
+
+        app:exitAnim="@anim/slide_out_left"
+        app:popEnterAnim="@anim/slide_in_left"
+        app:popExitAnim="@anim/fade_out"
+        tools:layout="@layout/fragment_budget_and_income_graph" />
 </navigation>

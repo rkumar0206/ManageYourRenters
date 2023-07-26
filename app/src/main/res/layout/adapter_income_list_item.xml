@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="5dp"
+    android:layout_marginTop="3dp"
+    android:layout_marginEnd="5dp"
+    app:cardCornerRadius="10dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <TextView
+            android:id="@+id/incomeValueTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="middle"
+            android:gravity="end"
+            android:maxLines="2"
+            android:padding="3dp"
+            android:textColor="@color/color_green"
+            android:textSize="22sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView93"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="21000" />
+
+        <TextView
+            android:id="@+id/incomeSourceValueTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="middle"
+            android:gravity="end"
+            android:maxLines="3"
+            android:padding="3dp"
+            android:text="@string/Null"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView93"
+            app:layout_constraintTop_toBottomOf="@+id/divider122"
+            tools:text="Mummy ne diya" />
+
+        <TextView
+            android:id="@+id/lincomeLinkedPaymentMethodsTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="5dp"
+            android:ellipsize="middle"
+            android:maxLines="3"
+            android:padding="3dp"
+            android:text="@string/Null"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/incomeSyncBtn"
+            app:layout_constraintStart_toStartOf="@+id/textView100"
+            app:layout_constraintTop_toTopOf="@+id/incomeMenuBtn"
+            tools:text="CASH | HDFC | BOI | PNB | KOTAK |  OTHERS" />
+
+        <TextView
+            android:id="@+id/textView93"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:padding="5dp"
+            android:text="@string/income"
+            android:textColor="@color/blue_text_color"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/incomeValueTV"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/incomeValueTV" />
+
+        <TextView
+            android:id="@+id/textView95"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="@string/source"
+            android:textColor="@color/blue_text_color"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/incomeSourceValueTV"
+            app:layout_constraintStart_toStartOf="@+id/textView93"
+            app:layout_constraintTop_toTopOf="@+id/incomeSourceValueTV" />
+
+        <TextView
+            android:id="@+id/textView100"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:padding="5dp"
+            android:text="@string/linked_payment_methods"
+            android:textColor="@color/blue_text_color"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@+id/textView95"
+            app:layout_constraintTop_toBottomOf="@+id/divider123" />
+
+        <View
+            android:id="@+id/divider122"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/incomeValueTV" />
+
+        <View
+            android:id="@+id/divider123"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/incomeSourceValueTV" />
+
+        <ImageButton
+            android:id="@+id/incomeMenuBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/white"
+            android:contentDescription="@string/menubtn"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView100"
+            app:srcCompat="@drawable/ic_baseline_more_vert_24" />
+
+        <ImageButton
+            android:id="@+id/incomeSyncBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:contentDescription="@string/menubtn"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="@+id/incomeMenuBtn"
+            app:layout_constraintEnd_toStartOf="@+id/incomeMenuBtn"
+            app:layout_constraintTop_toTopOf="@+id/incomeMenuBtn"
+            app:srcCompat="@drawable/ic_baseline_sync_24" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

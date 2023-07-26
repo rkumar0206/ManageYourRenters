@@ -311,6 +311,11 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
                 findNavController().navigate(R.id.action_expenseCategoryFragment_to_paymentMethodsFragment)
                 true
             }
+        binding.toolbar.menu.findItem(R.id.menu_create_budget).setOnMenuItemClickListener {
+
+            findNavController().navigate(R.id.action_expenseCategoryFragment_to_budgetAndIncomeFragment)
+            true
+        }
     }
 
     private fun setNoExpenseCategoryMessageTvVisibility(isVisible: Boolean) {

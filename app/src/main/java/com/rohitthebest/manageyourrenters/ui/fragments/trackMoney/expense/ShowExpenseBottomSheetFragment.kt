@@ -117,8 +117,52 @@ class ShowExpenseBottomSheetFragment : BottomSheetDialogFragment(), ExpenseAdapt
                 ShowExpenseBottomSheetTagsEnum.PAYMENT_METHOD_FRAGMENT -> {
                     showInPaymentMethodFragment(args)
                 }
+
+                ShowExpenseBottomSheetTagsEnum.BUDGET_AND_INCOME_FRAGMENT -> {
+                    showInBudgetAndIncomeOverviewFragment(args)
+                }
             }
         }
+    }
+
+    private fun showInBudgetAndIncomeOverviewFragment(args: ShowExpenseBottomSheetFragmentArgs) {
+
+        val budgetAndIncomeExpenseFilter = args.expenseFilterForBudgetAndIncome
+        val date1 = args.date1
+        val date2 = args.date2 + Constants.ONE_DAY_MILLISECONDS
+
+        if (budgetAndIncomeExpenseFilter != null) {
+
+            if (budgetAndIncomeExpenseFilter.paymentMethods.isEmpty()) {
+
+                expenseViewModel.getExpenseByCategoryKeysAndDateRange(
+                    budgetAndIncomeExpenseFilter.categoryKeys,
+                    date1,
+                    date2
+                ).observe(viewLifecycleOwner) { expenses ->
+                    submitListToAdapter(expenses)
+                }
+            } else {
+
+                expenseViewModel.getExpenseByCategoryKeysAndDateRange(
+                    budgetAndIncomeExpenseFilter.categoryKeys,
+                    date1,
+                    date2
+                ).observe(viewLifecycleOwner) { expenses ->
+
+                    submitListToAdapter(
+                        expenseViewModel.applyFilterByPaymentMethods(
+                            budgetAndIncomeExpenseFilter.paymentMethods, expenses
+                        )
+                    )
+                }
+            }
+
+        } else {
+            showToast(requireContext(), getString(R.string.something_went_wrong))
+            dismiss()
+        }
+
     }
 
     private fun showInPaymentMethodFragment(args: ShowExpenseBottomSheetFragmentArgs) {

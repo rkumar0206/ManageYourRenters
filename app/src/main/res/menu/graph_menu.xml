@@ -10,6 +10,9 @@
                 android:id="@+id/menu_monthly_graph"
                 android:title="@string/monthly_graph" />
 
+            <item
+                android:id="@+id/menu_category_graph"
+                android:title="@string/category_graph" />
         </menu>
 
     </item>

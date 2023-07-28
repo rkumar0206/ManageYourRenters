@@ -199,6 +199,25 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             true
         }
 
+        binding.toolbar.menu.findItem(R.id.menu_category_graph).setOnMenuItemClickListener {
+
+            expenseViewModel.isAnyExpenseAdded().observe(viewLifecycleOwner) {
+
+                if (it) {
+                    val action = GraphFragmentDirections.actionGraphFragmentToMonthlyGraphFragment(
+                        true
+                    )
+                    findNavController().navigate(action)
+                } else {
+
+                    showToast(requireContext(), getString(R.string.no_expense_added))
+                }
+            }
+
+            true
+        }
+
+
         binding.toolbar.menu.findItem(R.id.menu_share_expense_graph_sc).setOnMenuItemClickListener {
 
             binding.toolbar.hide()

@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -12,7 +13,9 @@ import com.anychart.charts.Cartesian
 import com.anychart.enums.HoverMode
 import com.anychart.enums.TooltipPositionMode
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentMonthlyGraphBinding
+import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseGraphDataViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
@@ -31,24 +34,57 @@ class MonthlyGraphFragment : Fragment(R.layout.fragment_monthly_graph) {
 
     private val expenseGraphDataViewModel by viewModels<ExpenseGraphDataViewModel>()
     private val expenseViewModel by viewModels<ExpenseViewModel>()
+    private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
 
     private lateinit var cartesian: Cartesian
     private var selectedYear = 2020
+
+    private lateinit var expenseCategories: List<ExpenseCategory>
+    private lateinit var selectedCategory: ExpenseCategory
+
+    private var isCategoryEnabled = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMonthlyGraphBinding.bind(view)
 
-        observeExpenseOfEachMonth()
-
+        getMessage()
         setUpChart()
-        getStartAndEndYear()
-
-        loadData()
 
         binding.toolbar.setNavigationOnClickListener {
 
             requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+    }
+
+    private fun getMessage() {
+
+        if (!arguments?.isEmpty!!) {
+
+            val args = arguments?.let {
+
+                MonthlyGraphFragmentArgs.fromBundle(it)
+            }
+
+            isCategoryEnabled = args?.isCategoryExpenseEnabled ?: false
+            binding.mcvCategories.isVisible = isCategoryEnabled
+
+            if (isCategoryEnabled) {
+                observeAllExpenseCategories()
+            }
+            observeExpenseOfEachMonth()
+            getStartAndEndYear()
+        }
+    }
+
+    private fun observeAllExpenseCategories() {
+
+        expenseCategoryViewModel.getAllExpenseCategories().observe(viewLifecycleOwner) {
+            expenseCategories = it
+
+            if (it.isNotEmpty()) {
+                initCategorySpinner()
+            }
         }
     }
 
@@ -70,12 +106,23 @@ class MonthlyGraphFragment : Fragment(R.layout.fragment_monthly_graph) {
 
                 delay(500)
 
-                cartesian.title(
-                    getString(
-                        R.string.monthly_expense_for_the_year,
-                        selectedYear.toString()
+                if (isCategoryEnabled) {
+                    cartesian.title(
+                        getString(
+                            R.string.monthly_expense_for_the_year_and_category,
+                            selectedYear.toString(), selectedCategory.categoryName
+                        )
                     )
-                )
+                } else {
+
+                    cartesian.title(
+                        getString(
+                            R.string.monthly_expense_for_the_year,
+                            selectedYear.toString()
+                        )
+                    )
+                }
+
                 cartesian.data(data)
             }
         }
@@ -133,10 +180,43 @@ class MonthlyGraphFragment : Fragment(R.layout.fragment_monthly_graph) {
             { position ->
 
                 selectedYear = yearList[position]
-                loadData()
+                if (isCategoryEnabled) {
+                    loadDataForSelectedCategory()
+                } else {
+                    loadData()
+                }
             }, {}
         )
     }
+
+    private fun initCategorySpinner() {
+
+        if (this::expenseCategories.isInitialized) {
+
+            binding.mcvCategories.isVisible = expenseCategories.isNotEmpty()
+
+            if (expenseCategories.isNotEmpty()) {
+
+                binding.categorySpinner.setListToSpinner(
+                    requireContext(),
+                    expenseCategories.map { it.categoryName },
+                    { position ->
+
+                        selectedCategory = expenseCategories[position]
+                        loadDataForSelectedCategory()
+                    }, {}
+                )
+            }
+        }
+    }
+
+    private fun loadDataForSelectedCategory() {
+        expenseGraphDataViewModel.getExpensesOfAllMonthsOfYearForSelectedCategory(
+            selectedYear,
+            selectedCategory.key
+        )
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

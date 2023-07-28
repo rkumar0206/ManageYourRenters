@@ -189,4 +189,47 @@ class ExpenseGraphDataViewModel @Inject constructor(
         }
 
     }
+
+    fun getExpensesOfAllMonthsOfYearForSelectedCategory(
+        year: Int,
+        selectedExpenseCategoryKey: String
+    ) {
+
+        val context = getApplication<Application>().applicationContext
+
+        viewModelScope.launch {
+
+            val listOfExpensesInEachMonth = ArrayList<Pair<String, Double>>()
+            val monthList = context.resources.getStringArray(R.array.months_short).asList()
+
+            for (i in 1..12) {
+
+                val calendar = Calendar.getInstance()
+                calendar.set(year, i - 1, 2)
+
+                val startAndEndDateInMillis =
+                    WorkingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonth(
+                        calendar.timeInMillis
+                    )
+
+                val amount = try {
+                    expenseRepository.getTotalExpenseAmountByCategoryKeyAndDateRange(
+                        selectedExpenseCategoryKey,
+                        startAndEndDateInMillis.first,
+                        startAndEndDateInMillis.second + Constants.ONE_DAY_MILLISECONDS
+                    ).first()
+
+                } catch (e: NullPointerException) {
+                    e.printStackTrace()
+                    0.0
+                }
+
+                listOfExpensesInEachMonth.add(Pair(monthList[i - 1], amount))
+            }
+
+            _expenseOfEachMonth.value = listOfExpensesInEachMonth
+        }
+
+    }
+
 }

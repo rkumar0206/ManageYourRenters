@@ -423,6 +423,9 @@
     <string name="no_data_available">No Data available!!!</string>
     <string name="month">Month</string>
     <string name="monthly_expense_for_the_year">Monthly expense for the year : %1$s</string>
+    <string name="monthly_expense_for_the_year_and_category">Monthly expense for the year: %1$s, category: %2$s</string>
+    <string name="category_graph">Category graph</string>
+    <string name="select_from_category">Select categories spinner</string>
 
     <string-array name="interest_time_schedule">
 

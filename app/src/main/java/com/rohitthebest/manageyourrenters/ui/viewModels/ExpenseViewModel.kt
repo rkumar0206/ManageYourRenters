@@ -21,7 +21,6 @@ import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
 import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
-import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.compareExpenseModel
 import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
 import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
@@ -29,7 +28,6 @@ import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.Calendar
 import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.collections.set
@@ -247,52 +245,6 @@ class ExpenseViewModel @Inject constructor(
     fun getExpensesByExpenseCategoryKey(expenseCategoryKey: String) =
         expenseRepository.getExpensesByExpenseCategoryKey(expenseCategoryKey).asLiveData()
 
-    private val _expenseOfEachMonth = MutableLiveData<List<Double>>(emptyList())
-    val expenseOfEachMonth: LiveData<List<Double>> get() = _expenseOfEachMonth
-
-    fun getExpensesOfAllMonthsOfYear(year: Int) {
-
-        viewModelScope.launch {
-
-            val calendars = ArrayList<Calendar>()
-
-            val listOfExpensesInEachMonth = ArrayList<Double>()
-
-            for (i in 1..12) {
-
-                calendars.add(Calendar.getInstance())
-                calendars[i - 1].set(year, i - 1, 2)
-
-                val startAndEndDateInMillis =
-                    WorkingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonth(
-                        calendars[i - 1].timeInMillis
-                    )
-
-                val amount = try {
-                    expenseRepository.getTotalExpenseAmountByDateRange(
-                        startAndEndDateInMillis.first,
-                        startAndEndDateInMillis.second + Constants.ONE_DAY_MILLISECONDS
-                    ).first()
-
-                } catch (e: NullPointerException) {
-                    e.printStackTrace()
-                    0.0
-                }
-
-                listOfExpensesInEachMonth.add(amount)
-
-                Log.d(
-                    TAG,
-                    "getExpensesOfAllMonthsOfYear: Year : $year, Month : ${
-                        calendars[i - 1].get(Calendar.MONTH)
-                    }, Amount : $amount"
-                )
-            }
-
-            _expenseOfEachMonth.value = listOfExpensesInEachMonth
-        }
-
-    }
 
     // issue #78
     private val _expensesByPaymentMethods = MutableLiveData<List<Expense>>(emptyList())
@@ -429,4 +381,5 @@ class ExpenseViewModel @Inject constructor(
     ) = expenseRepository.getExpenseByCategoryKeysAndDateRange(expenseCategoryKeys, date1, date2)
         .asLiveData()
 
+    fun isAnyExpenseAdded() = expenseRepository.isAnyExpenseAdded().asLiveData()
 }

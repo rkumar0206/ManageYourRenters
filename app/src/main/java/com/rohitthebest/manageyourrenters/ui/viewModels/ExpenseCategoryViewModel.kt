@@ -241,4 +241,6 @@ class ExpenseCategoryViewModel @Inject constructor(
 
     fun getAllExpenseCategories() = expenseCategoryRepository.getAllExpenseCategories().asLiveData()
 
+    fun getAllExpenseCategoriesByLimit(limit: Int) =
+        expenseCategoryRepository.getAllExpenseCategoriesByLimit(limit).asLiveData()
 }

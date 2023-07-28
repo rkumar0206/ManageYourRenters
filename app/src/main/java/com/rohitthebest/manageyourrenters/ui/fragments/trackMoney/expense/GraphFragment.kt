@@ -24,6 +24,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.CUSTOM_DATE_RANGE_FOR
 import com.rohitthebest.manageyourrenters.others.Constants.CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.ONE_DAY_MILLISECONDS
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseGraphDataViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
@@ -43,9 +44,12 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
     private val expenseViewModel by viewModels<ExpenseViewModel>()
+    private val expenseGraphDataViewModel by viewModels<ExpenseGraphDataViewModel>()
 
     private lateinit var pie: Pie
     private var isAllTimeSelected = false
+    private var d1 = System.currentTimeMillis() - (ONE_DAY_MILLISECONDS * 30)
+    private var d2 = System.currentTimeMillis()
 
     private var selectedCustomDateRangeMenu: CustomDateRange? = CustomDateRange.ALL_TIME
 
@@ -61,6 +65,53 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
         handleDateRangeSelectionMenu(selectedCustomDateRangeMenu ?: CustomDateRange.ALL_TIME)
         initListeners()
+
+        observeExpenseGraphData()
+    }
+
+    private fun observeExpenseGraphData() {
+
+        expenseGraphDataViewModel.expenseGraphData.observe(viewLifecycleOwner) {
+
+            if (it != null && it.first.isNotEmpty()) {
+
+                val expenseCategoryNameAndTheirTotalList = it.first
+                val total = it.second
+
+                pie.legend().title("Total expense : ${total.format(3)}")
+
+                val data = ArrayList<DataEntry>()
+
+                expenseCategoryNameAndTheirTotalList.forEach { expenseCategoryAndTheirTotalExpenseAmounts ->
+
+                    data.add(
+                        ValueDataEntry(
+                            expenseCategoryAndTheirTotalExpenseAmounts.categoryName,
+                            expenseCategoryAndTheirTotalExpenseAmounts.totalAmount
+                        )
+                    )
+                }
+
+                lifecycleScope.launch {
+
+                    delay(500)
+
+                    Log.d(TAG, "getAllExpenseCategory: $data")
+
+                    if (data.isNotEmpty()) {
+
+                        binding.chart.show()
+                        pie.data(data)
+                        //binding.chart.setChart(pie)
+                    } else {
+
+                        binding.chart.hide()
+                        showToast(requireContext(), getString(R.string.no_data_available))
+                    }
+
+                }
+            }
+        }
     }
 
     private fun loadCustomDateRangeValueFromSharedPreference() {
@@ -107,9 +158,6 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         binding.chart.setChart(pie)
     }
 
-    private var d1 = System.currentTimeMillis() - (ONE_DAY_MILLISECONDS * 30)
-    private var d2 = System.currentTimeMillis()
-
     private fun initListeners() {
 
         binding.toolbar.setNavigationOnClickListener {
@@ -118,7 +166,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
         binding.toolbar.menu.findItem(R.id.menu_deep_analyze_expense).setOnMenuItemClickListener {
 
-            expenseCategoryViewModel.getAllExpenseCategories().observe(viewLifecycleOwner) {
+            expenseCategoryViewModel.getAllExpenseCategoriesByLimit(2).observe(viewLifecycleOwner) {
 
                 if (it.size >= 2) {
 
@@ -138,9 +186,9 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
         binding.toolbar.menu.findItem(R.id.menu_monthly_graph).setOnMenuItemClickListener {
 
-            expenseViewModel.getAllExpenses().observe(viewLifecycleOwner) {
+            expenseViewModel.isAnyExpenseAdded().observe(viewLifecycleOwner) {
 
-                if (it.isNotEmpty()) {
+                if (it) {
                     findNavController().navigate(R.id.action_graphFragment_to_monthlyGraphFragment)
                 } else {
 
@@ -225,14 +273,9 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
                 if (!isAllTimeSelected) {
 
-                    Log.d(
-                        TAG,
-                        "handleDateRangeSelectionMenu: all time selected : $isAllTimeSelected"
-                    )
-
                     isAllTimeSelected = true
 
-                    getExpenseCategoryExpensesByAllTime()
+                    expenseGraphDataViewModel.getTotalExpenseAmountsWithTheirExpenseCategoryNames()
 
                     changeSelectionUI()
 
@@ -330,7 +373,8 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         if (!isAllTimeSelected) {
 
             changeSelectionUI()
-            getExpenseCategoryExpensesByDateRange(
+
+            expenseGraphDataViewModel.getTotalExpenseAmountsWithTheirExpenseCategoryNamesByDateRange(
                 d1,
                 d2
             )
@@ -355,148 +399,6 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                 )
             }"
 
-        }
-    }
-
-    private fun getExpenseCategoryExpensesByDateRange(date1: Long?, date2: Long?) {
-
-        if (!isAllTimeSelected) {
-
-            Log.d(TAG, "getExpenseCategoryExpensesByDateRange: ")
-
-            expenseViewModel.getTotalExpenseAmountByDateRange(
-                date1!!,
-                date2!! + ONE_DAY_MILLISECONDS
-            )
-                .observe(viewLifecycleOwner) { total ->
-
-                    pie.legend().title("Total expense : %.3f".format(total))
-                }
-
-
-            expenseCategoryViewModel.getAllExpenseCategories()
-                .observe(viewLifecycleOwner) { expenseCategories ->
-
-                    if (expenseCategories.isNotEmpty()) {
-
-                        val data = ArrayList<DataEntry>()
-
-                        expenseCategories.forEach { expenseCategory ->
-
-                            lifecycleScope.launch {
-
-                                try {
-                                    expenseViewModel.getExpenseAmountSumByExpenseCategoryByDateRange(
-                                        expenseCategory.key, date1, date2 + ONE_DAY_MILLISECONDS
-                                    ).collect { amount ->
-
-                                        Log.d(
-                                            TAG,
-                                            "getExpenseCategoryExpensesByDateRange: category : ${expenseCategory.categoryName} -> amount : $amount"
-                                        )
-
-                                        data.add(
-                                            ValueDataEntry(
-                                                expenseCategory.categoryName,
-                                                amount
-                                            )
-                                        )
-                                    }
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            }
-                        }
-
-                        lifecycleScope.launch {
-
-                            delay(500)
-
-                            Log.d(TAG, "getAllExpenseCategory: $data")
-
-                            if (data.isNotEmpty()) {
-
-                                binding.chart.show()
-                                pie.data(data)
-                            } else {
-
-                                binding.chart.hide()
-                                showToast(requireContext(), "No data found")
-                            }
-                        }
-
-                    }
-                }
-        }
-
-    }
-
-    private fun getExpenseCategoryExpensesByAllTime() {
-
-        if (isAllTimeSelected) {
-
-
-            Log.d(TAG, "getExpenseCategoryExpensesByAllTime: ")
-
-            expenseViewModel.getTotalExpenseAmount().observe(viewLifecycleOwner) { total ->
-
-                pie.legend().title("Total expense : ${total.format(3)}")
-            }
-
-            expenseCategoryViewModel.getAllExpenseCategories()
-                .observe(viewLifecycleOwner) { expenseCategories ->
-
-                    if (expenseCategories.isNotEmpty()) {
-
-                        val data = ArrayList<DataEntry>()
-
-                        expenseCategories.forEach { expenseCategory ->
-
-                            lifecycleScope.launch {
-
-                                try {
-                                    expenseViewModel.getExpenseAmountSumByExpenseCategoryKey(
-                                        expenseCategory.key
-                                    ).collect { amount ->
-
-                                        Log.d(
-                                            TAG,
-                                            "getExpenseCategoryExpensesByAllTime: category : ${expenseCategory.categoryName} -> amount : $amount"
-                                        )
-
-                                        data.add(
-                                            ValueDataEntry(
-                                                expenseCategory.categoryName,
-                                                amount
-                                            )
-                                        )
-                                    }
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            }
-                        }
-
-                        lifecycleScope.launch {
-
-                            delay(500)
-
-                            Log.d(TAG, "getAllExpenseCategory: $data")
-
-                            if (data.isNotEmpty()) {
-
-                                binding.chart.show()
-                                pie.data(data)
-                                //binding.chart.setChart(pie)
-                            } else {
-
-                                binding.chart.hide()
-                            }
-
-                        }
-
-                    }
-                }
         }
     }
 

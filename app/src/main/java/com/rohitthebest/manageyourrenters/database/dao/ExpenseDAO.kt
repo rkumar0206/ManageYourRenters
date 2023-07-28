@@ -1,6 +1,7 @@
 package com.rohitthebest.manageyourrenters.database.dao
 
 import androidx.room.*
+import com.rohitthebest.manageyourrenters.data.ExpenseCategoryAndTheirTotalExpenseAmounts
 import com.rohitthebest.manageyourrenters.database.model.Expense
 import kotlinx.coroutines.flow.Flow
 
@@ -60,6 +61,12 @@ interface ExpenseDAO {
         date2: Long
     ): Flow<Double>
 
+    @Query("SELECT SUM(amount) FROM expense_table WHERE categoryKey IN (:expenseCategoryKeys)")
+    fun getTotalExpenseByCategoryKeys(
+        expenseCategoryKeys: List<String>
+    ): Flow<Double>
+
+
     @Query("SELECT SUM(amount) FROM expense_table WHERE categoryKey IN (:expenseCategoryKeys) AND created BETWEEN :date1 AND :date2")
     fun getTotalExpenseByCategoryKeysAndDateRange(
         expenseCategoryKeys: List<String>,
@@ -103,4 +110,65 @@ interface ExpenseDAO {
 
     @Query("UPDATE expense_table SET isSynced = 0 WHERE `key` = :key")
     suspend fun updateIsSyncedValueToFalse(key: String)
+
+    @Query(
+        "SELECT expense_category_table.`key` as expenseCategoryKey, " +
+                "expense_category_table.categoryName AS categoryName, " +
+                "SUM(expense_table.amount) AS totalAmount " +
+                "FROM expense_table " +
+                "INNER JOIN expense_category_table " +
+                "ON expense_table.categoryKey = expense_category_table.`key` " +
+                "GROUP BY expense_category_table.`key`"
+    )
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeys(): Flow<List<ExpenseCategoryAndTheirTotalExpenseAmounts>>
+
+    @Query(
+        "SELECT expense_category_table.`key` AS expenseCategoryKey, " +
+                "expense_category_table.categoryName AS categoryName, " +
+                "SUM(expense_table.amount) AS totalAmount " +
+                "FROM expense_table " +
+                "INNER JOIN expense_category_table " +
+                "ON expense_table.categoryKey = expense_category_table.`key` " +
+                "WHERE expense_table.created BETWEEN :date1 AND :date2 " +
+                "GROUP BY expense_category_table.`key`"
+    )
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRange(
+        date1: Long,
+        date2: Long
+    ): Flow<List<ExpenseCategoryAndTheirTotalExpenseAmounts>>
+
+    @Query(
+        "SELECT expense_category_table.`key` AS expenseCategoryKey, " +
+                "expense_category_table.categoryName AS categoryName, " +
+                "SUM(expense_table.amount) AS totalAmount " +
+                "FROM expense_table " +
+                "INNER JOIN expense_category_table " +
+                "ON expense_table.categoryKey = expense_category_table.`key` " +
+                "WHERE expense_table.categoryKey IN (:selectedExpenseCategories) " +
+                "GROUP BY expense_category_table.`key`"
+    )
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysForSelectedExpenseCategories(
+        selectedExpenseCategories: List<String>
+    ): Flow<List<ExpenseCategoryAndTheirTotalExpenseAmounts>>
+
+    @Query(
+        "SELECT expense_category_table.`key` AS expenseCategoryKey, " +
+                "expense_category_table.categoryName AS categoryName, " +
+                "SUM(expense_table.amount) AS totalAmount " +
+                "FROM expense_table " +
+                "INNER JOIN expense_category_table " +
+                "ON expense_table.categoryKey = expense_category_table.`key` " +
+                "WHERE expense_table.categoryKey IN (:selectedExpenseCategories) " +
+                "AND expense_table.created BETWEEN :date1 AND :date2 " +
+                "GROUP BY expense_category_table.`key`"
+    )
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysForSelectedExpenseCategoriesByDateRange(
+        selectedExpenseCategories: List<String>,
+        date1: Long,
+        date2: Long
+    ): Flow<List<ExpenseCategoryAndTheirTotalExpenseAmounts>>
+
+
+    @Query("SELECT EXISTS(select `key` from expense_table limit 1)")
+    fun isAnyExpenseAdded(): Flow<Boolean>
 }

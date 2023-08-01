@@ -1,5 +1,7 @@
-// done
-- all the data should be created in viewModels and not in the fragments
-- add new graph in expense graph
-    - individual category graph
-- add option to filter data in graph using payment methods (#107)
+- add menu option to show overview of a particular budget
+- create a fragment for showing the overview
+- Also in BudgetAndIncomOverviewFragment, for all the budget, also show message, like,
+    1. You are on track
+    2. You are almost exceeding the budget
+    3. You reached your budget limit
+    4. You are overspent then your budget limit.

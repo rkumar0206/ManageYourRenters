@@ -71,6 +71,7 @@ class MonthlyGraphFragment : Fragment(R.layout.fragment_monthly_graph) {
 
             if (isCategoryEnabled) {
                 observeAllExpenseCategories()
+                binding.toolbar.title = getString(R.string.monthly_category_expense_graph)
             }
             observeExpenseOfEachMonth()
             getStartAndEndYear()
@@ -146,6 +147,11 @@ class MonthlyGraphFragment : Fragment(R.layout.fragment_monthly_graph) {
 
         cartesian.xAxis(0).title(getString(R.string.month))
         cartesian.yAxis(0).title(getString(R.string.expense))
+
+        cartesian.labels(true)
+        cartesian.labels().format("{%value}")
+        cartesian.labels().fontSize(10)
+        cartesian.labels().fontColor("#4D4C4C")
 
         binding.chart.setChart(cartesian)
     }

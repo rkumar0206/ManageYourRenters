@@ -68,7 +68,6 @@ class Functions {
 
         private val mAuth = Firebase.auth
 
-        private const val TAG = "Functions"
         fun showToast(context: Context, message: Any?, duration: Int = Toast.LENGTH_SHORT) {
             try {
                 Log.d(TAG, message.toString())
@@ -978,7 +977,10 @@ class Functions {
                     )
                 } else {
 
-                    PendingIntent.getActivity(context, 0, notificationIntent, 0)
+                    PendingIntent.getActivity(
+                        context, 0, notificationIntent,
+                        PendingIntent.FLAG_IMMUTABLE
+                    )
                 }
 
             }

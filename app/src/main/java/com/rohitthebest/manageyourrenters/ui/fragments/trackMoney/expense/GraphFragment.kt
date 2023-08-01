@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,10 +20,13 @@ import com.anychart.enums.LegendLayout
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
 import com.rohitthebest.manageyourrenters.data.ShowExpenseBottomSheetTagsEnum
+import com.rohitthebest.manageyourrenters.data.filter.ExpenseFilterDto
 import com.rohitthebest.manageyourrenters.databinding.FragmentGraphBinding
+import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.Constants.CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.CUSTOM_DATE_RANGE_FOR_GRAPH_FRAGMENT_SHARED_PREF_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.ONE_DAY_MILLISECONDS
+import com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.ShowPaymentMethodSelectorDialogFragment
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseGraphDataViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
@@ -37,7 +41,8 @@ import kotlinx.coroutines.launch
 private const val TAG = "GraphFragment"
 
 @AndroidEntryPoint
-class GraphFragment : Fragment(R.layout.fragment_graph) {
+class GraphFragment : Fragment(R.layout.fragment_graph),
+    ShowPaymentMethodSelectorDialogFragment.OnClickListener {
 
     private var _binding: FragmentGraphBinding? = null
     private val binding get() = _binding!!
@@ -52,6 +57,8 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
     private var d2 = System.currentTimeMillis()
 
     private var selectedCustomDateRangeMenu: CustomDateRange? = CustomDateRange.ALL_TIME
+
+    private var expenseFilterDto: ExpenseFilterDto? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -78,7 +85,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                 val expenseCategoryNameAndTheirTotalList = it.first
                 val total = it.second
 
-                pie.legend().title("Total expense : ${total.format(3)}")
+                pie.legend().title(getString(R.string.total_expense, total.format(3)))
 
                 val data = ArrayList<DataEntry>()
 
@@ -96,22 +103,29 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
                     delay(500)
 
-                    Log.d(TAG, "getAllExpenseCategory: $data")
+                    Log.d(TAG, "getAllExpenseCategory: ${data.size}")
 
                     if (data.isNotEmpty()) {
 
                         binding.chart.show()
+                        binding.noDataTV.hide()
                         pie.data(data)
-                        //binding.chart.setChart(pie)
                     } else {
 
-                        binding.chart.hide()
-                        showToast(requireContext(), getString(R.string.no_data_available))
+                        handleUIForNoDataAvailable()
                     }
-
                 }
+            } else {
+                handleUIForNoDataAvailable()
             }
         }
+    }
+
+    private fun handleUIForNoDataAvailable() {
+
+        binding.chart.hide()
+        binding.noDataTV.show()
+        showToast(requireContext(), getString(R.string.no_data_available))
     }
 
     private fun loadCustomDateRangeValueFromSharedPreference() {
@@ -140,7 +154,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
         binding.chart.setProgressBar(binding.progressBar)
 
         pie.title().enabled(true)
-        pie.title("All time")
+        pie.title(getString(R.string.all_time))
         //pie.title("Expenses on each category")
 
         pie.labels().position("outside")
@@ -166,93 +180,44 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
         binding.toolbar.menu.findItem(R.id.menu_deep_analyze_expense).setOnMenuItemClickListener {
 
-            expenseCategoryViewModel.getAllExpenseCategoriesByLimit(2).observe(viewLifecycleOwner) {
-
-                if (it.size >= 2) {
-
-                    findNavController().navigate(R.id.action_graphFragment_to_deepAnalyzeExpenseFragment)
-                } else {
-
-                    showToast(
-                        requireContext(),
-                        getString(R.string.depp_analyze_error_message),
-                        Toast.LENGTH_LONG
-                    )
-                }
-            }
-
+            handleCategoryCompareGraph()
             true
         }
 
         binding.toolbar.menu.findItem(R.id.menu_monthly_graph).setOnMenuItemClickListener {
 
-            expenseViewModel.isAnyExpenseAdded().observe(viewLifecycleOwner) {
-
-                if (it) {
-                    findNavController().navigate(R.id.action_graphFragment_to_monthlyGraphFragment)
-                } else {
-
-                    showToast(requireContext(), getString(R.string.no_expense_added))
-                }
-            }
-
+            handleMonthlyGraphMenu()
             true
         }
 
         binding.toolbar.menu.findItem(R.id.menu_category_graph).setOnMenuItemClickListener {
 
-            expenseViewModel.isAnyExpenseAdded().observe(viewLifecycleOwner) {
-
-                if (it) {
-                    val action = GraphFragmentDirections.actionGraphFragmentToMonthlyGraphFragment(
-                        true
-                    )
-                    findNavController().navigate(action)
-                } else {
-
-                    showToast(requireContext(), getString(R.string.no_expense_added))
-                }
-            }
-
+            handleCategoryGraph()
             true
         }
 
 
         binding.toolbar.menu.findItem(R.id.menu_share_expense_graph_sc).setOnMenuItemClickListener {
 
-            binding.toolbar.hide()
-
-            val bitmap = binding.root.loadBitmap()
-
-            binding.toolbar.show()
-
-            lifecycleScope.launch {
-
-                saveBitmapToCacheDirectoryAndShare(requireActivity(), bitmap)
-            }
-
+            handleShareExpenseGraphScreenshotMenu()
             true
         }
 
         binding.toolbar.menu.findItem(R.id.menu_save_expense_graph_sc).setOnMenuItemClickListener {
 
-            binding.toolbar.hide()
+            handleSaveExpenseGraphScreenshotMenu()
+            true
+        }
 
-            val bitmap = binding.root.loadBitmap()
+        binding.toolbar.menu.findItem(R.id.menu_filter_expense_graph).setOnMenuItemClickListener {
 
-            binding.toolbar.show()
-
-            bitmap.saveToStorage(requireContext(), "${getUid()}_expense_graph")
-
-            showToast(requireContext(), "Screenshot saved to phone storage")
-
+            handleFilterExpenseGraphMenu()
             true
         }
 
         binding.dateRangeMenuBtn.setOnClickListener { view ->
 
             showMenuForSelectingCustomTime(view)
-
         }
 
         binding.dateRangeCv.setOnClickListener {
@@ -263,10 +228,145 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
                     date1 = d1,
                     date2 = d2,
                     callingFragementTag = ShowExpenseBottomSheetTagsEnum.GRAPH_FRAGMENT,
-                    paymentMethodKey = null
+                    paymentMethodKey = if (expenseFilterDto != null && !expenseFilterDto?.paymentMethods.isNullOrEmpty()) {
+                        convertStringListToJSON(expenseFilterDto?.paymentMethods ?: emptyList())
+                    } else {
+                        null
+                    }
                 )
             findNavController().navigate(action)
         }
+    }
+
+    private fun handleFilterExpenseGraphMenu() {
+
+        //showing Payment Method Selector Dialog
+
+        requireActivity().supportFragmentManager.let { fragmentManager ->
+
+            val bundle = Bundle()
+            bundle.putString(
+                Constants.EXPENSE_FILTER_KEY,
+                if (expenseFilterDto == null) "" else expenseFilterDto.convertToJsonString()
+            )
+
+            ShowPaymentMethodSelectorDialogFragment.newInstance(
+                bundle
+            ).apply {
+                show(fragmentManager, TAG)
+            }.setOnClickListener(this)
+        }
+
+    }
+
+    override fun onFilterApply(selectedPaymentMethods: List<String>?) {
+
+        binding.toolbar.menu.findItem(R.id.menu_filter_expense_graph)
+            .apply {
+
+                if (selectedPaymentMethods.isNullOrEmpty()) {
+                    this.icon =
+                        ContextCompat.getDrawable(
+                            requireContext(),
+                            R.drawable.baseline_filter_list_24
+                        )
+
+                    expenseFilterDto = null
+
+                } else {
+                    this.icon = ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.baseline_filter_list_colored_24
+                    )
+
+                    expenseFilterDto = ExpenseFilterDto()
+                    expenseFilterDto!!.isPaymentMethodEnabled = true
+                    expenseFilterDto!!.paymentMethods = selectedPaymentMethods
+                }
+            }
+
+        if (selectedCustomDateRangeMenu == CustomDateRange.ALL_TIME) {
+            // making this value to false, so it will enter the ALL_TIME case in handleDateRangeSelectionMenu function
+            isAllTimeSelected = false
+        }
+
+        handleDateRangeSelectionMenu(selectedCustomDateRangeMenu ?: CustomDateRange.ALL_TIME)
+    }
+
+    private fun handleSaveExpenseGraphScreenshotMenu() {
+
+        binding.toolbar.hide()
+
+        val bitmap = binding.root.loadBitmap()
+
+        binding.toolbar.show()
+
+        bitmap.saveToStorage(requireContext(), "${getUid()}_expense_graph")
+
+        showToast(requireContext(), getString(R.string.screenshot_saved_to_phone_storage))
+    }
+
+    private fun handleShareExpenseGraphScreenshotMenu() {
+
+        binding.toolbar.hide()
+
+        val bitmap = binding.root.loadBitmap()
+
+        binding.toolbar.show()
+
+        lifecycleScope.launch {
+
+            saveBitmapToCacheDirectoryAndShare(requireActivity(), bitmap)
+        }
+    }
+
+    private fun handleCategoryGraph() {
+
+        expenseViewModel.isAnyExpenseAdded().observe(viewLifecycleOwner) {
+
+            if (it) {
+                val action = GraphFragmentDirections.actionGraphFragmentToMonthlyGraphFragment(
+                    true
+                )
+                findNavController().navigate(action)
+            } else {
+
+                showToast(requireContext(), getString(R.string.no_expense_added))
+            }
+        }
+
+    }
+
+    private fun handleMonthlyGraphMenu() {
+
+        expenseViewModel.isAnyExpenseAdded().observe(viewLifecycleOwner) {
+
+            if (it) {
+                findNavController().navigate(R.id.action_graphFragment_to_monthlyGraphFragment)
+            } else {
+
+                showToast(requireContext(), getString(R.string.no_expense_added))
+            }
+        }
+    }
+
+    private fun handleCategoryCompareGraph() {
+
+        expenseCategoryViewModel.getAllExpenseCategoriesByLimit(2).observe(viewLifecycleOwner) {
+
+            if (it.size >= 2) {
+
+                findNavController().navigate(R.id.action_graphFragment_to_deepAnalyzeExpenseFragment)
+            } else {
+
+                showToast(
+                    requireContext(),
+                    getString(R.string.depp_analyze_error_message),
+                    Toast.LENGTH_LONG
+                )
+            }
+        }
+
     }
 
     private fun showMenuForSelectingCustomTime(view: View) {
@@ -294,7 +394,14 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
                     isAllTimeSelected = true
 
-                    expenseGraphDataViewModel.getTotalExpenseAmountsWithTheirExpenseCategoryNames()
+                    Log.d(
+                        TAG,
+                        "handleDateRangeSelectionMenu: paymentMethods: ${expenseFilterDto?.paymentMethods}"
+                    )
+
+                    expenseGraphDataViewModel.getTotalExpenseAmountsWithTheirExpenseCategoryNames(
+                        expenseFilterDto?.paymentMethods ?: emptyList()
+                    )
 
                     changeSelectionUI()
 
@@ -394,8 +501,9 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
             changeSelectionUI()
 
             expenseGraphDataViewModel.getTotalExpenseAmountsWithTheirExpenseCategoryNamesByDateRange(
-                d1,
-                d2
+                date1 = d1,
+                date2 = d2 + ONE_DAY_MILLISECONDS,
+                paymentMethodKeys = expenseFilterDto?.paymentMethods ?: emptyList()
             )
         }
     }
@@ -405,7 +513,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 
         if (isAllTimeSelected) {
 
-            binding.dateRangeTv.text = "All time"
+            binding.dateRangeTv.text = getString(R.string.all_time)
         } else {
 
             binding.dateRangeTv.text = "${

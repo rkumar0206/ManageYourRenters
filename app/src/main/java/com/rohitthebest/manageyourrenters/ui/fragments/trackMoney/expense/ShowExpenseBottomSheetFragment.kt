@@ -19,6 +19,7 @@ import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.convertJSONToStringList
 import com.rohitthebest.manageyourrenters.utils.isValid
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -133,31 +134,22 @@ class ShowExpenseBottomSheetFragment : BottomSheetDialogFragment(), ExpenseAdapt
 
         if (budgetAndIncomeExpenseFilter != null) {
 
-            if (budgetAndIncomeExpenseFilter.paymentMethods.isEmpty()) {
+            expenseViewModel.getExpenseByCategoryKeysAndDateRange(
+                budgetAndIncomeExpenseFilter.categoryKeys,
+                date1,
+                date2
+            ).observe(viewLifecycleOwner) { expenses ->
 
-                expenseViewModel.getExpenseByCategoryKeysAndDateRange(
-                    budgetAndIncomeExpenseFilter.categoryKeys,
-                    date1,
-                    date2
-                ).observe(viewLifecycleOwner) { expenses ->
-                    submitListToAdapter(expenses)
-                }
-            } else {
-
-                expenseViewModel.getExpenseByCategoryKeysAndDateRange(
-                    budgetAndIncomeExpenseFilter.categoryKeys,
-                    date1,
-                    date2
-                ).observe(viewLifecycleOwner) { expenses ->
-
-                    submitListToAdapter(
+                submitListToAdapter(
+                    if (budgetAndIncomeExpenseFilter.paymentMethods.isEmpty()) {
+                        expenses
+                    } else {
                         expenseViewModel.applyFilterByPaymentMethods(
                             budgetAndIncomeExpenseFilter.paymentMethods, expenses
                         )
-                    )
-                }
+                    }
+                )
             }
-
         } else {
             showToast(requireContext(), getString(R.string.something_went_wrong))
             dismiss()
@@ -197,24 +189,37 @@ class ShowExpenseBottomSheetFragment : BottomSheetDialogFragment(), ExpenseAdapt
         date1 = args.date1
         date2 = args.date2 + Constants.ONE_DAY_MILLISECONDS
 
+        val paymentMethodKeys =
+            if (args.paymentMethodKey.isValid()) convertJSONToStringList(args.paymentMethodKey) else emptyList()
+
         if (dateRangeEnum == CustomDateRange.ALL_TIME) {
-            getAllExpenses()
+            getAllExpenses(paymentMethodKeys)
         } else if (dateRangeEnum == CustomDateRange.CUSTOM_DATE_RANGE) {
-            getExpensesByDateRange()
+            getExpensesByDateRange(paymentMethodKeys)
         }
     }
 
-    private fun getExpensesByDateRange() {
+    private fun getExpensesByDateRange(paymentMethodKeys: List<String?> = emptyList()) {
 
         expenseViewModel.getExpensesByDateRange(date1, date2)
             .observe(viewLifecycleOwner) { expenses ->
-                submitListToAdapter(expenses)
+                submitListToAdapter(
+                    if (paymentMethodKeys.isEmpty()) expenses else expenseViewModel.applyFilterByPaymentMethods(
+                        paymentMethodKeys,
+                        expenses
+                    )
+                )
             }
     }
 
-    private fun getAllExpenses() {
+    private fun getAllExpenses(paymentMethodKeys: List<String?> = emptyList()) {
         expenseViewModel.getAllExpenses().observe(viewLifecycleOwner) { expenses ->
-            submitListToAdapter(expenses)
+            submitListToAdapter(
+                if (paymentMethodKeys.isEmpty()) expenses else expenseViewModel.applyFilterByPaymentMethods(
+                    paymentMethodKeys,
+                    expenses
+                )
+            )
         }
     }
 

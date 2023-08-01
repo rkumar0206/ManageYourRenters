@@ -83,17 +83,18 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
                         myBudget.budgetLimit.format(2)
                     )
 
-                    //Log.d(TAG, "setData: budget: $myBudget")
-
                     val numberOfDaysLeftInMonth =
                         WorkingWithDateAndTime.getNumberOfDaysLeftInAnyMonth(
                             myBudget.month, myBudget.year
                         )
 
-                    //Log.d(TAG, "setData: numberOfDaysLeftInMonth: $numberOfDaysLeftInMonth")
+                    Log.d(TAG, "setData: numberOfDaysLeftInMonth: $numberOfDaysLeftInMonth")
 
-                    var perDayExpense =
+                    var perDayExpense = if (numberOfDaysLeftInMonth != 0) {
                         (myBudget.budgetLimit - myBudget.currentExpenseAmount) / numberOfDaysLeftInMonth
+                    } else {
+                        0.0
+                    }
 
                     if (perDayExpense < 0) perDayExpense = 0.0
 
@@ -112,17 +113,6 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
                     }
 
                     changeProgressColorsByProgressPercent(progressInPercent)
-
-                    Log.d(
-                        TAG,
-                        "setData: ${myBudget.categoryName} - percent: $progressInPercent"
-                    )
-                    Log.d(
-                        TAG,
-                        "setData: ${myBudget.categoryName} - progressDrawable: ${
-                            changeProgressColorsByProgressPercent(progressInPercent).hashCode()
-                        }"
-                    )
 
                     baProgressBar.max = myBudget.budgetLimit.toInt()
 

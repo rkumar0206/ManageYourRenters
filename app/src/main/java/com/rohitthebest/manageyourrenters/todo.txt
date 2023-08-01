@@ -1,8 +1,5 @@
-- remove the anyChart library and replace with MPChart
-- add option to filter data in graph using payment methods (#107)
-
-
 // done
 - all the data should be created in viewModels and not in the fragments
 - add new graph in expense graph
     - individual category graph
+- add option to filter data in graph using payment methods (#107)

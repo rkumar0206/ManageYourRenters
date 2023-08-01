@@ -101,8 +101,20 @@ class ExpenseRepository @Inject constructor(
     fun getTotalExpenseAmountsWithTheirExpenseCategoryKeys() =
         dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeys()
 
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByListOfExpenseKeys(
+        expenseKeys: List<String>
+    ) = dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByListOfExpenseKeys(expenseKeys)
+
     fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRange(date1: Long, date2: Long) =
         dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRange(date1, date2)
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRangeAndByListOfExpenseKeys(
+        date1: Long,
+        date2: Long,
+        expenseKeys: List<String>
+    ) = dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRangeAndByListOfExpenseKeys(
+        date1, date2, expenseKeys
+    )
 
     fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysForSelectedExpenseCategories(
         selectedExpenseCategories: List<String>
@@ -124,7 +136,7 @@ class ExpenseRepository @Inject constructor(
     fun isAnyExpenseAdded() = dao.isAnyExpenseAdded()
 
     fun applyExpenseFilterByPaymentMethods(
-        paymentMethodKeys: List<String>,
+        paymentMethodKeys: List<String?>,
         expenses: List<Expense>
     ): List<Expense> {
 

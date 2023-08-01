@@ -357,7 +357,7 @@ class ExpenseViewModel @Inject constructor(
     }
 
     fun applyFilterByPaymentMethods(
-        paymentMethodKeys: List<String>,
+        paymentMethodKeys: List<String?>,
         expenses: List<Expense>
     ): List<Expense> {
 

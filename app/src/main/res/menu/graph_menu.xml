@@ -2,36 +2,52 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item
+        android:id="@+id/menu_filter_expense_graph"
+        android:icon="@drawable/baseline_filter_list_24"
+        android:title="@string/add_filter"
+        app:showAsAction="ifRoom" />
+
     <item android:title="@string/graphs">
 
         <menu>
 
             <item
                 android:id="@+id/menu_monthly_graph"
+                android:icon="@drawable/ic_baseline_bar_chart_24"
                 android:title="@string/monthly_graph" />
 
             <item
                 android:id="@+id/menu_category_graph"
+                android:icon="@drawable/ic_baseline_bar_chart_24"
                 android:title="@string/category_graph" />
+
+            <item
+                android:id="@+id/menu_deep_analyze_expense"
+                android:icon="@drawable/ic_baseline_show_chart_24"
+                android:title="@string/deep_analyze_mode"
+                app:showAsAction="never" />
         </menu>
 
     </item>
 
-    <item
-        android:id="@+id/menu_share_expense_graph_sc"
-        android:icon="@drawable/ic_baseline_share_24"
-        android:title="@string/share_screenshot"
-        app:showAsAction="never" />
+    <item android:title="@string/screenshot">
 
-    <item
-        android:id="@+id/menu_save_expense_graph_sc"
-        android:icon="@drawable/ic_baseline_save_24"
-        android:title="@string/save_screenshot"
-        app:showAsAction="never" />
+        <menu>
+            <item
+                android:id="@+id/menu_share_expense_graph_sc"
+                android:icon="@drawable/ic_baseline_share_24"
+                android:title="@string/share_screenshot"
+                app:showAsAction="never" />
 
-    <item
-        android:id="@+id/menu_deep_analyze_expense"
-        android:icon="@drawable/ic_baseline_show_chart_24"
-        android:title="@string/deep_analyze_mode"
-        app:showAsAction="ifRoom" />
+            <item
+                android:id="@+id/menu_save_expense_graph_sc"
+                android:icon="@drawable/ic_baseline_save_24"
+                android:title="@string/save_screenshot"
+                app:showAsAction="never" />
+
+        </menu>
+
+    </item>
+
 </menu>

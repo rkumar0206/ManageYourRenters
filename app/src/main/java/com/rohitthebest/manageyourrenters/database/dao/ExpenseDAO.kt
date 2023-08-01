@@ -123,6 +123,21 @@ interface ExpenseDAO {
     fun getTotalExpenseAmountsWithTheirExpenseCategoryKeys(): Flow<List<ExpenseCategoryAndTheirTotalExpenseAmounts>>
 
     @Query(
+        "SELECT expense_category_table.`key` as expenseCategoryKey, " +
+                "expense_category_table.categoryName AS categoryName, " +
+                "SUM(expense_table.amount) AS totalAmount " +
+                "FROM expense_table " +
+                "INNER JOIN expense_category_table " +
+                "ON expense_table.categoryKey = expense_category_table.`key` " +
+                "WHERE expense_table.`key` in (:expenseKeys) " +
+                "GROUP BY expense_category_table.`key`"
+    )
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByListOfExpenseKeys(
+        expenseKeys: List<String>
+    ): Flow<List<ExpenseCategoryAndTheirTotalExpenseAmounts>>
+
+
+    @Query(
         "SELECT expense_category_table.`key` AS expenseCategoryKey, " +
                 "expense_category_table.categoryName AS categoryName, " +
                 "SUM(expense_table.amount) AS totalAmount " +
@@ -136,6 +151,24 @@ interface ExpenseDAO {
         date1: Long,
         date2: Long
     ): Flow<List<ExpenseCategoryAndTheirTotalExpenseAmounts>>
+
+    @Query(
+        "SELECT expense_category_table.`key` AS expenseCategoryKey, " +
+                "expense_category_table.categoryName AS categoryName, " +
+                "SUM(expense_table.amount) AS totalAmount " +
+                "FROM expense_table " +
+                "INNER JOIN expense_category_table " +
+                "ON expense_table.categoryKey = expense_category_table.`key` " +
+                "WHERE expense_table.created BETWEEN :date1 AND :date2 " +
+                "AND expense_table.`key` IN (:expenseKeys) " +
+                "GROUP BY expense_category_table.`key`"
+    )
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRangeAndByListOfExpenseKeys(
+        date1: Long,
+        date2: Long,
+        expenseKeys: List<String>
+    ): Flow<List<ExpenseCategoryAndTheirTotalExpenseAmounts>>
+
 
     @Query(
         "SELECT expense_category_table.`key` AS expenseCategoryKey, " +

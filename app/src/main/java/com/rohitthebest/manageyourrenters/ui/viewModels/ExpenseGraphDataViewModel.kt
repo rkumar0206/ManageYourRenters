@@ -31,20 +31,35 @@ class ExpenseGraphDataViewModel @Inject constructor(
         MutableLiveData<Pair<List<ExpenseCategoryAndTheirTotalExpenseAmounts>, Double>>()
     val expenseGraphData: LiveData<Pair<List<ExpenseCategoryAndTheirTotalExpenseAmounts>, Double>> get() = _expenseGraphData
 
-    fun getTotalExpenseAmountsWithTheirExpenseCategoryNames() {
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryNames(paymentMethodKeys: List<String> = emptyList()) {
 
         viewModelScope.launch {
 
             val expenseCategoriesWithTheirAmounts =
                 try {
-                    expenseRepository.getTotalExpenseAmountsWithTheirExpenseCategoryKeys().first()
+                    if (paymentMethodKeys.isEmpty()) {
+                        expenseRepository.getTotalExpenseAmountsWithTheirExpenseCategoryKeys()
+                            .first()
+                    } else {
+                        getExpenseCategoriesAndTheirAmountsAfterFilteringByPaymentMethods(
+                            paymentMethodKeys
+                        )
+                    }
                 } catch (e: Exception) {
                     emptyList()
                 }
 
-            val totalAmount = try {
-                expenseRepository.getTotalExpenseAmount().first()
-            } catch (e: NullPointerException) {
+            val totalAmount = if (expenseCategoriesWithTheirAmounts.isNotEmpty()) {
+                try {
+                    if (paymentMethodKeys.isEmpty()) {
+                        expenseRepository.getTotalExpenseAmount().first()
+                    } else {
+                        expenseCategoriesWithTheirAmounts.sumOf { it.totalAmount }
+                    }
+                } catch (e: NullPointerException) {
+                    0.0
+                }
+            } else {
                 0.0
             }
 
@@ -52,30 +67,80 @@ class ExpenseGraphDataViewModel @Inject constructor(
         }
     }
 
-    fun getTotalExpenseAmountsWithTheirExpenseCategoryNamesByDateRange(date1: Long, date2: Long) {
+    private suspend fun getExpenseCategoriesAndTheirAmountsAfterFilteringByPaymentMethods(
+        paymentMethodKeys: List<String>
+    ): List<ExpenseCategoryAndTheirTotalExpenseAmounts> {
+
+        val expenses = expenseRepository.getAllExpenses().first()
+
+        val filteredList =
+            expenseRepository.applyExpenseFilterByPaymentMethods(paymentMethodKeys, expenses)
+
+        return expenseRepository.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByListOfExpenseKeys(
+            filteredList.map { expense -> expense.key }
+        ).first()
+    }
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryNamesByDateRange(
+        date1: Long,
+        date2: Long,
+        paymentMethodKeys: List<String> = emptyList()
+    ) {
 
         viewModelScope.launch {
             val expenseCategoriesWithTheirAmounts =
                 try {
-                    expenseRepository.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRange(
-                        date1,
-                        date2
-                    ).first()
+                    if (paymentMethodKeys.isEmpty()) {
+                        expenseRepository.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRange(
+                            date1,
+                            date2
+                        ).first()
+                    } else {
+                        getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRangeAndFilterByPaymentMethods(
+                            date1,
+                            date2,
+                            paymentMethodKeys
+                        )
+                    }
                 } catch (e: Exception) {
                     emptyList()
                 }
 
-            val totalAmount = try {
-                expenseRepository.getTotalExpenseAmountByDateRange(
-                    date1,
-                    date2 + Constants.ONE_DAY_MILLISECONDS
-                ).first()
-            } catch (e: java.lang.NullPointerException) {
+            val totalAmount = if (expenseCategoriesWithTheirAmounts.isNotEmpty()) {
+                try {
+                    if (paymentMethodKeys.isEmpty()) {
+                        expenseRepository.getTotalExpenseAmountByDateRange(
+                            date1,
+                            date2
+                        ).first()
+                    } else {
+                        expenseCategoriesWithTheirAmounts.sumOf { it.totalAmount }
+                    }
+                } catch (e: java.lang.NullPointerException) {
+                    0.0
+                }
+            } else {
                 0.0
             }
 
             setValueForExpenseGraphDataPair(expenseCategoriesWithTheirAmounts, totalAmount)
         }
+    }
+
+    private suspend fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRangeAndFilterByPaymentMethods(
+        date1: Long,
+        date2: Long,
+        paymentMethodKeys: List<String>
+    ): List<ExpenseCategoryAndTheirTotalExpenseAmounts> {
+
+        val expenses = expenseRepository.getExpensesByDateRange(date1, date2).first()
+
+        val filteredList =
+            expenseRepository.applyExpenseFilterByPaymentMethods(paymentMethodKeys, expenses)
+
+        return expenseRepository.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRangeAndByListOfExpenseKeys(
+            date1, date2, filteredList.map { expense -> expense.key }
+        ).first()
     }
 
     fun getTotalExpenseAmountWithTheirExpenseCategoryNamesForSelectedExpenseCategories(

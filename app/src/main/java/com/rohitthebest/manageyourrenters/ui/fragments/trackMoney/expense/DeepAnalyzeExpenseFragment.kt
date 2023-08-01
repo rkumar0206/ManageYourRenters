@@ -26,9 +26,16 @@ import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.databinding.FragmentDeepAnalyzeExpenseBinding
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseGraphDataViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
-import com.rohitthebest.manageyourrenters.utils.*
+import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
+import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.executeAfterDelay
+import com.rohitthebest.manageyourrenters.utils.format
+import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.loadAnyValueFromSharedPreference
+import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -46,6 +53,7 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
     private val expenseViewModel by viewModels<ExpenseViewModel>()
+    private val expenseGraphDataViewModel by viewModels<ExpenseGraphDataViewModel>()
 
     private lateinit var pie: Pie
 
@@ -79,6 +87,50 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
         getAllExpenseCategories()
 
         initListeners()
+
+        observerExpenseGraphData()
+    }
+
+    private fun observerExpenseGraphData() {
+
+        expenseGraphDataViewModel.expenseGraphData.observe(viewLifecycleOwner) {
+
+            if (it != null && it.first.isNotEmpty()) {
+
+                val expenseCategoryNameAndTheirTotalList = it.first
+                val total = it.second
+
+                pie.title("Total expense amount: ${total.format(2)}")
+
+                val data = ArrayList<DataEntry>()
+
+                expenseCategoryNameAndTheirTotalList.forEach { expenseCategoryAndTheirTotalExpenseAmounts ->
+
+                    data.add(
+                        ValueDataEntry(
+                            expenseCategoryAndTheirTotalExpenseAmounts.categoryName,
+                            expenseCategoryAndTheirTotalExpenseAmounts.totalAmount
+                        )
+                    )
+                }
+
+                lifecycleScope.launch {
+
+                    delay(500)
+
+                    if (data.isNotEmpty()) {
+
+                        binding.chart.show()
+                        pie.data(data)
+                    } else {
+
+                        binding.chart.hide()
+                        showToast(requireContext(), getString(R.string.no_data_available))
+                    }
+
+                }
+            }
+        }
     }
 
     private fun loadCustomDateRangeValueFromSharedPreference() {
@@ -243,12 +295,16 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
                     CustomDateRange.THIS_MONTH -> binding.toolbar.subtitle =
                         getString(R.string.this_month)
+
                     CustomDateRange.THIS_WEEK -> binding.toolbar.subtitle =
                         getString(R.string.this_week)
+
                     CustomDateRange.PREVIOUS_MONTH -> binding.toolbar.subtitle =
                         getString(R.string.previous_month)
+
                     CustomDateRange.PREVIOUS_WEEK -> binding.toolbar.subtitle =
                         getString(R.string.previous_week)
+
                     else -> {}
                 }
                 initChartData()
@@ -380,146 +436,22 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
         val selectedCategories =
             deepAnalyzeExpenseCategoryAdapter.currentList.filter { expenseCategory ->
-
                 expenseCategory.isSelected
-            }
-
-        getTotalExpenseAmount(selectedCategories)
-
-        prepareChart(selectedCategories)
-
-    }
-
-    private fun prepareChart(selectedCategories: List<ExpenseCategory>) {
-
-        if (selectedCategories.isNotEmpty()) {
-
-            val data = ArrayList<DataEntry>()
-
-            selectedCategories.forEach { expenseCategory ->
-
-                lifecycleScope.launch {
-
-                    if (!isDateRangeSelected) {
-
-                        // get the all time amount
-
-                        try {
-                            expenseViewModel.getExpenseAmountSumByExpenseCategoryKey(
-                                expenseCategory.key
-                            ).collect { amount ->
-
-                                data.add(
-                                    ValueDataEntry(
-                                        expenseCategory.categoryName,
-                                        amount
-                                    )
-                                )
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-
-                    } else {
-
-                        // get the amount by the date range selected
-
-                        try {
-                            expenseViewModel.getExpenseAmountSumByExpenseCategoryByDateRange(
-                                expenseCategory.key,
-                                startDate,
-                                endDate + Constants.ONE_DAY_MILLISECONDS
-                            ).collect { amount ->
-
-                                data.add(
-                                    ValueDataEntry(
-                                        expenseCategory.categoryName,
-                                        amount
-                                    )
-                                )
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-
-                    }
-
-                }
-            }
-
-            lifecycleScope.launch {
-
-                delay(500)
-
-                if (data.isNotEmpty()) {
-
-                    binding.chart.show()
-                    pie.data(data)
-                    //binding.chart.setChart(pie)
-                } else {
-
-                    binding.chart.hide()
-                    showToast(requireContext(), "No Data available!!!")
-                }
-
-            }
-
-        }
-
-    }
-
-    private fun getTotalExpenseAmount(selectedCategories: List<ExpenseCategory>) {
-
-        var total = 0.0
+            }.map { it.key }
 
         if (!isDateRangeSelected) {
 
-            selectedCategories.forEach { expenseCategory ->
-
-                expenseViewModel.getTotalExpenseAmountByExpenseCategory(expenseCategory.key)
-                    .observe(viewLifecycleOwner) { amount ->
-
-                        try {
-
-                            total += amount
-                        } catch (e: NullPointerException) {
-
-                            e.printStackTrace()
-                        }
-
-                    }
-            }
+            expenseGraphDataViewModel.getTotalExpenseAmountWithTheirExpenseCategoryNamesForSelectedExpenseCategories(
+                selectedCategories
+            )
         } else {
 
-            selectedCategories.forEach { expenseCategory ->
-
-
-                expenseViewModel.getTotalExpenseAmountByCategoryKeyAndDateRange(
-                    expenseCategory.key,
-                    startDate,
-                    endDate + Constants.ONE_DAY_MILLISECONDS
-                )
-                    .observe(viewLifecycleOwner) { amount ->
-
-                        try {
-
-                            total += amount
-                        } catch (e: Exception) {
-
-                            e.printStackTrace()
-                        }
-                    }
-
-            }
-
+            expenseGraphDataViewModel.getTotalExpenseAmountWithTheirExpenseCategoryNamesForSelectedExpenseCategoriesByDateRange(
+                selectedCategories,
+                startDate,
+                endDate + Constants.ONE_DAY_MILLISECONDS
+            )
         }
-
-        lifecycleScope.launch {
-            delay(500)
-            pie.title("Total expense amount: $total")
-
-        }
-
     }
 
     private var changeChartDataJob: Job? = null
@@ -530,7 +462,10 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
 
             if (getSelectedExpenseCategoryCount() <= 2) {
 
-                showToast(requireContext(), "Minimum two categories has to be selected")
+                showToast(
+                    requireContext(),
+                    getString(R.string.minimum_two_categories_needs_to_be_selected)
+                )
                 return
             }
         }
@@ -551,19 +486,9 @@ class DeepAnalyzeExpenseFragment : Fragment(R.layout.fragment_deep_analyze_expen
             binding.clearSelectionFAB.enable()
         }
 
-        try {
+        changeChartDataJob = lifecycleScope.launch {
 
-            if (changeChartDataJob != null && changeChartDataJob?.isActive == true) {
-
-                changeChartDataJob?.cancel()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-
-            changeChartDataJob = lifecycleScope.launch {
-
-                delay(250)
+            changeChartDataJob.executeAfterDelay(250) {
 
                 initChartData()
             }

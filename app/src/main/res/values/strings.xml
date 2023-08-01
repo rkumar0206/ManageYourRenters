@@ -207,7 +207,7 @@
     <string name="show_all_expenses">Show All Expenses</string>
     <string name="expense_disabled_message">expense shortcut is disabled for now</string>
     <string name="house_renters_disabled_message">house renters shortcut is disabled</string>
-    <string name="deep_analyze_mode">Deep analyze mode</string>
+    <string name="deep_analyze_mode">Category compare graph</string>
     <string name="add_remove_expense_category_selection">Add Remove Expense category selection</string>
     <string name="add_remove_payment_method_selection">Add Remove payment method selection</string>
     <string name="clear_selection_fab">clear selection fab</string>
@@ -419,6 +419,16 @@
     <string name="savings_growth">Savings Growth</string>
     <string name="renter_dues">Renter dues</string>
     <string name="revenue_all_time">Revenue - All Time</string>
+    <string name="minimum_two_categories_needs_to_be_selected">Minimum two categories needs to be selected</string>
+    <string name="no_data_available">No Data available!!!</string>
+    <string name="month">Month</string>
+    <string name="monthly_expense_for_the_year">Monthly expense for the year : %1$s</string>
+    <string name="monthly_expense_for_the_year_and_category">Monthly expense for the year: %1$s and Category: %2$s</string>
+    <string name="category_graph">Category graph</string>
+    <string name="select_from_category">Select categories spinner</string>
+    <string name="monthly_category_expense_graph">Monthly category expense graph</string>
+    <string name="screenshot">Screenshot</string>
+    <string name="screenshot_saved_to_phone_storage">Screenshot saved to phone storage</string>
 
     <string-array name="interest_time_schedule">
 

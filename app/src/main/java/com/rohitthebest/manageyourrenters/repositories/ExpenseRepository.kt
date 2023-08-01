@@ -64,6 +64,10 @@ class ExpenseRepository @Inject constructor(
     ) =
         dao.getTotalExpenseAmountByCategoryKeyAndDateRange(expenseCategoryKey, date1, date2)
 
+    fun getTotalExpenseByCategoryKeys(
+        expenseCategoryKeys: List<String>
+    ) = dao.getTotalExpenseByCategoryKeys(expenseCategoryKeys)
+
     fun getTotalExpenseByCategoryKeysAndDateRange(
         expenseCategoryKeys: List<String>,
         date1: Long,
@@ -94,8 +98,45 @@ class ExpenseRepository @Inject constructor(
     suspend fun getKeysByExpenseCategoryKey(expenseCategoryKey: String) =
         dao.getKeysByExpenseCategoryKey(expenseCategoryKey)
 
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeys() =
+        dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeys()
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByListOfExpenseKeys(
+        expenseKeys: List<String>
+    ) = dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByListOfExpenseKeys(expenseKeys)
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRange(date1: Long, date2: Long) =
+        dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRange(date1, date2)
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRangeAndByListOfExpenseKeys(
+        date1: Long,
+        date2: Long,
+        expenseKeys: List<String>
+    ) = dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRangeAndByListOfExpenseKeys(
+        date1, date2, expenseKeys
+    )
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysForSelectedExpenseCategories(
+        selectedExpenseCategories: List<String>
+    ) = dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysForSelectedExpenseCategories(
+        selectedExpenseCategories
+    )
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysForSelectedExpenseCategoriesByDateRange(
+        selectedExpenseCategories: List<String>,
+        date1: Long,
+        date2: Long
+    ) =
+        dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysForSelectedExpenseCategoriesByDateRange(
+            selectedExpenseCategories,
+            date1,
+            date2
+        )
+
+    fun isAnyExpenseAdded() = dao.isAnyExpenseAdded()
+
     fun applyExpenseFilterByPaymentMethods(
-        paymentMethodKeys: List<String>,
+        paymentMethodKeys: List<String?>,
         expenses: List<Expense>
     ): List<Expense> {
 

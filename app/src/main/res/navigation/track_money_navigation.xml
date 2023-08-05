@@ -391,6 +391,14 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_budgetAndIncomeFragment_to_budgetOverviewFragment"
+            app:destination="@id/budgetOverviewFragment"
+
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/addBudgetFragment"
@@ -433,4 +441,22 @@
         app:popEnterAnim="@anim/slide_in_left"
         app:popExitAnim="@anim/fade_out"
         tools:layout="@layout/fragment_budget_and_income_graph" />
+    <fragment
+        android:id="@+id/budgetOverviewFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.budgetAndIncome.BudgetOverviewFragment"
+        android:label="BudgetOverviewFragment"
+        tools:layout="@layout/fragment_budget_overview">
+        <argument
+            android:name="budgetKeyMessage"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="month"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="year"
+            android:defaultValue="0"
+            app:argType="integer" />
+    </fragment>
 </navigation>

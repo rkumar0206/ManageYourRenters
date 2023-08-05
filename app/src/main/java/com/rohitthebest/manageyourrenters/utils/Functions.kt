@@ -687,16 +687,19 @@ class Functions {
                         onMenuItemClicked(CustomDateRange.THIS_MONTH)
                         true
                     }
+
                     R.id.menu_date_range_this_week -> {
 
                         onMenuItemClicked(CustomDateRange.THIS_WEEK)
                         true
                     }
+
                     R.id.menu_date_range_previous_month -> {
 
                         onMenuItemClicked(CustomDateRange.PREVIOUS_MONTH)
                         true
                     }
+
                     R.id.menu_date_range_previous_week -> {
 
                         onMenuItemClicked(CustomDateRange.PREVIOUS_WEEK)
@@ -707,18 +710,22 @@ class Functions {
                         onMenuItemClicked(CustomDateRange.LAST_30_DAYS)
                         true
                     }
+
                     R.id.menu_date_range_last_7_days -> {
                         onMenuItemClicked(CustomDateRange.LAST_7_DAYS)
                         true
                     }
+
                     R.id.menu_date_range_last_365_days -> {
                         onMenuItemClicked(CustomDateRange.LAST_365_DAYS)
                         true
                     }
+
                     R.id.menu_date_range_all_time -> {
                         onMenuItemClicked(CustomDateRange.ALL_TIME)
                         true
                     }
+
                     R.id.menu_date_range_custom_range -> {
                         onMenuItemClicked(CustomDateRange.CUSTOM_DATE_RANGE)
                         true
@@ -986,6 +993,40 @@ class Functions {
             }
         }
 
-    }
+        fun getAppropriateBudgetSuggestionOrMessage(
+            context: Context,
+            progressInPercent: Int,
+            budgetExpense: Double,
+            budgetLimit: Double
+        ): String {
 
+            val message: List<String>;
+
+            when {
+
+                (progressInPercent in 0..35) -> {
+                    message =
+                        context.resources.getStringArray(R.array.budget_start_messages).toList()
+                }
+
+                (progressInPercent in 36..68) -> {
+                    message =
+                        context.resources.getStringArray(R.array.budget_middle_messages).toList()
+                }
+
+                else -> {
+                    message = if (budgetExpense > budgetLimit) {
+                        context.resources.getStringArray(R.array.budget_overspent_messages).toList()
+                    } else if (budgetExpense == budgetLimit) {
+                        context.resources.getStringArray(R.array.budget_reachedLimit_messages)
+                            .toList()
+                    } else {
+                        context.resources.getStringArray(R.array.budget_end_messages).toList()
+                    }
+                }
+            }
+
+            return message[Random.nextInt(0, message.size - 1)]
+        }
+    }
 }

@@ -1,5 +1,4 @@
-- add menu option to show overview of a particular budget
-- create a fragment for showing the overview
+
 - Also in BudgetAndIncomeOverviewFragment, for all the budget, also show message, like,
 
            * Starting (Early Warning Stage):
@@ -22,3 +21,7 @@
            == "Oops! You've Exceeded Your Budget": Sympathetic message to acknowledge when they've gone over the budget.
            == "Time to Review Your Expenses": Encouraging users to reevaluate their spending habits and adjust accordingly.
            == "Learn from This Month and Plan Better Next Time": Encouraging a positive outlook and improvement for future budgeting.
+
+// done
+- click on budge to show overview of a particular budget
+- create a fragment for showing the overview

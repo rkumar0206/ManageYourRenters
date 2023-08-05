@@ -112,7 +112,13 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
 
     override fun onItemClick(budget: Budget) {
 
-        showExpensesInBottomSheet(budget.expenseCategoryKey)
+        val action =
+            BudgetAndIncomeOverviewFragmentDirections.actionBudgetAndIncomeFragmentToBudgetOverviewFragment(
+                budget.key,
+                selectedMonth,
+                selectedYear
+            )
+        findNavController().navigate(action)
     }
 
     private var adapterPosition = 0
@@ -138,6 +144,12 @@ class BudgetAndIncomeOverviewFragment : Fragment(R.layout.fragment_budget), View
                 R.id.menuAddExpense_bo -> {
 
                     handleAddExpenseMenu(budget)
+                    true
+                }
+
+                R.id.menu_show_budget_expenses -> {
+
+                    showExpensesInBottomSheet(budget.expenseCategoryKey)
                     true
                 }
 

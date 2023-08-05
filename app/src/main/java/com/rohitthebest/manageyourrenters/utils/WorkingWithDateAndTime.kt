@@ -381,4 +381,23 @@ object WorkingWithDateAndTime {
         return numberOfDaysInMonth - currentDay
     }
 
+    fun getStartMillisecondOfAllDaysInMonth(month: Int, year: Int): List<Pair<Long, Long>> {
+
+        val numberOfDays = getNumberOfDaysInMonth(month, year)
+
+        val startCalendar = Calendar.getInstance()
+        val endCalendar = Calendar.getInstance()
+
+        val startingMillisOfDays = ArrayList<Pair<Long, Long>>()
+
+        for (i in 1..numberOfDays) {
+
+            startCalendar.set(year, month, i, 0, 0)
+            endCalendar.set(year, month, i, 24, 0)
+            startingMillisOfDays.add(Pair(startCalendar.time.time, endCalendar.time.time))
+        }
+
+        return startingMillisOfDays
+    }
+
 }

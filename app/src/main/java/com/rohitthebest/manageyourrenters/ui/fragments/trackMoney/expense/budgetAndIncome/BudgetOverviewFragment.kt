@@ -73,16 +73,19 @@ class BudgetOverviewFragment : Fragment(R.layout.fragment_budget_overview) {
         val numberOfDaysInMonth =
             WorkingWithDateAndTime.getNumberOfDaysInMonth(receivedMonth, receivedYear)
 
+        val daysOfWeek =
+            WorkingWithDateAndTime.getDayOfWeeksForEntireMonth(receivedMonth, receivedYear)
+
         for (i in 0..numberOfDaysInMonth) {
 
             days.add(
                 when {
 
                     i.toString().startsWith("0") -> i.toString()
-                    i.toString().endsWith("1") -> i.toString() + "st"
-                    i.toString().endsWith("2") -> i.toString() + "nd"
-                    i.toString().endsWith("3") -> i.toString() + "rd"
-                    else -> i.toString() + "th"
+                    i.toString().endsWith("1") -> i.toString() + "st (${daysOfWeek[i - 1].second})"
+                    i.toString().endsWith("2") -> i.toString() + "nd (${daysOfWeek[i - 1].second})"
+                    i.toString().endsWith("3") -> i.toString() + "rd (${daysOfWeek[i - 1].second})"
+                    else -> i.toString() + "th (${daysOfWeek[i - 1].second})"
                 }
             )
         }
@@ -191,11 +194,18 @@ class BudgetOverviewFragment : Fragment(R.layout.fragment_budget_overview) {
                 amountSpentBudgetTV.text = receivedBudget.currentExpenseAmount.format(2)
                 budgetLimitAmountTV.text = receivedBudget.budgetLimit.format(2)
 
-                var amountLeft = receivedBudget.budgetLimit - receivedBudget.currentExpenseAmount
-                if (amountLeft < 0) amountLeft = 0.0
+                val amountLeft = receivedBudget.budgetLimit - receivedBudget.currentExpenseAmount
 
-                amountLeftBudgetTV.text =
-                    getString(R.string.you_still_have_left_in_your_budget, amountLeft.format(2))
+                when {
+
+                    amountLeft > 0 -> amountLeftBudgetTV.text =
+                        getString(R.string.you_still_have_left_in_your_budget, amountLeft.format(2))
+
+                    amountLeft == 0.0 -> amountLeftBudgetTV.text = getString(R.string.limit_reached)
+
+                    amountLeft < 0 -> getString(R.string.overspent)
+
+                }
 
                 val progressInPercent =
                     ((receivedBudget.currentExpenseAmount / receivedBudget.budgetLimit) * 100).toInt()

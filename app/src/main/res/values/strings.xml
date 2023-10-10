@@ -430,6 +430,8 @@
     <string name="screenshot">Screenshot</string>
     <string name="screenshot_saved_to_phone_storage">Screenshot saved to phone storage</string>
     <string name="you_still_have_left_in_your_budget">You still have %1$s left in your budget</string>
+    <string name="limit_reached">Limit reached!</string>
+    <string name="overspent">Overspent!</string>
 
     <string-array name="budget_start_messages">
 

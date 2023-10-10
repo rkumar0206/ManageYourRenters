@@ -46,6 +46,13 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
                     )
                 }
             }
+
+            binding.baDetailsBtn.setOnClickListener {
+                if (isPositionAndMlistenerValid()) {
+
+                    mListener!!.onDetailsButtonClicked(getItem(absoluteAdapterPosition))
+                }
+            }
         }
 
         private fun isPositionAndMlistenerValid(): Boolean {
@@ -138,6 +145,7 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
                         colorGreen
                     )
                     binding.percentMCV.strokeColor = colorGreen
+
                 }
 
                 (progressInPercent in 36..68) -> {
@@ -149,6 +157,7 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
                         colorYellow
                     )
                     binding.percentMCV.strokeColor = colorYellow
+
                 }
 
                 else -> {
@@ -195,6 +204,7 @@ class BudgetRVAdapter : ListAdapter<Budget, BudgetRVAdapter.BudgetViewHolder>(Di
 
         fun onItemClick(budget: Budget)
         fun onMenuBtnClick(budget: Budget, view: View, position: Int)
+        fun onDetailsButtonClicked(budget: Budget)
     }
 
     fun setOnClickListener(listener: OnClickListener) {

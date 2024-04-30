@@ -16,6 +16,7 @@ import com.rohitthebest.manageyourrenters.others.Constants.RANDOM_ID_KEY
 import com.rohitthebest.manageyourrenters.others.Constants.UPDATE_DOCUMENT_MAP_KEY
 import com.rohitthebest.manageyourrenters.repositories.UpdateIsSyncedValueForAnyTableRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.convertJsonToObject
 import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -38,12 +39,7 @@ class UpdateService : Service() {
         val collection = intent?.getStringExtra(COLLECTION_KEY)
         val key = intent?.getStringExtra(DOCUMENT_KEY)
 
-        val map: HashMap<String, Any?> =
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
-                intent?.getSerializableExtra(UPDATE_DOCUMENT_MAP_KEY) as HashMap<String, Any?>
-            } else ({
-                intent?.getSerializableExtra(UPDATE_DOCUMENT_MAP_KEY, HashMap::class.java)
-            }) as HashMap<String, Any?>
+        val map = intent?.getStringExtra(UPDATE_DOCUMENT_MAP_KEY)?.convertJsonToObject(HashMap::class.java) as HashMap<String, Any?>
 
         val randomId = intent?.getIntExtra(RANDOM_ID_KEY, 1000)
 

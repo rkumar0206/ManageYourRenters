@@ -9,11 +9,11 @@
 
     <application
         android:name=".BaseApplication"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_app_launcher_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_app_launcher_logo_round"
         android:supportsRtl="true"
-        android:allowBackup="true"
         android:theme="@style/Theme.SplashScreen">
         <activity
             android:name=".ui.activities.TrackMoneyActivity"
@@ -47,14 +47,30 @@
 
         </activity>
 
-        <service android:name=".services.UploadService" />
-        <service android:name=".services.DeleteService" />
-        <service android:name=".services.UpdateService" />
-        <service android:name=".services.DeleteAllDocumentsService" />
-        <service android:name=".services.UploadDocumentListToFireStoreService" />
-        <service android:name=".services.DeleteFileFromFirebaseStorageService" />
-        <service android:name=".services.UploadFileToCloudStorageService" />
-        <service android:name=".services.SyncDocumentsFromFirestoreService" />
+        <service
+            android:name=".services.UploadService"
+            android:foregroundServiceType="shortService" />
+        <service
+            android:name=".services.DeleteService"
+            android:foregroundServiceType="shortService" />
+        <service
+            android:name=".services.UpdateService"
+            android:foregroundServiceType="shortService" />
+        <service
+            android:name=".services.DeleteAllDocumentsService"
+            android:foregroundServiceType="shortService" />
+        <service
+            android:name=".services.UploadDocumentListToFireStoreService"
+            android:foregroundServiceType="shortService" />
+        <service
+            android:name=".services.DeleteFileFromFirebaseStorageService"
+            android:foregroundServiceType="shortService" />
+        <service
+            android:name=".services.UploadFileToCloudStorageService"
+            android:foregroundServiceType="shortService" />
+        <service
+            android:name=".services.SyncDocumentsFromFirestoreService"
+            android:foregroundServiceType="shortService" />
 
         <meta-data
             android:name="io.sentry.dsn"

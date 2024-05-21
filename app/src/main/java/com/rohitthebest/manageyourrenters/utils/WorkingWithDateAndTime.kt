@@ -5,7 +5,10 @@ import android.util.Log
 import java.sql.Timestamp
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.YearMonth
 import java.util.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 @SuppressLint("SimpleDateFormat")
 object WorkingWithDateAndTime {
@@ -288,6 +291,158 @@ object WorkingWithDateAndTime {
         }
 
         return Pair(firstCal.timeInMillis, lastCal.timeInMillis)
+    }
+
+    fun getMonthAndYearString(month: Int, year: Int): String {
+
+        return "${month}_${year}"
+    }
+
+    fun extractMonthAndYearFromMonthAndYearString(monthYearString: String): Pair<Int, Int> {
+
+        return try {
+
+            val pattern = "(\\d+)_(\\d+)"
+            val regex: Pattern = Pattern.compile(pattern)
+            val matcher: Matcher = regex.matcher(monthYearString)
+
+            if (matcher.find()) {
+
+                val month = matcher.group(1)?.toInt()
+                val year = matcher.group(2)?.toInt()
+
+                return if (month != null && year != null) {
+
+                    Pair(month, year)
+                } else {
+                    Pair(0, 0)
+                }
+
+            } else {
+                return Pair(0, 0)
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Pair(0, 0)
+        }
+
+    }
+
+
+    fun getNextMonth(selectedMonth: Int): Int {
+
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.MONTH, selectedMonth)
+        cal.add(Calendar.MONTH, 1)
+        return cal.get(Calendar.MONTH)
+    }
+
+    fun getPreviousMonth(selectedMonth: Int): Int {
+
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.MONTH, selectedMonth)
+        cal.add(Calendar.MONTH, -1)
+        return cal.get(Calendar.MONTH)
+    }
+
+    fun getMillisecondsOfStartAndEndDayOfMonthForGivenMonthAndYear(
+        month: Int,
+        year: Int
+    ): Pair<Long, Long> {
+
+        val calendar = Calendar.getInstance()
+        calendar.set(year, month, 5)
+        val dateInMillis = calendar.timeInMillis
+        return getMillisecondsOfStartAndEndDayOfMonth(dateInMillis)
+    }
+
+    /**
+     * @param month - month (0-11)
+     * @param year  - year (Ex: 2023)
+     *
+     * @return - Returns the number of days in a give month
+     */
+    fun getNumberOfDaysInMonth(month: Int, year: Int): Int {
+
+        val yearMonth = YearMonth.of(year, month + 1)
+        return yearMonth.lengthOfMonth()
+    }
+
+    /**
+     * @param month - month (0-11)
+     * @param year  - year (Ex: 2023)
+     *
+     * @return - Returns the number of days left in the month (Int)
+     */
+    fun getNumberOfDaysLeftInAnyMonth(month: Int, year: Int): Int {
+
+        val currentYear = getCurrentYear()
+        val currentMonth = getCurrentMonth()
+        val numberOfDaysInMonth = getNumberOfDaysInMonth(month, year)
+
+        if (year < currentYear) return 0
+        if (year > currentYear) return numberOfDaysInMonth
+
+        if (month < currentMonth) return 0
+        if (month > currentMonth) return numberOfDaysInMonth
+
+        // year = current year and month = current month
+        val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+
+        return numberOfDaysInMonth - currentDay
+    }
+
+    /**
+     * @param month - month (0-11)
+     * @param year  - year (Ex: 2023)
+     *
+     * @return - Returns list of Pair object for which the
+     * first value is the start milliseconds of the day (example : if the date is 20-09-2023, then it's value will the milliseconds of (20-09-2023 00:00:00)),
+     * second value is the end milliseconds of the day (example : if the date is 20-09-2023, then it's value will the milliseconds of (20-09-2023 24:00:00))
+     */
+    fun getStartMillisecondOfAllDaysInMonth(month: Int, year: Int): List<Pair<Long, Long>> {
+
+        val numberOfDays = getNumberOfDaysInMonth(month, year)
+
+        val startCalendar = Calendar.getInstance()
+        val endCalendar = Calendar.getInstance()
+
+        val startingMillisOfDays = ArrayList<Pair<Long, Long>>()
+
+        for (i in 1..numberOfDays) {
+
+            startCalendar.set(year, month, i, 0, 0)
+            endCalendar.set(year, month, i, 24, 0)
+            startingMillisOfDays.add(Pair(startCalendar.time.time, endCalendar.time.time))
+        }
+
+        return startingMillisOfDays
+    }
+
+    /**
+     * @param month - month (0-11)
+     * @param year  - year (Ex: 2023)
+     *
+     * @return - Returns the list of a pair object for which the first value is the int value of the DAY_OF_WEEK and the second value is String value i.e., human readable form
+     */
+    fun getDayOfWeeksForEntireMonth(month: Int, year: Int): List<Pair<Int, String>> {
+
+        val calendar = Calendar.getInstance()
+        val numberOfDays = getNumberOfDaysInMonth(month, year)
+
+        val daysList = ArrayList<Pair<Int, String>>()
+
+        for (i in 1..numberOfDays) {
+
+            calendar.set(year, month, i)
+            val dayOfWeekInt = calendar.get(Calendar.DAY_OF_WEEK)
+            val dayOfWeekString = SimpleDateFormat("EEEE").format(calendar.time)
+
+            daysList.add(Pair(dayOfWeekInt, dayOfWeekString))
+        }
+
+        return daysList;
     }
 
 }

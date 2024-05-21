@@ -19,6 +19,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/menu_renter_dues"
+        android:title="@string/renter_dues"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/menu_renter_revenue"
         android:title="@string/revenue">
 

@@ -2,7 +2,12 @@ package com.rohitthebest.manageyourrenters.ui.viewModels
 
 import android.app.Application
 import android.os.Parcelable
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.DocumentType
 import com.rohitthebest.manageyourrenters.data.SupportingDocument
@@ -15,13 +20,21 @@ import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants.R
 import com.rohitthebest.manageyourrenters.repositories.DeletedRenterRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterPaymentRepository
 import com.rohitthebest.manageyourrenters.repositories.RenterRepository
-import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
+import com.rohitthebest.manageyourrenters.utils.compareRenterModel
+import com.rohitthebest.manageyourrenters.utils.convertStringListToJSON
+import com.rohitthebest.manageyourrenters.utils.deleteAllDocumentsUsingKeyFromFirestore
+import com.rohitthebest.manageyourrenters.utils.deleteDocumentFromFireStore
+import com.rohitthebest.manageyourrenters.utils.deleteFileFromFirebaseStorage
+import com.rohitthebest.manageyourrenters.utils.updateDocumentOnFireStore
+import com.rohitthebest.manageyourrenters.utils.uploadDocumentToFireStore
+import com.rohitthebest.manageyourrenters.utils.uploadFileToFirebaseCloudStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.set
 
 private const val TAG = "RenterViewModel"
 
@@ -300,6 +313,9 @@ class RenterViewModel @Inject constructor(
             _renterNameWithTheirAmountPaid.value = map
         }
     }
+
+    val renterNameWithTheirDues: LiveData<Map<String, Double>> =
+        repo.getRentersWithTheirDues().asLiveData()
 
     fun getRentersWithTheirAmountPaidByDateCreated(
         startDate: Long,

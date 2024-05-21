@@ -2,6 +2,7 @@ package com.rohitthebest.manageyourrenters.repositories
 
 import com.rohitthebest.manageyourrenters.database.dao.ExpenseDAO
 import com.rohitthebest.manageyourrenters.database.model.Expense
+import com.rohitthebest.manageyourrenters.others.Constants
 import javax.inject.Inject
 
 class ExpenseRepository @Inject constructor(
@@ -63,6 +64,22 @@ class ExpenseRepository @Inject constructor(
     ) =
         dao.getTotalExpenseAmountByCategoryKeyAndDateRange(expenseCategoryKey, date1, date2)
 
+    fun getTotalExpenseByCategoryKeys(
+        expenseCategoryKeys: List<String>
+    ) = dao.getTotalExpenseByCategoryKeys(expenseCategoryKeys)
+
+    fun getTotalExpenseByCategoryKeysAndDateRange(
+        expenseCategoryKeys: List<String>,
+        date1: Long,
+        date2: Long
+    ) = dao.getTotalExpenseByCategoryKeysAndDateRange(expenseCategoryKeys, date1, date2)
+
+    fun getExpenseByCategoryKeysAndDateRange(
+        expenseCategoryKeys: List<String>,
+        date1: Long,
+        date2: Long
+    ) = dao.getExpenseByCategoryKeysAndDateRange(expenseCategoryKeys, date1, date2)
+
     fun getExpenseByDateRangeAndExpenseCategoryKey(
         expenseCategoryKey: String, date1: Long, date2: Long
     ) = dao.getExpenseByDateRangeAndExpenseCategoryKey(expenseCategoryKey, date1, date2)
@@ -80,4 +97,62 @@ class ExpenseRepository @Inject constructor(
 
     suspend fun getKeysByExpenseCategoryKey(expenseCategoryKey: String) =
         dao.getKeysByExpenseCategoryKey(expenseCategoryKey)
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeys() =
+        dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeys()
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByListOfExpenseKeys(
+        expenseKeys: List<String>
+    ) = dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByListOfExpenseKeys(expenseKeys)
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRange(date1: Long, date2: Long) =
+        dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRange(date1, date2)
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRangeAndByListOfExpenseKeys(
+        date1: Long,
+        date2: Long,
+        expenseKeys: List<String>
+    ) = dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysByDateRangeAndByListOfExpenseKeys(
+        date1, date2, expenseKeys
+    )
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysForSelectedExpenseCategories(
+        selectedExpenseCategories: List<String>
+    ) = dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysForSelectedExpenseCategories(
+        selectedExpenseCategories
+    )
+
+    fun getTotalExpenseAmountsWithTheirExpenseCategoryKeysForSelectedExpenseCategoriesByDateRange(
+        selectedExpenseCategories: List<String>,
+        date1: Long,
+        date2: Long
+    ) =
+        dao.getTotalExpenseAmountsWithTheirExpenseCategoryKeysForSelectedExpenseCategoriesByDateRange(
+            selectedExpenseCategories,
+            date1,
+            date2
+        )
+
+    fun isAnyExpenseAdded() = dao.isAnyExpenseAdded()
+
+    fun applyExpenseFilterByPaymentMethods(
+        paymentMethodKeys: List<String?>,
+        expenses: List<Expense>
+    ): List<Expense> {
+
+        val isOtherPaymentMethodKeyPresent =
+            paymentMethodKeys.contains(Constants.PAYMENT_METHOD_OTHER_KEY)
+
+        val resultExpenses = expenses.filter { expense ->
+
+            if (isOtherPaymentMethodKeyPresent) {
+                // for other payment method, get all the expenses where payment methods is null as well as payment method is other
+                expense.paymentMethods == null || expense.paymentMethods!!.any { it in paymentMethodKeys }
+            } else {
+                expense.paymentMethods != null && expense.paymentMethods!!.any { it in paymentMethodKeys }
+            }
+        }
+
+        return resultExpenses
+    }
 }

@@ -31,10 +31,11 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.isTextValid
+import com.rohitthebest.manageyourrenters.utils.isValid
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Calendar
 
 private const val TAG = "AddEditExpense"
 
@@ -113,7 +114,7 @@ class AddEditExpense : Fragment(R.layout.fragment_add_expense), View.OnClickList
 
             receivedExpenseKey = args.expenseKey!!
 
-            if (receivedExpenseKey != "") {
+            if (receivedExpenseKey.isValid()) {
 
                 isMessageReceivedForEditing = true
 

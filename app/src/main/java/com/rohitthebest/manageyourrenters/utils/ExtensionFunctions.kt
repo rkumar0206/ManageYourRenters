@@ -19,7 +19,11 @@ import android.text.TextWatcher
 import android.text.style.StrikethroughSpan
 import android.text.style.UnderlineSpan
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -155,6 +159,28 @@ fun RecyclerView.changeVisibilityOfFABOnScrolled(fab: FloatingActionButton) {
     })
 }
 
+fun RecyclerView.changeVisibilityOfViewOnScrolled(view: View) {
+
+    this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            try {
+                if (dy > 0 && view.visibility == View.VISIBLE) {
+
+                    view.hide()
+                } else if (dy < 0 && view.visibility != View.VISIBLE) {
+
+                    view.show()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    })
+}
+
 fun Double.format(digits: Int) = "%.${digits}f".format(this)
 
 fun TextView.changeTextColor(context: Context, color: Int) {
@@ -181,6 +207,8 @@ fun String?.isValid(): Boolean {
             && this.trim().isNotEmpty()
             && this.trim().isNotBlank()
 }
+
+fun String?.isNotValid() = !this.isValid()
 
 inline fun EditText.onTextChangedListener(
     crossinline onTextChanged: (s: CharSequence?) -> Unit
@@ -209,17 +237,18 @@ inline fun EditText.onTextChangedListener(
 inline fun showAlertDialogForDeletion(
     context: Context,
     crossinline positiveButtonListener: (DialogInterface) -> Unit,
-    crossinline negativeButtonListener: (DialogInterface) -> Unit
+    crossinline negativeButtonListener: (DialogInterface) -> Unit,
+    message: String = ""
 ) {
 
     MaterialAlertDialogBuilder(context)
-        .setTitle("Are you sure?")
-        .setMessage(context.getString(R.string.delete_warning_message))
-        .setPositiveButton("Delete") { dialogInterface, _ ->
+        .setTitle(context.getString(R.string.are_you_sure))
+        .setMessage(if (message.isNotValid()) context.getString(R.string.delete_warning_message) else message)
+        .setPositiveButton(context.getString(R.string._delete)) { dialogInterface, _ ->
 
             positiveButtonListener(dialogInterface)
         }
-        .setNegativeButton("Cancel") { dialogInterface, _ ->
+        .setNegativeButton(context.getText(R.string.cancel)) { dialogInterface, _ ->
 
             negativeButtonListener(dialogInterface)
         }
@@ -432,7 +461,7 @@ fun Bitmap.saveToStorage(context: Context, fileName: String): Uri? {
 
                 try {
 
-                    this.compress(Bitmap.CompressFormat.JPEG, 100, fout)
+                    this.compress(Bitmap.CompressFormat.JPEG, 100, fout!!)
                     fout?.close()
 
                 } catch (e: java.lang.Exception) {
@@ -482,6 +511,7 @@ fun TextView.applyStyles(text: String, textStyle: String) {
                 text.replace("-critical", "")
             )
         }
+
         text.startsWith("https") || text.startsWith("http") -> {
 
             this.changeTextStyle(

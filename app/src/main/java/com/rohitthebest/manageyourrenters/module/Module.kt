@@ -8,6 +8,7 @@ import com.rohitthebest.manageyourrenters.api.unsplash.UnsplashAPI
 import com.rohitthebest.manageyourrenters.database.databases.*
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.BORROWER_PAYMENT_DATABASE_NAME
+import com.rohitthebest.manageyourrenters.others.Constants.BUDGET_AND_INCOME_DATABASE
 import com.rohitthebest.manageyourrenters.others.Constants.EMI_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.EXPENSE_DATABASE_NAME
 import com.rohitthebest.manageyourrenters.others.Constants.MONTHLY_PAYMENT_DATABASE_NAME
@@ -279,6 +280,29 @@ object Module {
     @Provides
     @Singleton
     fun getPaymentMethodDao(db: PaymentMethodDatabase) = db.getPaymentMethodDao()
+
+    // ==================================================================================
+
+
+    // ----------------------------- Income and Budget ----------------------------------------
+
+    @Singleton
+    @Provides
+    fun getBudgetAndIncomeDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(
+        context,
+        BudgetAndIncomeDatabase::class.java,
+        BUDGET_AND_INCOME_DATABASE
+    ).build()
+
+    @Provides
+    @Singleton
+    fun getBudgetDao(db: BudgetAndIncomeDatabase) = db.getBudgetDao()
+
+    @Provides
+    @Singleton
+    fun getIncomeDao(db: BudgetAndIncomeDatabase) = db.getIncomeDao()
 
     // ==================================================================================
 

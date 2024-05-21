@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="8dp"
+    android:background="@color/white"
+    app:cardCornerRadius="18dp">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/ba_CategoryImageIV"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:contentDescription="@string/expense_category_image"
+            android:scaleType="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/gradient_blue"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:background="#5C444444"
+            app:layout_constraintBottom_toBottomOf="@+id/ba_CategoryImageIV"
+            app:layout_constraintEnd_toEndOf="@id/ba_CategoryImageIV"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@id/ba_CategoryImageIV"
+            app:layout_constraintTop_toTopOf="@id/ba_CategoryImageIV"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+            android:id="@+id/ba_categoryNameTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="middle"
+            android:maxLines="1"
+            android:padding="5dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@+id/ba_CategoryImageIV"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/ba_CategoryImageIV"
+            app:layout_constraintTop_toTopOf="@+id/ba_CategoryImageIV"
+            tools:text="Groceries and Households" />
+
+        <TextView
+            android:id="@+id/ba_perDayExpenseTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:maxLines="1"
+            android:padding="5dp"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/ba_CategoryImageIV"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/ba_CategoryImageIV"
+            app:layout_constraintTop_toBottomOf="@+id/ba_categoryNameTV"
+            tools:text="Groceries and Households" />
+
+        <ImageButton
+            android:id="@+id/ba_menuBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/menubtn"
+            android:minWidth="48dp"
+            android:rotation="90"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/ba_CategoryImageIV"
+            app:srcCompat="@drawable/ic_baseline_more_vert_white_24" />
+
+
+        <ImageButton
+            android:id="@+id/ba_detailsBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/menubtn"
+            android:minWidth="48dp"
+            app:layout_constraintEnd_toStartOf="@+id/ba_menuBtn"
+            app:layout_constraintTop_toTopOf="@+id/ba_CategoryImageIV"
+            app:srcCompat="@drawable/ic_baseline_bar_chart_24_white" />
+
+        <ProgressBar
+            android:id="@+id/ba_progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="8dp"
+            android:progress="30"
+            android:progressDrawable="@drawable/custom_progress_bar_1"
+            app:layout_constraintEnd_toStartOf="@+id/percentMCV"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ba_CategoryImageIV" />
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/percentMCV"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="8dp"
+            app:cardCornerRadius="1000dp"
+            app:layout_constraintBottom_toBottomOf="@+id/ba_progressBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/ba_progressBar"
+            app:strokeColor="@color/primaryTextColor"
+            app:strokeWidth="0.2dp">
+
+            <TextView
+                android:id="@+id/percentTV"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="12sp"
+                tools:text="100%" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/ba_SpentVsLimitTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="middle"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/ba_progressBar"
+            app:layout_constraintStart_toStartOf="@+id/ba_progressBar"
+            app:layout_constraintTop_toBottomOf="@+id/ba_progressBar"
+            tools:text="Spent 20 from 500" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

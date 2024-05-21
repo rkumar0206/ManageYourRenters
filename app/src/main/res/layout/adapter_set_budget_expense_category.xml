@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="3dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="3dp"
+    android:background="@color/white"
+    app:cardCornerRadius="10dp">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageButton
+            android:id="@+id/budget_menuBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="3dp"
+            android:backgroundTint="@android:color/transparent"
+            android:rotation="90"
+            android:src="@drawable/ic_baseline_more_vert_24"
+            app:layout_constraintBottom_toBottomOf="@+id/budgetCategoryNameTV"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/budgetCategoryNameTV" />
+
+        <ImageButton
+            android:id="@+id/budget_syncBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
+            android:rotation="90"
+            android:src="@drawable/ic_baseline_sync_24"
+            app:layout_constraintBottom_toBottomOf="@+id/budget_menuBtn"
+            app:layout_constraintEnd_toStartOf="@+id/budget_menuBtn"
+            app:layout_constraintTop_toTopOf="@+id/budget_menuBtn" />
+
+        <ImageView
+            android:id="@+id/categoryImage"
+            android:layout_width="100dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/expense_shortcut_icon" />
+
+        <TextView
+            android:id="@+id/budgetCategoryNameTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="middle"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:textColor="@color/primaryTextColor"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/budget_syncBtn"
+            app:layout_constraintStart_toEndOf="@+id/categoryImage"
+            app:layout_constraintTop_toTopOf="@+id/categoryImage"
+            tools:text="Shopping" />
+
+        <ProgressBar
+            android:id="@+id/budgetProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:max="100"
+            android:progress="40"
+            android:progressTint="@color/purple_500"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/categoryImage"
+            app:layout_constraintTop_toBottomOf="@+id/budgetCategoryNameTV" />
+
+        <TextView
+            android:id="@+id/budgetCurrent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:gravity="start|center_vertical"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="1000"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/divider121"
+            app:layout_constraintStart_toStartOf="@+id/budgetProgressBar"
+            app:layout_constraintTop_toBottomOf="@+id/budgetProgressBar" />
+
+        <TextView
+            android:id="@+id/budgetLimitTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical|end"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="5000"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@+id/budgetProgressBar"
+            app:layout_constraintStart_toEndOf="@+id/divider121"
+            app:layout_constraintTop_toBottomOf="@+id/budgetProgressBar" />
+
+        <View
+            android:id="@+id/divider121"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintBottom_toBottomOf="@+id/budgetCurrent"
+            app:layout_constraintEnd_toEndOf="@+id/budgetProgressBar"
+            app:layout_constraintStart_toStartOf="@+id/budgetProgressBar"
+            app:layout_constraintTop_toTopOf="@+id/budgetCurrent" />
+
+        <Button
+            android:id="@+id/budgetAddLimitBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="5dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Add limit"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/budgetCurrent"
+            app:layout_constraintEnd_toEndOf="@+id/budgetProgressBar"
+            app:layout_constraintStart_toEndOf="@+id/divider121"
+            app:layout_constraintTop_toTopOf="@+id/budgetCurrent"
+            tools:ignore="TouchTargetSizeCheck" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

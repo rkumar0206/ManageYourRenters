@@ -24,6 +24,7 @@ import com.rohitthebest.manageyourrenters.database.model.PartialPayment
 import com.rohitthebest.manageyourrenters.databinding.AddPartialPaymentLayoutBinding
 import com.rohitthebest.manageyourrenters.databinding.FragmentAddPartialPaymentBinding
 import com.rohitthebest.manageyourrenters.others.Constants.EDIT_TEXT_EMPTY_MESSAGE
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
 import com.rohitthebest.manageyourrenters.ui.viewModels.BorrowerPaymentViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PartialPaymentViewModel
 import com.rohitthebest.manageyourrenters.utils.*
@@ -444,7 +445,7 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
 
                 uploadListOfDataToFireStore(
                     requireContext(),
-                    collection = getString(R.string.partialPayments),
+                    collection = FirestoreCollectionsConstants.PARTIAL_PAYMENTS,
                     fromPartialPaymentListToString(notSyncedList)
                 )
             }

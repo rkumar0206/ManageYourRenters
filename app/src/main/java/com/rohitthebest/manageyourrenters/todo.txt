@@ -1,0 +1,27 @@
+
+- Also in BudgetAndIncomeOverviewFragment, for all the budget, also show message, like,
+
+           * Starting (Early Warning Stage):
+
+           == "Start Tracking Your Spending Now!": Encouraging users to begin monitoring their expenses early on to avoid surprises later.
+           == "Stay Ahead of Your Budget": Setting a proactive tone, reminding users to be mindful of their spending from the beginning.
+           == "It's Easier to Stay Within Budget from the Start": Highlighting the advantage of early budget adherence for better financial control.
+
+           * Middle (Approaching the Budget Limit):
+           == "You're Doing Well, But Be Cautious": Acknowledging their efforts to stick to the budget while urging caution as they get closer to the limit.
+           == "Your Spending Is Getting Closer to the Limit": Providing a straightforward update on their proximity to the budget cap.
+           == "Keep an Eye on Your Remaining Budget": Advising users to keep track of their remaining funds to avoid exceeding their limit.
+
+           * End (Near Budget Limit):
+           == "Alert: You're Approaching Your Budget Limit!": Using stronger language to grab their attention and indicate a critical stage.
+           == "Last Few Dollars Left – Spend Wisely": Reminding users that they have limited funds remaining and should use them judiciously.
+           == "You're Almost at Your Budget Limit": Clearly informing users that they are nearing the end of their budget.
+
+           * Budget Exceeded:
+           == "Oops! You've Exceeded Your Budget": Sympathetic message to acknowledge when they've gone over the budget.
+           == "Time to Review Your Expenses": Encouraging users to reevaluate their spending habits and adjust accordingly.
+           == "Learn from This Month and Plan Better Next Time": Encouraging a positive outlook and improvement for future budgeting.
+
+// done
+- click on budge to show overview of a particular budget
+- create a fragment for showing the overview

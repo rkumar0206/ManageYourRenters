@@ -26,7 +26,10 @@ class ExpenseCategoryRepository @Inject constructor(
         dao.deleteAllExpenseCategoriesByIsSynced(isSynced)
 
     fun getAllExpenseCategories() = dao.getAllExpenseCategories()
+    fun getExpenseCategoriesByKey(expenseCategoryKeys: List<String>) =
+        dao.getExpenseCategoriesByKey(expenseCategoryKeys)
 
     fun getExpenseCategoryByKey(key: String) = dao.getExpenseCategoryByKey(key)
 
+    fun getAllExpenseCategoriesByLimit(limit: Int) = dao.getAllExpenseCategoriesByLimit(limit)
 }

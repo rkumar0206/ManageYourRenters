@@ -7,14 +7,44 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.BillPeriodType
-import com.rohitthebest.manageyourrenters.database.model.*
+import com.rohitthebest.manageyourrenters.database.model.Borrower
+import com.rohitthebest.manageyourrenters.database.model.BorrowerPayment
+import com.rohitthebest.manageyourrenters.database.model.Budget
+import com.rohitthebest.manageyourrenters.database.model.EMI
+import com.rohitthebest.manageyourrenters.database.model.EMIPayment
+import com.rohitthebest.manageyourrenters.database.model.Expense
+import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
+import com.rohitthebest.manageyourrenters.database.model.Income
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPayment
+import com.rohitthebest.manageyourrenters.database.model.MonthlyPaymentCategory
+import com.rohitthebest.manageyourrenters.database.model.PartialPayment
+import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
+import com.rohitthebest.manageyourrenters.database.model.Renter
+import com.rohitthebest.manageyourrenters.database.model.RenterPayment
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
-import com.rohitthebest.manageyourrenters.repositories.*
+import com.rohitthebest.manageyourrenters.repositories.BorrowerPaymentRepository
+import com.rohitthebest.manageyourrenters.repositories.BorrowerRepository
+import com.rohitthebest.manageyourrenters.repositories.BudgetRepository
+import com.rohitthebest.manageyourrenters.repositories.EMIPaymentRepository
+import com.rohitthebest.manageyourrenters.repositories.EMIRepository
+import com.rohitthebest.manageyourrenters.repositories.ExpenseCategoryRepository
+import com.rohitthebest.manageyourrenters.repositories.ExpenseRepository
+import com.rohitthebest.manageyourrenters.repositories.IncomeRepository
+import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentCategoryRepository
+import com.rohitthebest.manageyourrenters.repositories.MonthlyPaymentRepository
+import com.rohitthebest.manageyourrenters.repositories.PartialPaymentRepository
+import com.rohitthebest.manageyourrenters.repositories.PaymentMethodRepository
+import com.rohitthebest.manageyourrenters.repositories.RenterPaymentRepository
+import com.rohitthebest.manageyourrenters.repositories.RenterRepository
 import com.rohitthebest.manageyourrenters.utils.Functions
 import com.rohitthebest.manageyourrenters.utils.getDataFromFireStore
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -59,6 +89,12 @@ class SyncDocumentsFromFirestoreService : Service() {
     @Inject
     lateinit var paymentMethodRepository: PaymentMethodRepository
 
+    @Inject
+    lateinit var budgetRepository: BudgetRepository
+
+    @Inject
+    lateinit var incomeRepository: IncomeRepository
+
     private var uid = ""
 
 
@@ -90,11 +126,28 @@ class SyncDocumentsFromFirestoreService : Service() {
             syncPaymentMethods()
         }
 
+        val job7 = CoroutineScope(Dispatchers.IO).launch {
+            syncBudgets()
+        }
+
+        val job8 = CoroutineScope(Dispatchers.IO).launch {
+            syncIncomes()
+        }
+
+
         CoroutineScope(Dispatchers.IO).launch {
 
             delay(50)
 
-            while (!job1.isCompleted || !job2.isCompleted || !job3.isCompleted || !job4.isCompleted || !job5.isCompleted || !job6.isCompleted) {
+            while (!job1.isCompleted
+                || !job2.isCompleted
+                || !job3.isCompleted
+                || !job4.isCompleted
+                || !job5.isCompleted
+                || !job6.isCompleted
+                || !job7.isCompleted
+                || !job8.isCompleted
+            ) {
 
                 delay(100)
                 Log.d(TAG, "onStartCommand: sync time extended")
@@ -390,6 +443,45 @@ class SyncDocumentsFromFirestoreService : Service() {
         }
     }
 
+    private suspend fun syncBudgets() {
+
+        getDataFromFireStore(
+            FirestoreCollectionsConstants.BUDGETS,
+            uid
+        ) {}?.let { budgetSnapshot ->
+
+            if (budgetSnapshot.size() != 0) {
+
+                budgetRepository.deleteByIsSyncedValue(true)
+                delay(50)
+                budgetRepository.insertAllBudget(
+                    budgetSnapshot.toObjects(
+                        Budget::class.java
+                    )
+                )
+            }
+        }
+    }
+
+    private suspend fun syncIncomes() {
+
+        getDataFromFireStore(
+            FirestoreCollectionsConstants.INCOMES,
+            uid
+        ) {}?.let { incomeSnapshot ->
+
+            if (incomeSnapshot.size() != 0) {
+
+                incomeRepository.deleteByIsSyncedValue(true)
+                delay(50)
+                incomeRepository.insertAllIncome(
+                    incomeSnapshot.toObjects(
+                        Income::class.java
+                    )
+                )
+            }
+        }
+    }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null

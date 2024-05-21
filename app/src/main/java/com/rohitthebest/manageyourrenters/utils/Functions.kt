@@ -985,7 +985,9 @@ class Functions {
                 } else {
 
                     PendingIntent.getActivity(
-                        context, 0, notificationIntent,
+                        context,
+                        0,
+                        notificationIntent,
                         PendingIntent.FLAG_IMMUTABLE
                     )
                 }

@@ -71,7 +71,7 @@ fun updateDocumentOnFireStore(
 
     foregroundService.putExtra(
         Constants.UPDATE_DOCUMENT_MAP_KEY,
-        map
+        map.convertToJsonString()
     )
 
     foregroundService.putExtra(

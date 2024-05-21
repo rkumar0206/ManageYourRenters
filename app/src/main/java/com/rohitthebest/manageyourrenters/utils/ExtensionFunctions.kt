@@ -461,7 +461,7 @@ fun Bitmap.saveToStorage(context: Context, fileName: String): Uri? {
 
                 try {
 
-                    this.compress(Bitmap.CompressFormat.JPEG, 100, fout)
+                    this.compress(Bitmap.CompressFormat.JPEG, 100, fout!!)
                     fout?.close()
 
                 } catch (e: java.lang.Exception) {

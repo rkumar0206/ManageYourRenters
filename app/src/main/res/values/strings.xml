@@ -429,6 +429,52 @@
     <string name="monthly_category_expense_graph">Monthly category expense graph</string>
     <string name="screenshot">Screenshot</string>
     <string name="screenshot_saved_to_phone_storage">Screenshot saved to phone storage</string>
+    <string name="you_still_have_left_in_your_budget">You still have %1$s left in your budget</string>
+    <string name="limit_reached">Limit reached!</string>
+    <string name="overspent">Overspent!</string>
+
+    <string-array name="budget_start_messages">
+
+        <item>Plenty of Room to Spare</item>
+        <item>Keep Going, You\'re On Track!</item>
+        <item>Remember to Stick to Your Plan</item>
+        <item>You Have Control Over Your Finances</item>
+        <item>You Have Control Over Your Finances</item>
+    </string-array>
+
+    <string-array name="budget_middle_messages">
+
+        <item>You\'re Doing Well, But Be Cautious</item>
+        <item>Keep an Eye on Your Remaining Budget</item>
+        <item>Maintain the Balance</item>
+
+    </string-array>
+
+    <string-array name="budget_end_messages">
+
+        <item>Alert: You\'re Approaching Your Budget Limit!</item>
+        <item>Last Few Dollars Left – Spend Wisely</item>
+        <item>You\'re Almost at Your Budget Limit</item>
+        <item>You\'re Nearing the Limit</item>
+
+    </string-array>
+
+    <string-array name="budget_reachedLimit_messages">
+
+        <item>Time to Review Your Expenses</item>
+        <item>Review Your Budgeting Strategy</item>
+
+    </string-array>
+
+    <string-array name="budget_overspent_messages">
+
+        <item>Oops! You\'ve Exceeded Your Budget</item>
+        <item>Learn from This Month and Plan Better Next Time</item>
+        <item>Avoid Unnecessary Expenses</item>
+        <item>Budgeting Is a Learning Process</item>
+        <item>Seek Ways to Increase Income</item>
+
+    </string-array>
 
     <string-array name="interest_time_schedule">
 

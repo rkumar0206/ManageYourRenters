@@ -239,30 +239,11 @@ class BudgetViewModel @Inject constructor(
             budget.categoryName = expenseCategories[index].categoryName
             budget.categoryImageUrl = expenseCategories[index].imageUrl ?: ""
 
-            val currentExpense = try {
-                if (selectedPaymentMethods.isEmpty()) {
-                    expenseRepository.getTotalExpenseAmountByCategoryKeyAndDateRange(
-                        expenseCategories[index].key,
-                        datePairForExpense.first,
-                        datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
-                    ).first()
-                } else {
-                    val tempExpense = expenseRepository.getExpenseByDateRangeAndExpenseCategoryKey(
-                        expenseCategories[index].key,
-                        datePairForExpense.first,
-                        datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
-                    ).first()
-
-                    val expenseAfterPaymentMethodFilter = applyExpenseFilterByPaymentMethods(
-                        selectedPaymentMethods,
-                        tempExpense
-                    )
-
-                    expenseAfterPaymentMethodFilter.sumOf { it.amount }
-                }
-            } catch (e: Exception) {
-                0.0
-            }
+            val currentExpense = calculateCurrentExpense(
+                datePairForExpense,
+                expenseCategories[index].key,
+                selectedPaymentMethods
+            )
 
             Log.d(
                 TAG,
@@ -286,6 +267,75 @@ class BudgetViewModel @Inject constructor(
     fun getTheOldestSavedBudgetYear() = budgetRepository.getTheOldestSavedBudgetYear().asLiveData()
 
     fun getBudgetByKey(budgetKey: String) = budgetRepository.getBudgetByKey(budgetKey).asLiveData()
+
+    private var _budgetByKey = MutableLiveData<Budget>()
+    val budgetByKey: LiveData<Budget> get() = _budgetByKey
+
+    fun getBudgetByKeyWithACategoryAndExpenseDetails(
+        budgetKey: String,
+        month: Int,
+        year: Int,
+        selectedPaymentMethods: List<String> = emptyList()
+    ) {
+
+        viewModelScope.launch {
+
+            val budget = budgetRepository.getBudgetByKey(budgetKey).first()
+            val category =
+                expenseCategoryRepository.getExpenseCategoryByKey(budget.expenseCategoryKey).first()
+
+            budget.categoryName = category.categoryName
+            budget.categoryImageUrl = category.imageUrl ?: ""
+
+            val datePairForExpense =
+                WorkingWithDateAndTime.getMillisecondsOfStartAndEndDayOfMonthForGivenMonthAndYear(
+                    month, year
+                )
+
+            val currentExpense: Double = calculateCurrentExpense(
+                datePairForExpense,
+                category.key,
+                selectedPaymentMethods
+            )
+
+            budget.currentExpenseAmount = currentExpense
+
+            _budgetByKey.value = budget
+        }
+    }
+
+    private suspend fun calculateCurrentExpense(
+        datePairForExpense: Pair<Long, Long>,
+        categoryKey: String,
+        selectedPaymentMethods: List<String>
+    ): Double {
+
+        return try {
+            if (selectedPaymentMethods.isEmpty()) {
+                expenseRepository.getTotalExpenseAmountByCategoryKeyAndDateRange(
+                    categoryKey,
+                    datePairForExpense.first,
+                    datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
+                ).first()
+            } else {
+                val tempExpense = expenseRepository.getExpenseByDateRangeAndExpenseCategoryKey(
+                    categoryKey,
+                    datePairForExpense.first,
+                    datePairForExpense.second + Constants.ONE_DAY_MILLISECONDS
+                ).first()
+
+                val expenseAfterPaymentMethodFilter = applyExpenseFilterByPaymentMethods(
+                    selectedPaymentMethods,
+                    tempExpense
+                )
+                expenseAfterPaymentMethodFilter.sumOf { it.amount }
+            }
+        } catch (e: Exception) {
+            0.0
+        }
+
+    }
+
 
     fun getTotalBudgetByMonthAndYear(month: Int, year: Int) =
         budgetRepository.getTotalBudgetByMonthAndYear(month, year).asLiveData()

@@ -230,4 +230,41 @@ class BudgetAndIncomeGraphViewModel @Inject constructor(
 
     }
 
+    private var _budgetExpense = MutableLiveData<List<BarEntry>>()
+    val budgetExpense: LiveData<List<BarEntry>> get() = _budgetExpense
+
+    fun getEveryDayExpenseData(categoryKey: String, month: Int, year: Int) {
+
+        viewModelScope.launch {
+
+            val startingMillisOfDays =
+                WorkingWithDateAndTime.getStartMillisecondOfAllDaysInMonth(month, year)
+
+            val dataList = ArrayList<BarEntry>()
+
+            for (i in 1..startingMillisOfDays.size) {
+
+                val dayMillis = startingMillisOfDays[i - 1]
+
+                Log.d(
+                    TAG,
+                    "getEveryDayExpenseData: $i ---->   ${dayMillis.first} ,,,,, ${dayMillis.second}"
+                )
+
+                val expenseAmount = try {
+                    expenseRepository.getTotalExpenseAmountByCategoryKeyAndDateRange(
+                        categoryKey, dayMillis.first, dayMillis.second
+                    ).first()
+                } catch (e: java.lang.NullPointerException) {
+                    0.0
+                }
+
+                val barEntry = BarEntry(i.toFloat(), expenseAmount.toFloat())
+                dataList.add(barEntry)
+            }
+
+            _budgetExpense.value = dataList
+        }
+    }
+
 }

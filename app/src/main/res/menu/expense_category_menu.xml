@@ -28,4 +28,14 @@
         android:title="@string/budget_and_income"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/menu_import_expenses"
+        android:title="@string/importer"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_export_expenses"
+        android:title="@string/exporter"
+        app:showAsAction="never" />
+
 </menu>

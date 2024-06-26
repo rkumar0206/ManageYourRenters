@@ -163,6 +163,21 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_expenseCategoryFragment_to_importFragment"
+            app:destination="@id/importFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_expenseCategoryFragment_to_exportFragment"
+            app:destination="@id/exportFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/fade_out" />
+
     </fragment>
     <fragment
         android:id="@+id/addEditExpenseCategoryFragment"
@@ -459,4 +474,15 @@
             android:defaultValue="0"
             app:argType="integer" />
     </fragment>
+    <fragment
+        android:id="@+id/importFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.export_import.ImportFragment"
+        android:label="ImportFragment"
+        tools:layout="@layout/fragment_import" />
+    <fragment
+        android:id="@+id/exportFragment"
+        android:name="com.rohitthebest.manageyourrenters.ui.fragments.trackMoney.expense.export_import.ExportFragment"
+        android:label="ExportFragment"
+        tools:layout="@layout/fragment_export" />
+
 </navigation>

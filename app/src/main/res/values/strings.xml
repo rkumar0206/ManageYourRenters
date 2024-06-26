@@ -432,6 +432,17 @@
     <string name="you_still_have_left_in_your_budget">You still have %1$s left in your budget</string>
     <string name="limit_reached">Limit reached!</string>
     <string name="overspent">Overspent!</string>
+    <string name="importer">Importer</string>
+    <string name="exporter">Exporter</string>
+    <string name="preview">Preview</string>
+    <string name="import_">Import</string>
+    <string name="remove_selected_file">Remove selected file</string>
+    <string name="select_file">Select file</string>
+    <string name="download_sample_csv">Download sample in CSV</string>
+    <string name="download_sample_json">Download sample in JSON</string>
+    <string name="sample">Sample</string>
+    <string name="sample_file_will_be_download_in_your_phones_download_directory">Sample file will be download in your phones Download directory.</string>
+    <string name="download_sample_file">Download sample file</string>
 
     <string-array name="budget_start_messages">
 

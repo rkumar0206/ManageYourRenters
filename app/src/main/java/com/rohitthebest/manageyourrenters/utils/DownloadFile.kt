@@ -12,7 +12,7 @@ import com.rohitthebest.manageyourrenters.R
 fun downloadFileFromUrl(activity: Activity, url: String?, fileName: String?) {
 
     try {
-        if (url != null && url.isNotEmpty()) {
+        if (!url.isNullOrEmpty()) {
             val uri: Uri = Uri.parse(url)
 
             val request = DownloadManager.Request(uri)

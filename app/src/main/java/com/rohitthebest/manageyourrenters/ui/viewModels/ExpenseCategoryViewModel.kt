@@ -239,6 +239,9 @@ class ExpenseCategoryViewModel @Inject constructor(
     fun getExpenseCategoryByKey(key: String) =
         expenseCategoryRepository.getExpenseCategoryByKey(key).asLiveData()
 
+    fun getExpenseCategoryByCategoryName(name: String) =
+        expenseCategoryRepository.getExpenseCategoryByCategoryName(name).asLiveData()
+
     fun getAllExpenseCategories() = expenseCategoryRepository.getAllExpenseCategories().asLiveData()
 
     fun getAllExpenseCategoriesByLimit(limit: Int) =

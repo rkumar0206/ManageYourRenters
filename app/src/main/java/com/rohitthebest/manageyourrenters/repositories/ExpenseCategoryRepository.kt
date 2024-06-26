@@ -31,5 +31,7 @@ class ExpenseCategoryRepository @Inject constructor(
 
     fun getExpenseCategoryByKey(key: String) = dao.getExpenseCategoryByKey(key)
 
+    fun getExpenseCategoryByCategoryName(name: String) = dao.getExpenseCategoryByCategoryName(name)
+
     fun getAllExpenseCategoriesByLimit(limit: Int) = dao.getAllExpenseCategoriesByLimit(limit)
 }

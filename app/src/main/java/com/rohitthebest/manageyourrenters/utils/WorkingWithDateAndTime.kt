@@ -5,7 +5,13 @@ import android.util.Log
 import java.sql.Timestamp
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -443,6 +449,88 @@ object WorkingWithDateAndTime {
         }
 
         return daysList;
+    }
+
+    @Throws(ParseException::class, IllegalArgumentException::class, DateTimeParseException::class)
+    fun identifyDateAndTimeFormatAndConvertToMillis(dateAndTimeString: String): Long {
+
+        val possibleFormatsDateAndTime = listOf(
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "yyyy/MM/dd HH:mm:ss",
+            "yyyy-MM-dd HH:mm",
+            "dd-MM-yyyy HH:mm:ss",
+            "dd/MM/yyyy HH:mm:ss",
+            "MM/dd/yyyy HH:mm:ss",
+            "dd-MM-yyyy HH:mm",
+            "MM/dd/yyyy HH:mm",
+            "yyyy/MM/dd HH:mm:ss",
+            "yyyy/MM/dd HH:mm",
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+            "dd-MM-yyyy hh:mm a",
+            "dd/MM/yyyy hh:mm a",
+            "MM/dd/yyyy hh:mm a",
+            "dd-MM-yyyy hh:mm:ss a",
+            "dd/MM/yyyy hh:mm:ss a",
+            "MM/dd/yyyy hh:mm:ss a",
+            "dd-MM-yyyy hh:mm a",
+            "dd/MM/yyyy hh:mm a",
+            "MM/dd/yyyy hh:mm a",
+            "dd-MM-yyyy hh:mm:ss a",
+            "dd/MM/yyyy hh:mm:ss a",
+            "MM/dd/yyyy hh:mm:ss a",
+            "dd-MM-yyyy HH:mm",
+            "dd/MM/yyyy HH:mm",
+            "MM/dd/yyyy HH:mm",
+            "dd-MM-yyyy HH:mm:ss",
+            "dd/MM/yyyy HH:mm:ss",
+            "MM/dd/yyyy HH:mm:ss"
+        )
+
+        val possibleDateOnlyFormats = listOf(
+            "yyyy-MM-dd",
+            "dd-MM-yyyy",
+            "MM/dd/yyyy",
+            "dd/MM/yyyy",
+            "MM/dd/yyyy",
+            "yyyy/MM/dd",
+            )
+
+        if (dateAndTimeString.trim().length == 10) {
+
+            for (format in possibleDateOnlyFormats) {
+                try {
+
+                    val localDate =
+                        LocalDate.parse(dateAndTimeString, DateTimeFormatter.ofPattern(format))
+                    return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                } catch (e: Exception) {
+                    // Ignore and try the next format
+                }
+            }
+        } else {
+
+            for (format in possibleFormatsDateAndTime) {
+                try {
+                    val zonedDateTime = ZonedDateTime.parse(dateAndTimeString, DateTimeFormatter.ofPattern(format))
+                    return zonedDateTime.toInstant().toEpochMilli()
+                } catch (e: DateTimeParseException) {
+                    // Continue to the next format
+                }
+
+                try {
+                    val localDateTime = LocalDateTime.parse(dateAndTimeString, DateTimeFormatter.ofPattern(format))
+                    return localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant()
+                        .toEpochMilli()
+                } catch (e: DateTimeParseException) {
+                    // Continue to the next format
+                }
+            }
+
+        }
+
+        throw IllegalArgumentException("Could not parse date: $dateAndTimeString")
     }
 
 }

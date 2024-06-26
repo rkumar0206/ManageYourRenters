@@ -294,7 +294,7 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
             ) -> {
 
                 binding.root.showSnackbarWithActionAndDismissListener(
-                    "Permission is required for selecting image from your storage.",
+                    "Permission is required for selecting file from your storage.",
                     "Ok",
                     {
                         requestPermissionLauncher.launch(

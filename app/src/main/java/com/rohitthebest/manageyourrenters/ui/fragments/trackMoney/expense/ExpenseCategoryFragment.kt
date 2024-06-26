@@ -17,15 +17,22 @@ import com.rohitthebest.manageyourrenters.databinding.FragmentExpenseCategoryBin
 import com.rohitthebest.manageyourrenters.others.Constants
 import com.rohitthebest.manageyourrenters.ui.fragments.CustomMenuItems
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
-import com.rohitthebest.manageyourrenters.utils.*
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
+import com.rohitthebest.manageyourrenters.utils.changeVisibilityOfFABOnScrolled
+import com.rohitthebest.manageyourrenters.utils.executeAfterDelay
+import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.isValid
+import com.rohitthebest.manageyourrenters.utils.onTextChanged
+import com.rohitthebest.manageyourrenters.utils.onTextSubmit
+import com.rohitthebest.manageyourrenters.utils.show
+import com.rohitthebest.manageyourrenters.utils.showAlertDialogForDeletion
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Locale
 
 private const val TAG = "ExpenseCategoryFragment"
 
@@ -221,6 +228,7 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
                 binding.progressbar.hide()
             }
     }
+
     private var searchTextDelayJob: Job? = null
     private fun setUpSearchView(expenseCategories: List<ExpenseCategory>) {
 
@@ -314,6 +322,18 @@ class ExpenseCategoryFragment : Fragment(R.layout.fragment_expense_category),
         binding.toolbar.menu.findItem(R.id.menu_create_budget).setOnMenuItemClickListener {
 
             findNavController().navigate(R.id.action_expenseCategoryFragment_to_budgetAndIncomeFragment)
+            true
+        }
+
+        binding.toolbar.menu.findItem(R.id.menu_import_expenses).setOnMenuItemClickListener {
+
+            findNavController().navigate(R.id.action_expenseCategoryFragment_to_importFragment)
+            true
+        }
+
+        binding.toolbar.menu.findItem(R.id.menu_export_expenses).setOnMenuItemClickListener {
+
+            findNavController().navigate(R.id.action_expenseCategoryFragment_to_exportFragment)
             true
         }
     }

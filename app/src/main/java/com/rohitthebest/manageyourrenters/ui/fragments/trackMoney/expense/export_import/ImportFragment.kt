@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -19,19 +20,26 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.ImportServiceHelperModel
 import com.rohitthebest.manageyourrenters.data.ParsedImportExportExpense
+import com.rohitthebest.manageyourrenters.database.model.Expense
 import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
 import com.rohitthebest.manageyourrenters.databinding.FragmentImportBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.MAXIMUM_BATCH_SIZE
+import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
+import com.rohitthebest.manageyourrenters.services.ImportService
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
-import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isPermissionGranted
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.ParsedImportExportExpenseJsonDeserializer
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
+import com.rohitthebest.manageyourrenters.utils.convertToJsonString
 import com.rohitthebest.manageyourrenters.utils.downloadFileFromUrl
 import com.rohitthebest.manageyourrenters.utils.getFileNameAndSize
 import com.rohitthebest.manageyourrenters.utils.hide
@@ -55,13 +63,12 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
     private val binding get() = _binding!!
 
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
-    private val expenseViewModel by viewModels<ExpenseViewModel>()
     private val paymentMethodViewModel by viewModels<PaymentMethodViewModel>()
 
-    private lateinit var allExpenseCategories: List<ExpenseCategory>
-    private lateinit var allPaymentMethods: List<PaymentMethod>
+    private lateinit var allExpenseCategories: MutableList<ExpenseCategory>
+    private lateinit var allPaymentMethods: MutableList<PaymentMethod>
 
-    private var previewStringJson = "";
+    private var previewStringJson = ""
     private lateinit var parsedImportExportExpensesAfterValidation: List<ParsedImportExportExpense>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -136,68 +143,223 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
 
     private fun importExpenses() {
 
-        //todo: using expense category check if the category extracted in file exists or not
-        //todo: if category does not exist then create a category and then import expenses
-        //todo: Also for payment methods extract the payment methods and check if the payment already exist
-        //todo: if not create a payment method and then add it to expense
+        val allNonExistingCategoryDocuments = HashMap<String, ExpenseCategory>()
+        val allNonExistingPaymentMethodDocuments = HashMap<String, PaymentMethod>()
+        val allExpensesDocuments = ArrayList<Expense>()
 
         parsedImportExportExpensesAfterValidation.forEach { parsedImportExportExpense ->
 
+            // initializing expense category
             val expenseCategory = if (allExpenseCategories.isEmpty()) {
 
-                createNewExpenseCategory(parsedImportExportExpense.category.trim())
+                val newExpenseCategory =
+                    createNewExpenseCategory(parsedImportExportExpense.category.trim())
+
+                allNonExistingCategoryDocuments[parsedImportExportExpense.category.trim()] =
+                    newExpenseCategory
+
+                allExpenseCategories.add(newExpenseCategory)
+
+                newExpenseCategory
             } else {
 
-                val filteredExpenseCategories = allExpenseCategories.filter { category ->
+                var expenseCategory = allExpenseCategories.filter { category ->
                     category.categoryName == parsedImportExportExpense.category.trim()
                 }.stream().findFirst().orElse(null)
 
-                filteredExpenseCategories
-                    ?: createNewExpenseCategory(parsedImportExportExpense.category.trim())
-            }
+                if (expenseCategory == null) {
 
-            var paymentMethods: List<String>
+                    expenseCategory =
+                        createNewExpenseCategory(parsedImportExportExpense.category.trim())
 
-            if (parsedImportExportExpense.paymentMethod.isValid()) {
+                    allNonExistingCategoryDocuments[parsedImportExportExpense.category.trim()] =
+                        expenseCategory
 
-                val isMultiplePaymentMethod =
-                    parsedImportExportExpense.paymentMethod?.contains("|") ?: false
-
-                if (isMultiplePaymentMethod) {
-
-                    paymentMethods =
-                        parsedImportExportExpense.paymentMethod?.split("|") ?: emptyList()
-
-                    if (paymentMethods.isEmpty()) {
-                        paymentMethods =
-                            parsedImportExportExpense.paymentMethod?.split(" | ") ?: emptyList()
-                    }
-
-                } else {
-
-                    paymentMethods = listOf(parsedImportExportExpense.paymentMethod!!)
+                    allExpenseCategories.add(expenseCategory)
                 }
-            } else {
-                paymentMethods = listOf(Constants.PAYMENT_METHOD_OTHER_KEY)
+
+                expenseCategory
             }
 
-            if (allPaymentMethods.isEmpty()) {
+            // initializing payment methods
+            val selectedPaymentMethodKeys = getAllPaymentMethodKeys(
+                parsedImportExportExpense.paymentMethod,
+                allNonExistingPaymentMethodDocuments
+            )
 
-                //todo: need to create all payment methods
-            } else {
+            val dateInMillis =
+                WorkingWithDateAndTime.getTimeInMillisFromDateInString(
+                    parsedImportExportExpense.date!!,
+                    "dd-MM-yyyy hh:mm a"
+                )
 
-                //todo: filter the payment methods which are already present in db and if not create one
+            // initializing expense
+            val expense = Expense(
+                key = Functions.generateKey("_${Functions.getUid()}"),
+                amount = parsedImportExportExpense.amount,
+                id = null,
+                created = dateInMillis ?: System.currentTimeMillis(),
+                modified = dateInMillis ?: System.currentTimeMillis(),
+                spentOn = parsedImportExportExpense.spentOn ?: "",
+                uid = Functions.getUid()!!,
+                categoryKey = expenseCategory.key,
+                paymentMethods = selectedPaymentMethodKeys,
+                isSynced = true
+            )
 
-                paymentMethods.forEach { paymentMethod ->
-
-                    //todo: check if payment method is already in
-                }
-            }
-
-
+            //expenseViewModel.insertExpense(expense)
+            allExpensesDocuments.add(expense)
         }
 
+        Log.d(TAG, "importExpenses: All Non existing categories: $allNonExistingCategoryDocuments")
+        Log.d(
+            TAG,
+            "importExpenses: All Non existing paymentMethods: $allNonExistingPaymentMethodDocuments"
+        )
+        Log.d(TAG, "importExpenses: All expenses: $allExpensesDocuments")
 
+        val isSizeValidForBatch =
+            (allNonExistingCategoryDocuments.size + allNonExistingPaymentMethodDocuments.size + allExpensesDocuments.size) < MAXIMUM_BATCH_SIZE
+
+        if (isSizeValidForBatch) {
+            if (isInternetAvailable(requireContext())) {
+                callImportServiceWithValidData(
+                    allNonExistingCategoryDocuments,
+                    allNonExistingPaymentMethodDocuments,
+                    allExpensesDocuments
+                )
+                requireContext().showToast("Importing expenses. See Notification")
+
+                initUIBeforeSelectingFile()
+            } else {
+                showNoInternetMessage(requireContext())
+            }
+        } else {
+
+            requireContext().showToast("Batch size exceeded. Please try again with less number of expenses in csv or json")
+        }
+    }
+
+    private fun callImportServiceWithValidData(
+        allNonExistingCategoryDocuments: java.util.HashMap<String, ExpenseCategory>,
+        allNonExistingPaymentMethodDocuments: java.util.HashMap<String, PaymentMethod>,
+        allExpensesDocuments: java.util.ArrayList<Expense>
+    ) {
+
+        val importServiceHelperModels = ArrayList<ImportServiceHelperModel>()
+
+        importServiceHelperModels.add(
+            ImportServiceHelperModel(
+                collectionKey = FirestoreCollectionsConstants.EXPENSE_CATEGORIES,
+                documents = allNonExistingCategoryDocuments.values.associateBy { it.key } // associating all the categories with their key
+            )
+        )
+
+        importServiceHelperModels.add(
+            ImportServiceHelperModel(
+                collectionKey = FirestoreCollectionsConstants.PAYMENT_METHODS,
+                documents = allNonExistingPaymentMethodDocuments.values.associateBy { it.key } // associating all the payment methods with their key
+            )
+        )
+
+        importServiceHelperModels.add(
+            ImportServiceHelperModel(
+                collectionKey = FirestoreCollectionsConstants.EXPENSES,
+                documents = allExpensesDocuments.associateBy { it.key } // associating all the expenses with their key
+            )
+        )
+
+        val foregroundService = Intent(context, ImportService::class.java)
+
+        foregroundService.putExtra(
+            Constants.UPLOAD_DATA_KEY,
+            importServiceHelperModels.convertToJsonString()
+        )
+
+        ContextCompat.startForegroundService(requireContext(), foregroundService)
+
+    }
+
+    private fun getAllPaymentMethodKeys(
+        paymentMethodString: String?,
+        allNonExistingPaymentMethodDocuments: HashMap<String, PaymentMethod>
+    ): List<String> {
+
+        val paymentMethods: List<String> = getValidPaymentMethods(paymentMethodString)
+
+        val selectedPaymentMethodKeys: ArrayList<String> = ArrayList()
+
+        if (allPaymentMethods.isEmpty()) {
+
+            // as no payment method exists all payment methods need to be create
+
+            paymentMethods.forEach { paymentMethod ->
+
+                val newPaymentMethod = createNewPaymentMethod(paymentMethod.trim())
+                allNonExistingPaymentMethodDocuments[paymentMethod.trim()] = newPaymentMethod
+
+                selectedPaymentMethodKeys.add(newPaymentMethod.key)
+                allPaymentMethods.add(newPaymentMethod)
+            }
+
+        } else {
+
+            //filter the payment methods which are already present in db and if not creating one
+
+            val allPaymentMethodsName = allPaymentMethods.map { it.paymentMethod }
+
+            paymentMethods.forEach { paymentMethod ->
+
+                if (allPaymentMethodsName.contains(paymentMethod.trim())) {
+                    selectedPaymentMethodKeys.add(allPaymentMethods.first { it.paymentMethod == paymentMethod.trim() }.key)
+                } else {
+                    val newPaymentMethod = createNewPaymentMethod(paymentMethod.trim())
+                    allNonExistingPaymentMethodDocuments[paymentMethod.trim()] = newPaymentMethod
+
+                    selectedPaymentMethodKeys.add(newPaymentMethod.key)
+                    allPaymentMethods.add(newPaymentMethod)
+                }
+            }
+        }
+
+        return selectedPaymentMethodKeys
+    }
+
+    private fun getValidPaymentMethods(paymentMethodString: String?): List<String> {
+
+        var paymentMethods = emptyList<String>()
+
+        if (paymentMethodString.isValid()) {
+
+            val isMultiplePaymentMethod =
+                paymentMethodString?.contains("|") ?: false
+
+            if (isMultiplePaymentMethod) {
+
+                paymentMethods = paymentMethodString?.split(" | ") ?: emptyList()
+
+                if (paymentMethods.isEmpty()) {
+                    paymentMethods = paymentMethodString?.split("|") ?: emptyList()
+                }
+
+            } else {
+
+                paymentMethods = listOf(paymentMethodString!!)
+            }
+        }
+
+        return paymentMethods
+    }
+
+    private fun createNewPaymentMethod(paymentMethodString: String): PaymentMethod {
+
+        return PaymentMethod(
+            key = Functions.generateKey("_${Functions.getUid()}"),
+            paymentMethod = paymentMethodString,
+            uid = Functions.getUid()!!,
+            isSynced = isInternetAvailable(requireContext()),
+            isSelected = false
+        )
     }
 
     private fun createNewExpenseCategory(category: String): ExpenseCategory {
@@ -214,7 +376,7 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
             true
         )
 
-        expenseCategoryViewModel.insertExpenseCategory(expenseCategory)
+        //expenseCategoryViewModel.insertExpenseCategory(expenseCategory)
 
         Log.i(TAG, "saveToDatabase: $expenseCategory")
 
@@ -475,7 +637,7 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
                             errorMessages.append("Line: $i").append(e.message).append("\n\n")
                         }
                     }
-                    i++;
+                    i++
                 }
 
                 reader.close()
@@ -553,12 +715,12 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
 
         expenseCategoryViewModel.getAllExpenseCategories()
             .observe(viewLifecycleOwner) { expenseCategories ->
-                allExpenseCategories = expenseCategories ?: emptyList()
+                allExpenseCategories = expenseCategories.toMutableList()
             }
 
         paymentMethodViewModel.getAllPaymentMethods()
             .observe(viewLifecycleOwner) { paymentMethods ->
-                allPaymentMethods = paymentMethods ?: emptyList()
+                allPaymentMethods = paymentMethods.toMutableList()
             }
     }
 

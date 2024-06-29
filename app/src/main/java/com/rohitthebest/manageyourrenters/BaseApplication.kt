@@ -23,8 +23,8 @@ class BaseApplication : Application() {
 
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "Adding contents to cloud database.",
-                NotificationManager.IMPORTANCE_LOW
+                "Syncing up with cloud database",
+                NotificationManager.IMPORTANCE_DEFAULT
             )
 
             val manager = getSystemService(NotificationManager::class.java)

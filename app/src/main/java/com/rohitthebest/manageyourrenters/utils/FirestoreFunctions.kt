@@ -35,6 +35,20 @@ suspend fun deleteFilesFromFirestore(batch: WriteBatch): Boolean {
 
 }
 
+suspend fun uploadBatchDocumentsToFirestore(batch: WriteBatch): Boolean {
+
+    return try {
+        batch.commit()
+            .await()
+
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
+
+}
+
 suspend fun deleteFileFromFirebaseStorage(mStorageRef: StorageReference?): Boolean {
 
     return try {

@@ -113,4 +113,6 @@ object Constants {
     //--------------------------------------------------------------------------------
 
     const val COPY_BUDGET_MONTH_AND_YEAR_KEY = "rdnjshbhsvygacfcfacfca"
+
+    const val MAXIMUM_BATCH_SIZE = 300
 }

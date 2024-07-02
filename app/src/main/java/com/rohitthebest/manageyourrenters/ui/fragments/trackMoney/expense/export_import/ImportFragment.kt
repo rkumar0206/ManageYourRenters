@@ -216,6 +216,305 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
 
     }
 
+    private fun handleCSVFile(uri: Uri) {
+
+        val fileNameAndSize = uri.getFileNameAndSize(requireActivity().contentResolver)
+
+        Log.d(
+            TAG,
+            "FileName: ${fileNameAndSize?.first} " +
+                    "and size : ${fileNameAndSize?.second?.div(1024 * 1024)}"
+        )
+
+        binding.openedFileNameTV.text = fileNameAndSize?.first
+
+        lifecycleScope.launch(Dispatchers.IO) {
+
+            try {
+                val parsedImportExportExpenses = validateCSVFileAndGetData(uri)
+
+                if (!parsedImportExportExpenses.first) {
+
+                    withContext(Dispatchers.Main) {
+                        showToast(requireContext(), "Invalid CSV file", Toast.LENGTH_LONG)
+                        initUIBeforeSelectingFile()
+                    }
+                } else {
+
+                    withContext(Dispatchers.Main) {
+
+                        if (parsedImportExportExpenses.third.toString().isValid()) {
+
+                            //todo: show the dialog or think how to show the error messages
+                        }
+
+                        initUIAfterSelectingFile()
+
+                        parsedImportExportExpensesAfterValidation =
+                            parsedImportExportExpenses.second
+
+                        val gson = Gson().newBuilder().setPrettyPrinting().create()
+                        previewStringJson = gson.toJson(parsedImportExportExpenses.second)
+
+                        Log.d(TAG, "handleCSVFile: previewString: $previewStringJson")
+                        binding.jsonTextView.text = previewStringJson
+                    }
+                }
+            } catch (e: Exception) {
+
+                withContext(Dispatchers.Main) {
+                    showToast(requireContext(), e.message, Toast.LENGTH_LONG)
+                    initUIBeforeSelectingFile()
+                }
+            }
+        }
+    }
+
+    private fun handleJSONFile(uri: Uri) {
+
+        val fileNameAndSize = uri.getFileNameAndSize(requireActivity().contentResolver)
+
+        Log.d(
+            TAG,
+            "FileNameAndSize: ${fileNameAndSize?.first} " +
+                    "and size : ${fileNameAndSize?.second?.div(1024 * 1024)}"
+        )
+
+        binding.openedFileNameTV.text = fileNameAndSize?.first
+
+        lifecycleScope.launch {
+
+            try {
+
+                val parsedImportExportExpenses = validateJSONFileAndGetData(uri)
+
+                withContext(Dispatchers.Main) {
+
+
+                    if (parsedImportExportExpenses.second.toString().isValid()) {
+
+                        //todo: show the dialog or think how to show the error messages
+                    }
+
+                    initUIAfterSelectingFile()
+
+                    parsedImportExportExpensesAfterValidation = parsedImportExportExpenses.first
+
+                    val gson = Gson().newBuilder().setPrettyPrinting().create()
+                    previewStringJson = gson.toJson(parsedImportExportExpenses.first)
+
+                    Log.d(TAG, "handleCSVFile: previewString: $previewStringJson")
+                    binding.jsonTextView.text = previewStringJson
+                }
+            } catch (e: Exception) {
+
+                withContext(Dispatchers.Main) {
+                    showToast(requireContext(), e.message, Toast.LENGTH_LONG)
+                    initUIBeforeSelectingFile()
+                }
+            }
+        }
+    }
+
+    /**
+     * returns Pair of
+     * 1. List of ParsedImportExportExpense
+     * 2. StringBuilder of errorMessages
+     */
+
+    private suspend fun validateJSONFileAndGetData(uri: Uri): Pair<List<ParsedImportExportExpense>, StringBuilder> {
+
+        return withContext(Dispatchers.IO) {
+
+            var parsedImportExportExpenses: List<ParsedImportExportExpense> = emptyList()
+            val errorMessages: StringBuilder = StringBuilder()
+
+            try {
+
+                val inputStream = requireContext().contentResolver.openInputStream(uri)
+                val reader = BufferedReader(InputStreamReader(inputStream))
+
+                val jsonText = reader.use { it.readText() }
+                Log.d(TAG, "validateJSONFileAndGetData: jsonText $jsonText")
+
+                val gson = GsonBuilder()
+                    .registerTypeAdapter(
+                        ParsedImportExportExpense::class.java,
+                        ParsedImportExportExpenseJsonDeserializer()
+                    )
+                    .create()
+
+                parsedImportExportExpenses = gson.fromJson(
+                    jsonText.trimIndent(),
+                    object : TypeToken<List<ParsedImportExportExpense>>() {}.type
+                )
+
+                parsedImportExportExpenses.forEach { parsedImportExportExpense ->
+
+                    if (parsedImportExportExpense.category.isNotValid()) {
+                        errorMessages.append("Invalid Category for below entry")
+                            .append("\n").append(parsedImportExportExpense)
+                            .append("\n")
+                    }
+                }
+
+            } catch (e: Exception) {
+                errorMessages.append(e.message).append("\n")
+            }
+
+            return@withContext Pair(parsedImportExportExpenses, errorMessages)
+        }
+    }
+
+    // checks if all the columns are present and proper values are present
+    /**
+     * returns
+     * 1. isAllColumnPresent  - Boolean
+     * 2. parsedImportExportExpense - ParsedImportExportExpense
+     * 3. errorMessages - StringBuilder
+     */
+    private suspend fun validateCSVFileAndGetData(uri: Uri): Triple<Boolean, List<ParsedImportExportExpense>, StringBuilder> {
+
+        return withContext(Dispatchers.IO) {
+            try {
+                val inputStream = requireContext().contentResolver.openInputStream(uri)
+                val reader = BufferedReader(InputStreamReader(inputStream))
+
+                var line: String?
+
+                var isAllColumnPresent = false
+
+                val parsedImportExportExpense: ArrayList<ParsedImportExportExpense> = ArrayList()
+
+                val errorMessages = StringBuilder()
+
+                var i = 0
+
+                while (reader.readLine().also { line = it } != null) {
+
+                    val columnValues = line!!.split(",")
+
+                    Log.d(TAG, "validateCSVFileAndGetData: CSV column: $columnValues")
+
+                    if (i == 0) {
+                        val expectedColumnHeaders =
+                            listOf("date", "amount", "category", "spentOn", "paymentMethod")
+
+                        isAllColumnPresent = columnValues == expectedColumnHeaders
+
+                        if (!isAllColumnPresent) {
+
+                            Log.d(
+                                TAG,
+                                "validateCSVFileAndGetData: Invalid CSV file: Please add all the columns in the csv file"
+                            )
+                            throw Exception(
+                                "Invalid CSV file: Please add all the columns in the csv file"
+                            )
+                        }
+                    } else {
+
+                        try {
+
+                            val dateInMillis: String? =
+                                validateDateAndGiveACommonFormat(columnValues[0])
+                            val amount: Double = validateAmount(columnValues[1])
+                            val expenseCategory =
+                                if (columnValues[2].isValid()) columnValues[2] else throw Exception(
+                                    "Invalid category: ${columnValues[2]}"
+                                )
+                            val spentOn = columnValues[3]
+                            val paymentMethods = columnValues[4]
+
+                            parsedImportExportExpense.add(
+                                ParsedImportExportExpense(
+                                    date = dateInMillis,
+                                    amount = amount,
+                                    category = expenseCategory,
+                                    spentOn = spentOn,
+                                    paymentMethod = paymentMethods
+                                )
+                            )
+
+                        } catch (e: Exception) {
+                            Log.d(TAG, "validateCSVFileAndGetData: exception: " + e.message)
+                            errorMessages.append("Line: $i").append(e.message).append("\n\n")
+                        }
+                    }
+                    i++
+                }
+
+                reader.close()
+
+                return@withContext Triple(
+                    isAllColumnPresent,
+                    parsedImportExportExpense,
+                    errorMessages
+                )
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+
+                throw e
+            }
+        }
+
+    }
+
+    private fun validateAmount(amount: String): Double {
+
+        // check if the amount is in number format or not
+        // if not in number format return 0.0
+        // if amount is null or empty return 0.0
+
+        return if (amount.isNotValid()) {
+            0.0
+        } else {
+            try {
+                amount.toDouble()
+            } catch (e: NumberFormatException) {
+                0.0
+            }
+        }
+
+    }
+
+    private fun validateDateAndGiveACommonFormat(dateString: String): String? {
+
+        val timeInMillis =
+            if (dateString.isNotValid()) System.currentTimeMillis() else WorkingWithDateAndTime.identifyDateAndTimeFormatAndConvertToMillis(
+                dateString
+            )
+        return WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
+            timeInMillis,
+            "dd-MM-yyyy hh:mm a"
+        )
+    }
+
+    private fun showDialogAndDownloadFile(url: String, fileName: String) {
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.download_sample_file))
+            .setMessage(getString(R.string.sample_file_will_be_download_in_your_phones_download_directory))
+            .setPositiveButton(getString(R.string.download)) { dialog, _ ->
+
+                downloadFileFromUrl(
+                    requireActivity(),
+                    url,
+                    fileName
+                )
+
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+
+    }
+
     private fun importExpenses() {
 
         val allNonExistingCategoryDocuments = HashMap<String, ExpenseCategory>()
@@ -522,305 +821,6 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
                 }
             }
         }
-    }
-
-    private fun handleCSVFile(uri: Uri) {
-
-        val fileNameAndSize = uri.getFileNameAndSize(requireActivity().contentResolver)
-
-        Log.d(
-            TAG,
-            "FileName: ${fileNameAndSize?.first} " +
-                    "and size : ${fileNameAndSize?.second?.div(1024 * 1024)}"
-        )
-
-        binding.openedFileNameTV.text = fileNameAndSize?.first
-
-        lifecycleScope.launch(Dispatchers.IO) {
-
-            try {
-                val parsedImportExportExpenses = validateCSVFileAndGetData(uri)
-
-                if (!parsedImportExportExpenses.first) {
-
-                    withContext(Dispatchers.Main) {
-                        showToast(requireContext(), "Invalid CSV file", Toast.LENGTH_LONG)
-                        initUIBeforeSelectingFile()
-                    }
-                } else {
-
-                    withContext(Dispatchers.Main) {
-
-                        if (parsedImportExportExpenses.third.toString().isValid()) {
-
-                            //todo: show the dialog or think how to show the error messages
-                        }
-
-                        initUIAfterSelectingFile()
-
-                        parsedImportExportExpensesAfterValidation =
-                            parsedImportExportExpenses.second
-
-                        val gson = Gson().newBuilder().setPrettyPrinting().create()
-                        previewStringJson = gson.toJson(parsedImportExportExpenses.second)
-
-                        Log.d(TAG, "handleCSVFile: previewString: $previewStringJson")
-                        binding.jsonTextView.text = previewStringJson
-                    }
-                }
-            } catch (e: Exception) {
-
-                withContext(Dispatchers.Main) {
-                    showToast(requireContext(), e.message, Toast.LENGTH_LONG)
-                    initUIBeforeSelectingFile()
-                }
-            }
-        }
-    }
-
-    private fun handleJSONFile(uri: Uri) {
-
-        val fileNameAndSize = uri.getFileNameAndSize(requireActivity().contentResolver)
-
-        Log.d(
-            TAG,
-            "FileNameAndSize: ${fileNameAndSize?.first} " +
-                    "and size : ${fileNameAndSize?.second?.div(1024 * 1024)}"
-        )
-
-        binding.openedFileNameTV.text = fileNameAndSize?.first
-
-        lifecycleScope.launch {
-
-            try {
-
-                val parsedImportExportExpenses = validateJSONFileAndGetData(uri)
-
-                withContext(Dispatchers.Main) {
-
-
-                    if (parsedImportExportExpenses.second.toString().isValid()) {
-
-                        //todo: show the dialog or think how to show the error messages
-                    }
-
-                    initUIAfterSelectingFile()
-
-                    parsedImportExportExpensesAfterValidation = parsedImportExportExpenses.first
-
-                    val gson = Gson().newBuilder().setPrettyPrinting().create()
-                    previewStringJson = gson.toJson(parsedImportExportExpenses.first)
-
-                    Log.d(TAG, "handleCSVFile: previewString: $previewStringJson")
-                    binding.jsonTextView.text = previewStringJson
-                }
-            } catch (e: Exception) {
-
-                withContext(Dispatchers.Main) {
-                    showToast(requireContext(), e.message, Toast.LENGTH_LONG)
-                    initUIBeforeSelectingFile()
-                }
-            }
-        }
-    }
-
-    /**
-     * returns Pair of
-     * 1. List of ParsedImportExportExpense
-     * 2. StringBuilder of errorMessages
-     */
-
-    private suspend fun validateJSONFileAndGetData(uri: Uri): Pair<List<ParsedImportExportExpense>, StringBuilder> {
-
-        return withContext(Dispatchers.IO) {
-
-            var parsedImportExportExpenses: List<ParsedImportExportExpense> = emptyList()
-            val errorMessages: StringBuilder = StringBuilder()
-
-            try {
-
-                val inputStream = requireContext().contentResolver.openInputStream(uri)
-                val reader = BufferedReader(InputStreamReader(inputStream))
-
-                val jsonText = reader.use { it.readText() }
-                Log.d(TAG, "validateJSONFileAndGetData: jsonText $jsonText")
-
-                val gson = GsonBuilder()
-                    .registerTypeAdapter(
-                        ParsedImportExportExpense::class.java,
-                        ParsedImportExportExpenseJsonDeserializer()
-                    )
-                    .create()
-
-                parsedImportExportExpenses = gson.fromJson(
-                    jsonText.trimIndent(),
-                    object : TypeToken<List<ParsedImportExportExpense>>() {}.type
-                )
-
-                parsedImportExportExpenses.forEach { parsedImportExportExpense ->
-
-                    if (parsedImportExportExpense.category.isNotValid()) {
-                        errorMessages.append("Invalid Category for below entry")
-                            .append("\n").append(parsedImportExportExpense)
-                            .append("\n")
-                    }
-                }
-
-            } catch (e: Exception) {
-                errorMessages.append(e.message).append("\n")
-            }
-
-            return@withContext Pair(parsedImportExportExpenses, errorMessages)
-        }
-    }
-
-    // checks if all the columns are present and proper values are present
-    /**
-     * returns
-     * 1. isAllColumnPresent  - Boolean
-     * 2. parsedImportExportExpense - ParsedImportExportExpense
-     * 3. errorMessages - StringBuilder
-     */
-    private suspend fun validateCSVFileAndGetData(uri: Uri): Triple<Boolean, List<ParsedImportExportExpense>, StringBuilder> {
-
-        return withContext(Dispatchers.IO) {
-            try {
-                val inputStream = requireContext().contentResolver.openInputStream(uri)
-                val reader = BufferedReader(InputStreamReader(inputStream))
-
-                var line: String?
-
-                var isAllColumnPresent = false
-
-                val parsedImportExportExpense: ArrayList<ParsedImportExportExpense> = ArrayList()
-
-                val errorMessages = StringBuilder()
-
-                var i = 0
-
-                while (reader.readLine().also { line = it } != null) {
-
-                    val columnValues = line!!.split(",")
-
-                    Log.d(TAG, "validateCSVFileAndGetData: CSV column: $columnValues")
-
-                    if (i == 0) {
-                        val expectedColumnHeaders =
-                            listOf("date", "amount", "category", "spentOn", "paymentMethod")
-
-                        isAllColumnPresent = columnValues == expectedColumnHeaders
-
-                        if (!isAllColumnPresent) {
-
-                            Log.d(
-                                TAG,
-                                "validateCSVFileAndGetData: Invalid CSV file: Please add all the columns in the csv file"
-                            )
-                            throw Exception(
-                                "Invalid CSV file: Please add all the columns in the csv file"
-                            )
-                        }
-                    } else {
-
-                        try {
-
-                            val dateInMillis: String? =
-                                validateDateAndGiveACommonFormat(columnValues[0])
-                            val amount: Double = validateAmount(columnValues[1])
-                            val expenseCategory =
-                                if (columnValues[2].isValid()) columnValues[2] else throw Exception(
-                                    "Invalid category: ${columnValues[2]}"
-                                )
-                            val spentOn = columnValues[3]
-                            val paymentMethods = columnValues[4]
-
-                            parsedImportExportExpense.add(
-                                ParsedImportExportExpense(
-                                    date = dateInMillis,
-                                    amount = amount,
-                                    category = expenseCategory,
-                                    spentOn = spentOn,
-                                    paymentMethod = paymentMethods
-                                )
-                            )
-
-                        } catch (e: Exception) {
-                            Log.d(TAG, "validateCSVFileAndGetData: exception: " + e.message)
-                            errorMessages.append("Line: $i").append(e.message).append("\n\n")
-                        }
-                    }
-                    i++
-                }
-
-                reader.close()
-
-                return@withContext Triple(
-                    isAllColumnPresent,
-                    parsedImportExportExpense,
-                    errorMessages
-                )
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-
-                throw e
-            }
-        }
-
-    }
-
-    private fun validateAmount(amount: String): Double {
-
-        // check if the amount is in number format or not
-        // if not in number format return 0.0
-        // if amount is null or empty return 0.0
-
-        return if (amount.isNotValid()) {
-            0.0
-        } else {
-            try {
-                amount.toDouble()
-            } catch (e: NumberFormatException) {
-                0.0
-            }
-        }
-
-    }
-
-    private fun validateDateAndGiveACommonFormat(dateString: String): String? {
-
-        val timeInMillis =
-            if (dateString.isNotValid()) System.currentTimeMillis() else WorkingWithDateAndTime.identifyDateAndTimeFormatAndConvertToMillis(
-                dateString
-            )
-        return WorkingWithDateAndTime.convertMillisecondsToDateAndTimePattern(
-            timeInMillis,
-            "dd-MM-yyyy hh:mm a"
-        )
-    }
-
-    private fun showDialogAndDownloadFile(url: String, fileName: String) {
-
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.download_sample_file))
-            .setMessage(getString(R.string.sample_file_will_be_download_in_your_phones_download_directory))
-            .setPositiveButton(getString(R.string.download)) { dialog, _ ->
-
-                downloadFileFromUrl(
-                    requireActivity(),
-                    url,
-                    fileName
-                )
-
-                dialog.dismiss()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-
     }
 
     private fun getExpenseCategoryListAndPaymentMethodList() {

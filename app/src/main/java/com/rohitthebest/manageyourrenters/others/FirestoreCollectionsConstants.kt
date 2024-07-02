@@ -17,4 +17,5 @@ object FirestoreCollectionsConstants {
     const val PAYMENT_METHODS = "PaymentMethods"
     const val BUDGETS = "Budgets"
     const val INCOMES = "Incomes"
+    const val IMPORT_LIMIT = "ImportLimitPerUser"
 }

@@ -16,10 +16,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.rohitthebest.manageyourrenters.R
+import com.rohitthebest.manageyourrenters.data.ImportLimitPerUser
 import com.rohitthebest.manageyourrenters.data.ImportServiceHelperModel
 import com.rohitthebest.manageyourrenters.data.ParsedImportExportExpense
 import com.rohitthebest.manageyourrenters.database.model.Expense
@@ -27,12 +29,15 @@ import com.rohitthebest.manageyourrenters.database.model.ExpenseCategory
 import com.rohitthebest.manageyourrenters.database.model.PaymentMethod
 import com.rohitthebest.manageyourrenters.databinding.FragmentImportBinding
 import com.rohitthebest.manageyourrenters.others.Constants
+import com.rohitthebest.manageyourrenters.others.Constants.IMPORT_LIMIT_PER_MONTH
 import com.rohitthebest.manageyourrenters.others.Constants.MAXIMUM_BATCH_SIZE
 import com.rohitthebest.manageyourrenters.others.FirestoreCollectionsConstants
 import com.rohitthebest.manageyourrenters.services.ImportService
 import com.rohitthebest.manageyourrenters.ui.viewModels.ExpenseCategoryViewModel
+import com.rohitthebest.manageyourrenters.ui.viewModels.ImportViewModel
 import com.rohitthebest.manageyourrenters.ui.viewModels.PaymentMethodViewModel
 import com.rohitthebest.manageyourrenters.utils.Functions
+import com.rohitthebest.manageyourrenters.utils.Functions.Companion.getUid
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isInternetAvailable
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isPermissionGranted
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showNoInternetMessage
@@ -41,8 +46,10 @@ import com.rohitthebest.manageyourrenters.utils.ParsedImportExportExpenseJsonDes
 import com.rohitthebest.manageyourrenters.utils.WorkingWithDateAndTime
 import com.rohitthebest.manageyourrenters.utils.convertToJsonString
 import com.rohitthebest.manageyourrenters.utils.downloadFileFromUrl
+import com.rohitthebest.manageyourrenters.utils.getDocumentFromFirestore
 import com.rohitthebest.manageyourrenters.utils.getFileNameAndSize
 import com.rohitthebest.manageyourrenters.utils.hide
+import com.rohitthebest.manageyourrenters.utils.insertToFireStore
 import com.rohitthebest.manageyourrenters.utils.isNotValid
 import com.rohitthebest.manageyourrenters.utils.isValid
 import com.rohitthebest.manageyourrenters.utils.show
@@ -64,12 +71,14 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
 
     private val expenseCategoryViewModel by viewModels<ExpenseCategoryViewModel>()
     private val paymentMethodViewModel by viewModels<PaymentMethodViewModel>()
+    private val importViewModel by viewModels<ImportViewModel>()
 
     private lateinit var allExpenseCategories: MutableList<ExpenseCategory>
     private lateinit var allPaymentMethods: MutableList<PaymentMethod>
 
     private var previewStringJson = ""
     private lateinit var parsedImportExportExpensesAfterValidation: List<ParsedImportExportExpense>
+    private var importLimitForUser = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -80,6 +89,67 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
         getExpenseCategoryListAndPaymentMethodList()
         initListeners()
         initUIBeforeSelectingFile()
+
+        observeImportLimit()
+
+        getUserImportLimit()
+    }
+
+    private fun observeImportLimit() {
+
+        importViewModel.importLimit.observe(viewLifecycleOwner) { importLimit ->
+            importLimitForUser = importLimit
+        }
+    }
+
+    private fun getUserImportLimit() {
+
+        lifecycleScope.launch {
+
+            getDocumentFromFirestore(
+                FirestoreCollectionsConstants.IMPORT_LIMIT,
+                getUid()!!,
+                {
+                    it?.toObject(ImportLimitPerUser::class.java)?.let { importLimit ->
+
+                        val numberOfDays = WorkingWithDateAndTime.calculateNumberOfDays(
+                            importLimit.modified, System.currentTimeMillis()
+                        )
+
+                        Log.d(
+                            TAG,
+                            "getUserImportLimit: Number of days since last modified: $numberOfDays"
+                        )
+
+                        val isLastModifiedGreaterThanOnMonth = numberOfDays >= 30
+
+                        importLimitForUser =
+                            if (isLastModifiedGreaterThanOnMonth) 0 else importLimit.limit
+
+                        importViewModel.updateImportLimit(importLimitForUser)
+
+                        checkForImportLimitAndShowProperMessage()
+                    }
+                },
+                {
+
+                    Log.d(TAG, "getUserImportLimit: Exception occurred\n ${it.message}")
+                    importLimitForUser = 0
+                }
+            )
+
+        }
+    }
+
+    private fun checkForImportLimitAndShowProperMessage(): Boolean {
+
+        if (importLimitForUser >= IMPORT_LIMIT_PER_MONTH) {
+
+            showToast(requireContext(), "You have reached your import limit for this month.")
+            return false
+        }
+
+        return true
     }
 
     private fun initListeners() {
@@ -90,21 +160,24 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
 
         binding.selectFileMCV.setOnClickListener {
 
-            if (requireContext().isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)
-                && requireContext().isPermissionGranted(Manifest.permission.READ_MEDIA_IMAGES)
-                || requireContext().isPermissionGranted(Manifest.permission.POST_NOTIFICATIONS)
-            ) {
+            if (checkForImportLimitAndShowProperMessage()) {
 
-                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                    type = "*/*"
-                    putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("text/csv", "application/json"))
-                    addCategory(Intent.CATEGORY_OPENABLE)
+                if (requireContext().isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    && requireContext().isPermissionGranted(Manifest.permission.READ_MEDIA_IMAGES)
+                    || requireContext().isPermissionGranted(Manifest.permission.POST_NOTIFICATIONS)
+                ) {
+
+                    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                        type = "*/*"
+                        putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("text/csv", "application/json"))
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                    }
+                    chooseDocumentLauncher.launch(intent)
+
+                } else {
+
+                    requestPermission()
                 }
-                chooseDocumentLauncher.launch(intent)
-
-            } else {
-
-                requestPermission()
             }
 
         }
@@ -133,7 +206,9 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
         binding.importOpenedFileBtn.setOnClickListener {
 
             if (parsedImportExportExpensesAfterValidation.isNotEmpty()) {
-                importExpenses()
+                if (checkForImportLimitAndShowProperMessage()) {
+                    importExpenses()
+                }
             } else {
                 requireContext().showToast("Nothing to import please select a valid csv or json file")
             }
@@ -195,13 +270,13 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
 
             // initializing expense
             val expense = Expense(
-                key = Functions.generateKey("_${Functions.getUid()}"),
+                key = Functions.generateKey("_${getUid()}"),
                 amount = parsedImportExportExpense.amount,
                 id = null,
                 created = dateInMillis ?: System.currentTimeMillis(),
                 modified = dateInMillis ?: System.currentTimeMillis(),
                 spentOn = parsedImportExportExpense.spentOn ?: "",
-                uid = Functions.getUid()!!,
+                uid = getUid()!!,
                 categoryKey = expenseCategory.key,
                 paymentMethods = selectedPaymentMethodKeys,
                 isSynced = true
@@ -218,26 +293,63 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
         )
         Log.d(TAG, "importExpenses: All expenses: $allExpensesDocuments")
 
-        val isSizeValidForBatch =
-            (allNonExistingCategoryDocuments.size + allNonExistingPaymentMethodDocuments.size + allExpensesDocuments.size) < MAXIMUM_BATCH_SIZE
+        val documentSize =
+            allNonExistingCategoryDocuments.size + allNonExistingPaymentMethodDocuments.size + allExpensesDocuments.size
+        val isSizeValidForBatch = documentSize < MAXIMUM_BATCH_SIZE
 
         if (isSizeValidForBatch) {
-            if (isInternetAvailable(requireContext())) {
-                callImportServiceWithValidData(
-                    allNonExistingCategoryDocuments,
-                    allNonExistingPaymentMethodDocuments,
-                    allExpensesDocuments
-                )
-                requireContext().showToast("Importing expenses. See Notification")
 
-                initUIBeforeSelectingFile()
+            val newLimit = importLimitForUser + documentSize
+
+            if (newLimit >= IMPORT_LIMIT_PER_MONTH) {
+
+                requireContext().showToast("Import limit exceeded by ${IMPORT_LIMIT_PER_MONTH - (newLimit + 1)}")
             } else {
-                showNoInternetMessage(requireContext())
+
+                if (isInternetAvailable(requireContext())) {
+
+                    callImportServiceWithValidData(
+                        allNonExistingCategoryDocuments,
+                        allNonExistingPaymentMethodDocuments,
+                        allExpensesDocuments
+                    )
+
+                    // --------- Inserting import limit to FireStore ---------
+                    val docRef = FirebaseFirestore.getInstance()
+                        .collection(FirestoreCollectionsConstants.IMPORT_LIMIT)
+                        .document(getUid()!!)
+
+                    importLimitForUser = newLimit
+                    importViewModel.updateImportLimit(importLimitForUser)
+
+                    lifecycleScope.launch {
+                        insertToFireStore(
+                            docRef,
+                            ImportLimitPerUser(
+                                getUid()!!,
+                                importLimitForUser,
+                                System.currentTimeMillis()
+                            )
+                        )
+                    }
+                    // ----------------------------------------------------
+
+                    requireContext().showToast("Importing expenses. See Notification")
+
+                    initUIBeforeSelectingFile()
+                } else {
+                    showNoInternetMessage(requireContext())
+                }
             }
         } else {
 
-            requireContext().showToast("Batch size exceeded. Please try again with less number of expenses in csv or json")
+            requireContext().showToast(
+                "Batch size exceeded. Please try again with less number of expenses, new categories or new payment Methods in csv or json",
+                Toast.LENGTH_LONG
+            )
         }
+
+
     }
 
     private fun callImportServiceWithValidData(
@@ -354,9 +466,9 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
     private fun createNewPaymentMethod(paymentMethodString: String): PaymentMethod {
 
         return PaymentMethod(
-            key = Functions.generateKey("_${Functions.getUid()}"),
+            key = Functions.generateKey("_${getUid()}"),
             paymentMethod = paymentMethodString,
-            uid = Functions.getUid()!!,
+            uid = getUid()!!,
             isSynced = isInternetAvailable(requireContext()),
             isSelected = false
         )
@@ -371,8 +483,8 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
             "",
             System.currentTimeMillis(),
             System.currentTimeMillis(),
-            Functions.getUid()!!,
-            Functions.generateKey("_${Functions.getUid()}", 60),
+            getUid()!!,
+            Functions.generateKey("_${getUid()}", 60),
             true
         )
 

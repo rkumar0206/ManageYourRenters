@@ -115,4 +115,5 @@ object Constants {
     const val COPY_BUDGET_MONTH_AND_YEAR_KEY = "rdnjshbhsvygacfcfacfca"
 
     const val MAXIMUM_BATCH_SIZE = 300
+    const val IMPORT_LIMIT_PER_MONTH = 1000
 }

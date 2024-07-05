@@ -245,10 +245,22 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
 
                         if (parsedImportExportExpenses.third.toString().isValid()) {
 
-                            //todo: show the dialog or think how to show the error messages
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle("Errors found while parsing CSV file")
+                                .setMessage(parsedImportExportExpenses.third.toString())
+                                .setPositiveButton("Ok") { dialog, _ ->
+                                    initUIAfterSelectingFile()
+                                    dialog.dismiss()
+                                }
+                                .setNegativeButton("Cancel Import") { dialog, _ ->
+                                    initUIBeforeSelectingFile()
+                                    dialog.dismiss()
+                                }
+                                .create()
+                                .show()
+                        } else {
+                            initUIAfterSelectingFile()
                         }
-
-                        initUIAfterSelectingFile()
 
                         parsedImportExportExpensesAfterValidation =
                             parsedImportExportExpenses.second
@@ -290,13 +302,33 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
 
                 withContext(Dispatchers.Main) {
 
-
                     if (parsedImportExportExpenses.second.toString().isValid()) {
 
-                        //todo: show the dialog or think how to show the error messages
+                        if (parsedImportExportExpenses.second.startsWith("Exception")) {
+                            showToast(
+                                requireContext(),
+                                "Unable to parse the JSON file",
+                                Toast.LENGTH_LONG
+                            )
+                            initUIBeforeSelectingFile()
+                        } else {
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle("Errors found while parsing CSV file")
+                                .setMessage(parsedImportExportExpenses.second.toString())
+                                .setPositiveButton("Ok") { dialog, _ ->
+                                    initUIAfterSelectingFile()
+                                    dialog.dismiss()
+                                }
+                                .setNegativeButton("Cancel Import") { dialog, _ ->
+                                    initUIBeforeSelectingFile()
+                                    dialog.dismiss()
+                                }
+                                .create()
+                                .show()
+                        }
+                    } else {
+                        initUIAfterSelectingFile()
                     }
-
-                    initUIAfterSelectingFile()
 
                     parsedImportExportExpensesAfterValidation = parsedImportExportExpenses.first
 
@@ -352,18 +384,38 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
                 parsedImportExportExpenses.forEach { parsedImportExportExpense ->
 
                     if (parsedImportExportExpense.category.isNotValid()) {
-                        errorMessages.append("Invalid Category for below entry")
-                            .append("\n").append(parsedImportExportExpense)
+                        errorMessages
+                            .append("Invalid Category for below entry")
                             .append("\n")
+                            .append(getFormattedString(parsedImportExportExpense))
+                            .append("\n\n")
                     }
                 }
 
             } catch (e: Exception) {
-                errorMessages.append(e.message).append("\n")
+
+                e.printStackTrace()
+
+                Log.d(TAG, "validateJSONFileAndGetData: Error: ${e.message}")
+                errorMessages.append("Exception: ").append(e.message).append("\n")
             }
 
             return@withContext Pair(parsedImportExportExpenses, errorMessages)
         }
+    }
+
+    private fun getFormattedString(parsedImportExportExpense: ParsedImportExportExpense): String {
+
+        return """ 
+           {
+                "date": "${parsedImportExportExpense.date}"},
+                "category": "${parsedImportExportExpense.category}",
+                "amount": "${parsedImportExportExpense.amount}",
+                "spentOn": "${parsedImportExportExpense.spentOn}",
+                "paymentMethod": "${parsedImportExportExpense.paymentMethod}"
+           }
+        """.trimIndent()
+
     }
 
     // checks if all the columns are present and proper values are present
@@ -421,7 +473,7 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
                             val amount: Double = validateAmount(columnValues[1])
                             val expenseCategory =
                                 if (columnValues[2].isValid()) columnValues[2] else throw Exception(
-                                    "Invalid category: ${columnValues[2]}"
+                                    "Invalid category ${columnValues[2]}"
                                 )
                             val spentOn = columnValues[3]
                             val paymentMethods = columnValues[4]
@@ -438,7 +490,7 @@ class ImportFragment : Fragment(R.layout.fragment_import) {
 
                         } catch (e: Exception) {
                             Log.d(TAG, "validateCSVFileAndGetData: exception: " + e.message)
-                            errorMessages.append("Line: $i").append(e.message).append("\n\n")
+                            errorMessages.append("Line: $i - ").append(e.message).append("\n\n")
                         }
                     }
                     i++

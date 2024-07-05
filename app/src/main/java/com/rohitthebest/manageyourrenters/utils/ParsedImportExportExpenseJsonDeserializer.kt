@@ -21,20 +21,44 @@ class ParsedImportExportExpenseJsonDeserializer : JsonDeserializer<ParsedImportE
 
             val category = if (jsonObject?.get("category") == null) {
                 ""
-            }else {
-                jsonObject.get("category")?.asString
+            } else {
+                try {
+                    jsonObject.get("category")?.asString
+                } catch (e: Exception) {
+                    ""
+                }
             }
 
-            val date = validateDateAndGiveACommonFormat(jsonObject?.get("date")?.asString ?: "")
+            val date = validateDateAndGiveACommonFormat(
+                try {
+                    jsonObject?.get("date")?.asString ?: ""
+                } catch (e: Exception) {
+                    ""
+                }
+            )
 
             val amount = try {
                 jsonObject?.get("amount")?.asDouble
             } catch (e: Exception) {
-                validateAmount(jsonObject?.get("amount")?.asString ?: "")
+                validateAmount(
+                    try {
+                        jsonObject?.get("amount")?.asString ?: ""
+                    } catch (e: Exception) {
+                        ""
+                    }
+                )
             }
 
-            val spentOn = jsonObject?.get("spentOn")?.asString
-            val paymentMethod = jsonObject?.get("paymentMethod")?.asString
+            val spentOn = try {
+                jsonObject?.get("spentOn")?.asString
+            } catch (e: Exception) {
+                ""
+            }
+            val paymentMethod = try {
+                jsonObject?.get("paymentMethod")?.asString
+            } catch (e: Exception) {
+                ""
+            }
 
             return ParsedImportExportExpense(
                 date = date,

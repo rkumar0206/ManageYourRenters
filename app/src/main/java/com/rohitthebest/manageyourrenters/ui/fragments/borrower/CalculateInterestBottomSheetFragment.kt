@@ -173,9 +173,9 @@ class CalculateInterestBottomSheetFragment : BottomSheetDialogFragment(),
         }
     }
 
-    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+    override fun onCheckedChanged(group: RadioGroup, checkedId: Int) {
 
-        when (group?.id) {
+        when (group.id) {
 
             includeBinding.interestTypeRG.id -> {
 

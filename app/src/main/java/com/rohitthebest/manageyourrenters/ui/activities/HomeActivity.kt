@@ -9,14 +9,15 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
+import androidx.credentials.exceptions.ClearCredentialException
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.auth
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.RenterTypeAdapter
 import com.rohitthebest.manageyourrenters.data.AppUpdate
@@ -53,7 +54,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
     ProfileBottomSheet.OnItemClickListener, View.OnClickListener {
 
     private lateinit var binding: ActivityHomeBinding
-    private lateinit var mAuth: FirebaseAuth
+    private lateinit var firebaseAuth: FirebaseAuth
 
     private val renterViewModel: RenterViewModel by viewModels()
     private val borrowerViewModel: BorrowerViewModel by viewModels()
@@ -75,10 +76,10 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        mAuth = Firebase.auth
+        firebaseAuth = Firebase.auth
 
         // checking if the user is logged in
-        if (mAuth.currentUser == null) {
+        if (firebaseAuth.currentUser == null) {
 
             navigateToLoginActivity()
         }
@@ -103,7 +104,7 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
         super.onResume()
 
         // checking if the user is logged in
-        if (mAuth.currentUser == null) {
+        if (firebaseAuth.currentUser == null) {
             navigateToLoginActivity()
         }
     }
@@ -444,29 +445,24 @@ class HomeActivity : AppCompatActivity(), RenterTypeAdapter.OnClickListener,
                 .setMessage("You will be signed out from this app.")
                 .setPositiveButton("Yes") { _, _ ->
 
-                    mAuth.signOut()
-
-                    //[Google Sign Out]
-                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(getString(R.string.default_web_client_id))
-                        .requestEmail()
-                        .build()
-                    val googleSignInClient = GoogleSignIn.getClient(this, gso)
-
-                    googleSignInClient.signOut().addOnCompleteListener {
-                        Log.i(TAG, "Google signOut Successful")
-
+                    firebaseAuth.signOut()
+                    lifecycleScope.launch {
                         try {
-                            Log.i(TAG, "signOut: Google signOut Successful")
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+                            val clearRequest = ClearCredentialStateRequest()
+                            val credentialManager = CredentialManager.create(applicationContext)
+
+                            credentialManager.clearCredentialState(clearRequest)
+                            Log.i(TAG, "Google signOut Successful")
+                        } catch (e: ClearCredentialException) {
+                            // Handle the error if the credentials couldn't be cleared
+                            Log.e(TAG, "Couldn't clear user credentials: ${e.localizedMessage}")
                         }
                     }
+
                     showToast(this, "SignOut Successful")
 
                     //deleting everything saved on SQLite
                     deleteEverythingFromSQLite()
-
                 }
                 .setNegativeButton("No") { dialog, _ ->
                     dialog.dismiss()

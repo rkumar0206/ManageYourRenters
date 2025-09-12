@@ -15,9 +15,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.auth
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.adapters.houseRenterAdapters.ShowRentersAdapter
 import com.rohitthebest.manageyourrenters.data.CustomDateRange
@@ -216,11 +216,11 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
             val filteredList = renters.filter { renter ->
 
                 renter.name.lowercase(Locale.ROOT).contains(
-                    query.toString().trim().lowercase(Locale.ROOT)
+                    query.trim().lowercase(Locale.ROOT)
                 )
                         ||
                         renter.roomNumber.lowercase(Locale.ROOT).contains(
-                            query.toString().trim().lowercase(Locale.ROOT)
+                            query.trim().lowercase(Locale.ROOT)
                         )
             }
 
@@ -337,7 +337,7 @@ class HomeFragment : Fragment(), View.OnClickListener, ShowRentersAdapter.OnClic
 
             showToast(requireContext(), getString(R.string.no_supporting_doc_added))
             return false
-        } else if (renterForMenus.isSupportingDocAdded && renterForMenus.supportingDocument == null) {
+        } else if (renterForMenus.supportingDocument == null) {
 
             showToast(requireContext(), getString(R.string.uploading_doc_progress_message))
             return false

@@ -35,6 +35,7 @@ import com.rohitthebest.manageyourrenters.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import java.io.ByteArrayOutputStream
+import androidx.core.net.toUri
 
 fun View.show() {
 
@@ -395,7 +396,7 @@ inline fun Spinner.setListToSpinner(
 
         adapter = ArrayAdapter(
             context,
-            R.layout.support_simple_spinner_dropdown_item,
+            androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,
             list
         )
 
@@ -462,7 +463,7 @@ fun Bitmap.saveToStorage(context: Context, fileName: String): Uri? {
                 try {
 
                     this.compress(Bitmap.CompressFormat.JPEG, 100, fout!!)
-                    fout?.close()
+                    fout.close()
 
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
@@ -484,7 +485,7 @@ fun Bitmap.saveToStorage(context: Context, fileName: String): Uri? {
             null
         )
 
-        return Uri.parse(path)
+        return path.toUri()
     }
 }
 

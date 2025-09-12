@@ -32,8 +32,8 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.data.*
 import com.rohitthebest.manageyourrenters.others.Constants
@@ -1002,7 +1002,7 @@ class Functions {
             budgetLimit: Double
         ): String {
 
-            val message: List<String>;
+            val message: List<String>
 
             when {
 

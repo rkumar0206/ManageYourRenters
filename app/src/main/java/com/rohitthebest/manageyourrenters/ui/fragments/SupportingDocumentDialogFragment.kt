@@ -26,6 +26,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.hideKeyBoard
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.isPermissionGranted
 import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.net.toUri
 
 private const val TAG = "SupportingDocument"
 
@@ -116,9 +117,9 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
         if (supportingDoc.documentUri != null) {
 
             if (docType == DocumentType.PDF) {
-                pdfUri = Uri.parse(supportingDoc.documentUri)
+                pdfUri = supportingDoc.documentUri!!.toUri()
             } else if (docType == DocumentType.IMAGE) {
-                imageUri = Uri.parse(supportingDoc.documentUri)
+                imageUri = supportingDoc.documentUri!!.toUri()
             }
         }
 
@@ -368,7 +369,7 @@ class SupportingDocumentDialogFragment : BottomSheetDialogFragment(),
     }
     //[END OF LAUNCHERS]
 
-    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+    override fun onCheckedChanged(group: RadioGroup, checkedId: Int) {
 
         hideKeyBoard(requireActivity())
 

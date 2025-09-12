@@ -511,7 +511,7 @@ class AddEditMonthlyPaymentFragment : Fragment(R.layout.fragment_add_edit_monthl
         includeBinding.expenseCategoryNameET.setText(expenseCategory.categoryName)
     }
 
-    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+    override fun onCheckedChanged(group: RadioGroup, checkedId: Int) {
 
         when (checkedId) {
 

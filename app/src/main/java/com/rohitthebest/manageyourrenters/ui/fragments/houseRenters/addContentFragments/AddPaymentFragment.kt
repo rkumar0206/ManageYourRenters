@@ -597,11 +597,11 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+    override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
 
         hideKeyBoard(requireActivity())
 
-        when (buttonView?.id) {
+        when (buttonView.id) {
 
             includeBinding.addSupportingDocCB.id -> {
 
@@ -1040,7 +1040,7 @@ class AddPaymentFragment : Fragment(), View.OnClickListener, RadioGroup.OnChecke
         }
     }
 
-    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+    override fun onCheckedChanged(group: RadioGroup, checkedId: Int) {
 
         if (checkedId == includeBinding.byMonthRB.id) {
 

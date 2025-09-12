@@ -154,9 +154,9 @@ class AddEditEMIFragment : Fragment(R.layout.fragment_add_emi), View.OnClickList
         includeBinding.viewEditSupportingDoc.setOnClickListener(this)
     }
 
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+    override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
 
-        when (buttonView?.id) {
+        when (buttonView.id) {
 
             includeBinding.addSupportingDocCB.id -> {
 

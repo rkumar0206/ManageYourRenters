@@ -178,11 +178,11 @@ class AddEmiPaymentFragment : Fragment(R.layout.fragment_add_emi_payment), View.
 
     }
 
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+    override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
 
         hideKeyBoard(requireActivity())
 
-        when (buttonView?.id) {
+        when (buttonView.id) {
 
             includeBinding.addSupportingDocCB.id -> {
 

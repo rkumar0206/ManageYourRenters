@@ -314,9 +314,9 @@ class AddPartialPaymentFragment : BottomSheetDialogFragment(),
     }
 
 
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+    override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
 
-        when (buttonView?.id) {
+        when (buttonView.id) {
 
             includeBinding.markAsDoneCB.id -> {
 

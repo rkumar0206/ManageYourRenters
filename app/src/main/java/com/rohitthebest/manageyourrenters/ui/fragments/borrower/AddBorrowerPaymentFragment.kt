@@ -304,11 +304,11 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         findNavController().navigate(action)
     }
 
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+    override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
 
         hideKeyBoard(requireActivity())
 
-        when (buttonView?.id) {
+        when (buttonView.id) {
 
             includeBinding.addInterestCB.id -> showInterestCardView(isChecked)
 
@@ -328,7 +328,7 @@ class AddBorrowerPaymentFragment : Fragment(R.layout.fragment_add_borrower_payme
         }
     }
 
-    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+    override fun onCheckedChanged(group: RadioGroup, checkedId: Int) {
         hideKeyBoard(requireActivity())
 
         when (checkedId) {

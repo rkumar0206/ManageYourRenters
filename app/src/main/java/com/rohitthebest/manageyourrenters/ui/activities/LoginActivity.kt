@@ -1,20 +1,27 @@
 package com.rohitthebest.manageyourrenters.ui.activities
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
+import androidx.credentials.Credential
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.GetCredentialInterruptedException
+import androidx.credentials.exceptions.GetCredentialUnsupportedException
+import androidx.credentials.exceptions.NoCredentialException
+import androidx.lifecycle.lifecycleScope
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.auth
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.ActivityLoginBinding
 import com.rohitthebest.manageyourrenters.others.Constants
@@ -25,6 +32,7 @@ import com.rohitthebest.manageyourrenters.utils.Functions.Companion.showToast
 import com.rohitthebest.manageyourrenters.utils.hide
 import com.rohitthebest.manageyourrenters.utils.show
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 private const val TAG = "LoginActivity"
 
@@ -32,10 +40,9 @@ private const val TAG = "LoginActivity"
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var mAuth: FirebaseAuth
-    private lateinit var googleSignInClient: GoogleSignInClient
-
+    private lateinit var firebaseAuth: FirebaseAuth
     private var isSynced = false
+    private lateinit var credentialManager: CredentialManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,14 +52,8 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        mAuth = Firebase.auth
-
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
+        credentialManager = CredentialManager.create(baseContext)
+        firebaseAuth = Firebase.auth
 
         isSynced = Functions.loadBooleanFromSharedPreference(
             this,
@@ -75,41 +76,86 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    // [START signin]
     private fun signIn() {
 
         showProgressBar()
-        val signInIntent = googleSignInClient.signInIntent
-        signInLauncher.launch(signInIntent)
-    }
-    // [END signin]
+
+        val googleIdOption = GetGoogleIdOption.Builder()
+            // Your server's client ID, not your Android client ID.
+            .setServerClientId(getString(R.string.default_web_client_id))
+            // Only show accounts previously used to sign in.
+            .setFilterByAuthorizedAccounts(true)
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
 
 
-    private var signInLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+        lifecycleScope.launch {
+            try {
+                // Launch Credential Manager UI
+                val result = credentialManager.getCredential(
+                    context = baseContext,
+                    request = request
+                )
 
-            if (activityResult.resultCode == Activity.RESULT_OK) {
-
-                val task = GoogleSignIn.getSignedInAccountFromIntent(activityResult.data)
-                try {
-                    // Google Sign In was successful, authenticate with Firebase
-                    val account = task.getResult(ApiException::class.java)!!
-                    Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
-
-                    firebaseAuthWithGoogle(account.idToken!!)
-                } catch (e: ApiException) {
-                    try {
-                        // Google Sign In failed, update UI appropriately
-                        Log.w(TAG, "Google sign in failed", e)
-                        // [START_EXCLUDE]
-                        showToast(this, "SignIn Un-successful")
-                        hideProgressBar()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
+                // Extract credential from the result returned by Credential Manager
+                handleSignIn(result.credential)
+            } catch (e: GetCredentialException) {
+                Log.e(TAG, "Couldn't retrieve user's credentials: ${e.localizedMessage}")
+                hideProgressBar()
+                handleSignInError(e)
             }
         }
+    }
+
+    // [START handle_sign_in]
+    private fun handleSignIn(credential: Credential) {
+        // Check if credential is of type Google ID
+        if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            // Create Google ID Token
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+
+            // Sign in to Firebase with using the token
+            firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
+        } else {
+            Log.w(TAG, "Credential is not of type Google ID!")
+        }
+    }
+    // [END handle_sign_in]
+
+
+    private fun handleSignInError(e: GetCredentialException) {
+        when (e) {
+            is GetCredentialCancellationException -> {
+                Log.w(TAG, "User cancelled the sign-in flow.")
+                showToast("Sign-in cancelled.")
+            }
+
+            is GetCredentialInterruptedException -> {
+                Log.e(TAG, "Sign-in flow interrupted.", e)
+                showToast("Sign-in interrupted. Please try again.")
+            }
+
+            is GetCredentialUnsupportedException -> {
+                Log.e(TAG, "Sign-in operation not supported on this device/provider.", e)
+                showToast("Sign-in not supported on this device.")
+            }
+
+            is NoCredentialException -> {
+                Log.i(TAG, "No Google accounts found or user chose not to sign in.")
+                showToast("No Google accounts found or sign-in declined.")
+                // You might want to guide the user to add a Google account to their device
+                // or offer alternative sign-up/sign-in methods here.
+            }
+
+            else -> {
+                Log.e(TAG, "Sign-in failed: ${e.message}", e)
+                showToast("Sign-in failed. Please try again.")
+            }
+        }
+    }
 
     private fun firebaseAuthWithGoogle(idToken: String) {
         // [START_EXCLUDE silent]
@@ -118,7 +164,7 @@ class LoginActivity : AppCompatActivity() {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
 
         try {
-            mAuth.signInWithCredential(credential)
+            firebaseAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information

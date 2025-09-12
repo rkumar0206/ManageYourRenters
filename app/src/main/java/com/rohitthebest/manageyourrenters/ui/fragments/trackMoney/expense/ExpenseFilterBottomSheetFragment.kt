@@ -215,9 +215,9 @@ class ExpenseFilterBottomSheetFragment :
         }
     }
 
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+    override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
 
-        when (buttonView?.id) {
+        when (buttonView.id) {
 
             includeBinding.expenseFilterAmountCB.id -> {
 
@@ -286,9 +286,9 @@ class ExpenseFilterBottomSheetFragment :
         }
     }
 
-    override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+    override fun onCheckedChanged(group: RadioGroup, checkedId: Int) {
 
-        when (group?.id) {
+        when (group.id) {
             includeBinding.amountRG.id -> {
 
                 executeWithDelay(50) {

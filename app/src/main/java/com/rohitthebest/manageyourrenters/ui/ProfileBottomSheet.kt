@@ -8,17 +8,17 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.rohitthebest.manageyourrenters.R
 import com.rohitthebest.manageyourrenters.databinding.UserInfoWithSignOutLayoutBinding
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 class ProfileBottomSheet() : BottomSheetDialogFragment() {
 
     private var _binding: UserInfoWithSignOutLayoutBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var mAuth: FirebaseAuth
+    private lateinit var firebaseAuth: FirebaseAuth
 
     private var mListener: OnItemClickListener? = null
 
@@ -36,7 +36,7 @@ class ProfileBottomSheet() : BottomSheetDialogFragment() {
 
         _binding = UserInfoWithSignOutLayoutBinding.bind(view)
 
-        mAuth = Firebase.auth
+        firebaseAuth = Firebase.auth
 
         updateUI()
 
@@ -52,20 +52,20 @@ class ProfileBottomSheet() : BottomSheetDialogFragment() {
 
     private fun updateUI() {
 
-        if (mAuth.currentUser != null) {
+        if (firebaseAuth.currentUser != null) {
 
             try {
 
-                if (mAuth.currentUser!!.photoUrl != null) {
+                if (firebaseAuth.currentUser!!.photoUrl != null) {
 
                     Glide.with(this)
-                        .load(mAuth.currentUser!!.photoUrl)
+                        .load(firebaseAuth.currentUser!!.photoUrl)
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(binding.profileImageIV)
                 }
 
-                binding.userNameTV.text = mAuth.currentUser?.displayName
-                binding.userEmailTV.text = mAuth.currentUser?.email
+                binding.userNameTV.text = firebaseAuth.currentUser?.displayName
+                binding.userEmailTV.text = firebaseAuth.currentUser?.email
 
             } catch (e: Exception) {
 
